@@ -30,7 +30,7 @@
 
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
-|   RPC   |  gRPC   | [1 —— hello protocol-buffers]( <https://github.com/Jstarfish/Technical-Articles-Collection/blob/master/contents/RPC/Protocol%20Buffers-Hello%20World.md> )<br>[2 —— hello gRPC]( <https://github.com/Jstarfish/Technical-Articles-Collection/blob/master/contents/JAVA/gRPC-Hello%20World.md> )<br> |
+|   RPC   |  gRPC   | [1 —— hello protocol-buffers]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/RPC/Protocol%20Buffers-Hello%20World.md> )<br> |
 
 ---------------------------
 
