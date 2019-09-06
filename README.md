@@ -38,7 +38,7 @@
 
 | Project  | Catalog | Article                                                      |
 | :------: | :-----: | :----------------------------------------------------------- |
-| Big Data |         | [1 —— Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md> > )<br> |
+| Big Data |         | [1 —— Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
 
 ------
 
