@@ -36,16 +36,17 @@
 
 # :computer: Big Data
 
-| Project  | Catalog | Article                                                      |
+| Project  | Version | Article                                                      |
 | :------: | :-----: | :----------------------------------------------------------- |
-| Big Data |         | [1 —— Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
+| Big Data |         | [Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
+|  Kafka   |   2.12  | [Hello Kafka]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Message%20Queue/Kafka/Hello%20Kafka.md> )<br> |
 
 ------
 
 
 ## ❗️ 勘误
 
-+ 文章只是记录自己的学习，如果在文章中发现了问题，欢迎大神们多多指点🙏🙏🙏
++ 文章只是记录自己的学习，如果在文章中发现问题或者侵权，欢迎指出
 
 
 ## ©️ 转载
