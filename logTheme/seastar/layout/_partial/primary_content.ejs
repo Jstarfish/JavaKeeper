@@ -1,0 +1,57 @@
+<%
+    var defaultTitle = 'Null'
+
+    var firstArticle = posts.data[0] || false
+    var secondArticle = posts.data[1] || false
+    var thirdArticle = posts.data[2] || false
+
+%>
+<div class="primary-container content-box is-flex-desktop clear-padding bottom-line" style="margin-bottom: 25px;">
+    <div class="column  <%- secondArticle ? 'is-7-desktop':'is-12'%>">
+        <a href="<%- config.root + firstArticle.path %>">
+            <div class="full-height post-hover"
+                 style="
+                         background-image: url('<%- getPostCoverPhoto(firstArticle) %>');
+                         height: 350px;
+                         background-size: cover;
+                         background-repeat: no-repeat;
+                         ">
+                    <div class=" is-flex flex-column center content has-text-centered full-height has-padding content-bg-mask">
+                        <h1 class="title text-shadow" style="margin-bottom: 15px;">
+                            <%- truncate(strip_html(firstArticle.title || defaultTitle), {length: 50, omission: '..'}) %>
+                        </h1>
+                        <div>
+                        <% if (firstArticle.tags){%>
+                            <% firstArticle.tags.forEach(function(tag){%>`
+                                <span class="tag is-post-tag"><%- tag.name %></span>
+                            <%})%>
+                        <%}%>
+                        </div>
+                        <p class="post-content-text is-marginless has-padding text-shadow">
+                            <%- truncate(strip_html(firstArticle.content), {length: 120, omission: '..'}) %>
+                        </p>
+                        <p class="date text-shadow"><%- firstArticle.date.format(config.date_format) %></p>
+                        <button class="button is-info is-small">Read More</button>
+                    </div>
+            </div>
+        </a>
+    </div>
+    <div class="column is-5 is-hidden-touch" style="padding-left: 0;">
+        <div class="full-height is-flex flex-column justify-space-between" style="min-height: 350px;">
+            <% if (secondArticle){%>
+                <%- partial('_partial/second_content', {article: secondArticle}) %>
+            <%}%>
+            <% if (thirdArticle){%>
+                <%- partial('_partial/second_content', {article: thirdArticle}) %>
+            <%}%>
+        </div>
+    </div>
+    <div class="column is-12 is-hidden-desktop">
+        <% if (secondArticle){%>
+        <%- partial('_partial/second_content', {article: secondArticle}) %>
+        <%}%>
+        <% if (thirdArticle){%>
+        <%- partial('_partial/second_content', {article: thirdArticle}) %>
+        <%}%>
+    </div>
+</div>

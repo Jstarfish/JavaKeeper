@@ -1,0 +1,108 @@
+<style>
+    .post-hover:hover {
+        box-shadow: inset 0 0 100px #000;
+        transition: box-shadow .2s;
+    }
+
+    .sub-post-container .post-hover:hover h3 {
+        text-decoration: underline gray;
+    }
+
+
+    .primary-item-main {
+        height: 330px;
+        background-size: cover;
+    }
+
+    .primary-container .title,
+    .primary-container .sub-title,
+    .primary-container .post-content-text,
+    .primary-container .date {
+        color: #fff;
+    }
+
+    .post-content-text {
+        color: #f1f1f1!important;
+    }
+
+    .primary-container .post-hover {
+        background: black;
+    }
+
+    .content-bg-mask {
+        background: rgba(0,0,0,.4);
+    }
+
+</style>
+<%
+    function getPostCoverPhoto(post) {
+        var content = post.content
+        var regex = /<img src="\S+"/
+        var result = regex.exec(content)
+        // is post first img
+        if (result) {
+            return result[0].split('src="')[1].split('"')[0]
+        }
+        // is anisina font-matter
+        if (post.header_img){
+            return post.header_img
+        }
+    }
+%>
+
+<div style="background: #f5f8f9;">
+    <div id="main-container" class="container" style="padding-top: 60px;">
+        <div class="is-flex main-content justify-center">
+            <section class="column is-9">
+                <%- partial('_partial/primary_content', {posts: page.posts, getPostCoverPhoto: getPostCoverPhoto}) %>
+                    <% page.posts.length > 0 && page.posts.each (function (post, index) { %>
+                    <% if ( index > 0 ){%>
+                        <div class="content-box  <%- index == 1 || index == 2 ? 'is-hidden-desktop':''%>" style="margin-bottom: 27px;">
+                            <a class="post-hover" href="<%= config.root + post.path %>">
+                            <div class="columns" style="min-height: 230px;">
+                                <% if (getPostCoverPhoto(post)){%>
+                                    <div class="column is-4-desktop is-5-tablet post-avatar is-hidden-mobile"
+                                         style="margin: 10px; background-size: cover;background-image: url('<%- getPostCoverPhoto(post) %>')">
+                                    </div>
+                                <%}%>
+                                <div class="column is-8-desktop post-content is-flex align-center">
+                                    <div class="content">
+                                        <h3><%= post.title || 'Null' %></h3>
+                                        <% if (post.subtitle){%>
+                                            <p class="sub-title"><%- post.subtitle %></p>
+                                        <%}%>
+                                        <p>
+                                            <% post.tags.forEach(function(tag){%>
+                                                <span class="tag is-post-tag"><%- tag.name %></span>
+                                            <%})%>
+                                        </p>
+                                        <p>
+                                            <%- truncate(strip_html(post.content), {length: 180, omission: '..'}) %>
+                                        </p>
+                                        <p><%= post.date.format(config.date_format) %></p>
+                                        <button class="button is-small">Read More</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        </div>
+                    <%}%>
+                <% })%>
+                <!--翻頁-->
+                <nav class="pagination is-flex" style="justify-content: flex-end">
+                    <% if (is_home()){%>
+                        <% if (page.prev){%>
+                            <a class="pagination-previous" href="<%- config.root %><%- page.prev_link %>">Previous</a>
+                        <%}%>
+                        <% if (page.next){ %>
+                            <a class="pagination-next" href="<%- config.root %><%- page.next_link %>">Next page</a>
+                        <%}%>
+                    <%}%>
+                </nav>
+            </section>
+            <% if(is_home()){ %>
+                <%- partial('_partial/sidebar', null, {cache: !config.relative_link}) %>
+            <%}%>
+        </div>
+    </div>
+</div>

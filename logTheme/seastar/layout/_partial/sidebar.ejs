@@ -1,0 +1,213 @@
+<style>
+    /*user info start*/
+    .user-info {
+        padding: 15px 0 0;
+    }
+
+    .user-info .avatar {
+        width: 155px;
+        height: 155px;
+        border-radius: 50%;
+    }
+
+    .sns-container {
+        flex-wrap: wrap;
+    }
+
+    .sns-container a{
+        color: black;
+    }
+    /*user info end*/
+
+    /*Tag start*/
+    #tag_cloud .tags-item{
+        display: inline-block;
+        color: #000;
+        border: 1px solid gray;
+
+        margin: 4px 2px;
+        padding: 0 4px;
+        border-radius: 6px;
+    }
+    /*Tag end*/
+
+    /*Site box start*/
+    .site-box {
+        height: 60px;
+    }
+    /*Site box end*/
+
+    .category-list-item,
+    .archive-list-item {
+        display: flex;
+        margin-bottom: 4px;
+        justify-content: space-between;
+        margin-left: -30px;
+    }
+    .category-list-link,
+    .archive-list-link {
+        color: black;
+    }
+
+    .category-list-count,
+    .archive-list-count {
+        width: 32px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        background-color: gray;
+    }
+</style>
+<aside class="column is-hidden-touch is-3" style="max-width: 300px; min-width: 230px">
+    <div class="content-box user-info">
+        <div class="has-padding">
+            <header class="has-text-centered">
+                <img class="avatar" src="<%= theme.user_avatar || config["sidebar-avatar"] %>">
+            </header>
+            <section class="has-text-centered">
+                <h3><strong><%= theme.user_name || config.author  || 'User Name'%></strong></h3>
+                <p class="sub-title"><%= theme.user_description || 'Hello World'%></p>
+                <% if (theme.user_location){%>
+                <p class="is-flex center" style=" color: gray">
+                    <i class="fa fa-map-marker" style="padding: 5px"></i>
+                    <%- theme.user_location %>
+                </p>
+                <%}%>
+            </section>
+        </div>
+        <div class="top-line">
+            <ul class="sns-container justify-center is-flex has-padding">
+                <% if (false && config.RSS) { %>
+                <li>
+                    <a href="<%= config.root + 'feed.xml' %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.twitter_username) { %>
+                <li>
+                    <a target="_blank" href="https://twitter.com/<%= theme.twitter_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.zhihu_username) { %>
+                <li>
+                    <a target="_blank" href="https://www.zhihu.com/people/<%= theme.zhihu_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa  fa-stack-1x fa-inverse">知</i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.facebook_username) { %>
+                <li>
+                    <a target="_blank" href="https://www.facebook.com/<%= theme.facebook_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.weibo_username) { %>
+                <li>
+                    <a target="_blank" href="http://weibo.com/<%= theme.weibo_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.csdn_username) { %>
+                <li>
+                    <a target="_blank" href="https://blog.csdn.net/<%= theme.csdn_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-stack-1x fa-inverse">C</i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.github_username) { %>
+                <li>
+                    <a target="_blank" href="https://github.com/<%= theme.github_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (theme.linkedin_username) { %>
+                <li>
+                    <a target="_blank" href="https://www.linkedin.com/in/<%= theme.linkedin_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                        </span>
+                    </a>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+    <div class="content-box">
+        <!--post数量和tag category 数量-->
+        <div class="site-box is-flex">
+            <div class="flex-1 is-flex flex-column center full-height right-line">
+                <strong><%- site.posts.length || ''%></strong>
+                <p>Posts</p>
+            </div>
+            <div class="flex-1 is-flex flex-column center full-height">
+                <strong><%- site.tags.length || ''%></strong>
+                <p>Tags</p>
+            </div>
+        </div>
+    </div>
+    <div id='tag_cloud' class="content-inner content-box">
+        <div class="has-text-centered">
+            <strong>Tags</strong>
+        </div>
+        <div class="content-inner is-flex flex-wrap justify-space-between">
+            <% site.tags.map(function(tag){ %>
+                <a class="tags-item" href="<%= tag.path %>" title="<%= tag.name %>" rel="<%= tag.length %>">
+                    <%= tag.name %>
+                </a>
+            <% }) %>
+        </div>
+    </div>
+    <div class="content-inner content-box">
+        <div class="has-text-centered">
+            <strong>Categories</strong>
+        </div>
+        <div class="content-inner">
+            <%- list_categories(site.categories, {
+                depth: 1
+            }) %>
+        </div>
+    </div>
+    <div class="content-inner content-box">
+        <div class="has-text-centered">
+            <strong>Archives</strong>
+        </div>
+        <div class="content-inner">
+            <%- list_archives(site.archives,{}) %>
+        </div>
+    </div>
+</aside>

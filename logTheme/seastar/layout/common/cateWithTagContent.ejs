@@ -1,0 +1,74 @@
+<style>
+    .container.tag-cate-wrap {
+        min-height: 93vh;
+    }
+
+    .category-title-inner {
+        padding-top: 80px;
+    }
+
+    strong {
+        text-transform: capitalize;
+    }
+</style>
+
+<%
+    var title = type + '·'
+
+    switch (type) {
+        case 'tag':
+            title += page.tag
+            break;
+        case 'category':
+            title += page.category
+            break;
+    }
+%>
+<div class="container tag-cate-wrap">
+    <div class="category-title-inner content has-text-centered">
+        <h1><strong style="border-top: 2px solid; border-bottom: 2px solid;"><%- title %></strong></h1>
+    </div>
+
+    <%
+        var anisina_cover = 'header-img'
+
+        function getArticleFirstPhoto(post) {
+            var content = post.content
+            var regex = /<img src="\S+"/
+            var result = regex.exec(content)
+
+            if (result) {
+                console.log(result[0].split('src="')[1].split('"')[0])
+                return result[0].split('src="')[1].split('"')[0]
+            }
+
+            return ''
+        }
+    %>
+    <% page.posts.forEach(function(post, index){%>
+        <div class="box">
+            <article class="media">
+                <% var cover_photo = post.cover_photo || post[anisina_cover] || getArticleFirstPhoto(post)%>
+                <a href="<%= config.root + post.path %>">
+                    <% if (cover_photo) {%>
+                    <div class="media-left">
+                        <figure class="image is-128x128">
+                            <img src="<%- cover_photo %>" style="height: 100%; width: 100%">
+                        </figure>
+                    </div>
+                    <%}%>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong><%- post.title %></strong> <small class="post-date">at: <%= post.date.format(config.date_format) %></small>
+                                <br>
+                                <%- truncate(strip_html(post.content), {length: 180, omission: '..'}) %>
+                            </p>
+                            <button class="button is-info">Read</button>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        </div>
+    <%})%>
+</div>

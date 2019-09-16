@@ -1,0 +1,63 @@
+# Header
+menu:
+  Home: /
+  My Works: /works
+  About: /about
+  #Tags: /tags
+
+rss: /atom.xml
+
+# User Info
+user_name: Starfish
+user_avatar: https://i.loli.net/2019/08/05/eCrk5u3Tx8moIR6.jpg
+user_location: 北京
+user_description: "一个嗜好太多，能力太小的程序猿"
+user_contact: Jstarfish@126.com
+user_introduction: "
+                    <p></p>"
+
+csdn_username: u011870547
+github_username: Jstarfish
+weixin_username: Jerome11479914
+#twitter_username: ehazon
+weibo_username: superdaxin
+zhihu_username: margretz
+facebook_username: profile.php?id=100010214377415
+linkedin_username:
+
+
+# Content
+excerpt_link: Read More
+fancybox: true
+
+# display widgets at the bottom of index pages (pagination == 2)
+#index_widgets:
+# - category
+# - tagcloud
+# - archive
+
+# widget behavior
+#archive_type: 'monthly'
+#show_count: false
+
+# 评论系统
+# 不要用别人的 uid, 自己去注册一个吧
+theme.use_livere: true
+livere_uid: MTAyMC80NTY4MS8yMjE5Mg==
+
+use_disqus: true
+disqus_url: https://haojen.disqus.com/embed.js
+
+# Miscellaneous
+google_analytics:
+favicon: Star_fish.ico
+#twitter:
+#google_plus:
+#fb_admins:
+#fb_app_id:
+
+# Highlight code
+# do ensure u have closed all the highlight choices in ur root _config.yml
+# currently we provided 6 choices based on highlight script
+# highlight_default, highlight_light, highlight_github, highlight_rainbow, highlight_vs, highlight_atom
+block_highlight: highlight_atom

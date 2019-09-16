@@ -1,0 +1,85 @@
+<style>
+    .categories-title {
+        margin-top: 85px;
+    }
+
+    .categories-title strong {
+        padding: 0 10px 5px;
+        text-transform: capitalize;
+        border-top: 2px solid #000;
+        border-bottom: 2px solid #000;
+    }
+
+    .categories-box {
+        min-height: 90vh;
+    }
+
+    .categories-inner {
+        flex-wrap: wrap;
+        min-height: 350px;
+    }
+
+    .category-link, .tag-link {
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 80px;
+        width: 80px;
+        padding: 12px;
+        margin: 15px;
+        border-radius: 50%;
+
+        color: #FFF;
+        background-color: #00d1b2;
+    }
+
+    .category-count, .tag-count {
+        position: absolute;
+        top:0;
+        right: 5px;
+
+        display: flex;
+        align-items:center;
+        justify-content: center;
+
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: black;
+    }
+
+</style>
+<div class="container categories-box">
+    <div class="content categories-title">
+        <h1 class="has-text-centered"><strong><%- page.title %></strong></h1>
+    </div>
+    <div class="categories-inner is-flex center">
+        <% if( page.title == 'categories' && site.categories.length) { %>
+            <%- list_categories(site.categories, {
+                style: 'none',
+                depth: 1,
+                separator: ''
+            }) %>
+        <% } else if (page.title == 'tags' && site.tags.length){%>
+            <%- list_tags(site.tags, {
+                style: 'none',
+                depth: 1,
+                separator: ''
+            }) %>
+        <%} else {%>
+            <h2><%- page.title %> is Empty</h2>
+        <%}%>
+    </div>
+</div>
+<script>
+    //    var allItem = document.querySelectorAll('.category-list-item')
+    //    allItem.forEach(function (item, index) {
+    //        var containerWidth = 80
+    //        var itemChilds = item.querySelectorAll('.category-list-child')
+    //        item.style.width = containerWidth * itemChilds.length + 'px'
+    //        item.classList.add('debug')
+    //    })
+</script>

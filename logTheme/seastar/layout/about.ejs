@@ -1,0 +1,118 @@
+<style>
+    .content-box {
+        min-height: 93vh;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, .8);
+    }
+
+    .sns-container li a{
+        color: black;
+    }
+</style>
+<%
+    // 优先使用专用的about页面头像, 如果没有设置才是用主页的用户头像
+    var avatar = theme.user_intro_avatar || theme.user_avatar || 'http://o7bkkhiex.bkt.clouddn.com/discobolus-avatar.png' || 'http://o7bkkhiex.bkt.clouddn.com/avatar.png'
+%>
+<div class="container">
+    <div class="content-box full-width is-flex justify-center">
+        <div class="columns">
+            <div class="column is-5">
+                <img class="avatar" src="<%- avatar %>">
+            </div>
+            <div class="column">
+                <div class="content">
+                    <h1>
+                        About
+                        <br>
+                        <strong><%- theme.user_name || '' %></strong>
+                    </h1>
+                    <p class="is-flex align-center"><i class="fa fa-location-arrow" style="margin-right: 5px;"></i> <%- theme.user_location %></p>
+                    <p><strong>E-mail:&nbsp;&nbsp;</strong><%- theme.user_contact %></p>
+                    <p><%- theme.user_description %></p>
+                    <p><%- theme.user_introduction || ''%></p>
+
+                </div>
+                <div>
+                    <ul class="sns-container is-flex">
+                        <% if (config.RSS) { %>
+                        <li>
+                            <a href="<%= config.root + 'feed.xml' %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.twitter_username) { %>
+                        <li>
+                            <a target="_blank" href="https://twitter.com/<%= config.twitter_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.zhihu_username) { %>
+                        <li>
+                            <a target="_blank" href="https://www.zhihu.com/people/<%= config.zhihu_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa  fa-stack-1x fa-inverse">知</i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.weibo_username) { %>
+                        <li>
+                            <a target="_blank" href="http://weibo.com/<%= config.weibo_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.facebook_username) { %>
+                        <li>
+                            <a target="_blank" href="https://www.facebook.com/<%= config.facebook_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.github_username) { %>
+                        <li>
+                            <a target="_blank" href="https://github.com/<%= config.github_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <% if (config.linkedin_username) { %>
+                        <li>
+                            <a target="_blank" href="https://www.linkedin.com/in/<%= config.linkedin_username %>">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                        </span>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

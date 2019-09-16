@@ -1,0 +1,282 @@
+---
+layout: layout
+---
+
+
+<!--only post-->
+<% if (page['wechat-share']) { %>
+
+<img class="wechat-title-img"
+     src="<%- config['cdn-url'] %> <%= page['wechat-share'] || page['header-img'] %> <%- config['cdn-url'] ? config['clip-content'] : '' %>">
+<% } else{ %>
+<% if (page["cdn"] === 'header-off'){ %>
+<img class="wechat-title-img" src="<%= page["header-img"] || config["post-default-img"] %>">
+<% } else { %>
+<img class="wechat-title-img"
+     src="<%- page['header-img'] ? config['cdn-url'] + page["header-img"] : config["post-default-img"] %>">
+<% } %>
+<% } %>
+<style>
+    .header-box {
+        height: 370px;
+        filter: blur(10px);
+        background-size: cover;
+        background-color: lightsteelblue;
+    }
+
+    .nav {
+    
+    }
+
+    .post-box {
+        padding: 15px;
+        padding-top: 60px;
+        min-height: 80vh;
+        margin-top: -200px;
+        border-radius: 4px;
+        background-color: rgba(255,255,255,.8);
+    }
+
+    .post-avatar {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+    }
+
+    .flow-chart {
+        text-align: center;
+    }
+
+    img[alt="post-cover"] {
+        display: none;
+    }
+
+    <% if (page["cdn"] === 'header-off'){%>
+    header.intro-header {
+        background-image: url('<%= page["header-img"] || config["post-default-img"]%>');
+    }
+
+    <%} else {%>
+    header.intro-header {
+        background-image: url('<%- page["header-img"] ? ((config["cdn-url"]?config["cdn-url"]:"")+page["header-img"]+config["clip-content"]) : config["post-default-img"] %>')
+    }
+
+    <% } %>
+</style>
+
+
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
+                <div class="post-heading">
+                    <h1><%= page.title %></h1>
+                    <% if(page.subtitle) { %>
+                    <h2 class="subheading"><%= page.subtitle %></h2>
+                    <% } %>
+                    <span class="meta">
+                         作者 <%- page.author || config.author %>
+                        <span>
+                          日期 <%= page.date.format(config.date_format) %>
+                         </span>
+                    </span>
+                    <div class="tags text-center">
+                        <% page.tags.forEach(function(tag){ %>
+                        <a class="tag" href="<%= config.root %>tags/#<%= tag.name %>"
+                           title="<%= tag.name %>"><%= tag.name %></a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="post-title-haojen">
+        <span>
+            <%- page.title %>
+        </span>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <!-- Post Container -->
+            <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
+                <%- page.content %>
+                <hr>
+
+                <ul class="pager">
+                    <% if (page.prev){ %>
+                    <li class="previous">
+                        <a href="<%- config.root %><%- page.prev.path %>" data-toggle="tooltip" data-placement="top"
+                           title="<%- page.prev.title %>">&larr; Previous Post</a>
+                    </li>
+                    <% } %>
+                    <% if (page.next){ %>
+                    <li class="next">
+                        <a href="<%- config.root %><%- page.next.path %>" data-toggle="tooltip" data-placement="top"
+                           title="<%- page.next.title %>">Next Post &rarr;</a>
+                    </li>
+                    <% } %>
+                </ul>
+
+
+               <!-- 来必力City版安装代码 -->
+                <div id="lv-container" data-id="city" data-uid="MTAyMC80NTY4MS8yMjE5Mg==">
+                <script type="text/javascript">
+                   (function(d, s) {
+                       var j, e = d.getElementsByTagName(s)[0];
+
+                       if (typeof LivereTower === 'function') { return; }
+
+                       j = d.createElement(s);
+                       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                       j.async = true;
+
+                       e.parentNode.insertBefore(j, e);
+                   })(document, 'script');
+                </script>
+                <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+                </div>
+                <!-- City版安装代码已完成 -->
+                
+                <% if(theme.valine && theme.valine.enable) { %>
+                    <!-- Valine -->
+                    <div class="vcomments"></div>
+                    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+                    <script src="//cdn.jsdelivr.net/npm/valine"></script>
+                    <script>
+                        var GUEST = ['nick','mail','link'];
+                        var meta = '<%= theme.valine.meta %>';
+                        meta = meta.split(',').filter(function (item) {
+                            return GUEST.indexOf(item)>-1;
+                        });
+                        var notify = '<%= theme.valine.notify %>' == true ? true : false;
+                        var verify = '<%= theme.valine.verify %>' == true ? true : false;
+                        new Valine({
+                            el: '.vcomments',
+                            notify: notify,
+                            verify: verify,
+                            app_id: "<%= theme.valine.appid %>",
+                            app_key: "<%= theme.valine.appkey %>",
+                            placeholder: "<%= theme.valine.placeholder %>",
+                            avatar:"<%= theme.valine.avatar %>",
+                            meta:meta
+                        });
+                    </script>
+                <% } %>
+
+            </div>
+
+            <div class="hidden-xs col-sm-3 toc-col">
+                <div class="toc-wrap">
+                    <%- toc(page.content, {list_number: false}) %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                <% if(config['featured-tags']) { %>
+                <section>
+                    <!-- no hr -->
+                    <h5 class="text-center">
+                        <a href="<%= config.root %>tags/">FEATURED TAGS</a>
+                    </h5>
+                    <div class="tags">
+                        <% page.tags.forEach(function(tag){ %>
+                        <a class="tag" href="<%= config.root %>tags/#<%= tag.name %>"
+                           title="<%= tag.name %>"><%= tag.name %></a>
+                        <% }) %>
+                    </div>
+                </section>
+                <% } %>
+
+                <!-- Friends Blog -->
+                <% if(config.friends) { %>
+                <div style="margin-top: 20px;">
+                    <h5 class="text-center">FRIENDS</h5>
+                    <ul class="list-inline text-center">
+                        <% config.friends.forEach(function(friend){ %>
+                        <li><a href="<%= friend.href %>"><%= friend.title %></a></li>
+                        <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
+</article>
+
+
+
+<% if(config['anchorjs']) { %>
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+                o = d.createElement(t),
+                s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) {
+            o.addEventListener('load', function (e) {
+                c(null, e);
+            }, false);
+        }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js", function () {
+        anchors.options = {
+            visible: 'always',
+            placement: 'right',
+            icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<%- css('css/' + theme.block_highlight) %>
+<%- css('css/' + theme.bootstrap.min) %>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link {
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top: -0.1em;
+        }
+    }
+</style>
+<% } %>
+
+<script>
+    // 获取第一张图, 用以当封面背景图
+    var img = document.querySelectorAll('img')[1]
+
+    if (img) {
+        var header_box = document.querySelector('#header_box')
+        header_box.style.backgroundImage = 'url('+ img.src +')'
+    }
+</script>
+
+<!-- for code block highlight --> 
+<!-- theme.block_highlight -->
+<!-- we do not guarantee the char sequences spell right, usr himself do it -->
+<%- css('css/' + theme.block_highlight) %>
+<script src="/js/highlight.min.js"></script>
+<script src="/js/blog.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script type="text/javascript"> hljs.initHighlightingOnLoad();</script>

@@ -1,0 +1,13 @@
+ function getPostCoverPhoto(post) {
+        var content = post.content
+        var regex = /<img src="\S+"/
+        var result = regex.exec(content)
+        // is post first img
+        if (result) {
+            return result[0].split('src="')[1].split('"')[0]
+        }
+        // is anisina font-matter
+        if (post.header_img){
+            return post.header_img
+        }
+    }

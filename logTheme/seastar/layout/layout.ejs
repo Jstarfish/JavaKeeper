@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<%- partial('_partial/head') %>
+<style>
+
+    header.intro-header {
+        background-image: url('<%= config["header-img"]%>')
+    }
+</style>
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="" class="animated fadeIn">
+<%- partial('_partial/nav') %>
+<!-- Main Content -->
+<%- body || '01_编译错误' %>
+<!-- Footer -->
+<%- partial('_partial/footer') %>
+<!--wechat title img-->
+<img class="wechat-title-img" src="<%= config['sidebar-avatar'] %>">
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+
+<a class="post-hover" href="<%- config.root + article.path %>" style="height: 48.5%">
+    <div class="content is-hidden-touch full-height overflow-hidden" style="background-image: url('<%- getPostCoverPhoto(article)%>')">
+        <div class="content-bg-mask full-width full-height has-padding">
+            <h3 class="title is-marginless text-shadow">
+                <%- truncate(strip_html(article.title || 'Null'), {length: 50, omission: '..'}) %>
+            </h3>
+            <% if (article.tags){%>
+            <% article.tags.forEach(function(tag){%>
+            <span class="tag is-post-tag"><%- tag.name %></span>
+            <%})%>
+            <%}%>
+            <p class="sub-title text-shadow"><%- article.subtitle || '' %></p>
+            <p class="is-marginless text-shadow post-content-text">
+                <%- truncate(strip_html(article.content), {length: 50, omission: '..'}) %>
+            </p>
+            <p class="date text-shadow is-marginless"><%- article.date.format(config.date_format) %></p>
+        </div>
+    </div>
+</a>

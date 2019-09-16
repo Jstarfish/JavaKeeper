@@ -1,0 +1,186 @@
+.debug {
+    border: 1px solid red;
+}
+
+/*layout start*/
+.flex {
+    display: flex;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+.center {
+    align-items: center;
+    justify-content: center;
+}
+
+/*水平居中*/
+.justify-center {
+    justify-content: center;
+}
+
+.justify-space-between {
+    justify-content: space-between;
+}
+
+.justify-space-around {
+    justify-content: space-around;
+}
+
+/*垂直居中*/
+.align-center {
+    align-items: center;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.half-height {
+    height: 50%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/*layout end*/
+
+.border-radius {
+    border-radius: 4px;
+}
+
+/*邊距控制*/
+.has-margin {
+    margin: 15px;
+}
+
+.has-padding {
+    padding: 15px;
+}
+
+.has-padding-bottom {
+    padding-bottom: 15px;
+}
+
+/*position start*/
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+}
+/*position end*/
+
+/*content start*/
+.sub-title {
+    color: darkgray;
+}
+
+.text-shadow {
+    text-shadow: 0 1px 20px black;
+}
+/*position end*/
+
+/*tools start*/
+.content-box {
+    background-color: #fff;
+    margin-bottom: 2px;
+    border-radius: 2px;
+    padding: 0 15px;
+}
+
+.clear-padding {
+    padding: 0;
+}
+
+.clear-margin {
+    margin: 0;
+}
+
+.bottom-line {
+    border-bottom: 1px solid #f1f1f1;
+}
+.top-line {
+    border-top: 2px solid #f1f1f1;
+}
+.right-line {
+    border-right: 2px solid #f1f1f1;
+}
+
+.content-inner {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.is-show {
+    display: inherit;
+}
+
+.is-hidden {
+    display: none;
+}
+/*tools end*/
+
+/*通用样式*/
+.is-post-tag {
+    background: rgba(0,0,0,0);
+    border-radius: 3px;
+    border: 1px solid orangered;
+    color: orangered;
+}
+
+.is-invisible {
+    visibility: hidden;
+}
+
+/*遮罩*/
+.mask {
+    content: '';
+    display: block;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+
+    background-color: rgba(0,0,0, .6);
+}
+
+/*!*index page*!*/
+#main-wrap.add-mask:after {
+    content: '';
+    display: block;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+
+    background-color: rgba(0,0,0, .15);
+}
+
+.blur {
+    filter: blur(10px);
+}
