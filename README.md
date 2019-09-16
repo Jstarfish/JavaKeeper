@@ -1,9 +1,7 @@
 # 新之助学习路上的一亩三分地
-<!--
 <p align='center'>
 <img src='images/background.png'>
 </p>
--->
 <!--
 <p align='center'>
 <img src="https://img.shields.io/badge/build-passing-brightgreen.svg">
