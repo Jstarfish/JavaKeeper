@@ -1,7 +1,7 @@
 # 新之助学习路上的一亩三分地
 <!--
 <p align='center'>
-<img src='contents/images/background.png'>
+<img src='images/background.png'>
 </p>
 -->
 <!--
