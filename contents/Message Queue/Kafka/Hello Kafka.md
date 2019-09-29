@@ -73,7 +73,7 @@ Kafka的客户端和服务器之间的通信是靠一个简单的，高性能的
 
 <img src='../../../images/Message Queue/Kafka/log_anatomy.png'>
 
-**每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到这个有组织的有保证的日志上。分区会给每个消息记录分配一个**顺序ID号 – 偏移量**， 能够唯一地标识该分区中的每个记录。
+**每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到这个有组织的有保证的日志上。分区会给每个消息记录分配一个**顺序ID号 – 偏移量**， 能够唯一地标识该分区中的每个记录。**kafka不能保证全局有序，只能保证分区内有序** 。
 
 Kafka集群保留所有发布的记录，不管这个记录有没有被消费过，Kafka提供可配置的保留策略去删除旧数据(还有一种策略根据分区大小删除数据)。例如，如果将保留策略设置为两天，在记录公布后两天，它可用于消费，之后它将被丢弃以腾出空间。Kafka的性能跟存储的数据量的大小无关， 所以将数据存储很长一段时间是没有问题的。
 
@@ -243,7 +243,34 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 
 
-## 4.Kafka 工作流程分析    
+## 4.Kafka 工作流程分析和存储机制    
+
+<img src='../../../images/Message Queue/Kafka/kafka-workflow.jpg'>
+
+Kafka中消息是以topic进行分类的，生产者生产消息，消费者消费消息，都是面向topic的。
+
+topic是逻辑上的概念，二patition是物理上的概念，每个patition对应一个log文件，而log文件中存储的就是producer生产的数据，patition生产的数据会被不断的添加到log文件的末端，且每条数据都有自己的offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
+
+<img src='../../../images/Message Queue/Kafka/kafka-partition.jpg'>
+
+
+
+
+
+由于生产者生产的消息会不断追加到log文件末尾，为防止log文件过大导致数据定位效率低下，Kafka采取了**分片**和**索引**机制，将每个partition分为多个segment。每个segment对应两个文件——“.index”文件和“.log”文件。这些文件位于一个文件夹下，该文件夹的命名规则为：topic名称+分区序号。例如，first这个topic有三个分区，则其对应的文件夹为first-0,first-1,first-2。
+
+```shell
+00000000000000000000.index
+00000000000000000000.log
+00000000000000170410.index
+00000000000000170410.log
+00000000000000239430.index
+00000000000000239430.log
+```
+
+index和log文件以当前segment的第一条消息的offset命名。下图为index文件和log文件的结构示意图。 
+
+<img src='../../../images/Message Queue/Kafka/kafka-segement.jpg'>
 
 ### 4.1 Kafka 生产过程分析    
 
@@ -253,23 +280,13 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 #####  分区（Partition） 
 
-​	消息发送时都被发送到一个 topic，其本质就是一个目录，而 topic 是由一些 Partition Logs(分区日志)组成， 其组织结构如下图所示：    
-
-<img src='../../../images/Message Queue/Kafka/log_anatomy.png'>
-
-
-
-<img src='../../../images/Message Queue/Kafka/log_consumer.png'> 
-
-
-
-我们可以看到，每个 Partition 中的消息都是有序的，生产的消息被不断追加到 Partition log 上，其中的每一个消息都被赋予了一个唯一的 offset 值。
+​	消息发送时都被发送到一个 topic，其本质就是一个目录，而 topic 是由一些 Partition Logs(分区日志)组成
 
 - 分区的原因 
 
-1. 方便在集群中扩展，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic 又可以有多个 Partition 组成，因此整个集群就可以适应任意大小的数据了；
+1. **方便在集群中扩展**，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic 又可以有多个 Partition 组成，因此整个集群就可以适应任意大小的数据了；
 
-2. 可以提高并发，因为可以以 Partition 为单位读写了。 
+2. **可以提高并发**，因为可以以 Partition 为单位读写了。 
 
 - 分区的原则 
 
@@ -287,6 +304,18 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
  	同 一 个 partition 可 能 会 有 多 个 replication （ 对 应 server.properties 配 置 中 的 default.replication.factor=N）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据    
 
 
+
+#### 数据可靠性保证
+
+1.副本数据同步策略
+
+ 为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
+
+![1569748683137](C:\Users\JIAHAI~1\AppData\Local\Temp\1569748683137.png)
+
+2.ISR
+
+![1569748845816](C:\Users\JIAHAI~1\AppData\Local\Temp\1569748845816.png)
 
 #### 写入流程
 
