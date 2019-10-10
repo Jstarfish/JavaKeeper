@@ -7,7 +7,7 @@
 - **点对点模式**（一对一，消费者主动拉取数据，消息收到后消息清除） 点对点模型通常是一个基于拉取或者轮询的消息传送模型，这种模型从队列中请求信息， 而不是将消息推送到客户端。这个模型的特点是发送到队列的消息被一个且只有一个接收者接收处理，即使有多个消息监听者也是如此。 
 - **发布/订阅模式**（一对多，数据生产后，推送给所有订阅者） 发布订阅模型则是一个基于推送的消息传送模型。发布订阅模型可以有多种不同的订阅者，临时订阅者只在主动监听主题时才接收消息，而持久订阅者则监听主题的所有消息，即使当前订阅者不可用，处于离线状态。    
 
-
+------
 
 
 
@@ -22,7 +22,7 @@
 7. **缓冲**： 有助于控制和优化数据流经过系统的速度， 解决生产消息和消费消息的处理速度不一致 的情况。 
 8. **异步通信**： 很多时候，用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要 的时候再去处理它们    
 
-
+------
 
 
 
@@ -228,10 +228,13 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 在流式计算中， Kafka 一般用来缓存数据， Storm 通过消费 Kafka 的数据进行计算。
 
 -  Kafka 作为一个分布式消息队列。 Kafka 对消息保存时根据 Topic 进行归类，发送消息 者称为 Producer，消息接受者称为 Consumer，此外 kafka 集群由多个 kafka 实例组成，每个实例(server)称为 broker。 
-- 无论是 kafka 集群，还是 consumer 都依赖于 zookeeper 集群保存一些 meta 信息， 来保证系统可用性。  
-- Kafka的客户端和服务器之间的通信是靠一个简单的，高性能的，与语言无关的[TCP协议](https://kafka.apache.org/protocol.html)完成的。这个协议有不同的版本，并保持向后兼容旧版本。Kafka不光提供了一个Java客户端，还有[许多语言版本的客户端。 
+-  无论是 kafka 集群，还是 consumer 都依赖于 zookeeper 集群保存一些 meta 信息， 来保证系统可用性。  
+-  Kafka的客户端和服务器之间的通信是靠一个简单的，高性能的，与语言无关的[TCP协议](https://kafka.apache.org/protocol.html)完成的。这个协议有不同的版本，并保持向后兼容旧版本。Kafka不光提供了一个Java客户端，还有[许多语言版本的客户端。 
 
-  
+
+------
+
+
 
 ## 3.上手操作
 
@@ -239,7 +242,7 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 [中文版入门指南](<http://ifeve.com/kafka-1/> )
 
-
+------
 
 
 
@@ -247,7 +250,7 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 <img src='../../../images/Message Queue/Kafka/kafka-workflow.jpg'>
 
-Kafka中消息是以topic进行分类的，生产者生产消息，消费者消费消息，都是面向topic的。
+**Kafka中消息是以topic进行分类的**，生产者生产消息，消费者消费消息，都是面向topic的。
 
 topic是逻辑上的概念，二patition是物理上的概念，每个patition对应一个log文件，而log文件中存储的就是producer生产的数据，patition生产的数据会被不断的添加到log文件的末端，且每条数据都有自己的offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
 
@@ -272,13 +275,29 @@ index和log文件以当前segment的第一条消息的offset命名。下图为in
 
 <img src='../../../images/Message Queue/Kafka/kafka-segement.jpg'>
 
-### 4.1 Kafka 生产过程分析    
 
-#### 写入方式 
+
+### 4.1 Kafka 生产过程    
+
+#### 4.1.1 写入流程
+
+producer 写入消息流程如下： 
+
+<img src="E:/gitBlog/Technical-Learning/images/Message%20Queue/Kafka/kafka-write-flow.png">
+
+
+
+1. producer 先从 zookeeper 的 "/brokers/.../state"节点找到该 partition 的 leader
+2. producer 将消息发送给该 leader 
+3. leader 将消息写入本地 log 
+4. followers 从 leader pull 消息，写入本地 log 后向 leader 发送 ACK    
+5. leader 收到所有 ISR 中的 replication 的 ACK 后，增加 HW（high watermark，最后 commit 的 offset）并向 producer 发送 ACK 
+
+#### 4.1.2 写入方式 
 
 ​	producer 采用推（push） 模式将消息发布到 broker，每条消息都被追加（append） 到分区（patition） 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 kafka 吞吐率）。
 
-#####  分区（Partition） 
+####  4.1.3 分区（Partition） 
 
 ​	消息发送时都被发送到一个 topic，其本质就是一个目录，而 topic 是由一些 Partition Logs(分区日志)组成
 
@@ -297,54 +316,97 @@ index和log文件以当前segment的第一条消息的offset命名。下图为in
 3. patition 和 key 都未指定，使用轮询选出一个 patition。    
 
 
-
-
-#### 副本（Replication）
+#### 4.1.4 副本（Replication）
 
  	同 一 个 partition 可 能 会 有 多 个 replication （ 对 应 server.properties 配 置 中 的 default.replication.factor=N）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据    
 
+#### 4.1.5 数据可靠性保证
+
+​	为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
+
+<img src='../../../images/Message Queue/Kafka/kafka-ack-slg.png'>
+
+##### 1) 副本数据同步策略
+
+| 方案                        | 优点                                               | 缺点                                                |
+| --------------------------- | -------------------------------------------------- | --------------------------------------------------- |
+| 半数以上完成同步，就发送ack | 延迟低                                             | 选举新的leader时，容忍n台借点的故障，需要2n+1个副本 |
+| 全部完成同步，才发送ack     | 选举新的leader时，容忍n台借点的故障，需要n+1个副本 | 延迟高                                              |
+
+Kafka选择了第二种方案，原因如下：
+
+- 同样为了容忍n台节点的故障，第一种方案需要的副本数相对较多，而Kafka的每个分区都有大量的数据，第一种方案会造成大量的数据冗余；
+- 虽然第二种方案的网络延迟会比较高，但网络延迟对Kafka的影响较小。
+
+##### 2) ISR
+
+​	采用第二种方案之后，设想一下情景：leader收到数据，所有follower都开始同步数据，但有一个follower挂了，迟迟不能与leader保持同步，那leader就要一直等下去，直到它完成同步，才能发送ack，这个问题怎么解决呢？
+
+​	leader维护了一个动态的in-sync replica set(ISR),意为和leader保持同步的follower集合。当ISR中的follower完成数据的同步之后，leader就会给follower发送ack。如果follower长时间未向leader同步数据，则该follower将会被踢出ISR，该时间阈值由replica.lag.time.max.ms参数设定。leader发生故障之后，就会从ISR中选举新的leader。（之前还有另一个参数，0.9 版本之后 replica.lag.max.messages 参数被移除了）
+
+##### 3) ack应答机制
+
+​	对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等ISR中的follower全部接收成功。
+
+​	所以Kafka为用户提供了**三种可靠性级别**，用户根据对可靠性和延迟的要求进行权衡，选择以下的配置。
+
+**acks参数配置：**
+
+- **acks:**
+
+  ​	0：producer不等待broker的ack，这一操作提供了一个最低的延迟，broker一接收到还没有写入磁盘就已经返回，当broker故障时有可能**丢失数据**；
+
+  ​	1：producer不等待broker的ack，这一操作提供了一个最低的延迟，broker一接收到还没有写入磁盘就已经返回，当broker故障时有可能**丢失数据**（下图为acks=1数据丢失案例）；
+
+<img src='../../../images/Message Queue/Kafka/kafka-ack=1.png'>
+
+​	-1（all）：producer等待broker的ack，partition的leader和follower全部落盘成功后才返回ack。但是	如果在follower同步完成后，broker发送ack之前，leader发生故障，那么就会造成**数据重复**。（下图为acks=1数据重复案例）
+
+<img src='../../../images/Message Queue/Kafka/kafka-ack=-1.png'>
+
+##### 4) 故障处理
+
+<img src='../../../images/Message Queue/Kafka/kafka-leo.png'>
 
 
-#### 数据可靠性保证
 
-1.副本数据同步策略
+- **LEO: 指的是每个副本最大的offset;**
+- **HW：指的是消费者能见到的最大的offset，ISR队列中最小的LEO;**
 
- 为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
+（1）**followew故障**
 
-![1569748683137](C:\Users\JIAHAI~1\AppData\Local\Temp\1569748683137.png)
+​	follower发生故障后会被临时踢出ISR,待该follower恢复后，follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向leader进行同步。等**该followew的LEO大于该Partition的HW**，即follower追上leader之后，就可以重新加入ISR了。
 
-2.ISR
+（2） **leader故障**
 
-![1569748845816](C:\Users\JIAHAI~1\AppData\Local\Temp\1569748845816.png)
+​	leader发生故障之后，会从ISR中选出一个新的leader，之后，为保证多个副本之间的数据一致性，其余的follower会先将各自的log文件高于HW的部分截掉，然后从新的leader同步数据。
 
-#### 写入流程
+​	注意：这**只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复**。
 
-producer 写入消息流程如下： 
+#### 4.1.6 Exactly Once语义
 
-<img src='../../../images/Message Queue/Kafka/kafka-write-flow.png'>
+​	将服务器的ACK级别设置为-1，可以保证Producer到Server之间不会丢失数据，即At Least Once语义。相对的，将服务器ACK级别设置为0，可以保证生产者每条消息只会被发送一次，即At Most Once语义。
 
+​	At Least Once可以保证数据不丢失，但是不能保证数据不重复。相对的，At Least Once可以保证数据不重复，但是不能保证数据不丢失。但是，对于一些非常重要的信息，比如说交易数据，下游数据消费者要求数据既不重复也不丢失，即Exactly Once语义。在0.11版本以前的Kafka，对此是无能为力的，智能保证数据不丢失，再在下游消费者对数据做全局去重。对于多个下游应用的情况，每个都需要单独做全局去重，这就对性能造成了很大的影响。
 
+​	0.11版本的Kafka，引入了一项重大特性：幂等性。所谓的幂等性就是指	Producer不论向Server发送多少次重复数据。Server端都会只持久化一条，幂等性结合At Least Once语义，就构成了Kafka的Exactily Once语义，即： **<u>At Least Once + 幂等性 = Exactly Once</u>**
 
-1. producer 先从 zookeeper 的 "/brokers/.../state"节点找到该 partition 的 leader
+​	要启用幂等性，只需要将Producer的参数中enable.idompotence设置为true即可。Kafka的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的Producer在初始化的时候会被分配一个PID，发往同一Partition的消息会附带Sequence Number。而Broker端会对<PID,Partition,SeqNumber>做缓存，当具有相同主键的消息提交时，Broker只会持久化一条。
 
-2.  producer 将消息发送给该 leader 
+​	但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区会话的Exactly Once。
 
-3. leader 将消息写入本地 log 
-
-4. followers 从 leader pull 消息，写入本地 log 后向 leader 发送 ACK    
-
-5. leader 收到所有 ISR 中的 replication 的 ACK 后，增加 HW（high watermark，最后 commit 的 offset）并向 producer 发送 ACK 
+![1570516198641](C:\Users\JIAHAI~1\AppData\Local\Temp\1570516198641.png)
 
 
 
 
 ### 4.2 Broker 保存消息
 
-#### 存储方式 
+#### 4.2.1 存储方式 
 
-​	物理上把 topic 分成一个或多个 patition（对应 server.properties 中的 num.partitions=3 配 置），每个 patition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文 件），如下：    
+​	物理上把 topic 分成一个或多个 patition（对应 server.properties 中的 num.partitions=3 配 置），每个 patition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文 件）。    
 
-#### 存储策略 
+#### 4.2.2 存储策略 
 
 ​	无论消息是否被消费， kafka 都会保留所有消息。有两种策略可以删除旧数据： 
 
@@ -354,7 +416,9 @@ producer 写入消息流程如下：
 
 
 
-#### Zookeeper 存储结构    
+#### 4.2.3 Zookeeper在Kafka中的作用    
+
+- **存储结构**
 
 <img src='../../../images/Message Queue/Kafka/zookeeper-store.png'>
 
@@ -362,42 +426,29 @@ producer 写入消息流程如下：
 
 注意： producer 不在 zk 中注册， 消费者在 zk 中注册。
 
+-  Zookeeper在Kafka中的作用
+
+  ​	Kafka集群中有一个broker会被选举为Controller，**负责管理集群broker的上线下，所有topic的分区副本分配和leader选举等工作**。
+
+  ​	Controller的管理工作都是依赖于Zookeeper的。
+
+  ​	下图为partition的leader选举过程：
+
+<img src='../../../images/Message Queue/Kafka/controller-leader.png'>
 
 
-### 4.3Kafka 消费过程分析 
 
-kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API。 
+### 4.3 Kafka 消费过程 
 
-#### 高级 API 
-
-- 高级 API 优点 
-  - 高级 API 写起来简单
-  -  不需要自行去管理 offset，系统通过 zookeeper 自行管理。 
-  - 不需要管理分区，副本等情况， .系统自动管理。 消费者断线会自动根据上一次记录在 zookeeper 中的 offset 去接着获取数据（默认设置 1 分钟更新一下 zookeeper 中存的 offset） 可以使用 group 来区分对同一个 topic 的不同程序访问分离开来（不同的 group 记录不 同的 offset，这样不同程序读取同一个 topic 才不会因为 offset 互相影响） 
-
-- 高级 API 缺点 
-  - 不能自行控制 offset（对于某些特殊需求来说） 不能细化控制如分区、副本、 zk 等 
-
-#### 低级 API 
-
-- 低级 API 优点    
-  - **能够让开发者自己控制 offset，想从哪里读取就从哪里读取。** 
-  - 自行控制连接分区，对分区自定义进行负载均衡 
-  - 对 zookeeper 的依赖性降低（如： offset 不一定非要靠 zk 存储，自行存储 offset 即可， 比如存在文件或者内存中）
-- 低级 API 缺点
-  - 太过复杂，需要自行控制 offset，连接哪个分区，找到分区 leader 等。
-
-#### 消费者组
+#### 4.3.1 消费者组
 
 <img src='../../../images/Message Queue/Kafka/kafka-consume-group.png'>
-
-
 
 ​	消费者是以 consumer group 消费者组的方式工作，由一个或者多个消费者组成一个组， 共同消费一个 topic。每个分区在同一时间只能由 group 中的一个消费者读取，但是多个 group 可以同时消费这个 partition。在图中，有一个由三个消费者组成的 group，有一个消费者读 取主题中的两个分区，另外两个分别读取一个分区。某个消费者读取某个分区，也可以叫做 某个消费者是某个分区的拥有者。
 
 ​	在这种情况下，消费者可以通过水平扩展的方式同时读取大量的消息。另外，如果一个 消费者失败了，那么其他的 group 成员会自动负载均衡读取之前失败的消费者读取的分区。    
 
-#### 消费方式 
+#### 4.3.2 消费方式
 
 **consumer 采用 pull（拉） 模式从 broker 中读取数据。** 
 
@@ -405,11 +456,81 @@ kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API
 
 ​	对于 Kafka 而言， pull 模式更合适，它可简化 broker 的设计， consumer 可自主控制消费消息的速率，同时 consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时 还能选择不同的提交方式从而实现不同的传输语义。 
 
-​	pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷入循环中，一直等待数据到达。为了避免这种情况，我们在我们的拉请求中有参数，允许消费者请求在等待数据到达 的“长轮询”中进行阻塞（并且可选地等待到给定的字节数，以确保大的传输大小）。    
+​	pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷入循环中，一直等待数据到达，一直返回空数据。为了避免这种情况，我们在我们的拉请求中有参数，允许消费者请求在等待数据到达 的“长轮询”中进行阻塞（并且可选地等待到给定的字节数，以确保大的传输大小）。    
+
+#### 4.3.3 分区分配策略
+
+​	一个consumer group中有多个consumer，一个topic有多个partition，所以必然会涉及到partition的分配问题，即确定哪个partition由哪个consumer来消费。
+
+​	Kafka有两种分配策略，一是RoundRobin，一是Range。
+
+#### 4.3.4 offset的维护
+
+​	由于consumer在消费过程中可能会出现断电宕机等故障，consumer恢复后，需要从故障前的位置继续消费，所以consumer需要实时记录自己消费到了哪个offset，以便故障恢复后继续消费。
+
+​	Kafka 0.9版本之前，consumer默认将offset保存在Zookeeper中，从0.9版本开始，consumer默认将offset保存在Kafka一个内置的topic中，该topic为**_consumer_offsets**。
+
+- 修改配置文件consumer.properties
+
+```shell
+exclude.internal.topics=false
+```
+
+- **查询__consumer_offsets topic所有内容** 
+
+**注意：运行下面命令前先要在consumer.properties中设置exclude.internal.topics=false**
+
+0.11.0.0之前版本
+
+```shell
+bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2181 --formatter "kafka.coordinator.GroupMetadataManager\$OffsetsMessageFormatter" --consumer.config config/consumer.properties --from-beginning
+```
+
+**0.11.0.0之后版本(含)**
+
+```shell
+bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2181 --formatter "kafka.coordinator.group.GroupMetadataManager\$OffsetsMessageFormatter" --consumer.config config/consumer.properties --from-beginning
+```
+
+默认情况下__consumer_offsets有50个分区，如果你的系统中consumer group也很多的话，那么这个命令的输出结果会很多
 
 
 
-## 5. Java中的Kafka使用
+### 4.4 Kafka高效读写数据的原因
+
+#### 4.4.1 顺序写磁盘
+
+​	Kafka的producer生产数据，要写入到log文件中，写的过程是一直追加到文件末端，为顺序写。官网有数据表明，同样的磁盘，顺序写能到到600M/s，而随机写只有100k/s。这与磁盘的机械机构有关，顺序写之所以快，是因为其省去了大量磁头寻址的时间 。
+
+#### 4.4.2 零拷贝技术（todo...）
+
+<img src='../../../images/Message Queue/Kafka/zero-copy.png'>
+
+
+
+------
+
+
+
+### 4.5 Kafka事务
+
+​	Kafka从0.11版本开始引入了事务支持。事务可以保证Kafka在Exactly Once语义的基础上，生产和消费可以跨分区和会话，要么全部成功，要么全部失败。
+
+#### 4.5.1 Producer事务
+
+​	为了了实现跨分区跨会话的事务，需要引入一个全局唯一的TransactionID，并将Producer获得的PID和Transaction ID绑定。这样当Producer重启后就可以通过正在进行的TransactionID获得原来的PID。
+
+​	为了管理Transaction，Kafka引入了一个新的组件Transaction Coordinator。Producer就是通过和Transaction Coordinator交互获得Transaction ID对应的任务状态。Transaction Coordinator还负责将事务所有写入Kafka的一个内部Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
+
+#### 4.5.2 Consumer事务
+
+​	对Consumer而言，事务的保证就会相对较弱，尤其是无法保证Commit的消息被准确消费。这是由于Consumer可以通过offset访问任意信息，而且不同的SegmentFile生命周期不同，同一事务的消息可能会出现重启后被删除的情况。
+
+------
+
+
+
+## 5. Kafka API（Java中的Kafka使用）
 
 ### 5.1 启动zk和kafka集群
 
@@ -431,6 +552,17 @@ kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API
 ```
 
 ### 5.3 创建生产者
+
+​	Kafka的Producer发送消息采用的是**异步发送**的方式。在消息发送过程中，涉及到了两个线程：**main线程和Sender线程**，以及一个线程共享变量：**RecordAccumulator**。main线程将消息发送给RecordAccumulator，Sender线程不断从RecordAccumulator中拉取消息发送到Kafka broker。
+
+<img src='../../../images/Message Queue/Kafka/kafka-producer-thread.png'>
+
+相关参数：	
+
+- **batch.size**：只有数据积累到batch.size之后，sender才会发送数据。
+- **linger.ms**：如果数据迟迟未达到batch.size，sender等待linger.time之后就会发送数据。
+
+#### 5.3.1 异步发送API
 
 ```java
 package priv.learn.producer;
@@ -463,66 +595,11 @@ public class CustomerProducer {
                     Integer.toString(i), "hello world-" + i));
         }
         producer.close();
-
     }
 }
 ```
 
-### 5.4 创建消费者
-
-```java
-package priv.learn.consume;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import java.util.Arrays;
-import java.util.Properties;
-
-/**
- * @date: 2019/9/9 16:58
- * @description: 高级 API:官方提供案例（自动维护消费情况）（新 API）
- */
-public class CustomNewConsumer {
-
-    public static void main(String[] args) {
-        Properties props = new Properties();
-        // 定义 kakfa 服务的地址，不需要将所有 broker 指定上
-        props.put("bootstrap.servers", "10.121.214.96:9092");
-        // 制定 consumer group
-        props.put("group.id", "test");
-        // 是否自动确认 offset
-        props.put("enable.auto.commit", "true");
-        // 自动确认 offset 的时间间隔
-        props.put("auto.commit.interval.ms", "1000");
-        // key 的序列化类
-        props.put("key.deserializer",
-                "org.apache.kafka.common.serialization.StringDeserializer");
-        // value 的序列化类
-        props.put("value.deserializer",
-                "org.apache.kafka.common.serialization.StringDeserializer");
-        // 定义 consumer
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-        // 消费者订阅的 topic, 可同时订阅多个
-        consumer.subscribe(Arrays.asList("first", "second", "third","learn-java-kafka"));
-        while (true) {
-            // 读取数据，读取超时时间为 100ms
-            ConsumerRecords<String, String> records = consumer.poll(100);
-            for (ConsumerRecord<String, String> record : records) {
-                System.out.printf("offset = %d, key = %s, value = %s%n",
-                        record.offset(), record.key(), record.value());
-            }
-        }
-    }
-}
-```
-
-**结果：**
-
-<img src='../../../images/Message Queue/Kafka/kakfa-java-demo.png'/>
-
-
-
-### 5.5 创建生产者带回调函数 
+#### 5.3.2  异步发送，带回调函数
 
 ```java
 package priv.learn.producer;
@@ -534,50 +611,208 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import java.util.Properties;
 
 /**
- * @date: 2019/9/9 16:11
- * @description: 创建生产者带回调函数（新 API）
+- @date: 2019/9/9 16:11
+- @description: 创建生产者带回调函数（新 API）
+  */
+  public class CallBackProducer {
+
+  public static void main(String[] args) {
+      Properties props = new Properties();
+      props.put("bootstrap.servers", "10.121.214.96:9092");
+      // 等待所有副本节点的应答
+      props.put("acks", "all");
+      // 消息发送最大尝试次数
+      props.put("retries", 0);
+      // 一批消息处理大小
+      props.put("batch.size", 16384);
+      // 增加服务端请求延时
+      props.put("linger.ms", 1);
+      // 发送缓存区内存大小
+      props.put("buffer.memory", 33554432);
+      // key 序列化
+      props.put("key.serializer",
+              "org.apache.kafka.common.serialization.StringSerializer");
+      // value 序列化
+      props.put("value.serializer",
+              "org.apache.kafka.common.serialization.StringSerializer");
+      KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(props);
+      for (int i = 0; i < 50; i++) {
+          kafkaProducer.send(new ProducerRecord<String, String>("learn-java-kafka", "hello"
+                  + i), new Callback() {
+              @Override
+              public void onCompletion(RecordMetadata metadata, Exception
+                      exception) {
+                  if (metadata != null) {
+                      System.err.println(metadata.partition() + "---" +
+                              metadata.offset());
+                  }
+              }
+          });
+      }
+      kafkaProducer.close();
+  }
+  }
+```
+
+#### 5.3.2  同步发送
+
+通过 producer.send（record)返回Future对象，通过调用Future.get()进行无限等待结果返回。 
+
+```java
+producer.send（record).get()
+```
+
+ 
+
+### 5.4 创建消费者
+
+kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API。 
+
+#### 4.3.1 高级 API（自动提交offset）
+
+- 高级 API 优点 
+
+  - 高级 API 写起来简单
+  - 不需要自行去管理 offset，系统通过 zookeeper 自行管理。 
+  - 不需要管理分区，副本等情况， .系统自动管理。 消费者断线会自动根据上一次记录在 zookeeper 中的 offset 去接着获取数据（默认设置 1 分钟更新一下 zookeeper 中存的 offset） 可以使用 group 来区分对同一个 topic 的不同程序访问分离开来（不同的 group 记录不 同的 offset，这样不同程序读取同一个 topic 才不会因为 offset 互相影响） 
+
+- 高级 API 缺点 
+
+  - 不能自行控制 offset（对于某些特殊需求来说） 不能细化控制如分区、副本、 zk 等 
+
+  ```java
+  package priv.learn.consume;
+  import org.apache.kafka.clients.consumer.ConsumerRecord;
+  import org.apache.kafka.clients.consumer.ConsumerRecords;
+  import org.apache.kafka.clients.consumer.KafkaConsumer;
+  import java.util.Arrays;
+  import java.util.Properties;
+  
+  /**
+   * @date: 2019/9/9 16:58
+   * @description: 高级 API:官方提供案例（自动维护消费情况）（新 API）
+   */
+  public class CustomNewConsumer {
+  
+      public static void main(String[] args) {
+          Properties props = new Properties();
+          // 定义 kakfa 服务的地址，不需要将所有 broker 指定上
+          props.put("bootstrap.servers", "10.121.214.96:9092");
+          // 制定 consumer group
+          props.put("group.id", "test");
+          // 是否自动确认 offset
+          props.put("enable.auto.commit", "true");
+          // 自动确认 offset 的时间间隔
+          props.put("auto.commit.interval.ms", "1000");
+          // key 的序列化类
+          props.put("key.deserializer",
+                  "org.apache.kafka.common.serialization.StringDeserializer");
+          // value 的序列化类
+          props.put("value.deserializer",
+                  "org.apache.kafka.common.serialization.StringDeserializer");
+          // 定义 consumer
+          KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+          // 消费者订阅的 topic, 可同时订阅多个
+          consumer.subscribe(Arrays.asList("first", "second", "third","learn-java-kafka"));
+          while (true) {
+              // 读取数据，读取超时时间为 100ms
+              ConsumerRecords<String, String> records = consumer.poll(100);
+              for (ConsumerRecord<String, String> record : records) {
+                  System.out.printf("offset = %d, key = %s, value = %s%n",
+                          record.offset(), record.key(), record.value());
+              }
+          }
+      }
+  }
+  ```
+
+  **结果：**
+
+  <img src="E:/gitBlog/Technical-Learning/images/Message%20Queue/Kafka/kakfa-java-demo.png"/>
+
+  
+
+#### 4.3.2 低级 API(手动提交offset)
+
+- 低级 API 优点    
+
+  - **能够让开发者自己控制 offset，想从哪里读取就从哪里读取。** 
+  - 自行控制连接分区，对分区自定义进行负载均衡 
+  - 对 zookeeper 的依赖性降低（如： offset 不一定非要靠 zk 存储，自行存储 offset 即可， 比如存在文件或者内存中）
+
+- 低级 API 缺点
+
+  - 太过复杂，需要自行控制 offset，连接哪个分区，找到分区 leader 等。
+
+- 手动提交offset的方法有两种，分别是commitSync(同步提交)和commitAsync(异步提交)。两者的相同点是，都会将本次poll的一批数据最高的偏移量提交；不同点是，commitSync阻塞当前线程，一直到提交成功，并且会自动失败重试（由不可控因素导致，也会出现提交失败）；而commitAsyc则没有失败重试机制，故有可能提交失败。
+
+  ##### 1) 同步提交offset
+
+```java
+package priv.learn.consume;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import java.util.Arrays;
+import java.util.Properties;
+/**
+ * @date: 2019/10/10 16:33
+ * @description: 同步手动提交offset
  */
-public class CallBackProducer {
+public class CommitSyncCounsumer {
 
     public static void main(String[] args) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "10.121.214.96:9092");
-        // 等待所有副本节点的应答
-        props.put("acks", "all");
-        // 消息发送最大尝试次数
-        props.put("retries", 0);
-        // 一批消息处理大小
-        props.put("batch.size", 16384);
-        // 增加服务端请求延时
-        props.put("linger.ms", 1);
-        // 发送缓存区内存大小
-        props.put("buffer.memory", 33554432);
-        // key 序列化
-        props.put("key.serializer",
-                "org.apache.kafka.common.serialization.StringSerializer");
-        // value 序列化
-        props.put("value.serializer",
-                "org.apache.kafka.common.serialization.StringSerializer");
-        KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(props);
-        for (int i = 0; i < 50; i++) {
-            kafkaProducer.send(new ProducerRecord<String, String>("learn-java-kafka", "hello"
-                    + i), new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata metadata, Exception
-                        exception) {
-                    if (metadata != null) {
-                        System.err.println(metadata.partition() + "---" +
-                                metadata.offset());
-                    }
-                }
-            });
+        props.put("bootstrap.servers", "192.121.214.51:9092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+
+        //1. 关闭自动提交offset
+        props.put("enable.auto.commit","false");
+        props.put("enable.auto.commit", "true");
+        props.put("auto.commit.interval.ms", "1000");
+        props.put("key.deserializer",
+                "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer",
+                "org.apache.kafka.common.serialization.StringDeserializer");
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Arrays.asList("first", "second", "third","learn-java-kafka"));
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(100);
+            for (ConsumerRecord<String, String> record : records) {
+                System.out.printf("offset = %d, key = %s, value = %s%n",
+                        record.offset(), record.key(), record.value());
+            }
+            //2. 需要自己手动提交
+            consumer.commitAsync();
         }
-        kafkaProducer.close();
     }
 }
 ```
 
+##### 2) 异步提交offset
+
+```java
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+    }
+    consumer.commitAsync(new OffsetCommitCallback() {
+        @Override
+        public void onComplete(Map<TopicPartition, OffsetAndMetadata> map, Exception e) {
+            if(e != null){
+                System.out.println("commit failed"+map);
+            }
+        }
+    });
+}
+```
+
 还可以用官方提供的例子跑一下：<https://github.com/apache/kafka/tree/trunk/examples> 
+
+------
 
 
 
@@ -600,7 +835,7 @@ public class CallBackProducer {
 
 - 需求： 实现一个简单的双 interceptor 组成的拦截链。第一个 interceptor 会在消息发送前将时间 戳信息加到消息 value 的最前部；第二个 interceptor 会在消息发送后更新成功发送消息数或 失败发送消息数。      
 
-![1568020262564](C:\Users\JIAHAI~1\AppData\Local\Temp\1568020262564.png)
+<img src="E:/gitBlog/Technical-Learning/images/Message%20Queue/Kafka/interceptor-demo.png"/>
 
 
 
@@ -684,7 +919,6 @@ public class CallBackProducer {
   
       @Override
       public void configure(Map<String, ?> map) {
-  
       }
   }
   ```
@@ -739,7 +973,7 @@ public class CallBackProducer {
   }
   ```
 
-
+------
 
 
 
@@ -747,7 +981,7 @@ public class CallBackProducer {
 
 Kafka Streams是Apache Kafka 开源项目的一个组成部分。是一个功能强大，易于使用的库。用于在 Kafka 上构建高可分布式、拓展性，容错的应用程序。 
 
-####  Kafka Streams 特点 
+####  7.1 Kafka Streams 特点 
 
 1. 功能强大：高扩展性，弹性，容错 
 
@@ -758,9 +992,7 @@ Kafka Streams是Apache Kafka 开源项目的一个组成部分。是一个功能
 4. 实时性： 毫秒级延迟 、并非微批处理、 窗口允许乱序数据、允许迟到数据
 
 
-
-
-####  为什么要有 Kafka Stream 
+####  7.2 为什么要有 Kafka Stream 
 
 ​	当前已经有非常多的流式处理系统，最知名且应用最多的开源流式处理系统有 Spark Streaming 和 Apache Storm。 Apache Storm 发展多年，应用广泛，提供记录级别的处理能力，当前也支持 SQL on Stream。而 Spark Streaming 基于 Apache Spark，可以非常方便与图计算， SQL 处理等集成，功能强大，对于熟悉其它 Spark 应用开发的用户而言使用门槛低。另外， 目前主流的 Hadoop 发行版，如 Cloudera 和 Hortonworks，都集成了 Apache Storm 和 Apache Spark，使得部署更容易。 既然 Apache Spark 与 Apache Storm 拥用如此多的优势，那为何还需要 Kafka Stream 呢？    
 
@@ -782,9 +1014,7 @@ Kafka Streams是Apache Kafka 开源项目的一个组成部分。是一个功能
 
 ​	第六，由于 Kafka Consumer Rebalance 机制， **Kafka Stream 可以在线动态调整并行度**。    
 
-
-
-#### Kafka Stream 数据清洗案例 
+#### 7.3 Kafka Stream 数据清洗案例 
 
 1. 需求： 实时处理单词带有”>>>”前缀的内容。例如输入”atguigu>>>ximenqing”，最终处理成 “ximenqing” 
 
@@ -883,6 +1113,8 @@ public class Application {
 }
 ```
 
+------
+
 
 
 ## 8. 扩展
@@ -911,8 +1143,6 @@ public class Application {
 
 
 ### 8.2 Kafka 配置信息 
-
-https://www.cnblogs.com/gxc2015/p/9835837.html
 
 ##### Broker 配置信息 
 
@@ -1046,3 +1276,6 @@ https://www.cnblogs.com/gxc2015/p/9835837.html
 | offsets.commit.max.retries        | 5              | 重试offset commit的次数。这个重试只应用于offset  commits在shut-down之间。他 |
 | dual.commit.enabled               | true           | 如果使用“kafka”作为offsets.storage，你可以二次提交offset到zookeeper(还有一次是提交到kafka）。在zookeeper-based的offset   storage到kafka-based的offset storage迁移时，这是必须的。对任意给定的consumer   group来说，比较安全的建议是当完成迁移之后就关闭这个选项 |
 | partition.assignment.strategy     | range          | 在“range”和“roundrobin”策略之间选择一种作为分配partitions给consumer 数据流的策略；  循环的partition分配器分配所有可用的partitions以及所有可用consumer   线程。它会将partition循环的分配到consumer线程上。如果所有consumer实例的订阅都是确定的，则partitions的划分是确定的分布。循环分配策略只有在以下条件满足时才可以：（1）每个topic在每个consumer实力上都有同样数量的数据流。（2）订阅的topic的集合对于consumer   group中每个consumer实例来说都是确定的。 |
+
+
+
