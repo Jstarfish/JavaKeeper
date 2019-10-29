@@ -1,25 +1,23 @@
-- 集合
+- Java SE
+  - 集合
+    - [ArrayList/Vector](collections/ArrayList.md)
+    - [LinkedList](collections/LinkedList.md)
+    - [HashMap](collections/HashMap.md)
+    - [HashSet](collections/HashSet.md)
+    - [LinkedHashMap](collections/LinkedHashMap.md)
+  - Java 多线程
 
-  - [ArrayList/Vector](collections/ArrayList.md)
-  - [LinkedList](collections/LinkedList.md)
-  - [HashMap](collections/HashMap.md)
-  - [HashSet](collections/HashSet.md)
-  - [LinkedHashMap](collections/LinkedHashMap.md)
-
-- Java 多线程
-
-  - [多线程中的常见问题](thread/Thread-common-problem.md)
-  - [synchronized 关键字原理](thread/Synchronize.md)
-  - [多线程的三大核心](thread/Threadcore.md)
-  - [对锁的一些认知](thread/Java-lock.md)
-  - [ReentrantLock 实现原理 ](thread/ReentrantLock.md)
-  - [ConcurrentHashMap 的实现原理](thread/ConcurrentHashMap.md)
-  - [如何优雅的使用和理解线程池](thread/ThreadPoolExecutor.md)
-  - [深入理解线程通信](thread/thread-communication.md)
-  - [一个线程罢工的诡异事件](thread/thread-gone.md)
-  - [线程池中你不容错过的一些细节](thread/thread-gone2.md)
-  - [『并发包入坑指北』之阻塞队列](thread/ArrayBlockingQueue.md)
-
+    - [多线程中的常见问题](thread/Thread-common-problem.md)
+    - [synchronized 关键字原理](thread/Synchronize.md)
+    - [多线程的三大核心](thread/Threadcore.md)
+    - [对锁的一些认知](thread/Java-lock.md)
+    - [ReentrantLock 实现原理 ](thread/ReentrantLock.md)
+    - [ConcurrentHashMap 的实现原理](thread/ConcurrentHashMap.md)
+    - [如何优雅的使用和理解线程池](thread/ThreadPoolExecutor.md)
+    - [深入理解线程通信](thread/thread-communication.md)
+    - [一个线程罢工的诡异事件](thread/thread-gone.md)
+    - [线程池中你不容错过的一些细节](thread/thread-gone2.md)
+    - [『并发包入坑指北』之阻塞队列](thread/ArrayBlockingQueue.md)
 - JVM
 
   - [Java 运行时内存划分](jvm/MemoryAllocation.md)
@@ -31,14 +29,12 @@
   - [一次内存溢出排查优化实战](jvm/OOM-Disruptor.md)
   - [一次 HashSet 所引起的并发问题](jvm/JVM-concurrent-HashSet-problem.md)
   - [一次生产 CPU 100% 排查优化实践](jvm/cpu-percent-100.md)
-
 - 分布式
 
   - [分布式限流](distributed/Distributed-Limit.md)
   - [基于 Redis 的分布式锁](distributed/distributed-lock-redis.md)
   - [分布式缓存设计](distributed/Cache-design.md)
   - [分布式 ID 生成器](distributed/ID-generator.md)
-
 - 常用框架
 
   - [Spring Bean 生命周期](frame/spring-bean-lifecycle.md)
