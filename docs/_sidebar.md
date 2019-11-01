@@ -1,3 +1,57 @@
+JAVA LOG
+
+- 先来缕清楚JAVA日志体系
+- log4j
+- logback
+- logstanch
+
+
+
+面向服务
+
+- Nginx
+- Zookeeper
+- Dubbo
+- 消息中间件
+
+
+
+微服务架构
+
+- Spring Boot
+- Spring Cloud
+
+
+
+数据存储和缓存
+
+- MySQL
+- Redis
+- Mongdb
+- Elastic Search
+- FastDFS(OSS)
+- s3
+
+
+
+JVM
+
+
+
+单体架构
+
+- MyBatis
+- Spring
+- Spring MVC
+
+
+
+大数据
+
+- HDFS
+
+
+
 - Java SE
   - 集合
     - [ArrayList/Vector](collections/ArrayList.md)
