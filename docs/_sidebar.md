@@ -1,9 +1,8 @@
-JAVA LOG
-
-- 先来缕清楚JAVA日志体系
-- log4j
-- logback
-- logstanch
+- JAVA LOG
+  - 先来缕清楚JAVA日志体系
+  - log4j
+  - logback
+  - logstanch
 
 
 
