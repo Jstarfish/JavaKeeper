@@ -1,14 +1,10 @@
 - **JAVA LOG**
   
-  - [缕清各种Java Logging](logging/Java-Logging.md)
+  - [Java Logging](logging/Java-Logging.md)
   
-  - [基于 Redis 的分布式锁](logging/Java-Logging.md)
-  
-  - 先来缕清楚JAVA日志体系
+  - [hello logback](logging/logback简单使用.md)
   
   - log4j
-  
-  - logback
   
   - logstanch
   
