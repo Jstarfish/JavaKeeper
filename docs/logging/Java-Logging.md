@@ -41,7 +41,7 @@ JUL、LOG4J1、LOG4J2、LOGBACK是**日志实现框架**，而Commons Logging和
   
 
   
-![](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/java_populor_jar.png)
+![](http://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/java_populor_jar.png)
 
 ## java常用日志框架关系
 
@@ -128,7 +128,7 @@ log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
 
 ## SLF4J绑定日志框架
 
-![](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
+![](http://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
 
 ![](http://www.slf4j.org/images/concrete-bindings.png)
 
