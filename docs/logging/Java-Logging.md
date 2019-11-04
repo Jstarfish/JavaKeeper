@@ -37,11 +37,11 @@ JUL、LOG4J1、LOG4J2、LOGBACK是**日志实现框架**，而Commons Logging和
 - 现今，Java日志领域被划分为两大阵营：Commons Logging阵营和Slf4j阵营。
   Commons Logging在Apache大树的笼罩下，有很大的用户基数。但有证据表明，形式正在发生变化。2013年底有人分析了GitHub上30000个项目，统计出了最流行的100个Libraries，可以看出Slf4j的发展趋势更好：
 
-  ![](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/java_populor_jar.png)
-
 - Apache眼看有被Logback反超的势头，于2012-07重写了Log4j 1.x，成立了新的项目Log4j 2, Log4j 2具有Logback的所有特性。
+  
 
-
+  
+![](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/java_populor_jar.png)
 
 ## java常用日志框架关系
 
@@ -128,7 +128,7 @@ log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
 
 ## SLF4J绑定日志框架
 
-![img](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
+![](https://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
 
 ![](http://www.slf4j.org/images/concrete-bindings.png)
 
