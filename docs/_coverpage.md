@@ -3,7 +3,8 @@
 <img src="_media/icon.png"  width="400" />
 
 
-> `Keep On Growing`：**lazy egg's Java Learning**
+> `Keep On Growing`：**Starfish Technical Guide**
 
 [GitHub](https://github.com/Jstarfish/Technical-Learning)
-[Get Started](#introduction)
+[Get Started](#lazyegg)
+
