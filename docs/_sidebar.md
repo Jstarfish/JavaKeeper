@@ -1,19 +1,22 @@
-- Getting started
+- **Java Logging**
 
   - [缕清各种Java Logging](logging/Java-Logging.md)
   - [hello logback](logging/logback简单使用.md)
-  - [Cover page](logback简单使用.md)
-  
-- Customization
+- **面向服务架构 (SOA)**
 
-  - [Configuration](configuration.md)
+  - [消息中间件](message-queue/readMQ.md)
+    
+    <!--   	[浅谈消息队列及常见的消息中间件](message-queue/浅谈消息队列及常见的消息中间件.md) -->
+    
+    <!-- [Hello Kafka](message-queue/Kafka/Hello-Kafka.md) -->
+    
+  - Zookeeper
   
-- Guide
-
-  - [Deploy](deploy.md)
+  - Nginx
   
-- [Awesome docsify](awesome.md)
-- [Changelog](changelog.md)
+  - Dubbo
+  
+    
 
 
 
@@ -26,12 +29,7 @@
   - logstanch
   - [LinkedList](https://github.com/Jstarfish/Technical-Learning/blob/master/docs/collections/LinkedList.md)
 
-面向服务
-
-- Nginx
-- Zookeeper
-- Dubbo
-- 消息中间件
+- 
 
 微服务架构
 
@@ -58,8 +56,26 @@ JVM
 大数据
 
 - HDFS
+
+
+
+工程化与工具
+
+- Maven
+- Sonar
+- Git
+
+性能优化
+
+- JVM优化
+- web调优
+- DB调优
+
+
+
 - Java SE
   - 集合
+  - IO
     - [ArrayList/Vector](https://github.com/Jstarfish/Technical-Learning/blob/master/docs/collections/ArrayList.md)
     - [LinkedList](https://github.com/Jstarfish/Technical-Learning/blob/master/docs/collections/LinkedList.md)
     - [HashMap](https://github.com/Jstarfish/Technical-Learning/blob/master/docs/collections/HashMap.md)
