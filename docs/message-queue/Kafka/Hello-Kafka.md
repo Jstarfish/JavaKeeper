@@ -1,6 +1,6 @@
-1. 消息队列实现原理
+## 1. 消息队列实现原理
 
-<img src='../../_images/message-queue/Kafka/mq.png'>
+![img](../../_images/message-queue/Kafka/mq.png)
 
 
 
@@ -61,7 +61,7 @@ Kafka是一个分布式的流处理平台。是支持分区的（partition）、
 
 - [Connector API](http://kafka.apache.org/documentation.html#connect)允许构建和运行可重用的生产者或消费者，能够把 Kafka主题连接到现有的应用程序或数据系统。例如，一个连接到关系数据库的连接器(connector)可能会获取每个表的变化。
 
-  <img src='../../_images/message-queue/Kafka/kafka-apis.png'>
+  ![img](../../_images/message-queue/Kafka/kafka-apis.png)
 
 Kafka的客户端和服务器之间的通信是靠一个简单的，高性能的，与语言无关的[TCP协议](https://kafka.apache.org/protocol.html)完成的。这个协议有不同的版本，并保持向后兼容旧版本。Kafka不光提供了一个Java客户端，还有[许多语言](https://cwiki.apache.org/confluence/display/KAFKA/Clients)版本的客户端。
 
@@ -71,13 +71,13 @@ Kafka的客户端和服务器之间的通信是靠一个简单的，高性能的
 
 对于每一个主题，Kafka集群保持一个分区日志文件，看下图：
 
-<img src='../../_images/message-queue/Kafka/log_anatomy.png'>
+![img](../../_images/message-queue/Kafka/log_anatomy.png)
 
 **每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到这个有组织的有保证的日志上。分区会给每个消息记录分配一个**顺序ID号 – 偏移量**， 能够唯一地标识该分区中的每个记录。**kafka不能保证全局有序，只能保证分区内有序** 。
 
 Kafka集群保留所有发布的记录，不管这个记录有没有被消费过，Kafka提供可配置的保留策略去删除旧数据(还有一种策略根据分区大小删除数据)。例如，如果将保留策略设置为两天，在记录公布后两天，它可用于消费，之后它将被丢弃以腾出空间。Kafka的性能跟存储的数据量的大小无关， 所以将数据存储很长一段时间是没有问题的。
 
-<img src='../../_images/message-queue/Kafka/log_consumer.png'>
+![img](../../_images/message-queue/Kafka/log_consumer.png)
 
 事实上，保留在每个消费者元数据中的最基础的数据就是消费者正在处理的当前记录的**偏移量(offset)或位置(position)**。这种偏移是由消费者控制：通常偏移会随着消费者读取记录线性前进，但事实上，因为其位置是由消费者进行控制，消费者可以在任何它喜欢的位置读取记录。例如，消费者可以恢复到旧的偏移量对过去的数据再加工或者直接跳到最新的记录，并消费从“现在”开始的新的记录。
 
@@ -105,7 +105,7 @@ Kafka集群保留所有发布的记录，不管这个记录有没有被消费过
 
 这是kafka用来实现一个topic消息的广播（发给所有的consumer） 和单播（发给任意一个 consumer）的手段。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现 单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需 要多次发送消息到不同的 topic； 
 
-<img src='../../_images/message-queue/Kafka/sumer-groups.png'>
+![img](../../_images/message-queue/Kafka/sumer-groups.png)
 
 两个服务器的Kafka集群具有四个分区（P0-P3）和两个消费群。A消费群有两个消费者，B群有四个。
 
@@ -181,11 +181,7 @@ Kafka结合了这些功能，这种结合对Kafka作为流应用平台以及数�
 
 ### 3.2 Kafka架构图
 
-<img src='../../_images/message-queue/Kafka/kakfa-principle.png'>
-
-
-
-
+![img](../../_images/message-queue/Kafka/kakfa-principle.png)
 
 - Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker 可以容纳多个 topic； 
 - Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上， 一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列。 partition 中的每条消息 都会被分配一个有序的 id（ offset）。 kafka 只保证按一个 partition 中的顺序将消息发给 consumer，不保证一个 topic 的整体（多个 partition 间）的顺序； 
@@ -247,13 +243,13 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 ## 4.Kafka 工作流程分析和存储机制    
 
-<img src='../../_images/message-queue/Kafka/kafka-workflow.jpg'>
+![img](../../_images/message-queue/Kafka/kafka-workflow.jpg)
 
 **Kafka中消息是以topic进行分类的**，生产者生产消息，消费者消费消息，都是面向topic的。
 
 topic是逻辑上的概念，二patition是物理上的概念，每个patition对应一个log文件，而log文件中存储的就是producer生产的数据，patition生产的数据会被不断的添加到log文件的末端，且每条数据都有自己的offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
 
-<img src='../../_images/message-queue/Kafka/kafka-partition.jpg'>
+![img](../../_images/message-queue/Kafka/kafka-partition.jpg)
 
 
 
@@ -272,7 +268,7 @@ topic是逻辑上的概念，二patition是物理上的概念，每个patition�
 
 index和log文件以当前segment的第一条消息的offset命名。下图为index文件和log文件的结构示意图。 
 
-<img src='../../_images/message-queue/Kafka/kafka-segement.jpg'>
+![img](../../_images/message-queue/Kafka/kafka-segement.jpg)
 
 
 
@@ -282,7 +278,7 @@ index和log文件以当前segment的第一条消息的offset命名。下图为in
 
 producer 写入消息流程如下： 
 
-<img src='../../_images/message-queue/Kafka/kafka-write-flow.png'>
+![img](../../_images/message-queue/Kafka/kafka-write-flow.png)
 
 
 
@@ -323,7 +319,7 @@ producer 写入消息流程如下：
 
 ​	为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
 
-<img src='../../_images/message-queue/Kafka/kafka-ack-slg.png'>
+![img](../../_images/message-queue/Kafka/kafka-ack-slg.png)
 
 ##### 1) 副本数据同步策略
 
@@ -357,15 +353,15 @@ Kafka选择了第二种方案，原因如下：
 
   ​	1：producer不等待broker的ack，这一操作提供了一个最低的延迟，broker一接收到还没有写入磁盘就已经返回，当broker故障时有可能**丢失数据**（下图为acks=1数据丢失案例）；
 
-<img src='../../_images/message-queue/Kafka/kafka-ack=1.png'>
+![img](../../_images/message-queue/Kafka/kafka-ack=1.png)
 
 ​	-1（all）：producer等待broker的ack，partition的leader和follower全部落盘成功后才返回ack。但是	如果在follower同步完成后，broker发送ack之前，leader发生故障，那么就会造成**数据重复**。（下图为acks=1数据重复案例）
 
-<img src='../../_images/message-queue/Kafka/kafka-ack=-1.png'>
+![img](../../_images/message-queue/Kafka/kafka-ack=-1.png)
 
 ##### 4) 故障处理
 
-<img src='../../_images/message-queue/Kafka/kafka-leo.png'>
+![img](../../_images/message-queue/Kafka/kafka-leo.png)
 
 
 
@@ -417,7 +413,7 @@ Kafka选择了第二种方案，原因如下：
 
 - **存储结构**
 
-<img src='../../_images/message-queue/Kafka/zookeeper-store.png'>
+![img](../../_images/message-queue/Kafka/zookeeper-store.png)
 
 
 
@@ -431,7 +427,7 @@ Kafka选择了第二种方案，原因如下：
 
   ​	下图为partition的leader选举过程：
 
-<img src='../../_images/message-queue/Kafka/controller-leader.png'>
+![img](../../_images/message-queue/Kafka/controller-leader.png)
 
 
 
@@ -439,7 +435,7 @@ Kafka选择了第二种方案，原因如下：
 
 #### 4.3.1 消费者组
 
-<img src='../../_images/message-queue/Kafka/kafka-consume-group.png'>
+![img](../../_images/message-queue/Kafka/kafka-consume-group.png)
 
 ​	消费者是以 consumer group 消费者组的方式工作，由一个或者多个消费者组成一个组， 共同消费一个 topic。每个分区在同一时间只能由 group 中的一个消费者读取，但是多个 group 可以同时消费这个 partition。在图中，有一个由三个消费者组成的 group，有一个消费者读 取主题中的两个分区，另外两个分别读取一个分区。某个消费者读取某个分区，也可以叫做 某个消费者是某个分区的拥有者。
 
@@ -501,7 +497,7 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 #### 4.4.2 零拷贝技术（todo...）
 
-<img src='../../_images/message-queue/Kafka/zero-copy.png'>
+![img](../../_images/message-queue/Kafka/zero-copy.png)
 
 
 
@@ -531,7 +527,7 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 ### 5.1 启动zk和kafka集群
 
-<img src='../../_images/message-queue/Kafka/kafka-start.png'>
+![img](../../_images/message-queue/Kafka/kafka-start.png)
 
 ### 5.2 导入 pom 依赖 
 
@@ -552,7 +548,7 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 ​	Kafka的Producer发送消息采用的是**异步发送**的方式。在消息发送过程中，涉及到了两个线程：**main线程和Sender线程**，以及一个线程共享变量：**RecordAccumulator**。main线程将消息发送给RecordAccumulator，Sender线程不断从RecordAccumulator中拉取消息发送到Kafka broker。
 
-<img src='../../_images/message-queue/Kafka/kafka-producer-thread.png'>
+![img](../../_images/message-queue/Kafka/kafka-producer-thread.png)
 
 相关参数：	
 
@@ -725,7 +721,7 @@ kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API
 
   **结果：**
 
-  <img src='../../_images/message-queue/Kafka/kakfa-java-demo.png'>
+  ![img](../../_images/message-queue/Kafka/kakfa-java-demo.png)
 
   
 
@@ -832,7 +828,7 @@ while (true) {
 
 - 需求： 实现一个简单的双 interceptor 组成的拦截链。第一个 interceptor 会在消息发送前将时间 戳信息加到消息 value 的最前部；第二个 interceptor 会在消息发送后更新成功发送消息数或 失败发送消息数。      
 
-<img src='../../_images/message-queue/Kafka/interceptor-demo.png'>
+![img](../../_images/message-queue/Kafka/interceptor-demo.png)
 
 
 
@@ -997,7 +993,7 @@ Kafka Streams是Apache Kafka 开源项目的一个组成部分。是一个功能
 
 ​	第一， Spark 和 Storm 都是流式处理框架，而 **Kafka Stream 提供的是一个基于 Kafka 的 流式处理类库**。框架要求开发者按照特定的方式去开发逻辑部分，供框架调用。开发者很难了解框架的具体运行方式，从而使得调试成本高，并且使用受限。而 Kafka Stream 作为流式处理类库，直接提供具体的类给开发者调用，整个应用的运行方式主要由开发者控制，方便使用和调试。
 
-<img src='../../_images/message-queue/Kafka/kakfa-streams-flow.png'/>    
+![img](../../_images/message-queue/Kafka/kakfa-streams-flow.png'/>    
 
 
 
@@ -1015,7 +1011,7 @@ Kafka Streams是Apache Kafka 开源项目的一个组成部分。是一个功能
 
 1. 需求： 实时处理单词带有”>>>”前缀的内容。例如输入”atguigu>>>ximenqing”，最终处理成 “ximenqing” 
 
-   <img src='../../_images/message-queue/Kafka/kafka-streams-data-clean.png'/>
+   ![img](../../_images/message-queue/Kafka/kafka-streams-data-clean.png'/>
 
 2. demo
 
