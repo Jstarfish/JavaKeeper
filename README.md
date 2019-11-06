@@ -1,4 +1,7 @@
+
+
 # 新之助学习路上的一亩三分地
+
 <p align='center'>
 <img src='images/background.png'>
 </p>
@@ -37,11 +40,17 @@
 | Project  | Version | Article                                                      |
 | :------: | :-----: | :----------------------------------------------------------- |
 | Big Data |         | [Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
-|  Kafka   |   2.12  | [Hello Kafka]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Message%20Queue/Kafka/Hello%20Kafka.md> )<br> |
 
 ------
 
+#  :email: Message Queue
 
+| Project | Version | Article                                                      |
+| :-----: | :-----: | :----------------------------------------------------------- |
+|   MQ    |         | [Hello MQ]( <[https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/%E6%B5%85%E8%B0%88%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%8F%8A%E5%B8%B8%E8%A7%81%E7%9A%84%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6.md](https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/浅谈消息队列及常见的消息中间件.md)>)<br> |
+|  Kafka  |  2.12   | [Hello Kafka]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/Kafka/Hello-Kafka.md> )<br> |
+
+------
 
 # :leaves: Spring
 
@@ -55,7 +64,7 @@
 
 ## ❗️ 勘误
 
-+ 文章只是记录自己的学习，如果在文章中发现错误或者侵权问题，欢迎指出
++ 文章只是记录自己的学习，如果在文章中发现错误或者侵权问题，欢迎指出，谢谢
 
 
 ## ©️ 转载
