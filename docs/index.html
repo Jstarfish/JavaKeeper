@@ -10,6 +10,13 @@
   <meta name="keywords" content="doc,docs,documentation,gitbook,creator,generator,github,jekyll,github-pages">
   <meta name="description" content="A magical documentation generator.">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" title="Simple">
+    <link rel="stylesheet" href="assets/css/main.css"> 
+https://jhildenbiddle.github.io/docsify-tabs/#/
+https://jhildenbiddle.github.io/docsify-themeable/#/customization
+  -->
+
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" title="vue">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/dark.css" title="dark" disabled>
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/buble.css" title="buble" disabled>
@@ -70,6 +77,10 @@
       // },
       formatUpdated: '{MM}/{DD} {HH}:{mm}',
 
+       // PLUGINS
+       // -----------------------------------------------------------------
+       executeScript: true,
+
       
 
   //       markdown: {
@@ -121,6 +132,10 @@
   <!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
 
   <!-- <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script> -->
+    <script>
+        // Initialize the default attribute listener
+        classChange.attrs();
+    </script>
 </body>
 
 </html>

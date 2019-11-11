@@ -44,7 +44,7 @@
 
 ### 1.4 企业数据部的一般组织结构 
 
-<img src='../../images/Big Data/company.png'>
+![](../_images/big-data/company.png)
 
 
 
@@ -122,7 +122,7 @@ Hortonworks 文档较好。
 
 
 
-<img src='../../images/Big Data/hadoop.png'>
+![](../_images/big-data/hadoop.png)
 
 ####  2.5.1 HDFS 架构概述 
 
@@ -142,7 +142,7 @@ Hortonworks 文档较好。
 
 4）Container：对任务运行环境的抽象，封装了 CPU、内存等多维资源以及环境变量、启动 命令等任务运行相关的信息。 
 
-<img src='../../images/Big Data/yarn.png'/>
+![](../_images/big-data/yarn.png)
 
 
 
@@ -154,7 +154,7 @@ MapReduce 将计算过程分为两个阶段：Map 和 Reduce
 
 2）Reduce 阶段对 Map 结果进行汇总 
 
-<img src='../../images/Big Data/MapReduce.png'/>
+![](../_images/big-data/MapReduce.png)
 
 
 
@@ -164,7 +164,7 @@ MapReduce 将计算过程分为两个阶段：Map 和 Reduce
 
 ### 2.6 大数据技术生态体系 
 
-<img src='../../images/Big Data/system.png'/>
+![](../_images/big-data/system.png)
 
 图中涉及的技术名词解释如下： 
 
@@ -202,7 +202,7 @@ MapReduce 将计算过程分为两个阶段：Map 和 Reduce
 
 ### 2.7 推荐系统框架图 
 
-<img src='../../images/Big Data/recommend .png'/>
+![](../_images/big-data/recommend .png)
 
 
 

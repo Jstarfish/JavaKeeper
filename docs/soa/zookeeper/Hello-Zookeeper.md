@@ -1,4 +1,4 @@
-# 1. What is ZooKeeper?
+# 1. 概述
 
 Zookeeper是一个开源的分布式的，为分布式应用提供协调服务的Apache项目 。
 
@@ -6,51 +6,40 @@ ZooKeeper是一个集中的服务，可用于维护配置信息、统一命名�
 
 **ZooKeeper 的设计目标是将那些复杂且容易出错的分布式一致性服务封装起来，构成一个高效可靠的原语集，并以一系列简单易用的接口提供给用户使用** 
 
-Zookeeper服务本身是分布式的，并且高度可靠 
-
-ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services. All of these kinds of services are used in some form or another by distributed applications. Each time they are implemented there is a lot of work that goes into fixing the bugs and race conditions that are inevitable. Because of the difficulty of implementing these kinds of services, applications initially usually skimp on them, which make them brittle in the presence of change and difficult to manage. Even when done correctly, different implementations of these services lead to management complexity when the applications are deployed.
-
-ZooKeeper aims at distilling the essence of these different services into a very simple interface to a centralized coordination service. The service itself is distributed and highly reliable. Consensus, group management, and presence protocols will be implemented by the service so that the applications do not need to implement them on their own. Application specific uses of these will consist of a mixture of specific components of Zoo Keeper and application specific conventions. [ZooKeeper Recipes](http://hadoop.apache.org/zookeeper/docs/current/recipes.html) shows how this simple service can be used to build much more powerful abstractions. 
+Zookeeper服务本身是分布式的，并且高度可靠   
 
 
 
-## 1.1 概述
-
-ZooKeeper allows distributed processes to coordinate with each other through a shared hierarchical name space of data registers (we call these registers znodes), much like a file system. Unlike normal file systems ZooKeeper provides its clients with high throughput, low latency, highly available, strictly ordered access to the znodes. The performance aspects of ZooKeeper allow it to be used in large distributed systems. The reliability aspects prevent it from becoming the single point of failure in big systems. Its strict ordering allows sophisticated synchronization primitives to be implemented at the client.
-
-The name space provided by ZooKeeper is much like that of a standard file system. A name is a sequence of path elements separated by a slash ("/"). Every znode in ZooKeeper's name space is identified by a path. And every znode has a parent whose path is a prefix of the znode with one less element; the exception to this rule is root ("/") which has no parent. Also, exactly like standard file systems, a znode cannot be deleted if it has any children.
-
-The main differences between ZooKeeper and standard file systems are that every znode can have data associated with it (every file can also be a directory and vice-versa) and znodes are limited to the amount of data that they can have. ZooKeeper was designed to store coordination data: status information, configuration, location information, etc. This kind of meta-information is usually measured in kilobytes, if not bytes. ZooKeeper has a built-in sanity check of 1M, to prevent it from being used as a large data store, but in general it is used to store much smaller pieces of data.
+## 1.1 特性
 
 ![img](https://cwiki.apache.org/confluence/download/attachments/24193436/service.png?version=1&modificationDate=1295027310000&api=v2)
 
-The service itself is replicated over a set of machines that comprise the service. These machines maintain an in-memory image of the data tree along with a transaction logs and snapshots in a persistent store. Because the data is kept in-memory, ZooKeeper is able to get very high throughput and low latency numbers. The downside to an in-memory database is that the size of the database that ZooKeeper can manage is limited by memory. This limitation is further reason to keep the amount of data stored in znodes small.
-
-The servers that make up the ZooKeeper service must all know about each other. As long as a majority of the servers are available, the ZooKeeper service will be available. Clients must also know the list of servers. The clients create a handle to the ZooKeeper service using this list of servers.
-
-Clients only connect to a single ZooKeeper server. The client maintains a TCP connection through which it sends requests, gets responses, gets watch events, and sends heartbeats. If the TCP connection to the server breaks, the client will connect to a different server. When a client first connects to the ZooKeeper service, the first ZooKeeper server will setup a session for the client. If the client needs to connect to another server, this session will get reestablished with the new server.
-
-Read requests sent by a ZooKeeper client are processed locally at the ZooKeeper server to which the client is connected. If the read request registers a watch on a znode, that watch is also tracked locally at the ZooKeeper server. Write requests are forwarded to other ZooKeeper servers and go through consensus before a response is generated. Sync requests are also forwarded to another server, but do not actually go through consensus. Thus, the throughput of read requests scales with the number of servers and the throughput of write requests decreases with the number of servers.
-
-Order is very important to ZooKeeper; almost bordering on obsessive–compulsive disorder. All updates are totally ordered. ZooKeeper actually stamps each update with a number that reflects this order. We call this number the zxid (ZooKeeper Transaction Id). Each update will have a unique zxid. Reads (and watches) are ordered with respect to updates. Read responses will be stamped with the last zxid processed by the server that services the read.
-
-Zookeeper是一个开源的分布式的，为分布式应用提供协调服务的Apache项目。 
-
-Zookeeper从设计模式角度来理解是一个基于观察者模式设计的服务管理框架，负责存储和管理数据，然后接收管理者的注册，一旦数据的状态发生变化，Zookeeper就通知注册者。
-
-
-
-## 1.2 特点
-
 1. Zookeeper：一个领导者（leader），多个跟随者（follower）组成的集群。
+
 2. Leader负责进行投票的发起和决议，更新系统状态
+
 3. Follower用于接收客户请求并向客户端返回结果，在选举Leader过程中参与投票
+
 4. 集群中只要有半数以上节点存活，Zookeeper集群就能正常服务。
+
 5. 全局数据一致：每个server保存一份相同的数据副本，client无论连接到哪个server，数据都是一致的。
+
 6. **顺序一致性：** 从同一客户端发起的事务请求，最终将会严格地按照顺序被应用到 ZooKeeper 中去。
+
 7. **原子性：** 所有事务请求的处理结果在整个集群中所有机器上的应用情况是一致的，也就是说，要么整个集群中所有的机器都成功应用了某一个事务，要么都没有应用。
+
 8. 实时性，在一定时间范围内，client能读到最新数据。
+
 9. **可靠性：** 一旦一次更改请求被应用，更改的结果就会被持久化，直到被下一次更改覆盖。
+
+   
+
+## 1.2 设计目标
+
+- **简单的数据结构** ：Zookeeper 使得分布式程序能够通过一个共享的树形结构的名字空间来进行相互协调，即Zookeeper 服务器内存中的数据模型由一系列被称为ZNode的数据节点组成，Zookeeper 将全量的数据存储在内存中，以此来提高服务器吞吐、减少延迟的目的。
+- **可以构建集群** ： Zookeeper 集群通常由一组机器构成，组成 Zookeeper 集群的而每台机器都会在内存中维护当前服务器状态，并且每台机器之间都相互通信。
+- **顺序访问** ： 对于来自客户端的每个更新请求，Zookeeper 都会分配一个全局唯一的递增编号，这个编号反映了所有事务操作的先后顺序。
+- **高性能** ：Zookeeper 和Redis一样全量数据存储在内存中，100%读请求压测QPS 12-13W
 
 
 
@@ -58,7 +47,7 @@ Zookeeper从设计模式角度来理解是一个基于观察者模式设计的�
 
 Zookeeper数据模型的结构与Unix文件系统的结构相似，整体上可以看做是一棵树，每个节点称作一个ZNode.。每个ZNode默认能存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
 
-<img src='../../images/Big Data/Hello Zookeeper/zk-znode.png'>
+![](../../_images/zookeeper/zk-znode.png)
 
 
 
@@ -68,7 +57,7 @@ Zookeeper数据模型的结构与Unix文件系统的结构相似，整体上可�
 
 #### 统一命名服务
 
-在分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同服务。
+在分布式系统中，通过使用命名服务，客户端应用能够根据指定名字来获取资源或服务的地址，提供者等信息。被命名的实体通常可以是集群中的机器，提供的服务地址，进程对象等等——这些我们都可以统称他们为名字（Name）。其中较为常见的就是一些分布式服务框架中的服务地址列表。通过调用ZK提供的创建节点的API，能够很容易创建一个全局唯一的path，这个path就可以作为一个名称。 
 
 （1）类似于域名与ip之间对应关系，ip不容易记住，而域名容易记住。
 
@@ -87,7 +76,7 @@ Zookeeper数据模型的结构与Unix文件系统的结构相似，整体上可�
 - 各个节点监听这个Znode。
 - 一旦Znode中的数据被修改，ZooKeeper将通知各个节点。
 
-<img src='../../images/Big Data/Hello Zookeeper/zk-unify-conf.png'>
+![](../../_images/zookeeper/zk-unify-conf.png)
 
 #### 统一集群管理
 
@@ -102,9 +91,13 @@ Zookeeper数据模型的结构与Unix文件系统的结构相似，整体上可�
 
 #### 软负载均衡
 
-<img src='../../images/Big Data/Hello Zookeeper/zk-loadbalancing.png'>
+![](../../_images/zookeeper/zk-loadbalancing.png)
 
 #### 服务器动态上下线
+
+#### 分布式锁
+
+分布式锁，这个主要得益于ZooKeeper为我们保证了数据的强一致性。锁服务可以分为两类，一个是保持独占，另一个是控制时序。 所谓保持独占，就是所有试图来获取这个锁的客户端，最终只有一个可以成功获得这把锁。通常的做法是把zk上的一个znode看作是一把锁，通过create znode的方式来实现。所有客户端都去创建 /distribute_lock 节点，最终成功创建的那个客户端也即拥有了这把锁。 控制时序，就是所有视图来获取这个锁的客户端，最终都是会被安排执行，只是有个全局时序了。做法和上面基本类似，只是这里 /distribute_lock 已绊预先存在，客户端在它下面创建临时有序节点（这个可以通过节点的属性控制：CreateMode.EPHEMERAL_SEQUENTIAL来指定）。Zk的父节点（/distribute_lock）维持一份sequence,保证子节点创建的时序性，从而也形成了每个客户端的全局时序
 
 
 
@@ -267,7 +260,7 @@ Zookeeper采用ACL（AccessControlLists）策略来进行权限控制，类似�
 
 假设有五台服务器组成的Zookeeper集群，它们的id从1-5，同时它们都是最新启动的，也就是没有历史数据，在存放数据量这一点上，都是一样的。假设这些服务器依序启动，来看看会发生什么，如下图所示。
 
-<img src='../../images/Big Data/Hello Zookeeper/zk-elect.jpg'>
+![](../../_images/zookeeper/zk-elect.jpg)
 
 1. 服务器1启动，此时只有它一台服务器启动了，它发出去的报文没有任何响应，所以它的选举状态一直是LOOKING状态。
 2. 服务器2启动，它与最开始启动的服务器1进行通信，互相交换自己的选举结果，由于两者都没有历史数据，所以id值较大的服务器2胜出，但是由于没有达到超过半数以上的服务器都同意选举它(这个例子中的半数以上是3)，所以服务器1、2还是继续保持LOOKING状态。
@@ -277,7 +270,7 @@ Zookeeper采用ACL（AccessControlLists）策略来进行权限控制，类似�
 
 ## 3.2 节点类型
 
-   ![](C:\Users\jiahaixin\Desktop\BFFAF6E0-625A-49a4-BF9C-9E529D860BF1.jpg)
+   ![](https://zookeeper.apache.org/doc/current/images/zknamespace.jpg)
 
 ## 3.3 Stat结构体
 
@@ -311,13 +304,13 @@ Zookeeper采用ACL（AccessControlLists）策略来进行权限控制，类似�
 
 
 
-<img src='../../images/Big Data/Hello Zookeeper/\zk-listener.png'>
+![](../../_images/zookeeper/\zk-listener.png)
 
 
 
 ## 3.5 写数据流程
 
-   <img src='../../images/Big Data/Hello Zookeeper/zk-write-data.png'>
+   ![](../../_images/zookeeper/zk-write-data.png)
 
 
 
@@ -341,33 +334,9 @@ Zookeeper采用ACL（AccessControlLists）策略来进行权限控制，类似�
 
 
 
-## 4.3 API应用
+## 4.2 API应用
 
-### 4.3.1 Eclipse环境搭建
-
-1．创建一个Maven工程
-
-2．添加pom文件
-
-3．拷贝log4j.properties文件到项目根目录
-
-需要在项目的src/main/resources目录下，新建一个文件，命名为“log4j.properties”，在文件中填入。
-
-log4j.rootLogger=INFO, stdout  
-
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender  
-
-log4j.appender.stdout.layout=org.apache.log4j.PatternLayout  
-
-log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - %m%n  
-
-log4j.appender.logfile=org.apache.log4j.FileAppender  
-
-log4j.appender.logfile.File=target/spring.log  
-
-log4j.appender.logfile.layout=org.apache.log4j.PatternLayout  
-
-log4j.appender.logfile.layout.ConversionPattern=%d %p [%c] - %m%n  
+### 4.3.1 环境搭建
 
 ### 4.3.2 创建ZooKeeper客户端
 
@@ -377,23 +346,17 @@ log4j.appender.logfile.layout.ConversionPattern=%d %p [%c] - %m%n
 
 ### 4.3.5 判断Znode是否存在
 
-## 4.4 监听服务器节点动态上下线案例
-
-1．需求
-
-某分布式系统中，主节点可以有多台，可以动态上下线，任意一台客户端都能实时感知到主节点服务器的上下线。
-
 
 
 # 企业面试真题
 
 ## 5.1 请简述ZooKeeper的选举机制
 
-详见3.1。
+
 
 ## 5.2 ZooKeeper的监听原理是什么？
 
-详见3.4。
+
 
 ## 5.3 ZooKeeper的部署方式有哪几种？集群中的角色有哪些？集群最少需要几台机器？
 
