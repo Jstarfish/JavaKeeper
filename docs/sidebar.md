@@ -1,7 +1,7 @@
 - **Java基础**
 - [JUC](#)
 - [NIO](#)
-- ***数据存储和缓存***
+- **数据存储和缓存**
 - [![MySQL](https://icongram.jgog.in/devicon/mysql-original.svg?&size=16)MySQL](mysql/readMySQL.md)
 - [![Redis](https://icongram.jgog.in/devicon/redis-original.svg?&size=16)Redis]( https://redis.io/ )
 - [![mongoDB](https://icongram.jgog.in/devicon/mongodb-original.svg?&size=16)mongoDB]( https://redis.io/ )
@@ -38,5 +38,4 @@
 - [![Twitter](https://icongram.jgog.in/simple/twitter.svg?colored&size=16)@jhildenbiddle](http://twitter.com/jhildenbiddle)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
-- [![NPM](https://icongram.jgog.in/simple/npm.svg?colored&size=16)NPM](https://www.npmjs.com/package/docsify-tabs)
-- [![Twitter](https://icongram.jgog.in/simple/twitter.svg?colored&size=16)@jhildenbiddle](http://twitter.com/jhildenbiddle)
+- [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
