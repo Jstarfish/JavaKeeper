@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+    <title>docsify-themeable (Test)</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" title="Defaults" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-defaults.css">
+
+    <!-- Alternate Stylesheets -->
+    <link rel="stylesheet alternate" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" title="Simple">
+    <link rel="stylesheet alternate" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css" title="Simple Dark">
+
+    <!-- PrismJS Themes -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs-themes/dist/coy.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-github/prism-github.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs-themes/dist/midnight.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-theme-one-dark/prism-onedark.css"> -->
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <!-- JavaScript -->
+    <script>
+        window.$docsify = {
+            // GENERAL
+            // -----------------------------------------------------------------
+            name         : 'docsify-themeable',
+            repo         : 'https://github.com/jhildenbiddle/docsify-themeable',
+            homepage     : '../markdown.md',
+            loadNavbar   : 'navbar.md',
+            // themeColor   : 'purple',
+
+            // NAVIGATION
+            // -----------------------------------------------------------------
+            auto2top     : true,
+            maxLevel     : 3,
+            autoHeader   : true,
+            mergeNavbar  : true,
+            subMaxLevel  : 3,
+
+            // PLUGINS
+            // -----------------------------------------------------------------
+            search       : {
+                depth      : 3,
+                noData     : 'No results!',
+                placeholder: 'Search...'
+            },
+            themeable    : {
+                // readyTransition : false,
+                // responsiveTables: false
+            }
+        };
+    </script>
+    <script src="../assets/js/main.js"></script>
+
+    <!-- Docsify + Themeable -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0"></script>
+
+    <!-- Docsify Plugins -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script> -->
+
+    <!-- PrismJS Options -->
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+</body>
+</html>

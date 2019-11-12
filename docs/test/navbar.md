@@ -1,0 +1,46 @@
+- Text
+- [Link](http://google.com)
+- [Menu (Link)](http://google.com)
+  - [![alt text](https://icongram.jgog.in/simple/facebook.svg?colored&size=16)Facebook](http://facebook.com)
+  - [![alt](https://icongram.jgog.in/simple/github.svg?colored&size=16)Github](http://github.com)
+  - [![alt](https://icongram.jgog.in/simple/instagram.svg?colored&size=16)Instagram](http://instagram.com)
+  - [![alt](https://icongram.jgog.in/simple/linkedin.svg?colored&size=16)Linkedin](http://linkedin.com)
+  - [![alt](https://icongram.jgog.in/simple/pinterest.svg?colored&size=16)Pinterest](http://pinterest.com)
+  - [![alt](https://icongram.jgog.in/simple/tumblr.svg?colored&size=16)Tumblr](http://tumblr.com)
+  - [![alt](https://icongram.jgog.in/simple/twitter.svg?colored&size=16)Twitter](http://twitter.com)
+  - [![alt](https://icongram.jgog.in/simple/youtube.svg?colored&size=16)YouTube](http://youtube.com)
+- Menu <span>(Text)</span>
+  - [Alfa](#)
+  - [Bravo](#)
+  - [Charlie](#)
+  - [Delta](#)
+  - [Echo](#)
+  - [Foxtrot](#)
+  - [Golf](#)
+  - [Hotel](#)
+  - [India](#)
+  - [Juliett](#)
+  - [Kilo](#)
+  - [Lima](#)
+  - [Mike](#)
+  - [November](#)
+  - [Oscar](#)
+  - [Papa](#)
+  - [Quebec](#)
+  - [Romeo](#)
+  - [Sierra](#)
+  - [Tango](#)
+  - [Uniform](#)
+  - [Victor](#)
+  - [Whiskey](#)
+  - [X-ray](#)
+  - [Yankee](#)
+  - [Zulu](#)
+- Themes
+  - <a href="#" data-link-title="Defaults">Defaults</a>
+  - <a href="#" data-link-title="Simple">Simple</a>
+  - <a href="#" data-link-title="Simple Dark">Simple Dark</a>
+  - <a href="#" data-link-href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">Vue</a>
+  - <a href="#" data-link-href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css">Buble</a>
+  - <a href="#" data-link-href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">Dark</a>
+  - <a href="#" data-link-href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/pure.css">Pure</a>

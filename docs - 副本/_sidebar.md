@@ -1,7 +1,8 @@
 - **Java Logging**
 
-  - [缕清各种Java Logging](logging/Java-Logging.md)
-  - [hello logback](logging/logback简单使用.md)
+- [缕清各种Java Logging](logging/Java-Logging.md)
+- [hello logback](logging/logback简单使用.md)
+
 - **面向服务架构 (SOA)**
 
   - [消息中间件](message-queue/readMQ.md)

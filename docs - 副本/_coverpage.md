@@ -1,5 +1,3 @@
-
-
 <img src="_media/icon.png"  width="400" />
 
 
