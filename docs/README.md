@@ -1,9 +1,5 @@
 ## lazyegg
 
-> 学习路上的总结
+> 每周下一颗学习JAVA开发的鸡蛋 :egg:  ​​
 
 
-
-## Blog
-
-My blog: https://www.lazyegg.net/

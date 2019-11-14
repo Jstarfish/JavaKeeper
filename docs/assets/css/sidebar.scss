@@ -1,0 +1,92 @@
+@import './_palette.scss';
+@import './_variables.scss';
+
+.sidebar-toggle span {
+  background-color: $secondary;
+}
+
+.sidebar {
+  /* For collapsing all but current page */
+  font-family: 'Dosis', sans-serif;
+
+  .collapse ul {
+    display: none;
+  }
+
+  li {
+    margin: 0;
+
+    a {
+      height: 36px;
+    }
+  }
+
+  /* Top-level ul */
+  .sidebar-nav > ul {
+    margin-left: $unit * 4;
+
+    & > li {
+      margin: $unit * 3 0;
+      & > p > a {
+        font-size: 18px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  /* Sub-level ul */
+  .sidebar-nav > ul ul {
+    margin-left: $unit * 3;
+
+    & > li {
+      a {
+        font-size: 16px;
+      }
+    }
+  }
+
+  /**
+  * For highlighting the currently selected page
+  * Because the default assumes you only want things highlighted if they don't have any subpages
+  **/
+  ul li .active > a {
+    border-right: $unit * 3/4 solid;
+    color: $secondary;
+    font-weight: 600;
+  }
+
+  .active {
+    &.engine-developer {
+      & > a,
+      & li.active > a {
+        color: $secondary;
+      }
+    }
+
+    &.ml-integrator {
+      & > a,
+      & li.active > a {
+        color: $accent2;
+      }
+    }
+
+    &.ml-explorer {
+      & > a,
+      & li.active > a {
+        color: $accent3;
+      }
+    }
+
+    &.app-developer {
+      & > a,
+      & li.active > a {
+        color: $accent1;
+      }
+    }
+  }
+
+  /* Provide some differentiation between section headings and sub-pages in the sidebar */
+  .section-link {
+    font-style: italic;
+  }
+}

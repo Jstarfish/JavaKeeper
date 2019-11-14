@@ -8,7 +8,5 @@
 
 <br>
 
-###  [1. MySQL索引及优化](/mysql/MySQL-index.md)
-
-### [2. MySQL锁机制](/mysql/MySQL-index.md)
+mysql基础知识
 

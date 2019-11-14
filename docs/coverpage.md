@@ -1,4 +1,4 @@
-![](/_media/icon.png)
+![](/_media/icon.svg)
 
 
 
