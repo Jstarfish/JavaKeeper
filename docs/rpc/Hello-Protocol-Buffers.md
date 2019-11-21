@@ -1,9 +1,3 @@
----
-title: Protocol-Buffers-Hello-World
-date: 2019-08-11 17:26:52
-category: Big Data
----
-
 Google Protocol Buffer( 简称 Protobuf) 是 Google 公司内部的混合语言数据标准 ,是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化(将 数据结构或对象 转换成 二进制串 的过程 )。它很适合做**数据存储**或 **RPC 数据交换**格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式 
 
 *protocol buffers 诞生之初是为了解决服务器端新旧协议(高低版本)兼容性问题，名字也很体贴，“协议缓冲区”。只不过后期慢慢发展成用于传输数据。*
@@ -33,7 +27,7 @@ Google Protocol Buffer( 简称 Protobuf) 是 Google 公司内部的混合语言�
 
 ### Hello World
 
-1. #### 定义 `.proto` 文件的消息格式（你希望存储的数据格式描述文件）
+1. ##### 定义 `.proto` 文件的消息格式（你希望存储的数据格式描述文件）
 
    ```protobuf
    syntax = "proto2";
@@ -93,7 +87,7 @@ Google Protocol Buffer( 简称 Protobuf) 是 Google 公司内部的混合语言�
      <img src='../../images/RPC/pb-vs-java.png'>
    </p>
 
-2. #### 使用 protocol buffer 编译器（下载地址：<https://github.com/protocolbuffers/protobuf/releases> )
+2. ##### 使用 protocol buffer 编译器（下载地址：<https://github.com/protocolbuffers/protobuf/releases> )
 
    ##### winows的话 cmd到编译器安装目录的bin目录中，执行  **protoc.exe -h  （E:\learning\protoc-3.9.0-win64\bin>protoc.exe -h**），可以看到参数说明。
 
@@ -110,27 +104,21 @@ Google Protocol Buffer( 简称 Protobuf) 是 Google 公司内部的混合语言�
 
 ![pd-idea-screenshot](../_images/rpc/pd-idea-screenshot.png)
 
-3. #### 通过 Java protocol buffer API 读写消息格式
+3. ##### 通过 Java protocol buffer API 读写消息格式
 
-```
+```java
 package priv.starfish.ProtocolBuffers;
-
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import priv.starfish.ProtocolBuffers.AddressBookProtos.Person;
 import priv.starfish.ProtocolBuffers.AddressBookProtos.AddressBook;
 import java.util.Arrays;
-
 /**
  * @author: starfish
  * @date: 2019/7/24 14:39
  * @description:
  */
 public class HelloProto {
-
     public static void main(String[] args) {
-
-
         Person person = Person.newBuilder()
                 .setId(123)
                 .setName("starfish")
@@ -142,7 +130,6 @@ public class HelloProto {
                 .build();
 
         System.out.println(person.toString());
-
         System.out.println(person.isInitialized());
 
         try {
@@ -157,7 +144,6 @@ public class HelloProto {
             e.printStackTrace();
         }
 
-
         // 向地址簿添加两条Person信息
         AddressBook.Builder books = AddressBook.newBuilder();
         books.addPeople(person);
@@ -165,7 +151,6 @@ public class HelloProto {
                 .build());
         System.out.println("AddressBook对象信息：");
         System.out.println(books.build());
-
     }
 }
 ```
@@ -192,7 +177,7 @@ PB常用方法
 
 
 
-Reference:
+**Reference:**
 
 <https://github.com/halfrost/Halfrost-Field/blob/master/contents/Protocol/Protocol-buffers-encode.md#%E5%85%AD-protocol-buffer-%E7%BC%96%E7%A0%81%E5%8E%9F%E7%90%86> 
 
