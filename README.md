@@ -1,5 +1,3 @@
-
-
 # 新之助学习路上的一亩三分地
 
 <p align='center'>
@@ -22,9 +20,13 @@
 <a href="https://www.zhihu.com/people/halfrost/activities"><img src="https://img.shields.io/badge/%E7%9F%A5%E4%B9%8E-@halfrost-50E3C2.svg?style=flat&colorA=0083ea"></a>
 <img src="https://img.shields.io/badge/PR-welcome%20!-brightgreen.svg?colorA=a0cd34">
 </p>
--->
+-->  
 
-<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/博客-CSDN-critical.svg"></a><a href="https://lazyegg.net"><img src=" https://img.shields.io/badge/Blog-lazyegg-blue "></a>
+<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/博客-CSDN-critical.svg"></a>
+
+<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/MyBlog-lazyegg-orange"></a>
+
+
 
 
 

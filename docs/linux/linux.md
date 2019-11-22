@@ -1,3 +1,21 @@
+![](https://www.w3cschool.cn/attachments/image/20170622/1498118505466168.jpg)
+
+ Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
+
+Linux是众多操作系统之一 , 目前流行的服务器和 PC 端操作系统有 Linux、Windows、UNIX 等 
+
+
+
+W2Cschool https://www.w3cschool.cn/linux/ 
+
+ http://c.biancheng.net/linux_tutorial/ 
+
+鸟哥的Linux私房菜 http://linux.vbird.org/linux_basic/ 
+
+
+
+
+
 ## 1.Linux的文件权限
 
 在linux中的每个用户必须属于一个组，不能独立于组外。在linux中每个文件有所有者、所在组、其它组的概念
@@ -12,15 +30,16 @@ ls -l(别名ll 就可以查看)
 
 第一列的十位字母代表的是文件的类型和权限，第一个字符代表这个文件是“目录、文件或链接文件等”含义：
 
-   d：代表是目录
+- d：代表是目录
 
-  -：代表是文件
+-  -：代表是文件
 
- 	 l：代表是连接文件
+- l：代表是连接文件
 
- 	 b：代表设备文件里可供存储的接口设备
+- b：代表设备文件里可供存储的接口设备
 
- 	 c：代表设备文件里面的串行端口设备。如键盘，鼠标等
+- c：代表设备文件里面的串行端口设备。如键盘，鼠标等
+
 
 后边9个字符，每3个字符为一组，“rwx”（可读、可写、可执行eXecute）这三个参数的组合，（rwx3者的顺序不能改变，换句话说，第一个要么是r,要么啥都没有，不能是w或者x），三个组合分别代表“文件所有者的权限”、“同用户组的权限”、“其他非本用户组的权限”。
 
@@ -28,92 +47,86 @@ ls -l(别名ll 就可以查看)
 
 **权限的重要性：**
 
-系统保护的功能；
+- 系统保护的功能；
 
-团队开发软件或数据共享的功能；
+- 团队开发软件或数据共享的功能；
+
 
 **改变文件属性和权限：**
 
-- **chgrp**: 改变文件所属用户组(change group)
+- <font color=red>**chgrp**</font>: 改变文件所属用户组(change group)
 
-- - - chgrp [-R]  users  目录或文件 ： 将这个路径下的文件的用户组改成“users“
-    - 这个新用户组一定得是/etc/group下有的，否则会报错。
-    - 若最后一个参数是目录，则表示只将这个目录下的文件的用户组改成这个。
-    - R表示若最后一个参数是目录，则将当前目录下的文件连同子目录下的所有文件的用户组都改成这个。
+  - chgrp [-R]  users  目录或文件 ： 将这个路径下的文件的用户组改成“users“
+  - 这个新用户组一定得是/etc/group下有的，否则会报错。
+  - 若最后一个参数是目录，则表示只将这个目录下的文件的用户组改成这个。
+  - R表示若最后一个参数是目录，则将当前目录下的文件连同子目录下的所有文件的用户组都改成这个。
 
-- **chown**: 改变文件所有者(change owner)
+- <font color=red>**chown**</font>: 改变文件所有者(change owner)
 
-- - - chown [-R] 用户名 文件或目录 ： 将这个目录下的所有文件的所有者都改成这个用户名。
-    - 这个用户名必须是/etc/passwd下有的才行。
-    - 这个命令可以既修改文件主又修改用户组：
-    - chown [-R] 用户名：用户组名 目录/文件（：和 . 都可以）
-    - chown [-R] 用户名.用户组名 目录/文件
-    - 由于用户名可以存在小数点，当出现含有小数点的用户名时，系统会发生误判，所以我们一般都使用：来连接用户名和用户组名。
-    - 还可以仅修改用户组名：chown [-R] .用户组名 目录/文件
+  - chown [-R] 用户名 文件或目录 ： 将这个目录下的所有文件的所有者都改成这个用户名。
+  - 这个用户名必须是/etc/passwd下有的才行。
+  - 这个命令可以既修改文件主又修改用户组：
+  - chown [-R] 用户名：用户组名 目录/文件（：和 . 都可以）
+  - chown [-R] 用户名.用户组名 目录/文件
+  - 由于用户名可以存在小数点，当出现含有小数点的用户名时，系统会发生误判，所以我们一般都使用：来连接用户名和用户组名。
+  - 还可以仅修改用户组名：chown [-R] .用户组名 目录/文件
 
-- **chmod**: 改变文件的权限
+- **<font color=red>chmod</font>**: 改变文件的权限
 
- 改变文件的权限有两种方法：用数字或者符号进行权限的修改
+   改变文件的权限有两种方法：用数字或者符号进行权限的修改
 
-a）用数字进行权限的修改
+  1. ##### 用数字进行权限的修改
 
-Linux文件的基本权限有9个，分别是owner、group、others三种身份各有自己的read、write、execute权限。在这种方式中，r＝4、w＝2、x＝1，将每一组的三个值加起来，组成一个三位数即可。例如：
+  ​		Linux文件的基本权限有9个，分别是owner、group、others三种身份各有自己的read、write、execute		权限。在这种方式中，r＝4、w＝2、x＝1，将每一组的三个值加起来，组成一个三位数即可。例如：
 
-文件主：rwx ＝ 4＋2＋1＝7；
+  ​		文件主：rwx ＝ 4＋2＋1＝7；
 
-同组用户：rwx＝4＋2＋1＝7；
+  ​		同组用户：rwx＝4＋2＋1＝7；
 
-其他人：－－－＝0＋0＋0＝0；
+  ​		其他人：－－－＝0＋0＋0＝0；
 
-所以命令如下：
+  ​		所以命令如下：
 
-**chmod [-R] 770  文件/目录**
+     **chmod [-R] 770  文件/目录**
 
-b）用符号进行权限的修改s
+  2. **用符号进行权限的修改**
 
-用u、g、o 代表user、group、others三种身份的权限，a 代表 all，也就是全部的身份。 +（加入），-（除去），=（设置）。
+     用u、g、o 代表user、group、others三种身份的权限，a 代表 all，也就是全部的身份。 +（加入），-（除去），=（设置）。
 
-**chmod u/g/o/a +/-/= r/w/x 文件/目录**
+  ​       **chmod u/g/o/a +/-/= r/w/x 文件/目录**
 
-例子：文件主能够读、写、执行；同组用户和其他用户能够读、执行。
+  ​       例子：文件主能够读、写、执行；同组用户和其他用户能够读、执行。
 
-**chmod u=rwx,go=rx 文件名**
+  ​       **chmod u=rwx,go=rx 文件名**
 
-假设原先不知道文件的属性，现在只想让所有的人能够执行这个文件，则：
+  ​       假设原先不知道文件的属性，现在只想让所有的人能够执行这个文件，则：
 
-**chmod a+x 文件/目录**
+  ​      **chmod a+x 文件/目录**
 
-假设原先不知道文件的属性，现在只想让同组用户和其他用户无法写，则：
+  ​      假设原先不知道文件的属性，现在只想让同组用户和其他用户无法写，则：
 
-**chmod go-w 文件/目录**
+  ​     **chmod go-w 文件/目录**
 
-**☆☆☆☆**
+<font color=blue>**目录和文件的权限意义：**</font>
 
-**目录和文件的权限意义：**
+- 权限对文件的意义.
+  - r：代表可读取此文件的实际内容
+  - w：代表可以编辑、新增或者修改文件的内容（但是不包含删除文件）
+  - x：代表该文件具有可以被系统执行的权限。<与windows不同，在Linux中判断一个文件是否可以执行，不是根据后缀名（如.exe ，.bat，.com），而是和这个文件是否具有“x”权限决定的。>
 
-a）权限对文件的意义.
+- 权限对目录的意义
+  -  r：代表具有读取目录结构列表的权限（你可以使用ls命令将目录下的所有列表读出来）
 
-​            r：代表可读取此文件的实际内容
+  - w：这个权限对目录来说可是很强大的，表示你具有更改该目录结构列表的权限
 
-​      w：代表可以编辑、新增或者修改文件的内容（但是不包含删除文件）
+    主要有：
 
-​      x：代表该文件具有可以被系统执行的权限。<与windows不同，在Linux中判断一个文件是否可以执行，不是根据后缀名（如.exe ，.bat，.com），而是和这个文件是否具有“x”权限决定的。>
+    - 新建新的文件与目录
+    - 删除已经存在的文件或者目录（无论文件的权限是怎样的）
+    - 将已经存在的文件或者目录重命名
+    - 转移该目录内的文件、目录位置
 
-b）权限对目录的意义
-
-​     r：代表具有读取目录结构列表的权限（你可以使用ls命令将目录下的所有列表读出来）
-
-​     w：这个权限对目录来说可是很强大的，表示你具有更改该目录结构列表的权限
-
-​        主要有：新建新的文件与目录
-
-​              删除已经存在的文件或者目录（无论文件的权限是怎样的）
-
-​              将已经存在的文件或者目录重命名
-
-​              转移该目录内的文件、目录位置
-
-​     x：目录虽然不可以被拿来执行，但是目录的x代表的是用户能否进入该目录成为工作目录的用途。（所谓工作目录就是你当下的目录，也就是时候，如果目录不具有x权限，那么你就不能通过cd命令进入到该目录下工作）。
+  - x：目录虽然不可以被拿来执行，但是目录的x代表的是用户能否进入该目录成为工作目录的用途。（所谓工作目录就是你当下的目录，也就是时候，如果目录不具有x权限，那么你就不能通过cd命令进入到该目录下工作）。
 
 能不能进入某一目录，只与该目录的x 权限有关。
 
@@ -185,15 +198,15 @@ b）权限对目录的意义
 
 ## 3.Linux文件与目录操作
 
-- **绝对路径：**
+**绝对路径：**
 
 路径的写法，由根目录 / 写起，例如： /usr/share/doc 这个目录。
 
-- **相对路径：**
+**相对路径：**
 
 路径的写法，不是由 / 写起，例如由 /usr/share/doc 要到 /usr/share/man 底下时，可以写成： cd ../man 这就是相对路径的写法啦！
 
-**目录的相关操作：**
+### 目录的相关操作
 
 **ls**（查看文件与目录）
 
@@ -207,79 +220,72 @@ b）权限对目录的意义
 
 加了-p 参数，可以自行创建多层目录， 加了-m，可以强制设置属性。
 
-case:
-
-*mkdir test*
-
-*mkdir -p test1/test2/test3/test4*
-
-*mkdir -m 711 test2（给予新目录drwx--x--x的权限）*
+```shell
+mkdir test
+mkdir -p test1/test2/test3/test4*
+mkdir -m 711 test2（给予新目录drwx--x--x的权限）
+```
 
 **rmdir**（删除“空”目录）
 
-*rmdir [-p] 目录名称（-p 可以连同上层空目录一起删除）*
+`rmdir [-p] 目录名称（-p 可以连同上层空目录一起删除）`
 
-*rmdir -p test1/test2/test3/test4*
+```shell
+rmdir -p test1/test2/test3/test4
+```
 
-**cp**（复制文件或目录）
+<font color=red>**cp**</font>（复制文件或目录）
 
-*cp [-adfilprsu] 源文件（source） 目标文件（destination）*
+```shell
+cp [-adfilprsu] 源文件（source） 目标文件（destination
+```
 
-**-a**：相当于-pdr的意思；
+- **-a**：相当于-pdr的意思；
+- **-i**：若目标文件已经存在且无法开启，则删除后再尝试一次；
 
-**-i**：若目标文件已经存在且无法开启，则删除后再尝试一次；
+- **-p**：连同文件的属性一起复制过去，而非使用默认属性（备份常用）；
+- **-r**：递归持续复制，用于**目录的复制行为**；
 
-**-p**：连同文件的属性一起复制过去，而非使用默认属性（备份常用）；
+```shell
+cp test testtest （将test文件重命名为testtest）
+cp /var/log/wtmp .（复制到当前目录.）
+cp -r /etc/ /tmp（复制etc目录下的所有内容到/tmp下，权限可能被改变了）
+```
 
-**-r**：递归持续复制，用于**目录的复制行为**；
+<font color=red>**rm**</font>（移除文件或目录）
 
-case:
+```shell
+rm [-fir] 文件或目录
+```
 
-*cp test testtest （将test文件***重命名***为testtest）*
+- **-f**：force的意思，忽略不存在的文件，不会出现警告信息；
+- **-i**：互动模式，在删除前会询问用户是否操作；
+- **-r**：递归删除，危险
 
-*cp /var/log/wtmp* **.***（复制到当前目录.）*
+```shell
+#不能直接删除目录，删除目录的话需要加-r
+rm -r /tmp/test （root用户默认会加入-i参数，询问，删除的是test文件，没有删除tmp）
+touch  /tmp/aaa （新建空文件aaa）
+rm /tmp/aaa（直接删除文件aaa）
+```
 
-*cp -r /etc/ /tmp（复制etc目录下的所有内容到/tmp下，权限可能被改变了）*
+<font color=red>**mv**</font>（移动文件与目录，或更名）
 
-**rm**（移除文件或目录）
+```shell
+mv [-fiu] source destination
+```
 
-*rm [-fir] 文件或目录*
+- **-f**：force强制的意思，如果目标文件已经存在，不会询问而直接覆盖；
+- **-i**：若目标文件已经存在，就会询问是否覆盖；
+- **-u**：若目标文件已经存在，且source比较新，才会更新；
 
-**-f**：force的意思，忽略不存在的文件，不会出现警告信息；
+```shell
+mv aaa test（将文件aaa移动到目录test中）
+mv test mytest（将test重命名为mytest）
+mv aaa bbb ccc test（将aaa、bbb、ccc多个源文件或目录全部移动到test目录中）
+```
 
-**-i**：互动模式，在删除前会询问用户是否操作；
-
-**-r**：递归删除，危险
-
-case:
-
-*不能直接删除目录，删除目录的话需要加-r*
-
-*rm -r /tmp/test （root用户默认会加入-i参数，询问，删除的是test文件，没有删除tmp）*
-
-*touch  /tmp/aaa （新建空文件aaa）*
-
-*rm /tmp/aaa（直接删除文件aaa）*
-
-**mv**（移动文件与目录，或更名）
-
-*mv [-fiu] source destination*
-
-**-f**：force强制的意思，如果目标文件已经存在，不会询问而直接覆盖；
-
-**-i**：若目标文件已经存在，就会询问是否覆盖；
-
-**-u**：若目标文件已经存在，且source比较新，才会更新；
-
-case:
-
-*mv aaa test（将文件aaa移动到目录test中）*
-
-*mv test mytest（将test重命名为mytest）*
-
-*mv aaa bbb ccc test（将aaa、bbb、ccc多个源文件或目录全部移动到test目录中）*
-
-**文件内容查阅**
+### 文件内容查阅
 
 **cat**：由第一行开始显示文件内容；
 
@@ -299,21 +305,19 @@ case:
 
 **直接查看文件内容 cat、tac、nl**
 
-**cat**（concatenate）
+<font color=red>**cat**</font>（concatenate）
 
-*cat [-AbEnTv] 文件*
+```shell
+cat [-AbEnTv] 文件
+```
 
-**-A**：相当于-vET的整合参数，可列出一些特殊字符，而不是空白而已；
+- **-A**：相当于-vET的整合参数，可列出一些特殊字符，而不是空白而已；
+- **-b**：列出行号，仅针对非空白行做行号显示，空白行不标行号；
+- **-E**：将结尾用断行字符 $ 显示出来；
+- **-n**：打印出行号，连同空白行也会有行号，区别于-b；
+- **-T**：将Tab按键以^T显示出来；
 
-**-b**：列出行号，仅针对非空白行做行号显示，空白行不标行号；
-
-**-E**：将结尾用断行字符 $ 显示出来；
-
-**-n**：打印出行号，连同空白行也会有行号，区别于-b；
-
-**-T**：将Tab按键以^T显示出来；
-
-**-v**：列出一些看不出来的特殊字符
+- **-v**：列出一些看不出来的特殊字符
 
 **cat -n 文件路径 | tail -n +5 | head -n 6  // 显示 5 ～ 10 行的内容， 包括5 和10**
 
@@ -323,81 +327,77 @@ case:
 
 **nl**（添加行号打印）
 
-*nl [-bnw] 文件*
+```shell
+nl [-bnw] 文件
+```
 
 **可翻页查看文件内容 more和less**
 
-**more**（一页一页翻动）
+**<font color=red>more</font>**（一页一页翻动）
 
 ![linux-more.png](https://i.loli.net/2019/11/19/Tnex5WvCocU3p4m.png)
 
 如果文件内容较多，more 命令之后，会继续等到后续操作
 
-**空格键（Space）**：向下翻页；
+- **空格键（Space）**：向下翻页；
+- **Enter**：向下滚动一行；
+- **/字符串**：在当前显示内容中，向下查询该字符串；
+- **:f**：显示出文件名以及目前显示的行数；
 
-**Enter**：向下滚动一行；
+- **q**：直接离开more，不再显示该文件内容；
+- **b**：往回翻页，只对文件有用，对管道无用
+- **less**（一页一页翻动）
 
-**/字符串**：在当前显示内容中，向下查询该字符串；
+**less可以用向上、下按键的功能前后翻页，也可以向上查询**
 
-**:f**：显示出文件名以及目前显示的行数；
+- **空格键（Space）**：向下翻页；
+- **[PageDown]**：向下翻动一页
 
-**q**：直接离开more，不再显示该文件内容；
+- **[PageUp]**：向上翻动一页
 
-**b**：往回翻页，只对文件有用，对管道无用
+- **Enter**：向下滚动一行；
 
-**less**（一页一页翻动）
+- **/字符串**：向下查询该字符串；
+- **?字符串**：向上查询该字符串；
 
- less可以用向上、下按键的功能前后翻页，也可以向上查询
+- **n**：重复前一个查询（与/或？有关）；
 
-**空格键（Space）**：向下翻页；
+- **N**：反向重复前一个查询（与/或？有关）；
 
-**[PageDown]**：向下翻动一页
-
-**[PageUp]**：向上翻动一页
-
-**Enter**：向下滚动一行；
-
-**/字符串**：向下查询该字符串；
-
-**?字符串**：向上查询该字符串；
-
-**n**：重复前一个查询（与/或？有关）；
-
-**N**：反向重复前一个查询（与/或？有关）；
-
-**q**：直接离开less，不再显示该文件内容；
+- **q**：直接离开less，不再显示该文件内容；
 
 **数据选取查看 head和tail**
 
-**head**（取出前面几行）
+**<font color=red>head</font>**（取出前面几行）
 
-*head [-n number] 文件（默认显示十行）*
+```shell
+head [-n number] 文件（默认显示十行）
+```
 
-**-n**：后边接数字，代表显示几行的意思；
+- **-n**：后边接数字，代表显示几行的意思；
 
-**tail**（取出后边几行）
+**<font color=red>tail</font>**（取出后边几行）
 
-*tail [-n number] 文件*
+```shell
+tail [-n number] 文件
+tail [-f] 文件
+```
 
-*tail [-f] 文件*
+- **-f**：表示持续监测后边所接的文件内容，一般用于查看日志进程，按下[ctrl]+c才会结束检测；
 
-**-f**：表示持续监测后边所接的文件内容，一般用于查看日志进程，按下[ctrl]+c才会结束检测；
+**<font color=red>touch</font>**（修改文件时间或者创建新文件）
 
-**touch**（修改文件时间或者创建新文件）
+```shell
+touch [-acdmt] 文件
+```
 
-*touch [-acdmt] 文件*
+- **-a**：仅修改访问时间；
+- **-c**：仅修改访问时间，若该文件不存在则不创建新文件；
+- **-d**：后面可以接想要修改的日期而不用目前的日期；
 
-**-a**：仅修改访问时间；
+- **-m**：仅修改mtime；
 
-**-c**：仅修改访问时间，若该文件不存在则不创建新文件；
-
-**-d**：后面可以接想要修改的日期而不用目前的日期；
-
-**-m**：仅修改mtime；
-
-**-t**：后面可以接想要修改的时间而不用目前的时间；
-
-
+- **-t**：后面可以接想要修改的时间而不用目前的时间；
 
 ------
 
@@ -420,7 +420,7 @@ vim 键盘图：
 
 vim其实可以视为vi的高级版本。
 
-**vi的使用：**
+### vi的使用
 
 vi共分为3种模式，分别是一般模式、编辑模式和命令行模式。
 
@@ -527,7 +527,7 @@ vi共分为3种模式，分别是一般模式、编辑模式和命令行模式�
 | :set nu                                                      | 显示行号，设定之后，会在每一行的前缀显示该行的行号           |
 | :set nonu                                                    | 与 set nu 相反，为取消行号！                                 |
 
-**vim的功能**
+### vim的功能
 
 **块选择**
 
@@ -560,6 +560,8 @@ vi共分为3种模式，分别是一般模式、编辑模式和命令行模式�
 | [ctrl]+w+ k[ctrl]+w+↑ | 同上，不过光标移动到上面的窗口。                             |
 | [ctrl]+w+ q           | 其实就是 :q 结束离开啦！ 举例来说，如果我想要结束下方的窗口，那么利用 [ctrl]+w+↓ 移动到下方窗口后，按下 :q 即可离开， 也可以按下 [ctrl]+w+q 啊！ |
 
+------
+
 
 
 ## 5.linux磁盘管理
@@ -572,13 +574,13 @@ Linux磁盘管理常用三个命令为df、du和fdisk。
 - du：检查磁盘空间使用量
 - fdisk：用于磁盘分区
 
-**df**
+**<font color=red>df</font>**
 
 df命令参数功能：检查文件系统的磁盘空间占用情况。可以利用该命令来获取硬盘被占用了多少空间，目前还剩下多少空间等信息。
 
 语法：
 
-df [-ahikHTm] [目录或文件名]
+`df [-ahikHTm] [目录或文件名]`
 
 选项与参数：
 
@@ -609,7 +611,14 @@ tmpfs              371332         0    371332   0% /dev/shm
 
 将容量结果以易读的容量格式显示出来
 
-[root@www ~]# **df -h** Filesystem            Size  Used Avail Use% Mounted on /dev/hdc2             9.5G  3.7G  5.4G  41% / /dev/hdc3             4.8G  139M  4.4G   4% /home /dev/hdc1              99M   11M   83M  12% /boot tmpfs                 363M     0  363M   0% /dev/shm
+```
+[root@www ~]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/hdc2             9.5G  3.7G  5.4G  41% /
+/dev/hdc3             4.8G  139M  4.4G   4% /home
+/dev/hdc1              99M   11M   83M  12% /boot
+tmpfs                 363M     0  363M   0% /dev/shm
+```
 
 **实例 3**
 
@@ -639,13 +648,13 @@ Filesystem            Size  Used Avail Use% Mounted on
 /dev/hdc2             9.5G  3.7G  5.4G  41% /
 ```
 
-**du**
+**<font color=red>du</font>**
 
 Linux du命令也是查看使用空间的，但是与df命令不同的是Linux du命令是对文件和目录磁盘使用的空间的查看，还是和df命令有一些区别的，这里介绍Linux du命令。
 
 语法：
 
-du [-ahskm] 文件或目录名称
+`du [-ahskm] 文件或目录名称`
 
 选项与参数：
 
@@ -712,42 +721,13 @@ fdisk 是 Linux 的磁盘分区表操作工具。
 
 语法：
 
-fdisk [-l] 装置名称
+`fdisk [-l] 装置名称`
 
 选项与参数：
 
 - -l ：输出后面接的装置所有的分区内容。若仅有 fdisk -l 时， 则系统将会把整个系统内能够搜寻到的装置的分区均列出来。
 
-**实例 1**
-
-列出所有分区信息
-
-```
-[root@AY120919111755c246621 tmp]# fdisk -l
-
-Disk /dev/xvda: 21.5 GB, 21474836480 bytes
-255 heads, 63 sectors/track, 2610 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00000000
-
-    Device Boot      Start         End      Blocks   Id  System
-/dev/xvda1   *           1        2550    20480000   83  Linux
-/dev/xvda2            2550        2611      490496   82  Linux swap / Solaris
-
-Disk /dev/xvdb: 21.5 GB, 21474836480 bytes
-255 heads, 63 sectors/track, 2610 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x56f40944
-
-    Device Boot      Start         End      Blocks   Id  System
-/dev/xvdb2               1        2610    20964793+  83  Linux
-```
-
-**实例 2**
+**实例 1
 
 找出你系统中的根目录所在磁盘，并查阅该硬盘内的相关信息
 
@@ -812,11 +792,11 @@ Command (m for help): q
 
 **磁盘格式化**
 
-磁盘分割完毕后自然就是要进行文件系统的格式化，格式化的命令非常的简单，使用 mkfs（make filesystem） 命令。
+磁盘分割完毕后自然就是要进行文件系统的格式化，格式化的命令非常的简单，使用 **mkfs**（make filesystem） 命令。
 
 语法：
 
-mkfs [-t 文件系统格式] 装置文件名
+`mkfs [-t 文件系统格式] 装置文件名`
 
 选项与参数：
 
@@ -826,7 +806,10 @@ mkfs [-t 文件系统格式] 装置文件名
 
 查看 mkfs 支持的文件格式
 
-[root@www ~]# mkfs[tab][tab] mkfs         mkfs.cramfs  mkfs.ext2    mkfs.ext3    mkfs.msdos   mkfs.vfat
+```
+[root@www ~]# mkfs[tab][tab]
+mkfs         mkfs.cramfs  mkfs.ext2    mkfs.ext3    mkfs.msdos   mkfs.vfat
+```
 
 按下两个[tab]，会发现 mkfs 支持的文件格式如上所示。
 
@@ -862,13 +845,13 @@ This filesystem will be automatically checked every 34 mounts or
 
 **磁盘检验**
 
-fsck（file system check）用来检查和维护不一致的文件系统。
+**fsck**（file system check）用来检查和维护不一致的文件系统。
 
 若系统掉电或磁盘发生问题，可利用fsck命令对文件系统进行检查。
 
 语法：
 
-fsck [-t 文件系统] [-ACay] 装置名称
+`fsck [-t 文件系统] [-ACay] 装置名称`
 
 选项与参数：
 
@@ -888,7 +871,10 @@ fsck [-t 文件系统] [-ACay] 装置名称
 
 查看系统有多少文件系统支持的 fsck 命令：
 
-[root@www ~]# fsck[tab][tab] fsck         fsck.cramfs  fsck.ext2    fsck.ext3    fsck.msdos   fsck.vfat
+```
+[root@www ~]# fsck[tab][tab]
+fsck         fsck.cramfs  fsck.ext2    fsck.ext3    fsck.msdos   fsck.vfat
+```
 
 **实例 2**
 
@@ -914,7 +900,7 @@ Linux 的磁盘挂载使用 mount 命令，卸载使用 umount 命令。
 
 磁盘挂载语法：
 
-mount [-t 文件系统] [-L Label名] [-o 额外选项] [-n]  装置文件名  挂载点
+`mount [-t 文件系统] [-L Label名] [-o 额外选项] [-n]  装置文件名  挂载点`
 
 **实例 1**
 
@@ -929,7 +915,7 @@ Filesystem           1K-blocks      Used Available Use% Mounted on
 /dev/hdc6              1976312     42072   1833836   3% /mnt/hdc6
 ```
 
-umount [-fn] 装置文件名或挂载点
+`umount [-fn] 装置文件名或挂载点`
 
 选项与参数：
 
@@ -941,6 +927,8 @@ umount [-fn] 装置文件名或挂载点
 ```
 [root@www ~]# umount /dev/hdc6     
 ```
+
+------
 
 
 
@@ -954,79 +942,78 @@ Linux支持的压缩命令很多，且不同的命令所用的压缩技术不同
 
 **tar**
 
--c: 建立压缩档案
-
--x：解压
-
--t：查看内容
-
--r：向压缩归档文件末尾追加文件
-
--u：更新原压缩包中的文件
+- -c: 建立压缩档案
+- -x：解压
+- -t：查看内容
+- -r：向压缩归档文件末尾追加文件
+- -u：更新原压缩包中的文件
 
 这五个是独立的命令，压缩解压都要用到其中一个，可以和别的命令连用但只能用其中一个。下面的参数是根据需要在压缩或解压档案时可选的。
 
--z：有gzip属性的
+- -z：有gzip属性的
+- -j：有bz2属性的
+- -Z：有compress属性的
+- -v：显示所有过程
+- -O：将文件解开到标准输出
+- **-f: 使用档案名字，切记，这个参数是最后一个参数，且是必须的，后面只能接档案名。**
 
--j：有bz2属性的
-
--Z：有compress属性的
-
--v：显示所有过程
-
--O：将文件解开到标准输出
-
-下面的参数-f是必须的
-
-**-f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名。**
-
-\# tar -cf all.tar *.jpg
+```shell
+# tar -cf all.tar *.jpg
+```
 
 这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。
 
-\# tar -rf all.tar *.gif
+```shell
+# tar -cf all.tar *.jpg# tar -rf all.tar *.gif
+```
 
 这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。
 
-\# tar -uf all.tar logo.gif
+```shell
+# tar -uf all.tar logo.gif
+```
 
 这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。
 
-\# tar -tf all.tar
+```shell
+# tar -tf all.tar
+```
 
 这条命令是列出all.tar包中所有文件，-t是列出文件的意思
 
-\# tar -xf all.tar
+```shell
+# tar -xf all.tar
+```
 
 这条命令是解出all.tar包中所有文件，-t是解开的意思
 
 **压缩**
 
-tar -cvf jpg.tar *.jpg //将目录里所有jpg文件打包成tar.jpg 
+`tar -cvf jpg.tar *.jpg`      //将目录里所有jpg文件打包成tar.jpg 
 
-tar -czf jpg.tar.gz *.jpg  //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz
+`tar -czf jpg.tar.gz *.jpg`  //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz
 
- tar -cjf jpg.tar.bz2 *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2
+ `tar -cjf jpg.tar.bz2 *.jpg` //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2
 
-tar -cZf jpg.tar.Z *.jpg  //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z
+`tar -cZf jpg.tar.Z *.jpg`  //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z
 
-rar a jpg.rar *.jpg //rar格式的压缩，需要先下载rar for linux
+`rar a jpg.rar *.jpg` //rar格式的压缩，需要先下载rar for linux
 
-zip jpg.zip *.jpg //zip格式的压缩，需要先下载zip for linux
+`zip jpg.zip *.jpg` //zip格式的压缩，需要先下载zip for linux
 
 **解压**
 
-tar -xvf file.tar //解压 tar包
+`tar -xvf file.tar` //解压 tar包
 
-tar -xzvf file.tar.gz //解压tar.gz
+`tar -xzvf file.tar.gz` //解压tar.gz
 
-tar -xjvf file.tar.bz2  //解压 tar.bz2
+`tar -xjvf file.tar.bz2`  //解压 tar.bz2
 
-tar -xZvf file.tar.Z  //解压tar.Z
+`tar -xZvf file.tar.Z`  //解压tar.Z
 
-unrar e file.rar //解压rar
+`unrar e file.rar` //解压rar
 
-unzip file.zip //解压zip
+`unzip file.zip` //解压zip
 
 **总结**
 
@@ -1050,7 +1037,15 @@ unzip file.zip //解压zip
 
 解压jdk到指定文件夹：
 
+```
 tar -xzvf jdk-8u131-linux-x64.tar.gz -C /usr/local/java
+```
+
+
+
+## 7.常用linux命令
+
+
 
 
 
@@ -1068,6 +1063,8 @@ tar -xzvf jdk-8u131-linux-x64.tar.gz -C /usr/local/java
 8. 进程和线程的区别。
 9. top 命令之后有哪些内容，有什么作用。
 10. 线上CPU爆高，请问你如何找到问题所在
+11.  linux系统日志在哪里看 
+12.  如何查看网络进程 
 
 
 
