@@ -4,7 +4,6 @@
 - **数据存储和缓存**
 - [![MySQL](../_media/mysql-original.svg)MySQL](mysql/readMySQL.md)
   - [MySQL索引](mysql/MySQL-index.md)
-  - [MySQ了44](mysql/1.MySQL.md)
 - [![Redis](../_media/redis-original.svg) Redis](redis/readRedis.md)
 - [![mongoDB](../_media/mongodb-original.svg)mongoDB]( https://redis.io/ )
 - [![ **Elasticsearch** ](../_media/elasticsearch.svg) Elasticsearch]( https://redis.io/ )

@@ -22,9 +22,7 @@
 </p>
 -->  
 
-<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/博客-CSDN-critical.svg"></a>
-
-<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/MyBlog-lazyegg-orange"></a>
+<a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/博客-CSDN-critical.svg"></a><a href="https://www.lazyegg.net"><img src="https://img.shields.io/badge/MyBlog-lazyegg-orange"></a>
 
 
 
