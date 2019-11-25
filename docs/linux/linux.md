@@ -1,60 +1,51 @@
 ![](https://www.w3cschool.cn/attachments/image/20170622/1498118505466168.jpg)
 
- Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
+Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
 
 Linux是众多操作系统之一 , 目前流行的服务器和 PC 端操作系统有 Linux、Windows、UNIX 等 
 
-Linux**的创始人** Linus Torvalds  林纳斯 (也是git的开发者)
+Linux**的创始人** Linus Torvalds  林纳斯 (同时也是git的开发者)
 
-![image-20191124110919540](/Users/starfish/Library/Application Support/typora-user-images/image-20191124110919540.png)
-
-
+![linux-creater.png](https://i.loli.net/2019/11/25/pUP5s7orvtfH6A8.png)
 
 
 
-Linux主要的发行版:
+**Linux主要的发行版:**
 
 Ubuntu(乌班图)、RedHat(红帽)、**CentOS**、Debain[蝶变]、Fedora、SuSE、OpenSUSE
 
+**unix是怎么来的**
+
+![unix.png](https://i.loli.net/2019/11/25/ul6R5xEZsgd1GDi.png)
 
 
 
 
 
+ **[理查德·斯托曼](https://zh.wikipedia.org/wiki/理查德·斯托曼)发起的GNU计划**
 
-uinux是怎么来的
+- 在自由的时代用户应该免费享有对软件源代码阅读、修改的权利。
 
-![image-20191124145033592](/Users/starfish/Library/Application Support/typora-user-images/image-20191124145033592.png)
-
-
-
+- 软件公司可以靠提供服务和训练获得盈利。
 
 
-**伟大的GNU计划**
+![gnu.png](https://i.loli.net/2019/11/25/DIBWoTAfyFLJZ8q.png)
 
-•在自由的时代用户应该免费享有对软件源代码阅读、修改的权利。
+**Linux和Unix的关系**
 
-•软件公司可以靠提供服务和训练获得盈利。
-
-
-
-![image-20191124105748086](/Users/starfish/Library/Application Support/typora-user-images/image-20191124105748086.png)
-
-Linux和Unix的关系
-
-![image-20191124110547808](/Users/starfish/Library/Application Support/typora-user-images/image-20191124110547808.png)
+![linux-unix.png](https://i.loli.net/2019/11/25/BXmIaiGeqkgj4Jt.png)
 
 （Redhat又衍生出两个版本，redhat和centOS）
 
 
 
-W2Cschool https://www.w3cschool.cn/linux/ 
+**Refrences:**
+
+ https://www.w3cschool.cn/linux/ 
 
  http://c.biancheng.net/linux_tutorial/ 
 
-鸟哥的Linux私房菜 http://linux.vbird.org/linux_basic/ 
-
-
+《鸟哥的Linux私房菜》 http://shouce.jb51.net/vbird-linux-basic-4/ 
 
 
 
@@ -98,20 +89,20 @@ ls -l(别名ll 就可以查看)
 
 - <font color=red>**chgrp**</font>: 改变文件所属用户组(change group)
 
-  - chgrp [-R]  users  目录或文件 ： 将这个路径下的文件的用户组改成“users“
+  - `chgrp [-R]  users  目录或文件` ： 将这个路径下的文件的用户组改成“users“
   - 这个新用户组一定得是/etc/group下有的，否则会报错。
   - 若最后一个参数是目录，则表示只将这个目录下的文件的用户组改成这个。
   - R表示若最后一个参数是目录，则将当前目录下的文件连同子目录下的所有文件的用户组都改成这个。
 
 - <font color=red>**chown**</font>: 改变文件所有者(change owner)
 
-  - chown [-R] 用户名 文件或目录 ： 将这个目录下的所有文件的所有者都改成这个用户名。
+  - `chown [-R] 用户名 文件或目录` ： 将这个目录下的所有文件的所有者都改成这个用户名。
   - 这个用户名必须是/etc/passwd下有的才行。
   - 这个命令可以既修改文件主又修改用户组：
-  - chown [-R] 用户名：用户组名 目录/文件（：和 . 都可以）
-  - chown [-R] 用户名.用户组名 目录/文件
+  - `chown [-R] 用户名：用户组名 目录/文件`（：和 . 都可以）
+  - `chown [-R] 用户名.用户组名 目录/文件`
   - 由于用户名可以存在小数点，当出现含有小数点的用户名时，系统会发生误判，所以我们一般都使用：来连接用户名和用户组名。
-  - 还可以仅修改用户组名：chown [-R] .用户组名 目录/文件
+  - 还可以仅修改用户组名：`chown [-R] .用户组名 目录/文件`
 
 - **<font color=red>chmod</font>**: 改变文件的权限
 
@@ -129,25 +120,25 @@ ls -l(别名ll 就可以查看)
 
   ​		所以命令如下：
 
-     **chmod [-R] 770  文件/目录**
+     **`chmod [-R] 770  文件/目录`**
 
   2. **用符号进行权限的修改**
 
      用u、g、o 代表user、group、others三种身份的权限，a 代表 all，也就是全部的身份。 +（加入），-（除去），=（设置）。
 
-  ​       **chmod u/g/o/a +/-/= r/w/x 文件/目录**
+  ​       **`chmod u/g/o/a +/-/= r/w/x 文件/目录`**
 
   ​       例子：文件主能够读、写、执行；同组用户和其他用户能够读、执行。
 
-  ​       **chmod u=rwx,go=rx 文件名**
+  ​       **`chmod u=rwx,go=rx 文件名`**
 
   ​       假设原先不知道文件的属性，现在只想让所有的人能够执行这个文件，则：
 
-  ​      **chmod a+x 文件/目录**
+  ​      **`chmod a+x 文件/目录`**
 
   ​      假设原先不知道文件的属性，现在只想让同组用户和其他用户无法写，则：
 
-  ​     **chmod go-w 文件/目录**
+  ​     **`chmod go-w 文件/目录`**
 
 <font color=blue>**目录和文件的权限意义：**</font>
 
@@ -170,7 +161,7 @@ ls -l(别名ll 就可以查看)
 
   - x：目录虽然不可以被拿来执行，但是目录的x代表的是用户能否进入该目录成为工作目录的用途。（所谓工作目录就是你当下的目录，也就是时候，如果目录不具有x权限，那么你就不能通过cd命令进入到该目录下工作）。
 
-能不能进入某一目录，只与该目录的x 权限有关。
+**能不能进入某一目录，只与该目录的x 权限有关**。
 
  Linux的单一文件或者目录的最大容许文件名为255个字符,包含完整路径名记（/）的完整文件名为4096个字符。
 
@@ -190,17 +181,17 @@ ls -l(别名ll 就可以查看)
 
 以下是对这些目录的解释：
 
-**/bin** bin是Binary的缩写。这个目录存放着最经常使用的命令。
+**/bin**    bin是Binary的缩写。这个目录存放着最经常使用的命令。
 
 **/boot** 这里存放的是启动Linux时使用的一些核心文件，包括一些连接文件以及镜像文件。
 
 **/dev**  dev是Device(设备)的缩写。该目录下存放的是Linux的外部设备，在Linux中访问设备的方式和访问文件的方式是相同的。
 
-**/etc** 这个目录用来存放所有的系统管理所需要的配置文件和子目录。
+**/etc**   这个目录用来存放所有的系统管理所需要的配置文件和子目录。
 
 **/home** 用户的主目录，在Linux中，每个用户都有一个自己的目录，一般该目录名是以用户的账号命名的。
 
-**/lib** 这个目录里存放着系统最基本的动态连接共享库，其作用类似于Windows里的DLL文件。几乎所有的应用程序都需要用到这些共享库。
+**/lib**  这个目录里存放着系统最基本的动态连接共享库，其作用类似于Windows里的DLL文件。几乎所有的应用程序都需要用到这些共享库。
 
 **/lost+found**  这个目录一般情况下是空的，当系统非法关机后，这里就存放了一些文件。
 
@@ -387,10 +378,12 @@ nl [-bnw] 文件
 - **Enter**：向下滚动一行；
 - **/字符串**：在当前显示内容中，向下查询该字符串；
 - **:f**：显示出文件名以及目前显示的行数；
-
 - **q**：直接离开more，不再显示该文件内容；
 - **b**：往回翻页，只对文件有用，对管道无用
-- **less**（一页一页翻动）
+
+
+
+**<font color=red>less</font>**（一页一页翻动）
 
 **less可以用向上、下按键的功能前后翻页，也可以向上查询**
 
@@ -500,8 +493,8 @@ vim其实可以视为vi的高级版本。
 | +                                                            | 光标移动到非空格符的下一列                                   |
 | -                                                            | 光标移动到非空格符的上一列                                   |
 | n<space>                                                     | 那个 n 表示『数字』，例如 20 。按下数字后再按空格键，光标会向右移动这一行的 n 个字符。例如 20<space> 则光标会向后面移动 20 个字符距离。 |
-| **0 或功能键[Home]**                                         | 这是数字『 0 』：移动到这一行的最前面字符处 (常用)           |
-| **$ 或功能键[End]**                                          | 移动到这一行的最后面字符处(常用)                             |
+| **<font color=green>0 或功能键[Home]</font>**                | 这是数字『 0 』：移动到这一行的最前面字符处 (常用)           |
+| **<font color=green>$ 或功能键[End]</font>**                 | 移动到这一行的最后面字符处(常用)                             |
 | **H**                                                        | 光标移动到这个屏幕的最上方那一行的第一个字符                 |
 | M                                                            | 光标移动到这个屏幕的中央那一行的第一个字符                   |
 | L                                                            | 光标移动到这个屏幕的最下方那一行的第一个字符                 |
@@ -510,9 +503,9 @@ vim其实可以视为vi的高级版本。
 | **gg**                                                       | 移动到这个档案的第一行，相当于 1G 啊！ (常用)                |
 | n<Enter>                                                     | n 为数字。光标向下移动 n 行(常用)                            |
 | **查找与替换**                                               |                                                              |
-| **/word**                                                    | 向光标之下寻找一个名称为 word 的字符串。例如要在档案内搜寻 vbird 这个字符串，就输入 /vbird 即可！ (常用) |
-| **?word**                                                    | 向光标之上寻找一个字符串名称为 word 的字符串。               |
-| **n**                                                        | 这个 n 是英文按键。代表『重复前一个搜寻的动作』。举例来说， 如果刚刚我们执行 /vbird 去向下搜寻 vbird 这个字符串，则按下 n 后，会向下继续搜寻下一个名称为 vbird 的字符串。如果是执行 ?vbird 的话，那么按下 n 则会向上继续搜寻名称为 vbird 的字符串！ |
+| **<font color=red>/word</font>**                             | 向光标之下寻找一个名称为 word 的字符串。例如要在档案内搜寻 vbird 这个字符串，就输入 /vbird 即可！ (常用) |
+| **<font color=red>?word</font>**                             | 向光标之上寻找一个字符串名称为 word 的字符串。               |
+| **<font color=red>n</font>**                                 | 这个 n 是英文按键。代表『重复前一个搜寻的动作』。举例来说， 如果刚刚我们执行 /vbird 去向下搜寻 vbird 这个字符串，则按下 n 后，会向下继续搜寻下一个名称为 vbird 的字符串。如果是执行 ?vbird 的话，那么按下 n 则会向上继续搜寻名称为 vbird 的字符串！ |
 | N                                                            | 这个 N 是英文按键。与 n 刚好相反，为『反向』进行前一个搜寻动作。 例如 /vbird 后，按下 N 则表示『向上』搜寻 vbird 。 |
 | 使用 /word 配合 n 及 N 是非常有帮助的！可以让你重复的找到一些你搜寻的关键词！ |                                                              |
 | **:n1,n2s/word1/word2/g**                                    | n1 与 n2 为数字。在第 n1 与 n2 行之间寻找 word1 这个字符串，并将该字符串取代为 word2 ！举例来说，在 100 到 200 行之间搜寻 vbird 并取代为 VBIRD 则： 『:100,200s/vbird/VBIRD/g』。(常用) |
@@ -521,23 +514,23 @@ vim其实可以视为vi的高级版本。
 | **删除、复制和粘贴**                                         |                                                              |
 | **x, X**                                                     | 在一行字当中，x 为向后删除一个字符 (相当于 [del] 按键)， X 为向前删除一个字符(相当于 [backspace] 亦即是退格键) (常用) |
 | nx                                                           | n 为数字，连续向后删除 n 个字符。举例来说，我要连续删除 10 个字符， 『10x』。 |
-| **dd**                                                       | 剪切游标所在的那一行(常用)                                   |
-| **D**                                                        | 删除从当前光标到光标所在行尾的全部字符                       |
-| **ndd**                                                      | n 为数字。删除光标所在的向下 n 列，例如 20dd 则是删除 20 列 (常用) |
+| **<font color=red>dd</font>**                                | 剪切游标所在的那一行(常用)                                   |
+| **<font color=red>D</font>**                                 | 删除从当前光标到光标所在行尾的全部字符                       |
+| **<font color=red>ndd</font>**                               | n 为数字。删除光标所在的向下 n 列，例如 20dd 则是删除 20 列 (常用) |
 | d1G                                                          | 删除光标所在到第一行的所有数据                               |
 | dG                                                           | 删除光标所在到最后一行的所有数据                             |
 | d$                                                           | 删除游标所在处，到该行的最后一个字符                         |
 | d0                                                           | 那个是数字的 0 ，删除游标所在处，到该行的最前面一个字符      |
-| **yy**                                                       | 复制游标所在的那一行(常用)                                   |
+| **<font color=red>yy</font>**                                | 复制游标所在的那一行(常用)                                   |
 | nyy                                                          | n 为数字。复制光标所在的向下 n 列，例如 20yy 则是复制 20 列(常用) |
 | y1G                                                          | 复制游标所在列到第一列的所有数据                             |
 | yG                                                           | 复制游标所在列到最后一列的所有数据                           |
 | y0                                                           | 复制光标所在的那个字符到该行行首的所有数据                   |
 | y$                                                           | 复制光标所在的那个字符到该行行尾的所有数据                   |
-| **p, P**                                                     | p 为将已复制的数据在光标下一行贴上，P 则为贴在游标上一行！ 举例来说，我目前光标在第 20 行，且已经复制了 10 行数据。则按下 p 后， 那 10 行数据会贴在原本的 20 行之后，亦即由 21 行开始贴。但如果是按下 P 呢？ 那么原本的第 20 行会被推到变成 30 行。 (常用) 粘贴到光标上一行(p)，下一行（P） |
+| **<font color=red>p, P</font>**                              | p 为将已复制的数据在光标下一行贴上，P 则为贴在游标上一行！ 举例来说，我目前光标在第 20 行，且已经复制了 10 行数据。则按下 p 后， 那 10 行数据会贴在原本的 20 行之后，亦即由 21 行开始贴。但如果是按下 P 呢？ 那么原本的第 20 行会被推到变成 30 行。 (常用) 粘贴到光标上一行(p)，下一行（P） |
 | J                                                            | 将光标所在列与下一列的数据结合成同一列                       |
 | c                                                            | 重复删除多个数据，例如向下删除 10 行，[ 10cj ]               |
-| **u**                                                        | 复原前一个动作。撤销(常用)                                   |
+| **<font color=red>u</font>**                                 | 复原前一个动作。撤销(常用)                                   |
 | [Ctrl]+r                                                     | 重做上一个动作。(常用)                                       |
 | 这个 u 与 [Ctrl]+r 是很常用的指令！一个是复原，另一个则是重做一次～ 利用这两个功能按键，你的编辑，嘿嘿！很快乐的啦！ |                                                              |
 | .                                                            | 不要怀疑！这就是小数点！意思是重复前一个动作的意思。 如果你想要重复删除、重复贴上等等动作，按下小数点『.』就好了！ (常用) |
@@ -557,12 +550,12 @@ vim其实可以视为vi的高级版本。
 
 | **进命令行的保存、离开等命令**                               |                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **:w**                                                       | 将编辑的数据写入硬盘档案中(常用)                             |
-| **:w!**                                                      | 若文件属性为『只读』时，强制写入该档案。不过，到底能不能写入， 还是跟你对该档案的档案权限有关啊！ |
-| **:q**                                                       | 离开 vi (常用)                                               |
-| **:q!**                                                      | 若曾修改过档案，又不想储存，使用 ! 为强制离开不储存档案。    |
+| **<font color=red>:w</font>**                                | 将编辑的数据写入硬盘档案中(常用)                             |
+| **<font color=red>:w!</font>**                               | 若文件属性为『只读』时，强制写入该档案。不过，到底能不能写入， 还是跟你对该档案的档案权限有关啊！ |
+| **<font color=red>:q</font>**                                | 离开 vi (常用)                                               |
+| **<font color=red>:q!</font>**                               | 若曾修改过档案，又不想储存，使用 ! 为强制离开不储存档案。    |
 | 注意一下啊，那个惊叹号 (!) 在 vi 当中，常常具有『强制』的意思～ |                                                              |
-| **:wq**                                                      | 储存后离开，若为 :wq! 则为强制储存后离开 (常用)              |
+| **<font color=red>:wq</font>**                               | 储存后离开，若为 :wq! 则为强制储存后离开 (常用)              |
 | ZZ                                                           | 这是大写的 Z 喔！若档案没有更动，则不储存离开，若档案已经被更动过，则储存后离开！ |
 | :w [filename]                                                | 将编辑的数据储存成另一个档案（类似另存新档）                 |
 | :r [filename]                                                | 在编辑的数据中，读入另一个档案的数据。亦即将 『filename』 这个档案内容加到游标所在行后面 |
@@ -618,9 +611,9 @@ Linux磁盘管理常用三个命令为df、du和fdisk。
 - du：检查磁盘空间使用量
 - fdisk：用于磁盘分区
 
-**<font color=red>df</font>**
+### **<font color=red>df</font>**
 
-df命令参数功能：检查文件系统的磁盘空间占用情况。可以利用该命令来获取硬盘被占用了多少空间，目前还剩下多少空间等信息。
+df命令参数功能： 显示指定磁盘文件的可用空间。如果没有文件名被指定，则所有当前被挂载的文件系统的可用空间将被显示 。可以利用该命令来获取硬盘被占用了多少空间，目前还剩下多少空间等信息。
 
 语法：
 
@@ -631,31 +624,14 @@ df命令参数功能：检查文件系统的磁盘空间占用情况。可以利
 - -a ：列出所有的文件系统，包括系统特有的 /proc 等文件系统；
 - -k ：以 KBytes 的容量显示各文件系统；
 - -m ：以 MBytes 的容量显示各文件系统；
-- -h ：以人们较易阅读的 GBytes, MBytes, KBytes 等格式自行显示；
+- **-h ：以人们较易阅读的 GBytes, MBytes, KBytes 等格式自行显示；**
 - -H ：以 M=1000K 取代 M=1024K 的进位方式；
 - -T ：显示文件系统类型, 连同该 partition 的 filesystem 名称 (例如 ext3) 也列出；
 - -i ：不用硬盘容量，而以 inode 的数量来显示
 
-**实例 1**
-
-将系统内所有的文件系统列出来！
-
-```
-[root@www ~]# df
-Filesystem      1K-blocks      Used Available Use% Mounted on
-/dev/hdc2         9920624   3823112   5585444  41% /
-/dev/hdc3         4956316    141376   4559108   4% /home
-/dev/hdc1          101086     11126     84741  12% /boot
-tmpfs              371332         0    371332   0% /dev/shm
-```
-
-在 Linux 底下如果 df 没有加任何选项，那么默认会将系统内所有的 (不含特殊内存内的文件系统与 swap) 都以 1 Kbytes 的容量来列出来！
-
-**实例 2**
-
 将容量结果以易读的容量格式显示出来
 
-```
+```sh
 [root@www ~]# df -h
 Filesystem            Size  Used Avail Use% Mounted on
 /dev/hdc2             9.5G  3.7G  5.4G  41% /
@@ -664,35 +640,7 @@ Filesystem            Size  Used Avail Use% Mounted on
 tmpfs                 363M     0  363M   0% /dev/shm
 ```
 
-**实例 3**
-
-将系统内的所有特殊文件格式及名称都列出来
-
-```
-[root@www ~]# df -aT
-Filesystem    Type 1K-blocks    Used Available Use% Mounted on
-/dev/hdc2     ext3   9920624 3823112   5585444  41% /
-proc          proc         0       0         0   -  /proc
-sysfs        sysfs         0       0         0   -  /sys
-devpts      devpts         0       0         0   -  /dev/pts
-/dev/hdc3     ext3   4956316  141376   4559108   4% /home
-/dev/hdc1     ext3    101086   11126     84741  12% /boot
-tmpfs        tmpfs    371332       0    371332   0% /dev/shm
-none   binfmt_misc         0       0         0   -  /proc/sys/fs/binfmt_misc
-sunrpc  rpc_pipefs         0       0         0   -  /var/lib/nfs/rpc_pipefs
-```
-
-**实例 4**
-
-将 /etc 底下的可用的磁盘容量以易读的容量格式显示
-
-```linux
-[root@www ~]# df -h /etc
-Filesystem            Size  Used Avail Use% Mounted on
-/dev/hdc2             9.5G  3.7G  5.4G  41% /
-```
-
-**<font color=red>du</font>**
+### **<font color=red>du</font>**
 
 Linux du命令也是查看使用空间的，但是与df命令不同的是Linux du命令是对文件和目录磁盘使用的空间的查看，还是和df命令有一些区别的，这里介绍Linux du命令。
 
@@ -759,7 +707,7 @@ Linux du命令也是查看使用空间的，但是与df命令不同的是Linux d
 
 与 df 不一样的是，du 这个命令其实会直接到文件系统内去搜寻所有的文件数据。
 
-**fdisk**
+### **fdisk**
 
 fdisk 是 Linux 的磁盘分区表操作工具。
 
@@ -771,68 +719,7 @@ fdisk 是 Linux 的磁盘分区表操作工具。
 
 - -l ：输出后面接的装置所有的分区内容。若仅有 fdisk -l 时， 则系统将会把整个系统内能够搜寻到的装置的分区均列出来。
 
-**实例 1
 
-找出你系统中的根目录所在磁盘，并查阅该硬盘内的相关信息
-
-```
-[root@www ~]# df /            <==注意：重点在找出磁盘文件名而已
-Filesystem           1K-blocks      Used Available Use% Mounted on
-/dev/hdc2              9920624   3823168   5585388  41% /
-
-[root@www ~]# fdisk /dev/hdc  <==仔细看，不要加上数字喔！
-The number of cylinders for this disk is set to 5005.
-There is nothing wrong with that, but this is larger than 1024,
-and could in certain setups cause problems with:
-1) software that runs at boot time (e.g., old versions of LILO)
-2) booting and partitioning software from other OSs
-   (e.g., DOS FDISK, OS/2 FDISK)
-
-Command (m for help):     <==等待你的输入！
-输入 m 后，就会看到底下这些命令介绍
-Command (m for help): m   <== 输入 m 后，就会看到底下这些命令介绍
-Command action
-   a   toggle a bootable flag
-   b   edit bsd disklabel
-   c   toggle the dos compatibility flag
-   d   delete a partition            <==删除一个partition
-   l   list known partition types
-   m   print this menu
-   n   add a new partition           <==新增一个partition
-   o   create a new empty DOS partition table
-   p   print the partition table     <==在屏幕上显示分割表
-   q   quit without saving changes   <==不储存离开fdisk程序
-   s   create a new empty Sun disklabel
-   t   change a partition's system id
-   u   change display/entry units
-   v   verify the partition table
-   w   write table to disk and exit  <==将刚刚的动作写入分割表
-   x   extra functionality (experts only)
-```
-
-离开 fdisk 时按下 q，那么所有的动作都不会生效！相反的， 按下w就是动作生效的意思。
-
-```
-Command (m for help): p  <== 这里可以输出目前磁盘的状态
-
-Disk /dev/hdc: 41.1 GB, 41174138880 bytes        <==这个磁盘的文件名与容量
-255 heads, 63 sectors/track, 5005 cylinders      <==磁头、扇区与磁柱大小
-Units = cylinders of 16065 * 512 = 8225280 bytes <==每个磁柱的大小
-
-   Device Boot      Start         End      Blocks   Id  System
-/dev/hdc1   *           1          13      104391   83  Linux
-/dev/hdc2              14        1288    10241437+  83  Linux
-/dev/hdc3            1289        1925     5116702+  83  Linux
-/dev/hdc4            1926        5005    24740100    5  Extended
-/dev/hdc5            1926        2052     1020096   82  Linux swap / Solaris
-# 装置文件名 启动区否 开始磁柱    结束磁柱  1K大小容量 磁盘分区槽内的系统
-
-Command (m for help): q
-```
-
-想要不储存离开吗？按下 q 就对了！不要随便按 w 啊！
-
-使用 p 可以列出目前这颗磁盘的分割表信息，这个信息的上半部在显示整体磁盘的状态。
 
 **磁盘格式化**
 
@@ -846,46 +733,7 @@ Command (m for help): q
 
 - -t ：可以接文件系统格式，例如 ext3, ext2, vfat 等(系统有支持才会生效)
 
-**实例 1**
 
-查看 mkfs 支持的文件格式
-
-```
-[root@www ~]# mkfs[tab][tab]
-mkfs         mkfs.cramfs  mkfs.ext2    mkfs.ext3    mkfs.msdos   mkfs.vfat
-```
-
-按下两个[tab]，会发现 mkfs 支持的文件格式如上所示。
-
-**实例 2**
-
-将分区 /dev/hdc6（可指定你自己的分区） 格式化为 ext3 文件系统：
-
-```
-[root@www ~]# mkfs -t ext3 /dev/hdc6
-mke2fs 1.39 (29-May-2006)
-Filesystem label=                <==这里指的是分割槽的名称(label)
-OS type: Linux
-Block size=4096 (log=2)          <==block 的大小配置为 4K 
-Fragment size=4096 (log=2)
-251392 inodes, 502023 blocks     <==由此配置决定的inode/block数量
-25101 blocks (5.00%) reserved for the super user
-First data block=0
-Maximum filesystem blocks=515899392
-16 block groups
-32768 blocks per group, 32768 fragments per group
-15712 inodes per group
-Superblock backups stored on blocks:
-        32768, 98304, 163840, 229376, 294912
-
-Writing inode tables: done
-Creating journal (8192 blocks): done <==有日志记录
-Writing superblocks and filesystem accounting information: done
-
-This filesystem will be automatically checked every 34 mounts or
-180 days, whichever comes first.  Use tune2fs -c or -i to override.
-# 这样就创建起来我们所需要的 Ext3 文件系统了！简单明了！
-```
 
 **磁盘检验**
 
@@ -911,32 +759,7 @@ This filesystem will be automatically checked every 34 mounts or
 - -r : 如果检查有错则由使用者回答是否修复
 - -y : 选项指定检测每个文件是自动输入yes，在不确定那些是不正常的时候，可以执行 # fsck -y 全部检查修复。
 
-**实例 1**
 
-查看系统有多少文件系统支持的 fsck 命令：
-
-```
-[root@www ~]# fsck[tab][tab]
-fsck         fsck.cramfs  fsck.ext2    fsck.ext3    fsck.msdos   fsck.vfat
-```
-
-**实例 2**
-
-强制检测 /dev/hdc6 分区:
-
-```
-[root@www ~]# fsck -C -f -t ext3 /dev/hdc6 
-fsck 1.39 (29-May-2006)
-e2fsck 1.39 (29-May-2006)
-Pass 1: Checking inodes, blocks, and sizes
-Pass 2: Checking directory structure
-Pass 3: Checking directory connectivity
-Pass 4: Checking reference counts
-Pass 5: Checking group summary information
-vbird_logical: 11/251968 files (9.1% non-contiguous), 36926/1004046 blocks
-```
-
-如果没有加上 -f 的选项，则由于这个文件系统不曾出现问题，检查的经过非常快速！若加上 -f 强制检查，才会一项一项的显示过程。
 
 **磁盘挂载与卸除**
 
@@ -946,19 +769,6 @@ Linux 的磁盘挂载使用 mount 命令，卸载使用 umount 命令。
 
 `mount [-t 文件系统] [-L Label名] [-o 额外选项] [-n]  装置文件名  挂载点`
 
-**实例 1**
-
-用默认的方式，将刚刚创建的 /dev/hdc6 挂载到 /mnt/hdc6 上面！
-
-```
-[root@www ~]# mkdir /mnt/hdc6
-[root@www ~]# mount /dev/hdc6 /mnt/hdc6
-[root@www ~]# df
-Filesystem           1K-blocks      Used Available Use% Mounted on
-.....中间省略.....
-/dev/hdc6              1976312     42072   1833836   3% /mnt/hdc6
-```
-
 `umount [-fn] 装置文件名或挂载点`
 
 选项与参数：
@@ -966,25 +776,66 @@ Filesystem           1K-blocks      Used Available Use% Mounted on
 - -f ：强制卸除！可用在类似网络文件系统 (NFS) 无法读取到的情况下；
 - -n ：不升级 /etc/mtab 情况下卸除。
 
-卸载/dev/hdc6
-
-```
-[root@www ~]# umount /dev/hdc6     
-```
-
 ------
 
 
 
 ## 6.文件与文件系统的压缩与打包
 
-Linux系统常见的压缩命令
-
- 在linux环境中，压缩文件的扩展名大多是.tar, .tar.gz, .tgz, .gz, .Z, .bz2;
+在linux环境中，压缩文件的扩展名大多是.tar, .tar.gz, .tgz, .gz, .Z, .bz2;
 
 Linux支持的压缩命令很多，且不同的命令所用的压缩技术不同，彼此可能无法相互压缩/解压文件。
 
-**tar**
+```
+*.Z         compress 程序压缩的文件；
+*.zip       zip 程序压缩的文件；
+*.gz        gzip 程序压缩的文件；
+*.bz2       bzip2 程序压缩的文件；
+*.xz        xz 程序压缩的文件；
+*.tar       tar 程序打包的数据，并没有压缩过；
+*.tar.gz    tar 程序打包的文件，其中并且经过 gzip 的压缩
+*.tar.bz2   tar 程序打包的文件，其中并且经过 bzip2 的压缩
+*.tar.xz    tar 程序打包的文件，其中并且经过 xz 的压缩
+```
+
+### gzip, zcat/zmore/zless/zgrep
+
+`gzip [-cdtv#] 文件名`   压缩文件为  *.gz 的文件，**使用gzip压缩后原始文件就不再存在了** 
+
+- -c  ：将压缩的数据输出到屏幕上，可通过数据流重导向来处理；
+- -d  ：解压缩的参数；
+- -t  ：可以用来检验一个压缩文件的一致性～看看文件有无错误；
+- -v  ：可以显示出原文件/压缩文件的压缩比等信息；
+- -#  ：# 为数字的意思，代表压缩等级，-1 最快，但是压缩比最差、-9 最慢，但是压缩比最好！默认是 -6
+
+
+
+zcat/zmore/zless/zgrep和cat/more等指令类似，查看、查找压缩文件
+
+```sh
+gzip test.txt   #压缩test.txt文件
+gcat test.gz   #查看test.gz文件内容
+gzip -d test.gz  #解压文件，和gunzip效果相同
+zgrep -n 'http' services.gz  #http 这个关键字在哪几行
+
+gzip -c test > test.gz   #压缩test,并保留原文件
+
+```
+
+### bzip2, bzcat/bzmore/bzless/bzgrep
+
+`bzip2 [-cdkzv#] 文件名`   bzip2 则是为了取代 gzip 并提供更佳的压缩比而来的,用法和gzip几乎相同
+
+- -c  ：将压缩的过程产生的数据输出到屏幕上！
+- -d  ：解压缩的参数
+- -k  ：保留原始文件，而不会删除原始的文件喔！
+- -z  ：压缩的参数 （默认值，可以不加）
+- -v  ：可以显示出原文件/压缩文件的压缩比等信息；
+- -#  ：与 gzip 同样的，都是在计算压缩比的参数， -9 最佳， -1 最快！
+
+### tar 
+
+tar  打包指令 , 将多个文件或目录包成一个大文件的指令 
 
 - -c: 建立压缩档案
 - -x：解压
@@ -999,65 +850,19 @@ Linux支持的压缩命令很多，且不同的命令所用的压缩技术不同
 - -Z：有compress属性的
 - -v：显示所有过程
 - -O：将文件解开到标准输出
-- **-f: 使用档案名字，切记，这个参数是最后一个参数，且是必须的，后面只能接档案名。**
+- **<font color=green>-f: 使用档案名字，切记，这个参数是最后一个参数，且是必须的，后面只能接档案名。</font>**
 
 ```shell
-# tar -cf all.tar *.jpg
+tar -cf all.tar *.jpg #将所有.jpg的文件打成一个名为all.tar的包,-c是表示产生新的包，-f指定包的文件名
+
+tar -rf all.tar *.gif   #将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思
+
+tar -uf all.tar logo.gif #更新原来tar包all.tar中logo.gif文件
+
+tar -tf all.tar #列出all.tar包中所有文件
+
+tar -xf all.tar #解出all.tar包中所有文件
 ```
-
-这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。
-
-```shell
-# tar -cf all.tar *.jpg# tar -rf all.tar *.gif
-```
-
-这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。
-
-```shell
-# tar -uf all.tar logo.gif
-```
-
-这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。
-
-```shell
-# tar -tf all.tar
-```
-
-这条命令是列出all.tar包中所有文件，-t是列出文件的意思
-
-```shell
-# tar -xf all.tar
-```
-
-这条命令是解出all.tar包中所有文件，-t是解开的意思
-
-**压缩**
-
-`tar -cvf jpg.tar *.jpg`      //将目录里所有jpg文件打包成tar.jpg 
-
-`tar -czf jpg.tar.gz *.jpg`  //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz
-
- `tar -cjf jpg.tar.bz2 *.jpg` //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2
-
-`tar -cZf jpg.tar.Z *.jpg`  //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z
-
-`rar a jpg.rar *.jpg` //rar格式的压缩，需要先下载rar for linux
-
-`zip jpg.zip *.jpg` //zip格式的压缩，需要先下载zip for linux
-
-**解压**
-
-`tar -xvf file.tar` //解压 tar包
-
-`tar -xzvf file.tar.gz` //解压tar.gz
-
-`tar -xjvf file.tar.bz2`  //解压 tar.bz2
-
-`tar -xZvf file.tar.Z`  //解压tar.Z
-
-`unrar e file.rar` //解压rar
-
-`unzip file.zip` //解压zip
 
 **总结**
 
@@ -1091,7 +896,7 @@ tar -xzvf jdk-8u131-linux-x64.tar.gz -C /usr/local/java
 
 ### RPM
 
-#### RPM概述
+##### RPM概述
 
 RPM（RedHat Package Manager），RedHat软件包管理工具，类似windows里面的setup.exe
 
@@ -1104,17 +909,17 @@ RPM包的名称格式:  Apache-1.3.23-11.i386.rpm
 - “i386”是软件所运行的硬件平台，Intel 32位微处理器的统称
 -  “rpm”文件扩展名，代表RPM包
 
-#### RPM查询命令（rpm -qa）
+##### RPM查询命令（rpm -qa）
 
-`rpm -qa`                         （功能描述：查询所安装的所有rpm软件包）
+`rpm -qa`         （功能描述：查询所安装的所有rpm软件包）
 
 由于软件包比较多，一般都会采取过滤。rpm -qa | grep rpm软件包
 
-```
+```sh
 pm -qa |grep firefox  #查询firefox软件安装情况
 ```
 
-#### RPM卸载命令（rpm -e）
+##### RPM卸载命令（rpm -e）
 
 `rpm -e RPM软件包`  
 
@@ -1129,7 +934,7 @@ pm -qa |grep firefox  #查询firefox软件安装情况
 rpm -e firefox #卸载firefox软件
 ```
 
-#### RPM安装命令（rpm -ivh）
+##### RPM安装命令（rpm -ivh）
 
 ` rpm -ivh RPM包全名`
 
@@ -1140,13 +945,13 @@ rpm -e firefox #卸载firefox软件
 | -h       | -h=hash，进度条          |
 | --nodeps | --nodeps，不检测依赖进度 |
 
-### YUM仓库配置
+### YUM
 
-#### YUM概述
+##### YUM概述
 
 YUM（全称为Yellow dog Updater, Modified）是一个在Fedora和RedHat以及CentOS中的Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包，无须繁琐地一次次下载、安装。
 
-#### YUM的常用命令
+##### YUM的常用命令
 
 `yum [-y] [参数]`  -y表示对所有提问都回答“yes”
 
@@ -1160,7 +965,7 @@ YUM（全称为Yellow dog Updater, Modified）是一个在Fedora和RedHat以及C
 | clean        | 清理yum过期的缓存             |
 | deplist      | 显示yum软件包的所有依赖关系   |
 
-#### 修改网络YUM源
+##### 修改网络YUM源
 
 默认的系统YUM源，需要连接国外apache网站，网速比较慢，可以修改关联的网络YUM源为国内镜像的网站，比如网易163。
 
@@ -1410,17 +1215,23 @@ Linux系统是一个多用户多任务的操作系统，任何一个要使用系
 
 每行的含义：用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell
 
+![linux-passwd.png](https://i.loli.net/2019/11/25/y7wGSIWHTlm2usn.png)
+
  **<font color=red>/etc/shadow </font>文件**
 
 口令的配置文件
 
 每行的含义：登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:保留
 
+![linux-shadow.png](https://i.loli.net/2019/11/25/DJ4GOMcoZdNrlUW.png)
+
 **<font color=red>/etc/group</font>文件**
 
 组(group)的配置文件，记录Linux包含的组的信息
 
 每行含义：组名:口令:组标识号:组内用户列表
+
+![linux-group.png](https://i.loli.net/2019/11/25/fpWeksFZR19zL4T.png)
 
 ##### useradd 添加新用户
 
@@ -1690,11 +1501,12 @@ tar -zxvf test.tar.gz -C /opt #解压到指定目录
 
 ```sh
 df -h #查看磁盘使用情况
+du -h /目录  #查询指定目录的磁盘占用情况
 ```
 
 ##### fdisk 查看分区
 
-`fdisk -l `                 （功能描述：查看磁盘分区详情,该命令必须在root用户下才能使用）
+`fdisk -l `          （功能描述：查看磁盘分区详情,该命令必须在root用户下才能使用）
 
 功能说明
 
@@ -1726,7 +1538,10 @@ Linux中每个分区都是用来组成整个文件系统的一部分，它在用
 
 ### 进程线程类
 
-进程是正在执行的一个程序或命令，每一个进程都是一个运行的实体，都有自己的地址空间，并占用一定的系统资源。
+1. 在LINUX中，每个执行的**程序（代码）**都称为一个进程。每一个进程都分配一个ID号。
+2. 每一个进程，都会对应一个父进程，而这个父进程可以复制多个子进程。例如www服务器。
+3. 每个进程都可能以两种方式存在的。**前****台** 与**后台**，所谓前台进程就是用户目前的屏幕上可以进行操作的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行[sshd , crond]。 
+4. 一般系统的**服务**都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才才结束。
 
 ##### ps 查看当前系统进程状态
 
@@ -1744,7 +1559,7 @@ ps:process status 进程状态
 
 3．功能说明
 
-​       （1）ps aux显示信息说明
+（1）ps aux显示信息说明
 
 - USER：该进程是由哪个用户产生的
 - PID：进程的ID号
@@ -1756,7 +1571,7 @@ ps:process status 进程状态
 - STAT：进程状态。常见的状态有：R：运行、S：睡眠、T：停止状态、s：包含子进程、+：位于后台
 - START：该进程的启动时间
 - TIME：该进程占用CPU的运算时间，注意不是系统时间
-- COMMAND：产生此进程的命令名
+- COMMAND：启动进程所用的命令和参数，如果过长会被截断显示
 
 （2）ps -ef显示信息说明
 
@@ -1794,7 +1609,77 @@ ps -ef|grep tomcat
 | -p   | 显示进程的PID      |
 | -u   | 显示进程的所属用户 |
 
+```sh
+Pstree -p #用树状的形式显示进程的pid 
+Pstree –u #用树状的形式进程的用户id
+```
+
+
+
+#### 服务管理
+
+服务(service) 本质就是进程，但是是运行在后台的，通常都会监听某个端口，等待其它程序的请求，比如(mysql , sshd **防火墙**等)，因此我们又称为**守护进程**  
+
+**service管理指令：**
+
+service 服务名 [start | stop | restart | reload | status]
+
+在CentOS7.0后 不再使用service ,而是 **systemctl**
+
+```sh
+service iptables status #查看当前防火墙的状况
+service  iptables  stop #关闭或者启用防火墙后，立即生效（临时生效，重启后恢复）
+service iptables start
+
+```
+
+**服务的运行级别(runlevel):**
+
+**查看或者修改默认级别：** **vi /etc/inittab** 
+
+Linux系统有7种运行级别(runlevel)：**常用的是级别3和5**
+
+- **运行级别0：**系统停机状态，系统默认运行级别不能设为0，否则不能正常启动
+- **运行级别1：**单用户工作状态，root权限，用于系统维护，禁止远程登陆
+- **运行级别2：**多用户状态(没有NFS)，不支持网络
+- **运行级别3：**完全的多用户状态(有NFS)，登陆后进入控制台命令行模式
+- **运行级别4：**系统未使用，保留
+- **运行级别5：**X11控制台，登陆后进入图形GUI模式
+- **运行级别6**：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动
+
+**开机的流程说明：**
+
+![linux-runlevel.png](https://i.loli.net/2019/11/25/K64PRwq82d1zUpS.png)
+
+**chkconfig指令**
+
+**通过chkconfig命令可以给每个服务的各个运行级别设置自启动/关闭**
+
+**基本语法**
+
+ **1)** **查看服务 chkconfig  --list|grep xxx** 
+
+ **2) chkconfig 服务名 --list** 
+
+ 3) chkconfig  --level 5  服务名  on/off  [可以指定某个服务，某各个运行级别，开启或关闭]
+
+```sh
+chkconfig –level 1 sshd off/on #sshd 服务在 1 运行级别 off
+```
+
+ 4) chkconfig   服务名 on/off 
+
+```sh
+chkconfig iptables off #  iptables 彻底关闭 ,不管是哪个级别都关闭
+
+chkconfig --list   #显示当前系统所有服务的各个运行级别的运行状态 
+```
+
+
+
 ##### top 查看系统健康状态
+
+top与ps命令很相似。它们都用来显示正在执行的进程。top与ps最大的不同之处，在于**top在执行一段时间可以更新正在运行的的进程**(默认每3秒变化一次)  
 
 ` top [选项]  ` 
 
@@ -1871,18 +1756,17 @@ top -p 2575
 
 `netstat -anp |grep 进程号`（功能描述：查看该进程网络信息）
 
-`netstat -nlp      | grep 端口号`  （功能描述：查看网络端口号占用情况）
+`netstat -nlp | grep 端口号`  （功能描述：查看网络端口号占用情况）
 
-| 选项 | 功能                                     |
-| ---- | ---------------------------------------- |
-| -n   | 拒绝显示别名，能显示数字的全部转化成数字 |
-| -l   | 仅列出有在listen（监听）的服务状态       |
-| -p   | 表示显示哪个进程在调用                   |
+| 选项 | 功能                   |
+| ---- | ---------------------- |
+| -an  | 按一定顺序排列输出     |
+| -p   | 表示显示哪个进程在调用 |
 
 ```sh
 netstat -anp | grep java #通过进程号查看该进程的网络信息
 
-netstat -nlp | grep **20670 **#查看某端口号是否被占用
+netstat -nlp | grep 20670 #查看某端口号是否被占用
 ```
 
 
@@ -1931,58 +1815,35 @@ service crond restart #重新启动crond服务
 
 
 
-
-
-# 第9章常见错误及解决方案
-
-\1.     虚拟化支持异常情况如下几种情况
-
-
-
-图1-168
-
-
-
-图1-169
-
-
-
-图1-170
-
-
-
-图1-171
-
-问题原因：宿主机BIOS设置中的硬件虚拟化被禁用了
-
-解决办法：需要打开笔记本BIOS中的IVT对虚拟化的支持
-
-
-
-图1-172
-
-第10
-
-
-
-
-
-
-
 ## FAQ
 
-1. Linux系统下你关注过哪些内核参数，说说你知道的。
-2. Linux下IO模型有几种，各自的含义是什么。
-3. epoll和poll有什么区别。
-4. 平时用到哪些Linux命令。
-5. 用一行命令查看文件的最后五行。
-6. 用一行命令输出正在运行的java进程。
-7. 介绍下你理解的操作系统中线程切换过程。
-8. 进程和线程的区别。
-9. top 命令之后有哪些内容，有什么作用。
-10. 线上CPU爆高，请问你如何找到问题所在
-11.  linux系统日志在哪里看 
-12.  如何查看网络进程 
+- 统计/home文件夹下文件的个数
+   ls –l /home/ | grep “^-” | wc -l
+
+- 统计/home文件夹下目录的个数
+   ls –l /home/ | grep “^d” | wc -l
+
+- 统计/home文件夹下文件的个数，包括子文件夹里的
+   ls –lR /home/ | grep “^-” | wc -l
+
+- 统计/home文件夹下目录的个数，包括子文件夹里的
+  ls –lR /home/ | grep “^d” | wc -l
+
+-  如何查看当前系统都有哪些进程 
+
+   ps -aux 或者ps -elf 
+
+- 如何查看系统都开启了哪些端口？ 
+
+  netstat -lnp
+
+- 平时用到哪些Linux命令
+
+  ps、grep、tar、touch、pwd
+
+
+
+
 
 
 
