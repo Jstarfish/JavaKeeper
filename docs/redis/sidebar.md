@@ -34,7 +34,7 @@
 - web调优
 - DB调优
 - **其他**
-- [![Linux](../_media/linux-original.svg?&size=16)Linux](https://www.linux.org/)
+- [![Linux](https://icongram.jgog.in/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)

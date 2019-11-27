@@ -1,13 +1,13 @@
 - **Java基础**
-- [JUC](#)
-- [NIO](#)
+
+  
 - **数据存储和缓存**
 - [![MySQL](https://icongram.jgog.in/devicon/mysql-original.svg?&size=16)MySQL](mysql/readMySQL.md)
 - [![Redis](https://icongram.jgog.in/devicon/redis-original.svg?&size=16)Redis](redis/2.readRedis.md)
 - [![mongoDB](https://icongram.jgog.in/devicon/mongodb-original.svg?&size=16)mongoDB]( https://redis.io/ )
 - [![ **Elasticsearch** ](https://icongram.jgog.in/simple/elasticsearch.svg?&size=16) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongram.jgog.in/devicon/amazonwebservices-original.svg?&size=16)S3]( https://aws.amazon.com/cn/s3/ )
-- [FastDFS(OSS)]()
+- [FastDFS(OSS)]( https://github.com/happyfish100/fastdfs )
 - **单体架构**
 - [缕清各种Java Logging](logging/Java-Logging.md)
 - [hello logback](logging/logback简单使用.md)

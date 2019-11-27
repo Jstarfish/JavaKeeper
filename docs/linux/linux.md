@@ -41,11 +41,9 @@ Ubuntu(乌班图)、RedHat(红帽)、**CentOS**、Debain[蝶变]、Fedora、SuSE
 
 **Refrences:**
 
- https://www.w3cschool.cn/linux/ 
+ [w3cschool](https://www.w3cschool.cn/linux/). 
 
- http://c.biancheng.net/linux_tutorial/ 
-
-《鸟哥的Linux私房菜》 http://shouce.jb51.net/vbird-linux-basic-4/ 
+ [鸟哥的Linux私房菜]( http://shouce.jb51.net/vbird-linux-basic-4/). 
 
 
 
