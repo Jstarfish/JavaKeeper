@@ -24,7 +24,7 @@ SHOW VARIABLES LIKE 'storage_engine
 
 
 
-![image-20191128113256242](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191128113256242.png)
+![](H:\Technical-Learning\docs\_images\mysql\mysql-engines.png)
 
 
 
