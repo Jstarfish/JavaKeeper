@@ -50,7 +50,7 @@
 
   - 创建索引：**CREATE [UNIQUE] INDEX indexName ON mytable(username(length))**;
 
-    ☆☆☆ 如果是CHAR，VARCHAR类型，length可以小于字段实际长度；如果是BLOB和TEXT类型，必须指定 length。
+    ?> **Tip** 如果是CHAR，VARCHAR类型，length可以小于字段实际长度；如果是BLOB和TEXT类型，必须指定 length。
 
   - 修改表结构(添加索引)：**ALTER table tableName ADD [UNIQUE] INDEX indexName(columnName)**
 
@@ -106,7 +106,7 @@
 
 - 检索原理
 
-  ![image-20191128164903707](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191128164903707.png)
+  ![bTree](../_images/mysql/bTree.png)
 
   【初始化介绍】 
   一颗b+树，浅蓝色的块我们称之为一个磁盘块，可以看到每个磁盘块包含几个数据项（深蓝色所示）和指针（黄色所示），
@@ -151,9 +151,10 @@ MyISAM索引文件和数据文件是分离的，索引文件仅保存记录所�
 
 ![](https://img-blog.csdn.net/20180421144534845?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xKRlBIUA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-      上图所提供的示例表字段有Col1（ID）、Col2(age)、Col3（name）三个，其中Col1为Primary Key（主键），上图很好地说明了树中叶子保存的是对应行的物理位置。通过该值，存储引擎能顺利地进行回表查询，得到一行完整记录。同时，每个叶子页也保存了指向下一个叶子页的指针。从而方便叶子节点的范围遍历。
-    
-      而对于二级索引，在 MyISAM存储引擎中以与上图同样的方式实现，可以看出MyISAM的索引文件仅仅保存数据记录的地址。
+  上图所提供的示例表字段有Col1（ID）、Col2(age)、Col3（name）三个，其中Col1为Primary Key（主键），上图很好地说明了树中叶子保存的是对应行的物理位置。通过该值，存储引擎能顺利地进行回表查询，得到一行完整记录。同时，每个叶子页也保存了指向下一个叶子页的指针。从而方便叶子节点的范围遍历。
+
+  而对于二级索引，在 MyISAM存储引擎中以与上图同样的方式实现，可以看出MyISAM的索引文件仅仅保存数据记录的地址。
+
 InnoDB索引的实现
 1、聚集索引
 
@@ -197,6 +198,8 @@ InnoDB索引的实现
     
 
 
+
+![img](G:/youdaoLocalData/jstarfish@126.com/151524bb2d634dd1b1c92cbd0af458f7/clipboard.png)
 
 
 

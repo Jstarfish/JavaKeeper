@@ -3,7 +3,7 @@
 
 
 
-> `Keep On Growing`：**Starfish Technical Guide**
+> `Keep On Growing`：**Java Reference Manual**
 
 [GitHub](https://github.com/Jstarfish/Technical-Learning)
 [Get Started](#lazyegg)

@@ -1,6 +1,4 @@
 - **Java基础**
-
-  
 - **数据存储和缓存**
 - [![MySQL](https://icongram.jgog.in/devicon/mysql-original.svg?&size=16)MySQL](mysql/readMySQL.md)
 - [![Redis](https://icongram.jgog.in/devicon/redis-original.svg?&size=16)Redis](redis/2.readRedis.md)

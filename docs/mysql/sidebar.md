@@ -1,8 +1,15 @@
 - **Java基础**
 - **数据存储和缓存**
 - [![MySQL](../_media/mysql-original.svg)MySQL](mysql/readMySQL.md)
-  - [MySQL索引](mysql/MySQL-index.md)
-- [![Redis](../_media/redis-original.svg) Redis](redis/readRedis.md)
+  - [MySQL 架构介绍](mysql/MySQL-Framework.md)
+  - [MySQL 存储引擎](mysql/MySQL-Storage-Engines.md)
+  - [MySQL 索引](mysql/MySQL-index.md)
+  - [MySQL 事务](mysql/MySQL-Transaction.md)
+  - [MySQL 优化](mysql/MySQL-Optimization.md)
+  - [MySQL 锁机制](mysql/MySQL-Lock.md)
+  - [MySQL 分表分库](mysql/MySQL-Segmentation.md)
+  - [MySQL 主从复制](mysql/MySQL-Master-Slave.md)
+- [![Redis](../_media/redis-original.svg) Redis](redis/2.readRedis.md)
 - [![mongoDB](../_media/mongodb-original.svg)mongoDB]( https://redis.io/ )
 - [![ **Elasticsearch** ](../_media/elasticsearch.svg) Elasticsearch]( https://redis.io/ )
 - [![S3](../_media/amazonwebservices-original.svg)S3]( https://aws.amazon.com/cn/s3/ )

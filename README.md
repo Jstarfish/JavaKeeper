@@ -15,7 +15,7 @@
 
 |                  Mind Map                   | Version | Article                                                      |
 | :-----------------------------------------: | :-----: | :----------------------------------------------------------- |
-| ![](/docs/_images/mysql/mysql-mind-map.png) | 5.7.25  | 1 —— 数据库设计原则<br/>[2 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>3 —— MySQL存储引擎]<br/>4 —— 索引<br/>5 —— 事务<br/>6 —— 表设计<br/>7 —— 性能优化<br/>8 —— 锁机制<br/>9 ——分区分表分库<br/>10 —— 主从复制<br/> |
+| ![](/docs/_images/mysql/mysql-mind-map.png) | 5.7.25  | 1 —— 数据库设计原则<br/>[2 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[3 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>4 —— 索引<br/>5 —— 事务<br/>6 —— 表设计<br/>7 —— 性能优化<br/>8 —— 锁机制<br/>9 ——分区分表分库<br/>10 —— 主从复制<br/> |
 
 
 
