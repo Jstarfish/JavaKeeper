@@ -1,3 +1,9 @@
+《高性能MySQL》给出的性能定义：完成某件任务所需要的的时间度量，性能既响应时间。
+
+假设性能优化就是在一定负载下尽可能的降低响应时间。
+
+性能监测工具  **New Relic**   **OneAPM**  
+
 ## 1. 影响mysql的性能因素
 
 ##### 1.1 业务需求对mysql的影响(合适合度)
@@ -237,6 +243,8 @@ log-queries-not-using-indexes
 
 
 
+**使用 pt-query-digest 分析 RDS MySQL 慢查询日志**
+
 #### 2.4.4 Show Profile分析查询
 
 通过慢日志查询可以知道哪些SQL语句执行效率低下，通过explain我们可以得知SQL语句的具体执行情况，索引使用等，还可以结合Show Profile命令查看执行状态。
@@ -256,7 +264,7 @@ log-queries-not-using-indexes
   2. 开启功能，默认是关闭，使用前需要开启
 
      ```mysql
-     mysql>set profiling=on;
+     mysql>set profiling=1;  
      ```
 
   3. 运行SQL
@@ -364,6 +372,26 @@ log-queries-not-using-indexes
   - group by实质是先排序后进行分组，遵照索引建的最佳左前缀
   - 当无法使用索引列，增大max_length_for_sort_data参数的设置+增大sort_buffer_size参数的设置
   - where高于having，能写在where限定的条件就不要去having限定了。
+
+
+
+### 3.3 数据类型优化
+
+MySQL支持的数据类型非常多，选择正确的数据类型对于获取高性能至关重要。不管存储哪种类型的数据，下面几个简单的原则都有助于做出更好的选择。
+
+- 更小的通常更好：一般情况下，应该尽量使用可以正确存储数据的最小数据类型。
+
+  简单就好：简单的数据类型通常需要更少的CPU周期。例如，整数比字符操作代价更低，因为字符集和校对规则（排序规则）使字符比较比整型比较复杂。
+
+- 尽量避免NULL：通常情况下最好指定列为NOT NULL
+
+
+
+
+
+
+
+
 
 
 
