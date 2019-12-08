@@ -1,14 +1,34 @@
-### 2.2. 常见通用的Join查询
+## 常见通用的Join查询
 
-##### 3.1 SQL执行顺序
+### SQL执行顺序
 
 - 手写
 
-  ![sql-seq1](../_images/mysql/sql-seq1.png)
+  ```mysql
+  SELECT DISTINCT <select_list>
+  FROM  <left_table> <join_type>
+  JOIN  <right_table> ON <join_condition>
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
 
 - 机读
 
-  ![sql-seq2](../_images/mysql/sql-seq2.png)
+  ```mysql
+  FROM  <left_table>
+  ON <join_condition>
+  <join_type> JOIN  <right_table> 
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  SELECT
+  DISTINCT <select_list>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
 
 - 总结
 
@@ -16,13 +36,13 @@
 
   
 
-### 3.2 Join图
+### Join图
 
 ![sql-joins](../_images/mysql/sql-joins.jpg)
 
-### 3.4 建表SQL
+### demo
 
-实例说明
+#### 建表SQL
 
 ```plsql
 CREATE TABLE `tbl_dept` (
@@ -58,7 +78,7 @@ INSERT INTO tbl_emp(NAME,deptId) VALUES('s9',51);
 
 ```
 
-### 3.5 7种JOIN
+#### 7种JOIN
 
 1. A、B两表共有
 
@@ -91,14 +111,15 @@ INSERT INTO tbl_emp(NAME,deptId) VALUES('s9',51);
    ```
 
 6. AB全有
-   #MySQL Full Join的实现 因为MySQL不支持FULL JOIN,替代方法:left join + union(可去除重复数据)+ right join
-
+   
+**MySQL Full Join的实现 因为MySQL不支持FULL JOIN,替代方法:left join + union(可去除重复数据)+ right join**
+   
    ```mysql
    SELECT * FROM tbl_emp A LEFT JOIN tbl_dept B ON A.deptId = B.id
    UNION
    SELECT * FROM tbl_emp A RIGHT JOIN tbl_dept B ON A.deptId = B.id
-   ```
-
+```
+   
 7. A的独有+B的独有
 
    ```mysql

@@ -2,7 +2,7 @@
 
 假设性能优化就是在一定负载下尽可能的降低响应时间。
 
-性能监测工具  **New Relic**   **OneAPM**  
+性能监测工具：  **New Relic**   **OneAPM**  
 
 ## 1. 影响mysql的性能因素
 
@@ -221,29 +221,68 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 #### 2.4.3 慢查询日志
 
-慢查询日志开启方法一：在配置文件my.cnf或my.ini中在[mysqld]一行下面加入两个配置参数
+MySQL的慢查询日志是MySQL提供的一种日志记录，它用来记录在MySQL中响应时间超过阈值的语句，具体指运行时间超过long_query_time值的SQL，则会被记录到慢查询日志中。
 
-log-slow-queries=/data/mysqldata/slow-query.log
+- long_query_time的默认值为10，意思是运行10秒以上的语句。
+- 默认情况下，MySQL数据库没有开启慢查询日志，需要手动设置参数开启。
+- 如果不是调优需要的话，一般不建议启动该参数。
 
-long_query_time=2
+**查看开启状态**
 
-注：log-slow-queries参数为慢查询日志存放的位置，一般这个目录要有mysql的运行帐号的可写权限，一般都将这个目录设置为mysql的数据存放目录；long_query_time=2中的2表示查询超过两秒才记录；在my.cnf或者my.ini中添加log-queries-not-using-indexes参数，表示记录下没有使用索引的查询。
+`SHOW VARIABLES LIKE '%slow_query_log%'`
 
-如下：
+**开启慢查询日志**
 
+- 临时配置：
+
+```mysql
+mysql> set global slow_query_log='ON';
+mysql> set global slow_query_log_file='/var/lib/mysql/hostname-slow.log';
+mysql> set global long_query_time=2;
 ```
-log-slow-queries=/data/mysqldata/slow-query.log
-long_query_time=10
-log-queries-not-using-indexes
+
+​	也可set文件位置，系统会默认给一个缺省文件host_name-slow.log
+
+​	使用set操作开启慢查询日志只对当前数据库生效，如果MySQL重启则会失效。
+
+- 永久配置
+
+  修改配置文件my.cnf或my.ini，在[mysqld]一行下面加入两个配置参数
+
+```cnf
+[mysqld]
+slow_query_log = ON
+slow_query_log_file = /var/lib/mysql/hostname-slow.log
+long_query_time = 3
 ```
 
-慢查询日志开启方法二：当然我们也可以通过命令行设置变量来即时启动慢日志查询，这里就不详细介绍啦。
+​	注：log-slow-queries参数为慢查询日志存放的位置，一般这个目录要有mysql的运行帐号的可写权限，一般都	将这个目录设置为mysql的数据存放目录；long_query_time=2中的2表示查询超过两秒才记录；在my.cnf或者	my.ini中添加log-queries-not-using-indexes参数，表示记录下没有使用索引的查询。
 
-接下来就是打开log文件查看得知哪些SQL执行效率低下，再进行分析和处理。
+可以用 `select sleep(4)` 验证是否成功开启。
+
+在生产环境中，如果手工分析日志，查找、分析SQL，还是比较费劲的，所以MySQL提供了日志分析工具mysqldumpslow。
+
+通过 mysqldumpslow --help查看操作帮助信息
+
+- 得到返回记录集最多的10个SQL
+
+  `mysqldumpslow -s r -t 10 /var/lib/mysql/hostname-slow.log`
+
+- 得到访问次数最多的10个SQL
+
+  `mysqldumpslow -s c -t 10 /var/lib/mysql/hostname-slow.log`
+
+- 得到按照时间排序的前10条里面含有左连接的查询语句
+
+  `mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/hostname-slow.log`
+
+- 也可以和管道配合使用
+
+  `mysqldumpslow -s r -t 10 /var/lib/mysql/hostname-slow.log | more`
+
+**也可使用 pt-query-digest 分析 RDS MySQL 慢查询日志**
 
 
-
-**使用 pt-query-digest 分析 RDS MySQL 慢查询日志**
 
 #### 2.4.4 Show Profile分析查询
 
@@ -384,38 +423,6 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
   简单就好：简单的数据类型通常需要更少的CPU周期。例如，整数比字符操作代价更低，因为字符集和校对规则（排序规则）使字符比较比整型比较复杂。
 
 - 尽量避免NULL：通常情况下最好指定列为NOT NULL
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
