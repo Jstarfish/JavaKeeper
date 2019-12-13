@@ -1,4 +1,6 @@
-# Nginx 通关攻略
+# Nginx 学习一路向北
+
+>  Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
 ## 1. Nginx简介 
 
@@ -86,9 +88,19 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 - 通过缓存静态资源，加速Web请求
 - 实现负载均衡
 
-**负载均衡**
+#### **负载均衡**
 
-TODO: 留一个负载均衡传送门
+TODO: 留一个负载均衡详细介绍传送门
+
+
+
+#### 地址重定向
+
+Nginx 的Rewrite主要的功能就是实现URL重写
+
+比如输入360.com  跳转到了360.cn
+
+product.dmp.360.cn 跳转到了 product.dop.360.cn
 
 
 
@@ -98,13 +110,7 @@ TODO: 留一个负载均衡传送门
 
 
 
-### 1.6 地址重定向
 
-Nginx 的Rewrite主要的功能就是实现URL重写
-
-比如输入360.com  跳转到了360.cn
-
-product.dmp.360.cn 跳转到了 product.dop.360.cn
 
 ------
 
@@ -122,11 +128,11 @@ product.dmp.360.cn 跳转到了 product.dop.360.cn
 
    - 用于编译c、c++代码的GCC；
 
-   - 用c语言编写的正则表达式函数库Pcre；
+   - 用c语言编写的正则表达式函数库Pcre(使用rewrite模块)；
 
    - 用于数据压缩的函式库的Zlib；
 
-   - 安全套接字层密码库OpenSSL
+   - 安全套接字层密码库OpenSSL（启用SSL支持）
 
    ```sh
    yum install gcc c++                                          
@@ -135,16 +141,15 @@ product.dmp.360.cn 跳转到了 product.dop.360.cn
    yum install -y openssl openssl-devel   
    ```
 
-3. 安装、编译nginx 
+3. 解压、配置（Nginx支持各种配置选项,文末一一列出 [Nginx配置选项](#Nginx配置选项) ）、编译、安装nginx
 
    ```sh
    tar -zxvf nginx-1.15.tar.gz cd nginx-1.16.1
    cd nginx-1.16.1
    ./configure
-   make 
-   make install 
+   make && sudo make install 
    ```
-
+   
 4. 启动、重启、关闭
 
    ```sh
@@ -153,7 +158,7 @@ product.dmp.360.cn 跳转到了 product.dop.360.cn
    ./nginx
    #关闭命令 
    ./nginx -s stop
-   #重启
+   #重启，热部署
    ./nginx -s reload
    #修改配置文件后也别嘚瑟，反正我会动不动就写错，检查修改的nginx.conf配置是否正确
    ./nginx -t
@@ -171,27 +176,27 @@ product.dmp.360.cn 跳转到了 product.dop.360.cn
 
 ## 3. 配置文件
 
-nginx.conf 配置文件分为三部分：全局块、events块、https块。
+nginx.conf 配置文件主要分为三部分：全局块、events块、https块。
 
 **Nginx配置语法：**
 
 - 配置文件由指令和指令块构成
-- 每条指令以分号；结尾，指令和参数间以空格符分隔
+- 每条指令以分号（;）结尾，指令和参数间以空格符分隔
 - 指令块以大括号{}将多条指令组织在一起
 - include语句允许组合多个配置文件以提高可维护性
-- 使用#添加注释
-- 使用$定义变量
+- 使用 # 添加注释
+- 使用 $ 定义变量
 - 部分指令的参数支持正则表达式
 
 #### 3.1 全局块
 
-从配置文件开始到 events 块之间的内容，主要会设置一些影响 nginx 服务器整体运行的配置指令，主要包括配置运行 Nginx 服务器的用户（组）、允许生成的 worker process 数，进程 PID 存放路径、日志存放路径和类型以 及配置文件的引入等。 比如
+全局配置部分用来配置对整个server都有效的参数。主要会设置一些影响 nginx 服务器整体运行的配置指令，主要包括配置运行 Nginx 服务器的用户（组）、允许生成的 worker process 数，进程 PID 存放路径、日志存放路径和类型以 及配置文件的引入等。 示例：
 
 ```
-worker_processes  1;
+user nobody;
+worker_processes  4;
+error_log  /data/nginx/logs/error.log  notice; 
 ```
-
-这是 Nginx 服务器并发处理服务的关键配置，worker_processes 值越大，可以支持的并发处理量也越多，但是 会受到硬件、软件等设备的制约 
 
 #### 3.2 events 块 
 
@@ -199,11 +204,10 @@ events 块涉及的指令主要影响 Nginx 服务器与用户的网络连接，
 
 ```
 events {
+	#每个 work process 支持的最大连接数为 1024.
     worker_connections  1024;
 }
 ```
-
-上述例子就表示每个 work process 支持的最大连接数为 1024. 这部分的配置对 Nginx 的性能影响较大，在实际中应该灵活配置。 
 
 #### 3.3 http 块  
 
@@ -223,26 +227,45 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 这块和虚拟主机有密切关系，虚拟主机从用户角度看，和一台独立的硬件主机是完全一样的，该技术的产生是为了 节省互联网服务器硬件成本。
 
- 每个 http 块可以包括多个 server 块，而每个 server 块就相当于一个虚拟主机。 
+每个 http 块可以包括多个 server 块，而每个 server 块就相当于一个虚拟主机。 
 
 而每个 server 块也分为全局 server 块，以及可以同时包含多个 locaton 块。
 
 - **全局 server 块** 
 
-  最常见的配置是本虚拟机主机的监听配置和本虚拟主机的名称或 IP 配置。
+  也被叫做“虚拟服务器”部分，它描述的是一组根据不同server_name指令逻辑分割的资源，这些虚拟服务器响应HTTP请求，因此都包含在http部分。最常见的配置是本虚拟机主机的监听配置和本虚拟主机的名称或 IP 配置。
 
       server {
         listen       80;
+        #server_name也支持通配符，*.example.com、www.example.*、.example.com
         server_name  localhost;
-      #charset koi8-r;
+        #charset koi8-r;
         #access_log  logs/host.access.log  main;
 
 - **location 块** 
 
   一个 server 块可以配置多个 location 块。
 
-   这块的主要作用是基于 Nginx 服务器接收到的请求字符串（例如 server_name/uri-string），对虚拟主机名称 （也可以是 IP 别名）之外的字符串（例如 前面的 /uri-string）进行匹配，对特定的请求进行处理。地址定向、数据缓 存和应答控制等功能，还有许多第三方模块的配置也在这里进行。
+  这块的主要作用是基于 Nginx 服务器接收到的请求字符串（例如 server_name/uri-string），对虚拟主机名称 （也可以是 IP 别名）之外的字符串（例如 前面的 /uri-string）进行匹配，对特定的请求进行处理。地址定向、数据缓存和应答控制等功能，还有许多第三方模块的配置也在这里进行。
 
+   **location 指令说明** 
+  
+  该指令用于匹配 URL。
+  
+   语法如下：`location [ = | ~ | ~* | ^~] uri{}`
+  
+  - = ：该修饰符使用精确匹配并且终止搜索。 
+  - ~：该修饰符使用区分大小写的正则表达式匹配。 
+  - ~*：该修饰符使用不区分大小写的正则表达式匹配。
+  - ^~：用于不含正则表达式的 uri 前，要求 Nginx 服务器找到标识 uri 和请求字 符串匹配度最高的 location 后，立即使用此 location 处理请求，而不再使用 location 块中的正则 uri 和请求字符串做匹配。
+  
+   ?> **Tip**  注意：如果 uri 包含正则表达式，则必须要有 ~ 或者 ~* 标识。 
+  
+  当一个请求进入时，URI将会被检测匹配一个最佳的location。
+  
+  - 没有正则表达式的location被作为最佳的匹配，独立于含有正则表达式的location顺序；
+  - **在配置文件中按照查找顺序进行正则表达式匹配**。在查找到第一个正则表达式匹配之后结束查找。由这个最佳的location提供请求处理。
+  
   ```
    location / {
    	root   html;
@@ -256,12 +279,16 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
     	root   html;
-     }
+    }
+    location / {
+        #try_files指令将会按照给定的参数顺序进行匹配尝试
+        try_files $uri $uri/ /index.html;
+    }
   ```
 
 
 
-#### nginx.conf 详细介绍
+#### nginx.conf 详细配置
 
     #定义Nginx运行的用户和用户组
     user www www; 
@@ -285,52 +312,31 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
     #这是因为nginx调度时分配请求到进程并不是那么的均衡，所以假如填写10240，总并发量达到3-4万时就有进程可能超过10240了，这时会返回502错误。
     worker_rlimit_nofile 65535;
     
-    
+    #################################  events  ###############################
     events {
         #参考事件模型，use [ kqueue | rtsig | epoll | /dev/poll | select | poll ]; epoll模型
-        #是Linux 2.6以上版本内核中的高性能网络I/O模型，linux建议epoll，如果跑在FreeBSD上面，就用kqueue模型。
-        #补充说明：
-        #与apache相类，nginx针对不同的操作系统，有不同的事件模型
-        #A）标准事件模型
-        #Select、poll属于标准事件模型，如果当前系统不存在更有效的方法，nginx会选择select或poll
-        #B）高效事件模型
-        #Kqueue：使用于FreeBSD 4.1+, OpenBSD 2.9+, NetBSD 2.0 和 MacOS X.使用双处理器的MacOS X系统使用kqueue可能会造成内核崩溃。
-        #Epoll：使用于Linux内核2.6版本及以后的系统。
-        #/dev/poll：使用于Solaris 7 11/99+，HP/UX 11.22+ (eventport)，IRIX 6.5.15+ 和 Tru64 UNIX 5.1A+。
-        #Eventport：使用于Solaris 10。 为了防止出现内核崩溃的问题， 有必要安装安全补丁。
         use epoll
-        
-        
         #单个进程最大连接数（最大连接数=连接数+进程数）
-        #根据硬件调整，和前面工作进程配合起来用，尽量大，但是别把cup跑到100%就行。
         worker_connections  1024;
         
         #keepalive 超时时间
         keepalive_timeout 60;
         
-        #客户端请求头部的缓冲区大小。这个可以根据你的系统分页大小来设置，一般一个请求头的大小不会超过1k，不过由于一般系统分页都要大于1k，所以这里设置为分页大小。
-        #分页大小可以用命令getconf PAGESIZE 取得。
-        #[root@web001 ~]# getconf PAGESIZE
-        #但也有client_header_buffer_size超过4k的情况，但是client_header_buffer_size该值必须设置为“系统分页大小”的整倍数。
+        #客户端请求头部的缓冲区大小。
         client_header_buffer_size 4k;
         
         #这个将为打开文件指定缓存，默认是没有启用的，max指定缓存数量，建议和打开文件数一致，inactive是指经过多长时间文件没被请求后删除缓存。
         open_file_cache max=65535 inactive=60s;
-        
-        
         #这个是指多长时间检查一次缓存的有效信息。
-        #语法:open_file_cache_valid time 默认值:open_file_cache_valid 60 使用字段:http, server, location 这个指令指定了何时需要检查open_file_cache中缓存项目的有效信息.
         open_file_cache_valid 80s;
-        
-        
-        #open_file_cache指令中的inactive参数时间内文件的最少使用次数，如果超过这个数字，文件描述符一直是在缓存中打开的，如上例，如果有一个文件在inactive时间内一次没被使用，它将被移除。
-        #语法:open_file_cache_min_uses number 默认值:open_file_cache_min_uses 1 使用字段:http, server, location  这个指令指定了在open_file_cache指令无效的参数中一定的时间范围内可以使用的最小文件数,如果使用更大的值,文件描述符在cache中总是打开状态.
+            #open_file_cache指令中的inactive参数时间内文件的最少使用次数，如果超过这个数字，文件描述符一直是在缓存中打开的，如上例，如果有一个文件在inactive时间内一次没被使用，它将被移除。
         open_file_cache_min_uses 1;
         
         #语法:open_file_cache_errors on | off 默认值:open_file_cache_errors off 使用字段:http, server, location 这个指令指定是否在搜索一个文件是记录cache错误.
         open_file_cache_errors on;
     }
     
+    ##############################   http    ##################################
     
     #设定http服务器，利用它的反向代理功能提供负载均衡支持
     http{
@@ -344,26 +350,24 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
         charset utf-8;
         
         #服务器名字的hash表大小
-        #保存服务器名字的hash表是由指令server_names_hash_max_size 和server_names_hash_bucket_size所控制的。参数hash bucket size总是等于hash表的大小，并且是一路处理器缓存大小的倍数。在减少了在内存中的存取次数后，使在处理器中加速查找hash表键值成为可能。如果hash bucket size等于一路处理器缓存的大小，那么在查找键的时候，最坏的情况下在内存中查找的次数为2。第一次是确定存储单元的地址，第二次是在存储单元中查找键 值。因此，如果Nginx给出需要增大hash max size 或 hash bucket size的提示，那么首要的是增大前一个参数的大小.
         server_names_hash_bucket_size 128;
         
-        #客户端请求头部的缓冲区大小。这个可以根据你的系统分页大小来设置，一般一个请求的头部大小不会超过1k，不过由于一般系统分页都要大于1k，所以这里设置为分页大小。分页大小可以用命令getconf PAGESIZE取得。
+        #客户端请求头部的缓冲区大小。
         client_header_buffer_size 32k;
         
-        #客户请求头缓冲大小。nginx默认会用client_header_buffer_size这个buffer来读取header值，如果header过大，它会使用large_client_header_buffers来读取。
+        #客户请求头缓冲大小。
         large_client_header_buffers 4 64k;
         
         #允许客户端请求的最大单个文件字节数
         client_max_body_size 8m;
         
         #开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。注意：如果图片显示不正常把这个改成off。
-        #sendfile指令指定 nginx 是否调用sendfile 函数（zero copy 方式）来输出文件，对于普通应用，必须设为on。如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络IO处理速度，降低系统uptime。
         sendfile on;
         
-         #开启目录列表访问，适合下载服务器，默认关闭。
+        #开启目录列表访问，适合下载服务器，默认关闭。
         autoindex on;
         
-          #此选项允许或禁止使用socke的TCP_CORK的选项，此选项仅在使用sendfile的时候使用
+        #此选项允许或禁止使用socke的TCP_CORK的选项，此选项仅在使用sendfile的时候使用
         tcp_nopush on;
          
         tcp_nodelay on;
@@ -392,10 +396,9 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
         #开启限制IP连接数的时候需要使用
         #limit_zone crawler $binary_remote_addr 10m;
         
-        
-        #负载均衡配置
-        upstream piao.jd.com {
-         
+            #负载均衡配置
+        upstream lazyegg.net {
+      
             #upstream的负载均衡，weight是权重，可以根据机器配置定义权重。weigth参数表示权值，权值越高被分配到的几率越大。
             server 192.168.80.121:80 weight=3;
             server 192.168.80.122:80 weight=2;
@@ -459,17 +462,16 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
             #location对URL进行匹配.可以进行重定向或者进行新的代理 负载均衡
         }
         
-        
-        #虚拟主机的配置
+           #虚拟主机的配置
         server {
             #监听端口
             listen 80;
     
             #域名可以有多个，用空格隔开
-            server_name www.jd.com jd.com;
+            server_name lazyegg.net;
             #默认入口文件名称
             index index.html index.htm index.php;
-            root /data/www/jd;
+            root /data/www/lazyegg;
     
             #对******进行负载均衡
             location ~ .*.(php|php5)?$
@@ -574,7 +576,15 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 ​    
 
-## 4. Nginx 配置实例-反向代理 
+------
+
+
+
+
+
+​    
+
+## 4. Nginx 配置实例
 
 ### 4.1 反向代理demo1
 
@@ -643,24 +653,15 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
    ![](../_images/nginx/demo2.png)
 
- **location 指令说明** 
 
-该指令用于匹配 URL。
-
- 语法如下：`location [ = | ~ | ~* | ^~] uri{}`
-
-- = ：用于不含正则表达式的 uri 前，要求请求字符串与 uri 严格匹配，如果匹配 成功，就停止继续向下搜索并立即处理该请求。 
-- ~：用于表示 uri 包含正则表达式，并且区分大小写。 
-- ~*：用于表示 uri 包含正则表达式，并且不区分大小写。
-- ^~：用于不含正则表达式的 uri 前，要求 Nginx 服务器找到标识 uri 和请求字 符串匹配度最高的 location 后，立即使用此 location 处理请求，而不再使用 location 块中的正则 uri 和请求字符串做匹配。
-
- ?> **Tip**  注意：如果 uri 包含正则表达式，则必须要有 ~ 或者 ~* 标识。 
 
 
 
 ### 4.3 Nginx 配置-负载均衡 
 
 随着互联网信息的爆炸性增长，负载均衡（load balance）已经不再是一个很陌生的话题， 顾名思义，负载均衡即是将负载分摊到不同的服务单元，既保证服务的可用性，又保证响应足够快，给用户很好的体验。快速增长的访问量和数据流量催生了各式各样的负载均衡产品， 很多专业的负载均衡硬件提供了很好的功能，但却价格不菲，这使得负载均衡软件大受欢迎， nginx 就是其中的一个，在 linux 下有 Nginx、LVS、Haproxy 等等服务可以提供负载均衡服务。
+
+Nginx的负载均衡是proxy模块和upstream模块搭配实现的。upstream模块将会启用一个新的配置区段，在该区段定义了一组上游服务器。
 
  实现效果：配置负载均衡  
 
@@ -756,13 +757,11 @@ Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理�
 
 
 
-## 5. Nginx 高可用
+### 4.5. Nginx 高可用
 
 如果将Web服务器集群当做一个城池，那么负载均衡服务器就相当于城门。如果“城门”关闭了，与外界的通道就断了。如果只有一台Nginx负载服务器，当故障宕机的时候，就会导致整个网站无妨访问。所以我们需要两台以上Nginx来实现故障转移和高可用。
 
-![image-20191211172902457](../_images/nginx/nginx-availability.png)
-
-
+![nginx-availability](../_images/nginx/nginx-availability.png)
 
 #### 配置高可用
 
@@ -863,350 +862,98 @@ Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理�
 
 
 
-## 线上环境配置
+## 5. Nginx 原理与优化参数配置 
 
-线上环境，可以会配置多个域名，所以在nginx.conf同级目录会放一个文件夹来存放不同域名的配置
+Nginx默认采用多进程工作方式，Nginx启动后，会运行一个master进程和多个worker进程。其中master充当整个进程组与用户的交互接口，同时对进程进行监护，管理worker进程来实现重启服务、平滑升级、更换日志文件、配置文件实时生效等功能。worker用来处理基本的网络事件，worker之间是平等的，他们共同竞争来处理来自客户端的请求 
 
-![image-20191212100321791](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191212100321791.png)
+ ![nginx-work](../_images/nginx/nginx-work.png) 
 
-```
-user                 nobody;
-worker_processes     4;
-worker_rlimit_nofile 65535;
 
-error_log  /data/nginx/logs/error.log  notice;
 
-events {
-    use epoll;
-    worker_connections  4096;
-}
 
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
 
-    full_log_format  full  '$remote_addr $request_length $body_bytes_sent $request_time[s] - - [$time_local] '
-                           '"$request" $status $http_referer "-" "$http_user_agent" $server_name $server_addr '
-                           '$http_x_forwarded_for $http_x_real_ip';
-    full_access_log  /data/nginx/logs/allweb.log  full;
+#### master-workers 的机制的好处 
 
-    log_format       combinedio  '$remote_addr - $remote_user [$time_local] '
-                                 '"$request" $status $body_bytes_sent '
-                                 '"$http_referer" "$http_user_agent" $request_length $request_time $upstream_response_time';
-    access_log off;
+1. 可以使用nginx-s reload 热部署
+2. 每个worker是独立的进程，不需要加锁，省掉了锁带来的开销。采用独立的进程，可以让互相之间不会影响，一个进程退出后，其它进程还在工作，服务不会中断，master 进程则很快启动新的 worker 进程。
 
-    sendfile                     on;
-    gzip                         on;
-    tcp_nopush                   on;
-    tcp_nodelay		         on;
 
-    keepalive_timeout            0;
-    client_body_timeout          10;
-    client_header_timeout        10;
 
-    client_header_buffer_size    1k;
-    large_client_header_buffers  4  4k;
-    output_buffers               1  32k;
-    client_max_body_size	 64m;
-    client_body_buffer_size      256k; 
- 
-    #lua_package_path "/usr/local/luajit/share/lua/5.1/ngx_metric/?.lua;;";
-    #lua_shared_dict shared_dict 64M;
-    #log_by_lua_file /usr/local/luajit/share/lua/5.1/ngx_metric/ngx_metric.lua;
+#### 需要设置多少个 worker 
 
-    server {
-        listen       80;
-        server_name  localhost;
-
-        location /server-status {
-            stub_status  on;
-            allow        127.0.0.1;
-            deny         all;
-        }
-
-        location /status {
-            include      fastcgi.conf;
-            fastcgi_pass 127.0.0.1:9000;
-            allow        127.0.0.1;
-            deny         all;
-        }
-
-        #location /ngx/metric {
-        #    content_by_lua_file /usr/local/luajit/share/lua/5.1/ngx_metric/ngx_metric_output.lua;
-        #    allow 127.0.0.1;
-        #    deny all;
-        #}
-    }
-
-    include include/*/vhost.conf;
-}
+Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是一个独立的进程，但每个进程里只有一个主线程，通过异步非阻塞的方式来处理请求，即使是千上万个请求也不在话下。每个 worker 的线程可以把一个 cpu 的性能发挥到极致。所以 **worker 数和服务器的 cpu 数相等是最为适宜**的。设少了会浪费 cpu，设多了会造成 cpu 频繁切换上下文带来的损耗。
 
 ```
-
-**vhost.conf**
-
-```
-server {
-    listen 80;
-    server_name product.dop.360.cn;
-    rewrite ^(.*)$ https://$host$1 permanent;
-}
-server {
-    listen 443 ssl;
-    server_name product.dop.360.cn;
-    root /home/q/system/product/www;
-    access_log /data/nginx/logs/product.dop.360.cn/web/product.dop.360.cn-access.log combinedio;
-    error_log /data/nginx/logs/product.dop.360.cn/web/product.dop.360.cn-error.log;
-
-    client_body_temp_path /data/nginx/client_body_temp/ 1 2;
-    proxy_temp_path /data/nginx/proxy_temp/ 1 2;
-    fastcgi_temp_path /data/nginx/fastcgi_temp/ 1 2;
-
-    # The 'ENV' file in document root contains various environment information,
-    # such as the path of document root, the location of log file, and so on.
-    # For security reason, you CAN NOT remove this location!!
-    location ~ ^.*\.xml$ {
-                add_header Content-Disposition "attachment";
-        }   
-    
-
-        location ~ ^/dmpproduct/ {
-                valid_referers none blocked server_names *.360.cn;
-                if ($invalid_referer) {
-                        return   403;
-                }   
-                proxy_pass              http://127.0.0.1:8180;
-                proxy_set_header        clientip $remote_addr;
-        }   
-       
-        location / {
-                try_files $uri $uri/ /index.html;
-        }
-    ssl  on;
-    ssl_session_cache  shared:SSL:50m;
-    ssl_session_timeout  300;
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-RC4-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:RC4-SHA:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!DSS:!PKS;
-    ssl_prefer_server_ciphers  on;
-
-    ssl_certificate /usr/local/nginx/ssl/20210804.dop.360.cn.crt;
-    ssl_certificate_key /usr/local/nginx/ssl/20210804.dop.360.cn.key;
-}
-
-```
-
- 第 7 章 nginx 原理与优化参数配置 
-
-![image-20191209112336633](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191209112336633.png)
-
-master-workers 的机制的好处 
-
-首先，对于每个 worker 进程来说，独立的进程，不需要加锁，所以省掉了锁带来的开销， 同时在编程以及问题查找时，也会方便很多。其次，采用独立的进程，可以让互相之间不会 影响，一个进程退出后，其它进程还在工作，服务不会中断，master 进程则很快启动新的 worker 进程。当然，worker 进程的异常退出，肯定是程序有 bug 了，异常退出，会导致当 前 worker 上的所有请求失败，不过不会影响到所有请求，所以降低了风险。 
-
-
-
- 需要设置多少个 worker 
-
-Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是一个独立的进程，但每个进 程里只有一个主线程，通过异步非阻塞的方式来处理请求， 即使是千上万个请求也不在话 下。每个 worker 的线程可以把一个 cpu 的性能发挥到极致。所以 worker 数和服务器的 cpu 数相等是最为适宜的。设少了会浪费 cpu，设多了会造成 cpu 频繁切换上下文带来的损耗。
-
-
-
- #设置 worker 数量。
-
+#设置 worker 数量。
  worker_processes 4 
-
 #work 绑定 cpu(4 work 绑定 4cpu)。 
-
-worker_cpu_affinity 0001 0010 0100 1000 
-
+ worker_cpu_affinity 0001 0010 0100 1000 
 #work 绑定 cpu (4 work 绑定 8cpu 中的 4 个) 。 
-
-worker_cpu_affinity 0000001 00000010 00000100 00001000 
-
-
-
-连接数 worker_connection 
-
-这个值是表示每个 worker 进程所能建立连接的最大值，所以，一个 nginx 能建立的最大连接 数，应该是 worker_connections * worker_processes。当然，这里说的是最大连接数，对于 HTTP 请 求 本 地 资 源 来 说 ， 能 够 支 持 的 最 大 并 发 数 量 是 worker_connections * worker_processes，如果是支持 http1.1 的浏览器每次访问要占两个连接，所以普通的静态访 问最大并发数是： worker_connections * worker_processes /2，而如果是 HTTP 作 为反向代 理来说，最大并发数量应该是 worker_connections * worker_processes/4。因为作为反向代理服务器，每个并发会建立与客户端的连接和与后端服 务的连接，会占用两个连接。 
-
-![image-20191209112457455](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191209112457455.png)
-
-
-
-详情见配置文件 nginx.conf  
-
-
-
-
-
-
-
- 第 8 章 nginx 搭建高可用集群
-
-8.1 Keepalived+Nginx 高可用集群（主从模式）
-
-![image-20191209112531708](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191209112531708.png)  
-
-
-
-```
-global_defs {
- notification_email {
- acassen@firewall.loc
- failover@firewall.loc
- sysadmin@firewall.loc
- }
- notification_email_from Alexandre.Cassen@firewall.loc
- smtp_server 192.168.17.129
- smtp_connect_timeout 30
- router_id LVS_DEVEL
-}
-
-vrrp_script chk_http_port {
-
- script "/usr/local/src/nginx_check.sh"
-
- interval 2 #（检测脚本执行的间隔）
-
- weight 2 
-vrrp_instance VI_1 {
- state BACKUP # 备份服务器上将 MASTER 改为 BACKUP
- interface ens33 //网卡
- virtual_router_id 51 # 主、备机的 virtual_router_id 必须相同
- priority 100 # 主、备机取不同的优先级，主机值较大，备份机值较小
- advert_int 1
- authentication {
- auth_type PASS
- auth_pass 1111
- }
- virtual_ipaddress {
- 192.168.17.50 // VRRP H 虚拟地址
- }
-}
-
-
-#!/bin/bash
-A=`ps -C nginx –no-header |wc -l`
-if [ $A -eq 0 ];then
- /usr/local/nginx/sbin/nginx
- sleep 2
- if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then
- killall keepalived
- fi
-fi 
+ worker_cpu_affinity 0000001 00000010 00000100 00001000
 ```
 
- （1）在所有节点上面进行配置 
+ 
 
-```
-# systemctl stop firewalld //关闭防火墙
-# sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/sysconfig/selinux //关闭 selinux，重启
-生效
-# setenforce 0 //关闭 selinux，临时生效
-# ntpdate 0.centos.pool.ntp.org //时间同步
-# yum install nginx -y //安装 nginx
-```
+#### 连接数 worker_connection 
+
+这个值是表示每个 worker 进程所能建立连接的最大值，所以，一个 nginx 能建立的最大连接数，应该是 worker_connections * worker_processes。当然，这里说的是最大连接数，对于 HTTP 请 求 本 地 资 源 来 说 ， 能 够 支 持 的 最 大 并 发 数 量 是 worker_connections * worker_processes，如果是支持 http1.1 的浏览器每次访问要占两个连接，所以普通的静态访 问最大并发数是： worker_connections * worker_processes /2，而如果是 HTTP 作 为反向代理来说，最大并发数量应该是 worker_connections * worker_processes/4。因为作为反向代理服务器，每个并发会建立与客户端的连接和与后端服 务的连接，会占用两个连接。 
 
 
 
- （2）配置后端 web 服务器（两台一样）  
+#### Nginx请求处理流程
 
-```
-# echo "`hostname` `ifconfig ens33 |sed -n 's#.*inet \(.*\)netmask.*#\1#p'`" >
-/usr/share/nginx/html/index.html //准备测试文件，此处是将主机名和 ip 写到 index.html 页
-面中
-# vim /etc/nginx/nginx.conf //编辑配置文件
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /run/nginx.pid;
-include /usr/share/nginx/modules/*.conf;
-events {
- worker_connections 1024;
-}
-http {
- log_format main '$remote_addr - $remote_user [$time_local] "$request" '
- '$status $body_bytes_sent "$http_referer" '
- '"$http_user_agent" "$http_x_forwarded_for"';
- access_log /var/log/nginx/access.log main;
- sendfile on;
- tcp_nopush on;
- tcp_nodelay on;
- keepalive_timeout 65;
- types_hash_max_size 2048;
- include /etc/nginx/mime.types;
- default_type application/octet-stream;
- include /etc/nginx/conf.d/*.conf;
- server {
- listen 80;
- server_name www.mtian.org;
- location / {
- root /usr/share/nginx/html;
- }
- access_log /var/log/nginx/access.log main;
- }
-}
-# systemctl start nginx //启动 nginx
-# systemctl enable nginx //加入开机启动
+![nginx-process](../_images/nginx/nginx-process.png)
 
+------
+
+
+
+
+
+## 6. Nginx模块开发
+
+由于Nginx的模块化特性，所以可以支持模块配置，也可以自定义模块
+
+**Nginx模块分类**
+
+![nginx-module](../_images/nginx/nginx-module.png)
+
+#### Nginx配置选项
+
+解压nginx后的配置操作示例
+
+```sh
+./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-pcre  --with-http_ssl_module
 ```
 
- （3）配置 LB 服务器（两台都一样）  
-
-```
-# vim /etc/nginx/nginx.conf
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /run/nginx.pid;
-include /usr/share/nginx/modules/*.conf;
-events {
-worker_connections 1024;
-}
-http {
- log_format main '$remote_addr - $remote_user [$time_local] "$request" '
- '$status $body_bytes_sent "$http_referer" '
- '"$http_user_agent" "$http_x_forwarded_for"';
- access_log /var/log/nginx/access.log main;
- sendfile on;
- tcp_nopush on;
- tcp_nodelay on;
- keepalive_timeout 65;
- types_hash_max_size 2048;
- include /etc/nginx/mime.types;
- default_type application/octet-stream;
- include /etc/nginx/conf.d/*.conf;
- upstream backend {
- server 192.168.1.33:80 weight=1 max_fails=3 fail_timeout=20s;
- server 192.168.1.34:80 weight=1 max_fails=3 fail_timeout=20s;
- }
- server {
- listen 80;
- server_name www.mtian.org;
- location / {
- proxy_pass http://backend;
- proxy_set_header Host $host:$proxy_port;
- proxy_set_header X-Forwarded-For $remote_addr;
- }
- }
-}
-# systemctl start nginx //启动 nginx
-# systemctl enable nginx //加入开机自启动
-```
+| 选项                            | 解释                                                         |
+| ------------------------------- | ------------------------------------------------------------ |
+| --prefix=\<path>                | Nginx安装的根目录，所有其他安装路径都要依赖于该选项          |
+| --sbin- path=\<path>            | 指定Nginx二进制文件的路径                                    |
+| --conf-path=\<path>             | 指定nginx.conf配置文件的路径                                 |
+| --error-log- path=\<path>       | 指定错误文件的路径                                           |
+| --user=name                     | worker进程运行的用户                                         |
+| --group=\<group>                | worker进程运行的组                                           |
+| --with-http_ssl_module          | 使用https协议模块。默认情况下该模块没有被构建。前提是openssl与openssl-devel已安装 |
+| --with-http_image_filter_module | 该模块被用作图像过滤器使用，将图像投递给客户前先进行过滤（需要libgd库） |
+| --with-http_stub_status_module  | 启用这个模块会收集Nginx自身状态信息，常用来做监控            |
+| --with-mail                     | 启用mail模块，默认没有被激活                                 |
+| --without-http_autoindex_module | 禁用：如果一个目录没有index文件，该模块能收集文件并列出      |
+| --add-module=\<path>            | 添加第三方外部模块,每次添加新的模块都要重新编译              |
 
 
 
+## 7. Nginx 面试题
 
+ https://zhuanlan.zhihu.com/p/80863868 
 
-Nginx请求处理流程
+参考：
 
-![image-20191212184345777](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191212184345777.png)
-
-## Nginx模块开发
-
->  https://juejin.im/post/5cdd4d3ee51d456e8240ddca#heading-0 
+>  《Nginx核心知识100讲》
+>
+>  《精通Nginx》
 >
 >  [nginx.conf 配置文件详解](https://juejin.im/post/5c1616186fb9a049a42ef21d)
 >
->  
+>  《尚硅谷Nginx》
 

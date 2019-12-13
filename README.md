@@ -10,16 +10,60 @@
 
 
 
-# :dolphin: MySQL
 
 
-|                   Mind Map                   | Version | Article                                                      |
-| :------------------------------------------: | :-----: | :----------------------------------------------------------- |
-| ![](./docs/_images/mysql/mysql-mind-map.png) | 5.7.25  | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
+# 💾  数据存储、缓存和搜索
+
+
+|                       Mind Map                        |     Version     | Article                                                      |
+| :---------------------------------------------------: | :-------------: | :----------------------------------------------------------- |
+| ![:dolphin:](./docs/_images/mysql/mysql-mind-map.png) | :dolphin:5.7.25 | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
+|                       **Redis**                       |                 |                                                              |
+|                   **Elasticsearch**                   |                 |                                                              |
+|                     **Amazon S3**                     |                 |                                                              |
+|                        MongoDB                        |                 |                                                              |
+|                        FastDFS                        |                 |                                                              |
 
 
 
-----------------------------
+#  :computer: 必备技能
+
+|  Project  |       Version       | Article                                                      |
+| :-------: | :-----------------: | :----------------------------------------------------------- |
+| **Linux** | CentOS release 6.10 | [Java程序员必会Linux知识点]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>) |
+| **Nginx** |       1.16.1        | Nginx<br>                                                    |
+
+
+
+# 🍃 Spring全家福和微服务
+
+|   Project    | Version | Article                                                      |
+| :----------: | :-----: | :----------------------------------------------------------- |
+|    Spring    |         |                                                              |
+|  Spring MVC  |         |                                                              |
+| Spring Boot  |  2.1.8  | [Spring Boot入门]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Spring/spring%20boot%E5%85%A5%E9%97%A8.md>)<br>[Spingboot定时任务@Scheduled](  <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Spring/Spingboot%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%40Scheduled.md> )<br> |
+| Spring Cloud |         |                                                              |
+
+
+
+#  🏡  必备框架
+
+| Project | Version | Article |
+| :-----: | :-----: | :------ |
+|   JPA   |         |         |
+| MyBatis |         |         |
+|  Shiro  |         |         |
+
+
+
+#  ✉️ Message Queue
+
+| Project | Version | Article                                                      |
+| :-----: | :-----: | :----------------------------------------------------------- |
+|   MQ    |         | [Hello MQ]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/浅谈消息队列及常见的消息中间件.md>)<br> |
+|  Kafka  |  2.12   | [Hello Kafka]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/Kafka/Hello-Kafka.md> )<br> |
+
+
 
 # :dog: RPC Learning
 
@@ -30,7 +74,9 @@
 
 ---------------------------
 
-# :computer: Big Data
+
+
+# 👨🏿‍💻 Big Data
 
 | Project  | Version | Article                                                      |
 | :------: | :-----: | :----------------------------------------------------------- |
@@ -38,30 +84,9 @@
 
 ------
 
-#  :email: Message Queue
-
-| Project | Version | Article                                                      |
-| :-----: | :-----: | :----------------------------------------------------------- |
-|   MQ    |         | [Hello MQ]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/浅谈消息队列及常见的消息中间件.md>)<br> |
-|  Kafka  |  2.12   | [Hello Kafka]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/Kafka/Hello-Kafka.md> )<br> |
-
-------
-
-# :leaves: Spring
-
-|   Project   | Version | Article                                                      |
-| :---------: | :-----: | :----------------------------------------------------------- |
-| Spring Boot |  2.1.8  | [Spring Boot入门]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Spring/spring%20boot%E5%85%A5%E9%97%A8.md>)<br>[Spingboot定时任务@Scheduled](  <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Spring/Spingboot%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%40Scheduled.md> )<br> |
-
-------
 
 
 
-#  👨🏿‍💻  Linux
-
-| Project |       Version       | Article                                                      |
-| :-----: | :-----------------: | :----------------------------------------------------------- |
-|  Linux  | CentOS release 6.10 | [Java程序员必会Linux知识点]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>)<br> |
 
 ## ❗️ 勘误
 
