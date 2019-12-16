@@ -1,4 +1,4 @@
-# 新之助学习路上的一亩三分地
+# Java猿大帅的一亩三分地
 
 <p>
 <img src="https://img.shields.io/badge/language-Java-blue.svg">
@@ -15,27 +15,27 @@
 # 💾  数据存储、缓存和搜索
 
 
-|                       Mind Map                        |     Version     | Article                                                      |
-| :---------------------------------------------------: | :-------------: | :----------------------------------------------------------- |
-| ![:dolphin:](./docs/_images/mysql/mysql-mind-map.png) | :dolphin:5.7.25 | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
-|                       **Redis**                       |                 |                                                              |
-|                   **Elasticsearch**                   |                 |                                                              |
-|                     **Amazon S3**                     |                 |                                                              |
-|                        MongoDB                        |                 |                                                              |
-|                        FastDFS                        |                 |                                                              |
+|      Project      | Version | Article                                                      |
+| :---------------: | :-----: | :----------------------------------------------------------- |
+|  :dolphin: MySQL  | ​5.7.25  | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
+|     **Redis**     |         |                                                              |
+| **Elasticsearch** |         |                                                              |
+|   **Amazon S3**   |         |                                                              |
+|      MongoDB      |         |                                                              |
+|      FastDFS      |         |                                                              |
 
 
 
-#  :computer: 必备技能
+#  👶🏽 必备技能
 
 |  Project  |       Version       | Article                                                      |
 | :-------: | :-----------------: | :----------------------------------------------------------- |
 | **Linux** | CentOS release 6.10 | [Java程序员必会Linux知识点]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>) |
-| **Nginx** |       1.16.1        | Nginx<br>                                                    |
+| **Nginx** |       1.16.1        | [Nginx](docs/nginx/nginx.md)                                 |
 
 
 
-# 🍃 Spring全家福和微服务
+# 🌱 Spring全家福和微服务
 
 |   Project    | Version | Article                                                      |
 | :----------: | :-----: | :----------------------------------------------------------- |
@@ -72,9 +72,23 @@
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   RPC   |  gRPC   | [1 —— Hello protocol-buffers]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/RPC/Protocol%20Buffers-Hello%20World.md> )<br> |
 
----------------------------
 
 
+# 🎨 设计模式
+
+| Project  | Version | Article                                                      |
+| :------: | :-----: | :----------------------------------------------------------- |
+| Big Data |         | [Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
+
+
+
+## ☕ Java
+
+| Project | Version | Article |
+| :-----: | :-----: | :------ |
+|   JVM   |         |         |
+
+​
 
 # 👨🏿‍💻 Big Data
 

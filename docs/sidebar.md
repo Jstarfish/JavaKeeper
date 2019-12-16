@@ -17,7 +17,7 @@
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
 - [![message](https://icongram.jgog.in/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](https://icongram.jgog.in/devicon/nginx-original.svg?&size=16)Nginx](logging/logback简单使用.md)
+- [![Nginx](https://icongram.jgog.in/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
 - **工程化与工具**
 - [![Maven](https://icongram.jgog.in/fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
 - [![Git](https://icongram.jgog.in/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)

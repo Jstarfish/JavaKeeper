@@ -1,3 +1,5 @@
+![](../_images/nginx/nginx-index.png)
+
 # Nginx 学习一路向北
 
 >  Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
@@ -98,19 +100,13 @@ TODO: 留一个负载均衡详细介绍传送门
 
 Nginx 的Rewrite主要的功能就是实现URL重写
 
-比如输入360.com  跳转到了360.cn
-
-product.dmp.360.cn 跳转到了 product.dop.360.cn
+比如输入360.com  跳转到了360.cn，baidu.cn跳转到了baidu.com
 
 
 
 ### 1.5 动静分离 
 
 为了加快网站的解析速度，可以把动态页面和静态页面由不同的服务器来解析，加快解析速度，降低原来单个服务器的压力。 这里指的就是让动态程序（Java、PHP）去访问应用服务器，让缓存、图片、JS、CSS等去访问Nginx。
-
-
-
-
 
 ------
 
@@ -573,16 +569,9 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
         }
     }
 
-
-​    
-
 ------
 
 
-
-
-
-​    
 
 ## 4. Nginx 配置实例
 
@@ -592,7 +581,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 1. 启动一个 tomcat，浏览器地址栏输入 127.0.0.1:8080，出现如下界面 
 
-![image-20191210142551360](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191210142551360.png)
+![tomcat-index](../_images/nginx/tomcat-index.png)
 
 
 
@@ -616,7 +605,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 5.  如上配置，我们监听 80 端口，访问域名为 www.12345.com，不加端口号时默认为 80 端口，故访问该域名时会跳转到 127.0.0.1:8080 路径上。在浏览器端输入 www.12345.com 结果如下： 
 
-![image-20191210151117772](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20191210151117772.png)
+![nginx-demo1](../_images/nginx/nginx-demo1.png)
 
 
 
@@ -757,7 +746,72 @@ Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理�
 
 
 
-### 4.5. Nginx 高可用
+### 4.5  Nginx的Rewrite
+
+ Rewrite是Nginx服务器提供的一个重要的功能，它可以实现URL重写和重定向功能。 
+
+场景：
+
+- URL访问跳转，支持开发设计。 页面跳转、兼容性支持(新旧版本更迭)、展示效果(网址精简)等
+- SEO优化(Nginx伪静态的支持)
+- 后台维护、流量转发等
+- 安全(动态界面进行伪装)
+
+该指令是通过正则表达式的使用来改变URI。可以同时存在一个或多个指令。需要按照顺序依次对URL进行匹配和处理。
+
+该指令可以在server块或location块中配置，其基本语法结构如下：
+
+```
+rewrite regex replacement [flag];
+```
+
+1. 采用反向代理demo2中的例子，修改nginx.conf(只多加了一行rewrite)
+
+   ```
+   server {
+           listen       80;
+           server_name  localhost;
+   
+           location /java/ {
+               proxy_pass http://127.0.0.1:8080;
+               rewrite ^/java /egg/ redirect;
+           }
+   
+           location /egg/ {
+               proxy_pass http://127.0.0.1:8081;
+           }
+   }
+   
+   ```
+
+2. `./nginx -s reload`，验证效果（输入ip/java/被重定向到了egg）
+
+   ![](C:\Users\jiahaixin\Desktop\截图20191216112932100.jpg)
+
+
+
+rewrite指令可以在server块或location块中配置，其基本语法结构如下：
+
+```
+rewrite regex replacement [flag];
+```
+
+- **rewrite**的含义：该指令是实现URL重写的指令。
+- **regex**的含义：用于匹配URI的正则表达式。
+- **replacement**：将regex正则匹配到的内容替换成 replacement。
+- **flag: flag**标记，flag有如下值：
+  - **last:** 本条规则匹配完成后，继续向下匹配新的location URI 规则。(不常用)
+  - **break:** 本条规则匹配完成即终止，不再匹配后面的任何规则(不常用)。
+  - **redirect:** 返回302临时重定向，浏览器地址会显示跳转新的URL地址。
+  - **permanent:** 返回301永久重定向。浏览器地址会显示跳转新的URL地址。
+
+```
+rewrite ^/(.*) http://www.360.cn/$1 permanent;
+```
+
+
+
+### 4.6 Nginx 高可用
 
 如果将Web服务器集群当做一个城池，那么负载均衡服务器就相当于城门。如果“城门”关闭了，与外界的通道就断了。如果只有一台Nginx负载服务器，当故障宕机的时候，就会导致整个网站无妨访问。所以我们需要两台以上Nginx来实现故障转移和高可用。
 
@@ -908,11 +962,9 @@ Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是�
 
 
 
-
-
 ## 6. Nginx模块开发
 
-由于Nginx的模块化特性，所以可以支持模块配置，也可以自定义模块
+由于Nginx的模块化特性，所以可以支持模块配置，也可以自定义模块，Nginx的模块开发，程序员目前还不需要太深入
 
 **Nginx模块分类**
 
@@ -945,7 +997,79 @@ Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是�
 
 ## 7. Nginx 面试题
 
- https://zhuanlan.zhihu.com/p/80863868 
+恭喜你顺利来到大猿帅面试阶段，没有夹道欢迎
+
+- Nginx功能，你们项目中用到的Nginx？
+
+  反向代理服务器
+
+  实现负载均衡
+
+  做静态资源服务器
+
+  作为http server
+
+- Nginx常用命令有哪写？
+
+  启动nginx    ./sbin/nginx
+  停止nginx    ./sbin/nginx -s stop   ./sbin/nginx -s quit
+  重载配置      ./sbin/nginx -s reload(平滑重启) service nginx reload
+  重载指定配置文件    ./sbin/nginx -c  /usr/local/nginx/conf/nginx.conf
+  查看nginx版本  ./sbin/nginx -v
+  检查配置文件是否正确  ./sbin/nginx -t
+  显示帮助信息  ./sbin/nginx  -h 
+
+- Nginx常用配置？
+
+  ```
+  worker_processes 4;   #工作进程数
+  work_connections 65535; #每个进程的并发能力
+  error_log  /data/nginx/logs/error.log;  #错误日志
+  
+  ```
+
+- Nginx是如何实现高并发的？
+
+  Nginx 采用的是多进程（单线程） & 多路IO复用模型,，异步，非阻塞. 
+
+  一个主进程master，多个工作进程worker，每个工作进程可以处理多个请求
+
+  master进程主要负责收集、分发请求。每当一个请求过来时，master就拉起一个worker进程负责处理这个请求。同时master进程也负责监控woker的状态，保证高可靠性
+
+  在nginx中的work进程中，为了应对高并发场景，采取了Reactor模型（也就是I/O多路复用，NIO）：
+
+  - 每一个worker进程通过I/O多路复用处理多个连接请求；
+  - 为了减少进程切换（需要系统调用）的性能损耗，一般设置worker进程数量和CPU数量一致。
+
+  **I/O 多路复用模型：**在 I/O 多路复用模型中，最重要的系统调用函数就是 select（其他的还有epoll等），该方法的能够同时监控多个文件描述符的可读可写情况（每一个网络连接其实都对应一个文件描述符），当其中的某些文件描述符可读或者可写时，select 方法就会返回可读以及可写的文件描述符个数。
+
+  **nginx work进程**使用 I/O 多路复用模块同时监听多个 FD（文件描述符），当 accept、read、write 和 close 事件产生时，操作系统就会回调 FD 绑定的事件处理器，这时候work进程再去处理相应事件，而不是阻塞在某个请求连接上等待。这样就可以实现一个进程同时处理多个连接。
+
+- nginx和apache的区别？
+
+  轻量级，同样起web 服务，比apache 占用更少的内存及资源
+  抗并发，nginx 处理请求是异步非阻塞的，而apache 则是阻塞型的，在高并发下nginx 能保持低资源低消耗高性能
+  高度模块化的设计，编写模块相对简单
+  最核心的区别在于apache是同步多进程模型，一个连接对应一个进程；nginx是异步的，多个连接（万级别）可以对应一个进程 
+
+-  nginx 的 upstream支持的负载均衡方式？
+
+  -  轮询（默认）  
+  -  weight  ：指定权重
+  -  ip_hash ：每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器 
+  - 第三方： fair、url_hash
+
+-  Nginx常见的优化配置有哪些? 
+
+  1.  调整worker_processes : 指Nginx要生成的worker数量,最佳实践是每个CPU运行1个工作进程 
+  2.  最大化worker_connections :
+  3.  启用Gzip压缩 : 压缩文件大小，减少了客户端http的传输带宽，因此提高了页面加载速度 
+  4.  为静态文件启用缓存 
+  5.  禁用access_logs : 访问日志记录，它记录每个nginx请求，因此消耗了大量CPU资源，从而降低了nginx性能 
+
+  
+
+
 
 参考：
 

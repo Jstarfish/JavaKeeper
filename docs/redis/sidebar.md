@@ -22,7 +22,7 @@
 - Spring Cloud
 - **面向服务架构**
 - [![message](../_media/message.svg) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](../_media/nginx-original.svg)Nginx](logging/logback简单使用.md)
+- [![Nginx](../_media/nginx-original.svg)Nginx](nginx/nginx.md)
 - **工程化与工具**
 - [![Maven](https://icongram.jgog.in/fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
 - [![Git](../_media/git-original.svg?&size=16) Git](logging/logback简单使用.md)

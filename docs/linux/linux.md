@@ -1,4 +1,6 @@
-![](https://www.w3cschool.cn/attachments/image/20170622/1498118505466168.jpg)
+![](../_images/linux/linux-index.png)
+
+# Javer的Linux手册
 
 Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
 
