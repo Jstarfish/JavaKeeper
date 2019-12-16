@@ -1,5 +1,3 @@
-![](../_images/nginx/nginx-index.png)
-
 # Nginx 学习一路向西
 
 >  Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
@@ -67,7 +65,7 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 
 比如你想去google看个“动作片”，可国内不允许呀，就需要找翻墙代理，这个就是所谓的”正向代理“。
 
-![forward-proxy](../_images/nginx/forward-proxy.png)
+![forward-proxy.png](https://i.loli.net/2019/12/16/8VwaLh2p6noI7gY.png)
 
 
 
@@ -79,7 +77,7 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 
 再比如，你想本本分分的在“优酷”上看个“爱情片”，youku.com会把你的请求分发到存放片片的那台机器上，这个就是所谓的”反向代理“。
 
-![reverse-proxy](../_images/nginx/reverse-proxy.png)
+![reverse-proxy.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9ylbm1fs3j20mg0bzdgu.jpg)
 
 
 
@@ -91,8 +89,6 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 - 实现负载均衡
 
 #### **负载均衡**
-
-TODO: 留一个负载均衡详细介绍传送门
 
 
 
@@ -160,11 +156,11 @@ Nginx 的Rewrite主要的功能就是实现URL重写
    ./nginx -t
    ```
 
-   ![nginx-t](../_images/nginx/nginx-t.png)
+   ![nginx-t.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yl593jmyj20ii02lq2y.jpg)
 
 5. 验证（浏览器输入ip）
 
-   ![welcome-nginx](../_images/nginx/welcome-nginx.png)
+   ![welcome-nginx.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9ylatm17vj20ki06z74h.jpg)
 
 ------
 
@@ -581,7 +577,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 1. 启动一个 tomcat，浏览器地址栏输入 127.0.0.1:8080，出现如下界面 
 
-![tomcat-index](../_images/nginx/tomcat-index.png)
+![tomcat-index.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9ylabc0xrj20zk0dognq.jpg)
 
 
 
@@ -605,7 +601,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 5.  如上配置，我们监听 80 端口，访问域名为 www.12345.com，不加端口号时默认为 80 端口，故访问该域名时会跳转到 127.0.0.1:8080 路径上。在浏览器端输入 www.12345.com 结果如下： 
 
-![nginx-demo1](../_images/nginx/nginx-demo1.png)
+![nginx-demo1.png](https://i.loli.net/2019/12/16/ukBfxj32ZnAOWmc.png)
 
 
 
@@ -640,7 +636,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
 
 3. 重启nginx，验证效果
 
-   ![](../_images/nginx/demo2.png)
+   ![demo2.png](https://i.loli.net/2019/12/16/JClLBTxFMeG1Qyi.png)
 
 
 
@@ -656,7 +652,7 @@ Nginx的负载均衡是proxy模块和upstream模块搭配实现的。upstream模
 
 1. 同时启动两个Tomcat（为了方便验证效果，修改tomcat端口号的同时，顺便将Tomcat默认欢迎页面apache-tomcat-9.0.29/webapps/ROOR目录下的index.jsp修改下，看下8081欢迎页的“蛋蛋”没）
 
-   ![nginx-tomcat](../_images/nginx/nginx-tomcat.png)
+   ![nginx-tomcat.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yl66emjhj20xj0q378t.jpg)
 
 2. 修改nginx.conf
 
@@ -715,11 +711,11 @@ Nginx的负载均衡是proxy模块和upstream模块搭配实现的。upstream模
 
 Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理解成只是单纯的把动态页面和静态页面物理分离。严格意义上说应该是动态请求跟静态请求分开，可以理解成使用 Nginx 处理静态页面，Tomcat 处理动态页面。动静分离从目前实现角度来讲大致分为两种， 一种是纯粹把静态文件独立成单独的域名，放在独立的服务器上，也是目前主流推崇的方案； 另外一种方法就是动态跟静态文件混合在一起发布，通过 nginx 来分开。 通过 location 指定不同的后缀名实现不同的请求转发。通过 expires 参数设置，可以使浏览器缓存过期时间，减少与服务器之前的请求和流量。具体 Expires 定义：是给一个资 源设定一个过期时间，也就是说无需去服务端验证，直接通过浏览器自身确认是否过期即可， 所以不会产生额外的流量。此种方法非常适合不经常变动的资源。（如果经常更新的文件， 不建议使用 Expires 来缓存），我这里设置 3d，表示在这 3 天之内访问这个 URL，发送 一个请求，比对服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码 304，如果有修改，则直接从服务器重新下载，返回状态码 200。
 
-![nginx-separation.png](../_images/nginx/nginx-separation.png)
+![nginx-separation.png](https://i.loli.net/2019/12/16/NdlReOfovgUiMIb.png)
 
 1. 服务器找个目录存放自己的静态文件
 
-   ![](../_images/nginx/nginx-www.png)
+   ![nginx-www](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yl6t4delj20bi033t8m.jpg)
 
 2. 修改nginx.conf
 
@@ -738,7 +734,7 @@ Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理�
 
 3. `./nginx -s reload`，验证效果
 
-   ![image-20191211172217503](../_images/nginx/nginx-static.png)
+   ![nginx-static.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yl9nxb45j20um0ogdiz.jpg)
 
 
 
@@ -786,7 +782,7 @@ rewrite regex replacement [flag];
 
 2. `./nginx -s reload`，验证效果（输入ip/java/被重定向到了egg）
 
-   ![](../_images/nginx/nginx-rewrite.jpg)
+   ![nginx-rewrite.jpg](https://i.loli.net/2019/12/16/bWfyhMIXSQH7KzG.png)
 
 
 
@@ -815,7 +811,7 @@ rewrite ^/(.*) http://www.360.cn/$1 permanent;
 
 如果将Web服务器集群当做一个城池，那么负载均衡服务器就相当于城门。如果“城门”关闭了，与外界的通道就断了。如果只有一台Nginx负载服务器，当故障宕机的时候，就会导致整个网站无妨访问。所以我们需要两台以上Nginx来实现故障转移和高可用。
 
-![nginx-availability](../_images/nginx/nginx-availability.png)
+![nginx-availability.png](https://i.loli.net/2019/12/16/NCZw9iYOmpv7Gat.png)
 
 #### 配置高可用
 
@@ -920,7 +916,7 @@ rewrite ^/(.*) http://www.360.cn/$1 permanent;
 
 Nginx默认采用多进程工作方式，Nginx启动后，会运行一个master进程和多个worker进程。其中master充当整个进程组与用户的交互接口，同时对进程进行监护，管理worker进程来实现重启服务、平滑升级、更换日志文件、配置文件实时生效等功能。worker用来处理基本的网络事件，worker之间是平等的，他们共同竞争来处理来自客户端的请求 
 
- ![nginx-work](../_images/nginx/nginx-work.png) 
+ ![nginx-work](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yl6t2jhwj20jg0c3jsn.jpg) 
 
 
 
@@ -956,7 +952,7 @@ Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是�
 
 #### Nginx请求处理流程
 
-![nginx-process](../_images/nginx/nginx-process.png)
+![nginx-process.png](https://i.loli.net/2019/12/16/EiRL5wQG1d4M3xr.png)
 
 ------
 
@@ -968,7 +964,7 @@ Nginx 同 redis 类似都采用了 io 多路复用机制，每个 worker 都是�
 
 **Nginx模块分类**
 
-![nginx-module](../_images/nginx/nginx-module.png)
+![nginx-module.png](https://i.loli.net/2019/12/16/KInsi2H84V7wjaW.png)
 
 #### Nginx配置选项
 

@@ -2,6 +2,8 @@
 
 # Javer的Linux手册
 
+> Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
+
 Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
 
 Linux是众多操作系统之一 , 目前流行的服务器和 PC 端操作系统有 Linux、Windows、UNIX 等 

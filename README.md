@@ -1,4 +1,4 @@
-# Java猿大帅的一亩三分地 [:egg:](https://www.lazyegg.net/JavaEgg)
+# Java大猿帅的一亩三分地 [:egg:](https://www.lazyegg.net/JavaEgg)
 
 <p>
 <img src="https://img.shields.io/badge/language-Java-blue.svg">
@@ -15,8 +15,8 @@
 
 |      Project      | Version | Article                                                      |
 | :---------------: | :-----: | :----------------------------------------------------------- |
-|  :dolphin: MySQL  | ​5.7.25  | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
-|     **Redis**     |         |                                                              |
+|  :dolphin: MySQL  | 5.7.25  | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
+|     **Redis**     |         | 1、[NoSQL](redis/1.Nosql-Overview.md)<br/>                   |
 | **Elasticsearch** |         |                                                              |
 |   **Amazon S3**   |         |                                                              |
 |      MongoDB      |         |                                                              |
@@ -28,8 +28,8 @@
 
 |  Project  |       Version       | Article                                                      |
 | :-------: | :-----------------: | :----------------------------------------------------------- |
-| **Linux** | CentOS release 6.10 | [Java程序员必会Linux知识点]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>) |
-| **Nginx** |       1.16.1        | [Nginx](docs/nginx/nginx.md)                                 |
+| **Linux** | CentOS release 6.10 | [Linux通关]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>) |
+| **Nginx** |       1.16.1        | [Nginx通关](docs/nginx/nginx.md)                             |
 
 
 
