@@ -74,9 +74,9 @@
 
 ## 🎨 设计模式
 
-| Project  | Version | Article                                                      |
-| :------: | :-----: | :----------------------------------------------------------- |
-| Big Data |         | [Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
+| Project | Version | Article |
+| :-----: | :-----: | :------ |
+|         |         |         |
 
 
 

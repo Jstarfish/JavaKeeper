@@ -325,7 +325,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
         open_file_cache max=65535 inactive=60s;
         #这个是指多长时间检查一次缓存的有效信息。
         open_file_cache_valid 80s;
-            #open_file_cache指令中的inactive参数时间内文件的最少使用次数，如果超过这个数字，文件描述符一直是在缓存中打开的，如上例，如果有一个文件在inactive时间内一次没被使用，它将被移除。
+        #open_file_cache指令中的inactive参数时间内文件的最少使用次数，如果超过这个数字，文件描述符一直是在缓存中打开的，如上例，如果有一个文件在inactive时间内一次没被使用，它将被移除。
         open_file_cache_min_uses 1;
         
         #语法:open_file_cache_errors on | off 默认值:open_file_cache_errors off 使用字段:http, server, location 这个指令指定是否在搜索一个文件是记录cache错误.
@@ -392,7 +392,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
         #开启限制IP连接数的时候需要使用
         #limit_zone crawler $binary_remote_addr 10m;
         
-            #负载均衡配置
+        #负载均衡配置
         upstream lazyegg.net {
       
             #upstream的负载均衡，weight是权重，可以根据机器配置定义权重。weigth参数表示权值，权值越高被分配到的几率越大。
@@ -458,7 +458,7 @@ http 全局块配置的指令包括文件引入、MIME-TYPE 定义、日志自�
             #location对URL进行匹配.可以进行重定向或者进行新的代理 负载均衡
         }
         
-           #虚拟主机的配置
+         #虚拟主机的配置
         server {
             #监听端口
             listen 80;
