@@ -16,7 +16,7 @@
 |      Project      | Version | Article                                                      |
 | :---------------: | :-----: | :----------------------------------------------------------- |
 |  :dolphin: MySQL  | 5.7.25  | [1 —— MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2 —— MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3 —— 索引](docs/mysql/MySQL-Index.md)<br/>[4 —— 事务](docs/mysql/MySQL-Transaction.md)<br/>5 —— 表设计<br/>[6 —— 性能优化](docs/mysql/MySQL-Optimization.md)<br/>7 —— 锁机制<br/>8 ——分区分表分库<br/>9 —— 主从复制<br/> |
-|     **Redis**     |         | 1、[NoSQL概述](redis/1.Nosql-Overview.md)<br/>2、[Redis概述](redis/2.readRedis.md)<br/> |
+|     **Redis**     |         | 1、[NoSQL概述](docs/redis/1.Nosql-Overview.md)<br/>2、[Redis概述](docs/redis/2.readRedis.md)<br/> |
 | **Elasticsearch** |         |                                                              |
 |   **Amazon S3**   |         |                                                              |
 |      MongoDB      |         |                                                              |
@@ -108,3 +108,9 @@
 ## ©️ 转载
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />本<span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" rel="dct:type">作品</span>由 <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/Jstarfish/Technical-Learning" property="cc:attributionName" rel="cc:attributionURL">STARFISH</a> 创作，遵循<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC 4.0 BY-SA </a>版权协议。
+
+
+
+## 👦🏻 可以加我微信和我交朋友哈
+
+![QR-code.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9zi21xipaj20b40b4gm6.jpg)
