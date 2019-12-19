@@ -1,4 +1,12 @@
-Spring Boot从初始到开发全过程
+# Spring Boot从初识到实战
+
+![微信图片_20191219180720.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga26zho09tj20p00an0yr.jpg)
+
+
+
+>  文章收集在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) 中，欢迎star+指导
+>
+> [JavaEgg](https://github.com/Jstarfish/JavaEgg)——《“Java技术员”成长手册》，包含Java基础、框架、存储、搜索、优化、分布式等必备知识，N线互联网开发必备技能兵器谱。 
 
 # 一、Hello Spring Boot
 
@@ -45,11 +53,7 @@ Spring Boot从初始到开发全过程
 
 整合maven进来
 
-![1 _2_.png](http://i.loli.net/2019/11/14/2C7oBaHQJrMSA15.jpg)
-
-![2.png](http://i.loli.net/2019/11/14/VhxZqyr6PXvmBe9.png) 
-
- 
+![idea-maven.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga23e64lm3j20vj0klgn4.jpg) 
 
 #### 3.3、Spring Boot HelloWorld
 
@@ -821,7 +825,7 @@ xxxxProperties:封装配置文件中相关属性；
 
 我们可以通过启用   **debug=true**属性；来让控制台打印自动配置报告，这样我们就可以很方便的知道哪些自动配置类生效；
 
-  ```xml
+  ```
 =========================
 AUTO‐CONFIGURATION REPORT
 =========================
@@ -881,7 +885,7 @@ JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j....
 
 左边选一个门面（抽象层）、右边来选一个实现；我蒙着眼随便选两个，日志门面选： SLF4J，日志实现选：Logback（竟然和SpringBoot的设计者选的一样，英雄所见略同呀）；
 
-SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘ **SpringBoot**选用 **SLF4j**和**logback**；
+SpringBoot：底层是Spring框架，Spring框架默认是用JCL； **SpringBoot**选用 **SLF4j**和**logback**；
 
  
 
@@ -935,6 +939,8 @@ SpringBoot使用它来做日志功能；
 	<artifactId>spring‐boot‐starter‐logging</artifactId>
 </dependency>
   ```
+
+![springboot-log.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga25q0m4zaj20jr07mq3j.jpg)
 
 总结：
 
@@ -1152,15 +1158,11 @@ slf4j+log4j的方式；
 
 ![resource-properties.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga0vgp4jfuj213f0jcn4z.jpg)
 
-1）、所有 /webjars/** ，都去 classpath:/META-INF/resources/webjars/ 找资源；
+- 所有 /webjars/** ，都去 classpath:/META-INF/resources/webjars/ 找资源；
 
-webjars：以jar包的方式引入静态资源； 
+  [webjars](http://www.webjars.org/)：以jar包的方式引入静态资源； 
 
-<http://www.webjars.org/>
-
- 
-
-localhost:8080/webjars/jquery/3.3.1/jquery.js
+  localhost:8080/webjars/jquery/3.3.1/jquery.js
 
 ```xml
 <!‐‐引入jquery‐webjar‐‐>在访问的时候只需要写webjars下面资源的名称即可
@@ -1171,9 +1173,7 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 </dependency>
 ```
 
-  
-
-2）、"/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射
+- "/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射
 
   ```xml
 "classpath:/META‐INF/resources/",
@@ -1185,17 +1185,19 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 
 localhost:8080/abc === 去静态资源文件夹里面找abc
 
-3）、欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；
+- 欢迎页； 静态资源文件夹下的所有index.html页面；被"/**"映射；
 
-localhost:8080/ 找index页面
+  localhost:8080/ 找index页面
 
-4）、所有的 **/favicon.ico 都是在静态资源文件下找；
+- 所有的 **/favicon.ico 都是在静态资源文件下找；
 
  
 
 ## **3**、模板引擎
 
 常见的模板引擎：JSP、Velocity、Freemarker、Thymeleaf
+
+![template.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga268zn2bxj20hy08b0t0.jpg)
 
 SpringBoot推荐的Thymeleaf； 语法更简单，功能更强大；
 
@@ -1255,9 +1257,9 @@ public static final String DEFAULT_SUFFIX = ".html";
 
 1）、th:text；改变当前元素里面的文本内容；
 
-​	 th：任意html属性；来替换原生属性的值
+​	     th：任意html属性；来替换原生属性的值
 
-2）、表达式？
+2）、表达式
 
 ```java
 Simple expressions:（表达式语法）
@@ -1689,14 +1691,14 @@ public class MyLocaleResolver implements LocaleResolver {
 
 ​	a、禁用模板引擎的缓存
 
-```xml
+```properties
 # 禁用缓存
 spring.thymeleaf.cache=false
 ```
 
 ​	b、页面修改完成以后ctrl+f9：重新编译； 登陆错误消息的显示
 
-```xml
+```html
 <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
 ```
 
@@ -1856,6 +1858,8 @@ insert的公共片段在div标签中
 默认效果：
 
 a、浏览器，返回一个默认的错误页面
+
+![local-error.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga26j8yp0mj20kw084q39.jpg)
 
 b、如果是其他客户端，默认响应一个json数据
 
@@ -2977,13 +2981,23 @@ com.atguigu.springboot.listener.HelloSpringApplicationRunListener
 
 **CommandLineRunner**
 
+```java
+@Component
+public class HelloCommandLineRunner implements CommandLineRunner {
+    @Override
+    public void run(String... args) throws Exception {
+    System.out.println("CommandLineRunner...run..."+ Arrays.asList(args));
+    }
+}
+```
+
 ------
 
  
 
 # 七、自定义starter
 
-starter：
+**starter：**
 
 1、这个场景需要使用到的依赖是什么？
 
@@ -3146,3 +3160,5 @@ public class HelloServiceAutoConfiguration {
 
 
 > [SpringBoot官方文档](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/htmlsingle/#boot-features-developing-%20web-applications)
+>
+> 《尚硅谷视频笔记》
