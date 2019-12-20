@@ -85,6 +85,7 @@
 | Project | Version | Article |
 | :-----: | :-----: | :------ |
 |   JVM   |         |         |
+|  Java8  |         |         |
 
 
 
@@ -111,6 +112,5 @@
 
 
 
-## 👦🏻 可以加我微信和我交朋友哈
+## 👦🏻 最后一期干了这杯Java吧<img src="http://ww1.sinaimg.cn/large/9b9f09a9ly1ga3ddh9gitj20dw0dwaar.jpg" style="zoom:33%;" />
 
-![QR-code.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9zi21xipaj20b40b4gm6.jpg)
