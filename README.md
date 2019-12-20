@@ -114,5 +114,5 @@
 
 ## 最后一起干了这杯Java吧
 
-## <img src="/images/public.png" style="zoom: 50%;" />
+## <img src="/images/public.png" style="zoom: 25%;" />
 
