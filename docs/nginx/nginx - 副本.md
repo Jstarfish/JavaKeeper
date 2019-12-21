@@ -1,7 +1,5 @@
 # Nginx 学习一路向西
 
->  Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
-
 ## 1. Nginx简介 
 
 ### 1.1 Nginx 概述 
@@ -65,7 +63,7 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 
 比如你想去google看个“动作片”，可国内不允许呀，就需要找翻墙代理，这个就是所谓的”正向代理“。
 
-![forward-proxy.png](https://i.loli.net/2019/12/16/8VwaLh2p6noI7gY.png)
+![](https://tva1.sinaimg.cn/large/006tNbRwly1ga2ff1appkj30lb0dt759.jpg)
 
 
 
@@ -77,9 +75,7 @@ Apache HTTP Server和Nginx本身不支持生成动态页面，但它们可以通
 
 再比如，你想本本分分的在“优酷”上看个“爱情片”，youku.com会把你的请求分发到存放片片的那台机器上，这个就是所谓的”反向代理“。
 
-![reverse-proxy.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9ylbm1fs3j20mg0bzdgu.jpg)
-
-
+![](https://tva1.sinaimg.cn/large/006tNbRwly1ga2ff1appkj30lb0dt759.jpg)
 
 **为什么使用反向代理**
 
