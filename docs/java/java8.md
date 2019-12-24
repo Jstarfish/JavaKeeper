@@ -1,125 +1,42 @@
 https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html
 
+# Java8新特性概览 
 
+[What's New in JDK 8]( https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html )
 
-JAVA8增强的内容
-
-https://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8
-
-# Java8新特性
-
-Java8 新增了非常多的特性，我们主要讨论以下几个：
-
-- **Lambda 表达式** − Lambda 允许把函数作为一个方法的参数（函数作为参数传递到方法中）。
-- **方法引用** − 方法引用提供了非常有用的语法，可以直接引用已有Java类或对象（实例）的方法或构造器。与lambda联合使用，方法引用可以使语言的构造更紧凑简洁，减少冗余代码。
-- **默认方法** − 默认方法就是一个在接口里面有了一个实现的方法。
-- **新工具** − 新的编译工具，如：Nashorn引擎 jjs、 类依赖分析器jdeps。
-- **Stream API** −新添加的Stream API（java.util.stream） 把真正的函数式编程风格引入到Java中。
-- **Date Time API** − 加强对日期与时间的处理。
-- **Optional 类** − Optional 类已经成为 Java 8 类库的一部分，用来解决空指针异常。
-- **Nashorn, JavaScript 引擎** − Java 8提供了一个新的Nashorn javascript引擎，它允许我们在JVM上运行特定的javascript应用。
-
-
-
-1. Lambda 表达式 
-2. 函数式接口 
-3. 方法引用与构造器引用 
-4. Stream API
-5. 接口中的默认方法与静态方法
-6. 新时间日期 API 
-7. 其他新特性
-
-
-
-Java8
-
-- Java编程语言
-  - Lambda表达式： 它们使您能够将功能视为方法参数，或将代码视为数据 
-  - Method references provide easy-to-read lambda expressions for methods that already have a name.
-  - Default methods enable new functionality to be added to the interfaces of libraries and ensure binary compatibility with code written for older versions of those interfaces.
-  - Repeating Annotations provide the ability to apply the same annotation type more than once to the same declaration or type use.
-  - Type Annotations provide the ability to apply an annotation anywhere a type is used, not just on a declaration. Used with a pluggable type system, this feature enables improved type checking of your code.
-  - Improved type inference.
-  - Method parameter reflection.
-
-- 集合
-  -  Stream API：新java.util中的类。stream包提供了一个流API来支持对元素流的函数式操作 
-  -  具有键冲突的hashmap的性能改进
-
-- [Compact Profiles](http://docs.oracle.com/javase/8/docs/technotes/guides/compactprofiles/) contain predefined subsets of the Java SE platform and enable applications that do not require the entire Platform to be deployed and run on small devices. 
-
+-  [Java Programming Language](http://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8) 
+  - Lambda表达式：一个新的语言特性， 它们使您能够将函数视为方法参数，或将代码视为数据 
+  - 方法引用： 方法引用为已经有名称的方法提供易于阅读的lambda表达式 
+  -  重复注释提供了将同一注释类型多次应用于同一声明或类型使用的能力 
+  -  类型注释提供了在使用类型的任何地方应用注释的能力，而不仅仅是在声明上。与可插拔类型系统一起使用，该特性支持改进的代码类型检查。 
+  -  Improved type inference 
+  -  方法参数反射 
+-  [Collections](http://docs.oracle.com/javase/8/docs/technotes/guides/collections/changes8.html) 
+  -  [java.util.stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html) 
+  -  具有键冲突的hashmap的性能改进 
+-  [Compact Profiles](http://docs.oracle.com/javase/8/docs/technotes/guides/compactprofiles/) contain predefined subsets of the Java SE platform and enable applications that do not require the entire Platform to be deployed and run on small devices. 
 -  [Security](http://docs.oracle.com/javase/8/docs/technotes/guides/security/enhancements-8.html) 
-
-  - Client-side TLS 1.2 enabled by default
-  - New variant of `AccessController.doPrivileged` that enables code to assert a subset of its privileges, without preventing the full traversal of the stack to check for other permissions
-  - Stronger algorithms for password-based encryption
-  - SSL/TLS Server Name Indication (SNI) Extension support in JSSE Server
-  - Support for AEAD algorithms: The SunJCE provider is enhanced to support AES/GCM/NoPadding cipher implementation as well as GCM algorithm parameters. And the SunJSSE provider is enhanced to support AEAD mode based cipher suites. See Oracle Providers Documentation, JEP 115.
-  - KeyStore enhancements, including the new Domain KeyStore type `java.security.DomainLoadStoreParameter`, and the new command option `-importpassword` for the keytool utility
-  - SHA-224 Message Digests
-  - Enhanced Support for NSA Suite B Cryptography
-  - Better Support for High Entropy Random Number Generation
-  - New `java.security.cert.PKIXRevocationChecker` class for configuring revocation checking of X.509 certificates
-  - 64-bit PKCS11 for Windows
-  - New rcache Types in Kerberos 5 Replay Caching
-  - Support for Kerberos 5 Protocol Transition and Constrained Delegation
-  - Kerberos 5 weak encryption types disabled by default
-  - Unbound SASL for the GSS-API/Kerberos 5 mechanism
-  - SASL service for multiple host names
-  - JNI bridge to native JGSS on Mac OS X
-  - Support for stronger strength ephemeral DH keys in the SunJSSE provider
-  - Support for server-side cipher suites preference customization in JSSE
-
 -  [JavaFX](http://docs.oracle.com/javase/8/javase-clienttechnologies.htm) 
+-  [Tools](http://docs.oracle.com/javase/8/docs/technotes/tools/enhancements-8.html) 
+  -  提供jjs命令来调用Nashorn引擎 
 
-  - 
-    The new Modena theme has been implemented in this release. For more information, see the blog at [fxexperience.com](http://fxexperience.com/2013/03/modena-theme-update/).
-  - The new `SwingNode` class enables developers to embed Swing content into JavaFX applications. See the [`SwingNode`](http://docs.oracle.com/javase/8/javafx/api/javafx/embed/swing/SwingNode.html) javadoc and [Embedding Swing Content in JavaFX Applications](http://docs.oracle.com/javase/8/javafx/interoperability-tutorial/embed-swing.htm).
-  - The new UI Controls include the [`DatePicker`](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/DatePicker.html) and the [`TreeTableView`](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TreeTableView.html) controls.
-  - The `javafx.print` package provides the public classes for the JavaFX Printing API. See the [javadoc](http://docs.oracle.com/javase/8/javafx/api/javafx/print/package-summary.html) for more information.
-  - The 3D Graphics features now include 3D shapes, camera, lights, subscene, material, picking, and antialiasing. The new `Shape3D` (`Box`, `Cylinder`, `MeshView`, and `Sphere` subclasses), `SubScene`, `Material`, `PickResult`, `LightBase` (`AmbientLight` and `PointLight` subclasses) , and `SceneAntialiasing` API classes have been added to the JavaFX 3D Graphics library. The `Camera` API class has also been updated in this release. See the corresponding class javadoc for `javafx.scene.shape.Shape3D`, `javafx.scene.SubScene`, `javafx.scene.paint.Material`, `javafx.scene.input.PickResult`, `javafx.scene.SceneAntialiasing`, and the [Getting Started with JavaFX 3D Graphics](http://docs.oracle.com/javase/8/javafx/graphics-tutorial/javafx-3d-graphics.htm) document.
-  - The `WebView` class provides new features and improvements. Review [Supported Features of HTML5](http://docs.oracle.com/javase/8/javafx/embedded-browser-tutorial/index.html) for more information about additional HTML5 features including Web Sockets, Web Workers, and Web Fonts.
-  - Enhanced text support including bi-directional text and complex text scripts such as Thai and Hindi in controls, and multi-line, multi-style text in text nodes.
-  - Support for Hi-DPI displays has been added in this release.
-  - The CSS Styleable* classes became public API. See the [`javafx.css`](http://docs.oracle.com/javase/8/javafx/api/javafx/css/package-frame.html) javadoc for more information.
-  - The new [`ScheduledService`](http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/ScheduledService.html) class allows to automatically restart the service.
-  - JavaFX is now available for ARM platforms. JDK for ARM includes the base, graphics and controls components of JavaFX.
+-  [Internationalization](http://docs.oracle.com/javase/8/docs/technotes/guides/intl/enhancements.8.html) 
 
-- [Tools](http://docs.oracle.com/javase/8/docs/technotes/tools/enhancements-8.html)
+  -  Unicode增强，包括对Unicode 6.2.0的支持
+  -  Adoption of Unicode CLDR Data and the java.locale.providers System Property 
+  - 新的 Calendar  和  Locale  API
+  -  能够安装自定义资源包作为扩展 
 
-  - The `jjs` command is provided to invoke the Nashorn engine.
-  - The `java` command launches JavaFX applications.
-  - The `java` man page has been reworked.
-  - The `jdeps` command-line tool is provided for analyzing class files.
-  - Java Management Extensions (JMX) provide remote access to diagnostic commands.
-  - The `jarsigner` tool has an option for requesting a signed time stamp from a Time Stamping Authority (TSA).
-  - [Javac tool](http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html)
-    - The `-parameters` option of the `javac` command can be used to store formal parameter names and enable the Reflection API to retrieve formal parameter names.
-    - The type rules for equality operators in the Java Language Specification (JLS) Section 15.21 are now correctly enforced by the `javac` command.
-    - The `javac` tool now has support for checking the content of `javadoc` comments for issues that could lead to various problems, such as invalid HTML or accessibility issues, in the files that are generated when `javadoc` is run. The feature is enabled by the new `-Xdoclint` option. For more details, see the output from running "`javac -X`". This feature is also available in the `javadoc` tool, and is enabled there by default.
-    - The `javac` tool now provides the ability to generate native headers, as needed. This removes the need to run the `javah` tool as a separate step in the build pipeline. The feature is enabled in `javac` by using the new `-h` option, which is used to specify a directory in which the header files should be written. Header files will be generated for any class which has either native methods, or constant fields annotated with a new annotation of type `java.lang.annotation.Native`.
-  - [Javadoc tool](http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/whatsnew-8.html)
-    - The `javadoc` tool supports the new `DocTree` API that enables you to traverse Javadoc comments as abstract syntax trees.
-    - The `javadoc` tool supports the new Javadoc Access API that enables you to invoke the Javadoc tool directly from a Java application, without executing a new process. See the [javadoc what's new](http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/whatsnew-8.html) page for more information.
-    - The `javadoc` tool now has support for checking the content of `javadoc` comments for issues that could lead to various problems, such as invalid HTML or accessibility issues, in the files that are generated when `javadoc` is run. The feature is enabled by default, and can also be controlled by the new `-Xdoclint` option. For more details, see the output from running "`javadoc -X`". This feature is also available in the `javac` tool, although it is not enabled by default there.
-
-- [Internationalization](http://docs.oracle.com/javase/8/docs/technotes/guides/intl/enhancements.8.html)国际化
-
-  -  Unicode增强，包括对Unicode 6.2.0的支持 
-  - Adoption of Unicode CLDR Data and the java.locale.providers System Property
-  - New Calendar and Locale APIs
-  - Ability to Install a Custom Resource Bundle as an Extension
-
-- [Deployment](http://docs.oracle.com/javase/8/docs/technotes/guides/jweb/enhancements-8.html)部署
+-  [Deployment](http://docs.oracle.com/javase/8/docs/technotes/guides/jweb/enhancements-8.html) 
 
   - For sandbox applets and Java Web Start applications, `URLPermission` is now used to allow connections back to the server from which they were started. `SocketPermission` is no longer granted.
   - The Permissions attribute is required in the JAR file manifest of the main JAR file at all security levels.
 
-- [Date-Time Package](http://docs.oracle.com/javase/8/docs/technotes/guides/datetime/index.html) - a new set of packages that provide a comprehensive date-time model.
+-  [Date-Time Package](http://docs.oracle.com/javase/8/docs/technotes/guides/datetime/index.html) - a new set of packages that provide a comprehensive date-time model. 
 
-- [Scripting](http://docs.oracle.com/javase/8/docs/technotes/guides/scripting/enhancements.html#jdk8)
+-  [Scripting](http://docs.oracle.com/javase/8/docs/technotes/guides/scripting/enhancements.html#jdk8) 
 
-  - The Rhino javascript engine has been replaced with the [Nashorn](http://docs.oracle.com/javase/8/docs/technotes/guides/scripting/nashorn/) Javascript Engine
+  -  Java 8提供了一个新的Nashorn javascript引擎(取代了Nashorn javascript引擎)，它允许我们在JVM上运行特定的javascript应用
 
 - [Pack200](http://docs.oracle.com/javase/8/docs/technotes/guides/pack200/enhancements.html)
 
@@ -188,56 +105,48 @@ Java8
 
   - JDK 8 includes Java Mission Control 5.3.
 
-  [![E-mail this page](https://www.oracle.com/us/assets/email.gif)](javascript:mailpage()) [E-mail this page](javascript:mailpage())  [![Printer View](https://www.oracle.com/us/assets/print_icon.gif) Printer View](javascript: void 0;)
-
-##### Resources for
-
-- [Developers](https://developer.oracle.com/)
-- [Startups](https://www.oracle.com/startup/)
-- [Students and Educators](https://academy.oracle.com/en/oa-web-overview.html)
 
 
 
-##### Partners
-
-- [Oracle PartnerNetwork](https://www.oracle.com/partnernetwork/)
-- [Find a Partner](https://solutions.oracle.com/scwar/scr/Partners/index.html)
-- [Log in to OPN](https://www.oracle.com/partners/)
 
 
 
-##### How We Operate
+JAVA8增强的内容
 
-- [Corporate Security Practices](https://www.oracle.com/corporate/security-practices/)
-- [Corporate Responsibility](https://www.oracle.com/corporate/citizenship/)
-- [Diversity and Inclusion](https://www.oracle.com/corporate/careers/diversity/)
+https://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8
 
 
 
-##### Contact Us
+Java8 API
 
-- [US Sales: +1.800.633.0738](tel:18006330738)
-- [Global Contacts](https://www.oracle.com/corporate/contact/global.html)
-- [Subscribe to emails](https://go.oracle.com/subscriptions)
+ https://docs.oracle.com/javase/8/docs/api/overview-summary.html 
+
+## Java8新特性
+
+Java8 新增了非常多的特性，我们主要讨论以下几个：
+
+- **Lambda 表达式** − Lambda 允许把函数作为一个方法的参数（函数作为参数传递到方法中）。
+- **方法引用** − 方法引用提供了非常有用的语法，可以直接引用已有Java类或对象（实例）的方法或构造器。与lambda联合使用，方法引用可以使语言的构造更紧凑简洁，减少冗余代码。
+- **默认方法** − 默认方法就是一个在接口里面有了一个实现的方法。
+- **新工具** − 新的编译工具，如：Nashorn引擎 jjs、 类依赖分析器jdeps。
+- **Stream API** −新添加的Stream API（java.util.stream） 把真正的函数式编程风格引入到Java中。
+- **Date Time API** − 加强对日期与时间的处理。
+- **Optional 类** − Optional 类已经成为 Java 8 类库的一部分，用来解决空指针异常。
+- **Nashorn, JavaScript 引擎** − Java 8提供了一个新的Nashorn javascript引擎，它允许我们在JVM上运行特定的javascript应用。
 
 
 
-- 
-- 
-- 
-- 
+1. Lambda 表达式 
+2. 函数式接口 
+3. 方法引用与构造器引用 
+4. Stream API
+5. 接口中的默认方法与静态方法
+6. 新时间日期 API 
+7. 其他新特性
 
-- [© 2019 Oracle](https://www.oracle.com/legal/copyright.html)
-- [Site Map](https://www.oracle.com/sitemap.html)
-- [Terms of Use and Privacy](https://www.oracle.com/legal/privacy/index.html)
-- 
--  Cookie 喜好设置
-- [Ad Choices](https://www.oracle.com/legal/privacy/marketing-cloud-data-cloud-privacy-policy.html#12)
-- [Careers](https://www.oracle.com/corporate/careers/)
 
--  
 
-​	
+
 
 
 
@@ -269,7 +178,13 @@ Java 8新特性简介
 
 
 
-Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(将代码 像数据一样进行传递)。可以写出更简洁、更 灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
+Lambda 表达式，也可称为闭包，它是推动 Java 8 发布的最重要新特性。
+
+Lambda 允许把函数作为一个方法的参数（函数作为参数传递进方法中）。
+
+使用 Lambda 表达式可以使代码变的更加简洁紧凑。
+
+Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(将代码像数据一样进行传递)。可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
 
 
 
@@ -277,9 +192,13 @@ Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段
 
 
 
-Lambda 表达式语法 
+### Lambda 表达式语法 
 
-Lambda 表达式在Java 语言中引入了一个新的语法元 素和操作符。这个操作符为 “->” ， 该操作符被称 为 Lambda 操作符或剪头操作符。它将 Lambda 分为 两个部分：
+`(parameters) -> expression` 或`(parameters) ->{ statements; }`
+
+
+
+Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符。这个操作符为 “->” ， 该操作符被称 为 Lambda 操作符或剪头操作符。它将 Lambda 分为 两个部分：
 
 左侧：指定了 Lambda 表达式需要的所有参数 
 
@@ -326,6 +245,83 @@ email -> System.out.println(email)
  假设您正在创建一个社交网络应用 
 
 
+
+The following table maps each of the operations the method `processElements` performs with the corresponding aggregate operation:
+
+| `processElements` Action                                     | Aggregate Operation                      |
+| ------------------------------------------------------------ | ---------------------------------------- |
+| Obtain a source of objects                                   | `Stream **stream**()`                    |
+| Filter objects that match a `Predicate` object               | `Stream **filter**(Predicate predicate)` |
+| Map objects to another value as specified by a `Function` object | ` Stream **map**(Function mapper)`       |
+| Perform an action as specified by a `Consumer` object        | `void **forEach**(Consumer action)`      |
+
+
+
+## 方法引用类型
+
+Java 8 提供了4种方法引用
+
+| Kind                                                         | Example                                |
+| ------------------------------------------------------------ | -------------------------------------- |
+| 对静态方法的引用                                             | `ContainingClass::staticMethodName`    |
+| Reference to an instance method of a particular object       | `containingObject::instanceMethodName` |
+| Reference to an instance method of an arbitrary object of a particular type | `ContainingType::methodName`           |
+| 对构造器的引用                                               | `ClassName::new`                       |
+
+### Reference to a Static Method
+
+The method reference `Person::compareByAge` is a reference to a static method.
+
+### Reference to an Instance Method of a Particular Object
+
+```
+class ComparisonProvider {
+    public int compareByName(Person a, Person b) {
+        return a.getName().compareTo(b.getName());
+    }
+        
+    public int compareByAge(Person a, Person b) {
+        return a.getBirthday().compareTo(b.getBirthday());
+    }
+}
+ComparisonProvider myComparisonProvider = new ComparisonProvider();
+Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
+```
+
+###  引用特定类型的任意对象的实例方法 
+
+
+
+
+
+# New and Enhanced APIs That Take Advantage of Lambda Expressions and Streams in Java SE 8
+
+利用Lambda表达式和Streams，新增和改良的API
+
+- `java.util`:  增加了 java.lang.invoke 包，
+- `java.util.function`:  一个新的包，它包含为lambda表达式和方法引用提供目标类型的通用功能接口 
+- `java.util.stream`:  一个新的包，它包含了为流和聚合操作提供功能的大部分接口和类 
+
+## New Packages
+
+ `java.util.function`
+`java.util.stream` 
+
+
+
+## Modified Packages( [java8API](https://docs.oracle.com/javase/8/docs/api/overview-summary.html ))
+
+| Package                | New Classes                                                  | Modified Classes                                             |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `java.io`              | `UncheckedIOException`                                       | `BufferedReader`                                             |
+| `java.lang`            | not applicable                                               | `AutoCloseable` `ThreadLocal` `String` `Iterable` `CharSequence` `Boolean` `Integer` `Long` `Float` `Double` |
+| `java.nio.file`        | not applicable                                               | `Files`                                                      |
+| `java.util`            | `PrimitiveIterator` `Spliterator` `DoubleSummaryStatistics` `IntSummaryStatistics` `LongSummaryStatistics` `Optional` `OptionalDouble` `OptionalInt` `OptionalLong` `Spliterators` `SplittableRandom` `StringJoiner` | `Arrays` `BitSet` `Collection` `Comparator` `Iterator` `List` `Map` `Map.Entry` `LinkedHashMap` `Random` `TreeMap` |
+| `java.util.concurrent` | not applicable                                               | `ThreadLocalRandom`                                          |
+| `java.util.jar`        | not applicable                                               | `JarFile`                                                    |
+| `java.util.zip`        | not applicable                                               | `ZipFile`                                                    |
+| `java.util.logging`    | not applicable                                               | `Logger`                                                     |
+| `java.util.regex`      | not applicable                                               | `Pattern`                                                    |
 
 
 
@@ -480,6 +476,66 @@ Fork/Join 框架与传统线程池的区别
 采用 “工作窃取”模式（work-stealing）： 当执行新的任务时它可以将其拆分分成更小的任务执行，并将小任务加到线 程队列中，然后再从一个随机线程的队列中偷一个并把它放在自己的队列中。 
 
 相对于一般的线程池实现,fork/join框架的优势体现在对其中包含的任务的 处理方式上.在一般的线程池中,如果一个线程正在执行的任务由于某些原因 无法继续运行,那么该线程会处于等待状态.而在fork/join框架实现中,如果 某个子问题由于等待另外一个子问题的完成而无法继续运行.那么处理该子 问题的线程会主动寻找其他尚未运行的子问题来执行.这种方式减少了线程的等待时间,提高了性能.
+
+
+
+# Aggregate Operations聚合操作
+
+### Pipelines and Streams
+
+通过集合roster调用stream（）方法创建流， filter() 操作返回一个新流，该流包含与其谓词匹配的元素 
+
+ 管道是聚合操作的序列（下边代码包含了filter和forEach两个聚合操作，两段代码等价）
+
+```
+roster
+    .stream()
+    .filter(e -> e.getGender() == Person.Sex.MALE)
+    .forEach(e -> System.out.println(e.getName()));
+```
+
+```
+for (Person p : roster) {
+    if (p.getGender() == Person.Sex.MALE) {
+        System.out.println(p.getName());
+    }
+}
+```
+
+管道包含以下组件：
+
+- 一个 source ：可以是一个集合，一个数组，一个函数，或者是一个  I/O channel。
+- 0个或过个  *intermediate operations* ：比如filter，产生一个新的流（ 流是元素的序列。与集合不同，它不是存储元素的数据结构  相反，流通过管道携带来自source的值 ）
+- y个 *terminal operation* 
+
+
+
+计算所有男性的平均年龄
+
+```
+double average = roster
+    .stream()
+    .filter(p -> p.getGender() == Person.Sex.MALE)
+    .mapToInt(Person::getAge)
+    .average()
+    .getAsDouble();
+```
+
+ `mapToInt`  返回一个新的流 `IntStream`  
+
+
+
+###  聚合操作和迭代器之间的区别 
+
+ 聚合操作，比如forEach，看起来就像迭代器。然而，它们有几个根本的区别 
+
+- 内部迭代：不包含类似next的方法来指示它们处理集合的下一个元素 
+
+-  它们处理来自流的元素 ： 聚合操作只操作来自流的元素，而不是直接来自集合，所以也被叫做 *stream operations*. 
+
+-  它们支持将行为作为参数 ： 可以将lambda表达式指定为大多数聚合操作的参数 
+
+   
 
 
 
