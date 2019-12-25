@@ -58,8 +58,8 @@
 
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
-|   MQ    |         | [Hello MQ]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/浅谈消息队列及常见的消息中间件.md>)<br> |
-|  Kafka  |  2.12   | [Hello Kafka]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/message-queue/Kafka/Hello-Kafka.md> )<br> |
+|   MQ    |         | [Hello MQ](/docs/message-queue/浅谈消息队列及常见的消息中间件.md)<br> |
+|  Kafka  |  2.12   | [Hello Kafka](/docs/message-queue/Kafka/Hello-Kafka.md)<br>  |
 
 
 
@@ -68,7 +68,7 @@
 
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
-|   RPC   |  gRPC   | [1 —— Hello protocol-buffers]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/RPC/Protocol%20Buffers-Hello%20World.md> )<br> |
+|   RPC   |  gRPC   | [1 —— Hello protocol-buffers](/docs/rpc/Hello-Protocol-Buffers.md)<br> |
 
 
 
@@ -91,9 +91,9 @@
 
 ## 👨🏿‍💻 Big Data
 
-| Project  | Version | Article                                                      |
-| :------: | :-----: | :----------------------------------------------------------- |
-| Big Data |         | [Hello Big Data]( <https://github.com/Jstarfish/Technical-Learning/blob/master/contents/Big%20Data/hello%20big%20data.md>)<br> |
+| Project  | Version | Article                                               |
+| :------: | :-----: | :---------------------------------------------------- |
+| Big Data |         | [Hello Big Data](/docs/big-data/Hello-BigData.md)<br> |
 
 ------
 
