@@ -18,8 +18,9 @@ https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html
 -  [Security](http://docs.oracle.com/javase/8/docs/technotes/guides/security/enhancements-8.html) 
 -  [JavaFX](http://docs.oracle.com/javase/8/javase-clienttechnologies.htm) 
 -  [Tools](http://docs.oracle.com/javase/8/docs/technotes/tools/enhancements-8.html) 
-  -  提供jjs命令来调用Nashorn引擎 
-
+  
+-  提供jjs命令来调用Nashorn引擎 
+  
 -  [Internationalization](http://docs.oracle.com/javase/8/docs/technotes/guides/intl/enhancements.8.html) 
 
   -  Unicode增强，包括对Unicode 6.2.0的支持
@@ -170,7 +171,9 @@ Java 8新特性简介
 
 ## Lambda表达式
 
- Lambda表达式使您能够封装单个行为单元并将其传递给其他代码。如果希望对集合的每个元素、流程完成时或流程遇到错误时执行某个操作，可以使用lambda表达式。Lambda表达式由以下特性支持: 
+ “Lambda 表达式”(lambda expression)是一个**匿名函数**，Lambda表达式基于数学中的**λ演算**得名，直接对应于其中的 lambda 抽象(lambda abstraction)，是一个匿名函数，即没有函数名的函数。Lambda表达式可以表示**闭包**。 
+
+Lambda表达式使您能够封装单个行为单元并将其传递给其他代码。如果希望对集合的每个元素、流程完成时或流程遇到错误时执行某个操作，可以使用lambda表达式。Lambda表达式由以下特性支持: 
 
 - [Method References](http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html) are compact, easy-to-read lambda expressions for methods that already have a name.
 - [Default Methods](http://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html) enable you to add new functionality to the interfaces of your libraries and ensure binary compatibility with code written for older versions of those interfaces. They are interface methods that have an implementation and the `default` keyword at the beginning of the method signature. In addition, you can define static methods in interfaces.
@@ -178,17 +181,13 @@ Java 8新特性简介
 
 
 
-Lambda 表达式，也可称为闭包，它是推动 Java 8 发布的最重要新特性。
-
-Lambda 允许把函数作为一个方法的参数（函数作为参数传递进方法中）。
-
-使用 Lambda 表达式可以使代码变的更加简洁紧凑。
+### 为什么要使用Lambda表达式
 
 Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(将代码像数据一样进行传递)。可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
 
+匿名类的一个问题是，如果您的[匿名类](https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html)的实现非常简单，例如一个接口只包含一个方法，那么匿名类的语法可能看起来很笨拙和不清楚。在这些情况下，您通常试图将功能作为参数传递给另一个方法，例如当有人单击按钮时应该采取什么操作。Lambda表达式允许您这样做，将功能视为方法参数，或将代码视为数据。 
 
-
- 匿名类的一个问题是，如果您的匿名类的实现非常简单，例如一个接口只包含一个方法，那么匿名类的语法可能看起来很笨拙和不清楚。在这些情况下，您通常试图将功能作为参数传递给另一个方法，例如当有人单击按钮时应该采取什么操作。Lambda表达式允许您这样做，将功能视为方法参数，或将代码视为数据。 
+![hello-lambda](https://i.loli.net/2019/12/26/WugthVbdwUEm5J2.png)
 
 
 
@@ -196,53 +195,86 @@ Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段
 
 `(parameters) -> expression` 或`(parameters) ->{ statements; }`
 
+Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符。这个操作符为 <mark> “**->**”</mark> ， 该操作符被称为 **Lambda 操作符**或剪头操作符。它将 Lambda 分为两个部分：
 
+- 左侧：指定了 Lambda 表达式需要的所有参数 
 
-Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符。这个操作符为 “->” ， 该操作符被称 为 Lambda 操作符或剪头操作符。它将 Lambda 分为 两个部分：
-
-左侧：指定了 Lambda 表达式需要的所有参数 
-
-右侧：指定了 Lambda 体，即 Lambda 表达式要执行的功能。
-
-
-
-语法格式一：无参，无返回值，Lambda 体只需一条语句
+- 右侧：指定了 Lambda 体，即 Lambda 表达式要执行的功能。
 
 
 
-语法格式二：Lambda 需要一个参数
+1. 无参，无返回值，Lambda 体只需一条语句
+
+   ```java
+   Runnable runnable = () -> System.out.println("hello lambda");
+   ```
+
+2. Lambda 需要一个参数
+
+   ```java
+   Consumer<String> consumer = (args) -> System.out.println(args);
+   ```
+
+   Lambda 只需要一个参数时，参数的小括号可以省略
+
+   ```java
+   Consumer<String> consumer = args -> System.out.println(args);
+   ```
+
+3. Lambda 需要两个参数，并且有返回值（Lambda最多两个参数）
+
+   ```java
+   BinaryOperator<Long> binaryOperator = (Long x,Long y) -> {
+   	System.out.println("实现函数接口方法");
+   	return x +y;
+   };
+   ```
+
+   参数的数据类型可省略，Java8增强了**类型推断**，且当 Lambda 体只有一条语句时，return 与大括号可以省略
+
+   ```java
+   BinaryOperator<Long> binaryOperator = (x, y) -> x + y;
+   ```
+
+   
+
+**类型推断** 
+
+上述 Lambda 表达式中的参数类型都是由编译器推断 得出的。Lambda 表达式中无需指定类型，程序依然可以编译，这是因为 javac 根据程序的上下文，在后台 推断出了参数的类型。Lambda 表达式的类型依赖于上 下文环境，是由编译器推断出来的。这就是所谓的“类型推断”
 
 
 
-语法格式三：Lambda 只需要一个参数时，参数的小括号可以省略
+### [Lambda表达式实例](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)
+
+官方提供的示例，假设你要开发一个社交软件，那个缺打的PM成天改需求，今天要查询出成年用户的信息，明天又要查询成年女性的用户信息，后天又要按各种奇怪的搜索条件查询。
+
+这时的程序员：从简单的用户遍历比较方法改为通用的搜索方法到后来都用上了工厂模式，等到第7天的时候，你不耐烦了，玛德，每个条件就一句话，我写了7个类，我不想做`CtrlCV工程师`。
 
 
 
-语法格式四：Lambda 需要两个参数，并且有返回值
 
 
 
-语法格式五：当 Lambda 体只有一条语句时，return 与大括号可以省略
-
-```
-email -> System.out.println(email)
-```
 
 
 
-语法格式六：
 
 
 
-类型推断 
-
-上述 Lambda 表达式中的参数类型都是由编译器推断 得出的。Lambda 表达式中无需指定类型，程序依然可 以编译，这是因为 javac 根据程序的上下文，在后台 推断出了参数的类型。Lambda 表达式的类型依赖于上 下文环境，是由编译器推断出来的。这就是所谓的“类型推断”
 
 
 
- Lambda表达式的理想用例 
 
- 假设您正在创建一个社交网络应用 
+
+
+
+
+
+
+
+
+
+
 
 
 
