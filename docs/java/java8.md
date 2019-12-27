@@ -181,7 +181,7 @@ Lambda表达式使您能够封装单个行为单元并将其传递给其他代�
 
 
 
-### 为什么要使用Lambda表达式
+### 1. 为什么要使用Lambda表达式
 
 Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(将代码像数据一样进行传递)。可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
 
@@ -248,19 +248,572 @@ Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符�
 
 官方提供的示例，假设你要开发一个社交软件，那个缺打的PM成天改需求，今天要查询出成年用户的信息，明天又要查询成年女性的用户信息，后天又要按各种奇怪的搜索条件查询。
 
-这时的程序员：从简单的用户遍历比较方法改为通用的搜索方法到后来都用上了工厂模式，等到第7天的时候，你不耐烦了，玛德，每个条件就一句话，我写了7个类，我不想做`CtrlCV工程师`。
+这时的程序员：从简单的用户遍历比较方法改为通用的搜索方法到后来都用上了工厂模式，等到第7天的时候，你不耐烦了，玛德，每个条件就一句话，我写了7个类，我可不想做`CtrlCV工程师`，这时候Lambda表达式是你的不二之选。
+
+[代码](https://github.com/Jstarfish/starfish-learning/tree/master/starfish-learn-java8/src/lambda)
+
+```java
+import java.util.List;
+import java.util.ArrayList;
+import java.time.chrono.IsoChronology;
+import java.time.LocalDate;
+
+public class Person {
+
+    public enum Sex {
+        MALE, FEMALE
+    }
+
+    String name;
+    LocalDate birthday;
+    Sex gender;
+    String emailAddress;
+
+    Person(String nameArg, LocalDate birthdayArg,
+           Sex genderArg, String emailArg) {
+        name = nameArg;
+        birthday = birthdayArg;
+        gender = genderArg;
+        emailAddress = emailArg;
+    }
+
+    public int getAge() {
+        return birthday
+                .until(IsoChronology.INSTANCE.dateNow())
+                .getYears();
+    }
+
+    public void printPerson() {
+        System.out.println(name + ", " + this.getAge());
+    }
+
+    public Sex getGender() {
+        return gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public static int compareByAge(Person a, Person b) {
+        return a.birthday.compareTo(b.birthday);
+    }
+
+    public static List<Person> createRoster() {
+
+        List<Person> roster = new ArrayList<>();
+        roster.add(
+                new Person(
+                        "Fred",
+                        IsoChronology.INSTANCE.date(1980, 6, 20),
+                        Person.Sex.MALE,
+                        "fred@example.com"));
+        roster.add(
+                new Person(
+                        "Jane",
+                        IsoChronology.INSTANCE.date(1990, 7, 15),
+                        Person.Sex.FEMALE, "jane@example.com"));
+        roster.add(
+                new Person(
+                        "George",
+                        IsoChronology.INSTANCE.date(1991, 8, 13),
+                        Person.Sex.MALE, "george@example.com"));
+        roster.add(
+                new Person(
+                        "Bob",
+                        IsoChronology.INSTANCE.date(2000, 9, 12),
+                        Person.Sex.MALE, "bob@example.com"));
+
+        return roster;
+    }
+}
+
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+public class RosterTest {
+
+    interface CheckPerson {
+        boolean test(Person p);
+    }
+
+    /**
+     * 1. eg：输出年龄大于20岁的成员
+     *   匹配符合某一特征的成员的方法
+     *   如果老板要年龄在某一区间的成员呢？接着换方法
+     */
+    public static void printPersonsOlderThan(List<Person> roster, int age) {
+        for (Person p : roster) {
+            if (p.getAge() >= age) {
+                p.printPerson();
+            }
+        }
+    }
+
+    /**
+     * 2. eg:输出年龄在14到30岁之间的成员
+     * 		更全面的匹配方法
+     * 		如果老板只要男性成员呢？
+     */
+    public static void printPersonsWithinAgeRange(
+            List<Person> roster, int low, int high) {
+        for (Person p : roster) {
+            if (low <= p.getAge() && p.getAge() < high) {
+                p.printPerson();
+            }
+        }
+    }
+
+    /**
+     * 3. eg:老板又提出了各种复杂的需求，不要处女座的、只要邮箱是163的，怎么搞？
+     * 方法1：在本地类中指定搜索条件代码，通过接口方式，不同的需求对应不同的实现类，
+     *		 每次都要新建实现类，写大量的代码
+     * 方法2：在匿名类中指定搜索条件代码，不需要写各种实现，但是还要写个interface CheckPerson，
+     *       而且匿名类写起来也挺麻烦
+     * 方法3：Lambda表达式是懒人的不二之选，CheckPerson是一个只包含一个抽象方法的接口，
+     *	     比较简单，Lambda可以省略其实现
+     */
+    public static void printPersons(
+            List<Person> roster, CheckPerson tester) {
+        for (Person p : roster) {
+            if (tester.test(p)) {
+                p.printPerson();
+            }
+        }
+    }
+
+    /**
+     * 4. eg: 搞这么久，还得写一个接口，而且是只有一个抽象方法，还是不爽？
+     * 			你也可以使用标准的函数接口来代替接口CheckPerson，从而进一步减少所需的代码量
+     * 			java.util.function包中定义了标准的函数接口
+     * 			我们可以使用JDK8提供的 Predicate<T>接口来代替CheckPerson。
+     *			该接口包含方法boolean test(T t)
+     */
+    public static void printPersonsWithPredicate(
+            List<Person> roster, Predicate<Person> tester) {
+        for (Person p : roster) {
+            if (tester.test(p)) {
+                p.printPerson();
+            }
+        }
+    }
+
+    /**
+     * 5. Lambda表达式可不只是能够简化匿名类
+     * 		简化 p.printPerson(), 
+     * 		使用Consumer<T>接口的void accept(T t)方法，相当于入参的操作
+     */
+    public static void processPersons(
+            List<Person> roster,
+            Predicate<Person> tester,
+            Consumer<Person> block) {
+        for (Person p : roster) {
+            if (tester.test(p)) {
+                block.accept(p);
+            }
+        }
+    }
+
+    /**
+     * 6. eg: 老板说了只想看到邮箱
+     * Function<T,R>接口，相当于输入类型，mapper定义参数，block负责方对给定的参数进行执行
+     */
+    public static void processPersonsWithFunction(
+            List<Person> roster,
+            Predicate<Person> tester,
+            Function<Person, String> mapper,
+            Consumer<String> block) {
+        for (Person p : roster) {
+            if (tester.test(p)) {
+                String data = mapper.apply(p);
+                block.accept(data);
+            }
+        }
+    }
+
+    // 7. 使用泛型
+    public static <X, Y> void processElements(
+            Iterable<X> source,
+            Predicate<X> tester,
+            Function<X, Y> mapper,
+            Consumer<Y> block) {
+        for (X p : source) {
+            if (tester.test(p)) {
+                Y data = mapper.apply(p);
+                block.accept(data);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Person> roster = Person.createRoster();
+
+        /**
+         * 1. 输出年龄大于20岁的成员
+         */
+        System.out.println("Persons older than 20:");
+        printPersonsOlderThan(roster, 20);
+        System.out.println();
+
+        /**
+         * 2. 输出年龄在14到30岁之间的成员
+         */
+        System.out.println("Persons between the ages of 14 and 30:");
+        printPersonsWithinAgeRange(roster, 14, 30);
+        System.out.println();
+
+        /**
+         * 3. 输出年龄在18到25岁的男性成员
+         * （在本地类中指定搜索条件）
+         * 您可以使用一个匿名类而不是一个本地类，并且不必为每个搜索声明一个新类
+         */
+        System.out.println("Persons who are eligible for Selective Service:");
+        class CheckPersonEligibleForSelectiveService implements CheckPerson {
+            public boolean test(Person p) {
+                return p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25;
+            }
+        }
+
+        printPersons(
+                roster, new CheckPersonEligibleForSelectiveService());
+
+
+        System.out.println();
+
+        // 3. 在匿名类中指定搜索条件代码
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(anonymous class):");
+        printPersons(
+                roster,
+                new CheckPerson() {
+                    public boolean test(Person p) {
+                        return p.getGender() == Person.Sex.MALE
+                                && p.getAge() >= 18
+                                && p.getAge() <= 25;
+                    }
+                }
+        );
+
+        System.out.println();
+
+        // 3: 使用Lambda表达式简化代码，一个箭头
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(lambda expression):");
+
+//        printPersons(
+//                roster,
+//                (Person p) -> p.getGender() == Person.Sex.MALE
+//                        && p.getAge() >= 18
+//                        && p.getAge() <= 25
+//        );
+
+        printPersons(roster, p -> p.getGender() == Person.Sex.MALE && p.getAge() >= 18 && p.getAge() <= 25);
+
+        System.out.println();
+
+        // 4. 使用Lambda的标准功能接口
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(with Predicate parameter):");
+
+        printPersonsWithPredicate(
+                roster,
+                p -> p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25
+        );
+
+        System.out.println();
+
+        //5.使用Predicate和Consumer参数
+        System.out.println("5. Persons who are eligible for Selective Service " +
+                "(with Predicate and Consumer parameters):");
+
+        processPersons(
+                roster,
+                p -> p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25,
+                p -> p.printPerson()
+        );
+
+        System.out.println();
+
+        // 6. 通过Function<T,R> 指定输出类型
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(with Predicate, Function, and Consumer parameters):");
+
+        processPersonsWithFunction(
+                roster,
+                p -> p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25,
+                p -> p.getEmailAddress(),
+                email -> System.out.println(email)
+        );
+
+        System.out.println();
+
+        // 7. 使用泛型
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(generic version):");
+
+        processElements(
+                roster,
+                p -> p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25,
+                p -> p.getEmailAddress(),
+                email -> System.out.println(email)
+        );
+
+        System.out.println();
+
+        // 8: 使用接受Lambda表达式的批量数据操作
+        System.out.println("Persons who are eligible for Selective Service " +
+                "(with bulk data operations):");
+
+        roster.stream()
+                .filter(
+                        p -> p.getGender() == Person.Sex.MALE
+                                && p.getAge() >= 18
+                                && p.getAge() <= 25)
+                .map(p -> p.getEmailAddress())
+                .forEach(email -> System.out.println(email));
+        System.out.println();
+
+        /**
+         *  9. 按年龄排序。Java 8 之前需要实现 Comparator 接口
+         *  接口比较器是一个功能接口。因此，
+         *  可以使用lambda表达式来代替定义并创建一个实现了Comparator的类的新实例:
+         */
+        Person[] rosterAsArray = roster.toArray(new Person[roster.size()]);
+
+        Arrays.sort(rosterAsArray,
+                (a, b) -> Person.compareByAge(a, b)
+        );
+
+        for (Person person : roster) {
+            person.printPerson();
+        }
+
+        /**
+         *  这种比较两个Person实例的出生日期的方法已经作为Person. 
+         *	comparebyage存在。你可以在lambda表达式中调用这个方法
+         */
+
+        Arrays.sort(rosterAsArray,
+                (a, b) -> Person.compareByAge(a, b)
+        );
+
+        /**
+         *  ===================================================================
+         *  方法引用：
+         * 这个lambda表达式调用现有的方法，所以您可以使用方法引用而不是lambda表达式
+         *  Person::compareByAge 等同于 (a, b) -> Person.compareByAge(a, b)
+         */
+        Arrays.sort(rosterAsArray, Person::compareByAge);
+
+        System.out.println();
+
+        // Reference to an Instance Method of a Particular Object
+        class ComparisonProvider {
+            public int compareByName(Person a, Person b) {
+                return a.getName().compareTo(b.getName());
+            }
+
+            public int compareByAge(Person a, Person b) {
+                return a.getBirthday().compareTo(b.getBirthday());
+            }
+        }
+        ComparisonProvider myComparisonProvider = new ComparisonProvider();
+        Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
+        for (Person person : rosterAsArray) {
+            person.printPerson();
+        }
+
+        System.out.println();
+
+        /**
+         * 引用特定类型的任意对象的实例方法
+         * String::compareToIgnoreCase 格式化 (String a, String b) ，
+         *  并去调用 a.compareToIgnoreCase(b)
+         */
+        String[] stringArray = { "Barbara", "James", "Mary", "John",
+                "Patricia", "Robert", "Michael", "Linda" };
+        Arrays.sort(stringArray, String::compareToIgnoreCase);
+        for (String s : stringArray) {
+            System.out.println(s);
+        }
+
+
+        System.out.println();
+
+        // 通过 stream 将计算集合的和
+        Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
+        List<Integer> listOfIntegers =
+                new ArrayList<>(Arrays.asList(intArray));
+        System.out.println("Sum of integers: " +
+                listOfIntegers
+                        .stream()
+                        .reduce(Integer::sum).get());
+    }
+}
+```
 
 
 
+## 函数式接口
+
+### 什么是函数式接口  
+
+- 只包含一个抽象方法的接口，称为函数式接口。 
+- 这样的接口这么简单，都不值得在程序中定义，所以，JDK8在  `java.util.function`  中定义了几个标准的函数式接口，供我们使用。[Package java.util.function](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html)
+- 可以通过 Lambda 表达式来创建该接口的对象。（若 Lambda 表达式抛出一个受检异常，那么该异常需要在目标接口的抽象方法上进行声明）。 
+- 我们可以在任意函数式接口上使用 **@FunctionalInterface** 注解， 这样做可以检查它是否是一个函数式接口，同时 javadoc 也会包含一条声明，说明这个接口是一个函数式接口。
+
+### 自定义函数式接口
+
+```java
+@FunctionalInterface
+public interface MyFunc<T> {
+    T getValue(T t);
+}
+```
+
+```java
+public static String toUpperString(MyFunc<String> myFunc, String str) {
+    return myFunc.getValue(str);
+}
+
+public static void main(String[] args) {
+    String newStr = toUpperString((str) -> str.toUpperCase(), "abc");
+    System.out.println(newStr);
+}
+```
+
+作为参数传递 Lambda 表达式：为了将 Lambda 表达式作为参数传递，接收Lambda 表达式的参数类型必须是与该 Lambda 表达式兼容的函数式接口的类型。 
+
+### Java 内置四大核心函数式接口 
+
+| 函数式接口    | 参数类型 | 返回类型 | 用途                                                         |
+| ------------- | -------- | -------- | ------------------------------------------------------------ |
+| Consumer<T>   | T        | void     | 对类型为T的对象应用操作，包含方法：void accept(T t)          |
+| Supplier<T>   | 无       | T        | 返回类型为T的对象，包 含方法：T get();                       |
+| Function<T,R> | T        | R        | 对类型为T的对象应用操 作，并返回结果。结果 是R类型的对象。包含方法：R apply(T t); |
+| Predicate<T>  | T        | boolean  | 确定类型为T的对象是否 满足某约束，并返回 boolean 值。包含方法 boolean test(T t); |
 
 
 
+## 方法引用
+
+- 方法引用是指通过方法的名字来指向一个方法
+
+- 当要传递给 Lambda 体的操作，已经有实现的方法了，就可以使用方法引用（实现抽象方法的参数列表，必须与方法引用方法的参数列表保持一致！）
+
+- 方法引用的唯一用途是支持Lambda的简写 
+
+ 使用 **::** 操作符将**方法名**和**对象或类**的名字分隔开 
+
+### 方法引用实例
+
+```java
+Person[] rosterAsArray =
+    roster.toArray(new Person[roster.size()]);
+
+//Comparator 是一个函数式接口？？
+class PersonAgeComparator
+    implements Comparator<Person> {
+    public int compare(Person a, Person b) {
+        return a.getBirthday().compareTo(b.getBirthday());
+    }
+}
+
+// 实现比较器方法
+Arrays.sort(rosterAsArray, new PersonAgeComparator());
+
+// 使用Lambda表达式代替创建实现Comparator的实例类
+Arrays.sort(rosterAsArray,
+            (Person a, Person b) -> {
+                return a.getBirthday().compareTo(b.getBirthday());
+            }
+           );
+
+// 比较年龄的方法在Person.compareByAge的已经存在，所以可以使用方法引用
+Arrays.sort(rosterAsArray, Person::compareByAge);
+
+// 使用方法引用 == 下边简化后的 Lambda 表达式
+Arrays.sort(rosterAsArray, (a, b) -> Person.compareByAge(a, b));
+
+// 还可以直接使用Comparator比较器的方法
+Arrays.sort(rosterAsArray,Comparator.comparing(Person::getBirthday));
+```
 
 
 
+### 方法引用类型
 
+Java 8 提供了4种方法引用
 
+| Kind                             | Example                      |
+| -------------------------------- | ---------------------------- |
+| 引用静态方法                     | `类::静态方法`               |
+| 引用特定对象的实例方法           | `对象::实例方法`             |
+| 引用特定类型的任意对象的实例方法 | `ContainingType::methodName` |
+| 引用构造器                       | `类名::new`                  |
 
+#### 1. 引用静态方法
+
+```
+Arrays.sort(rosterAsArray, Person::compareByAge);
+```
+
+#### 2. 引用特定对象的实例方法
+
+```java
+class ComparisonProvider {
+    public int compareByName(Person a, Person b) {
+        return a.getName().compareTo(b.getName());
+    }
+        
+    public int compareByAge(Person a, Person b) {
+        return a.getBirthday().compareTo(b.getBirthday());
+    }
+}
+ComparisonProvider myComparisonProvider = new ComparisonProvider();
+Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
+```
+
+####  3. 引用特定类型的任意对象的实例方法
+
+```java
+String[] stringArray = { "Barbara", "James", "Mary", "John",
+    "Patricia", "Robert", "Michael", "Linda" };
+Arrays.sort(stringArray, String::compareToIgnoreCase);
+```
+
+#### 4. 引用构造器
+
+```
+
+```
 
 
 
@@ -289,38 +842,7 @@ The following table maps each of the operations the method `processElements` per
 
 
 
-## 方法引用类型
-
-Java 8 提供了4种方法引用
-
-| Kind                                                         | Example                                |
-| ------------------------------------------------------------ | -------------------------------------- |
-| 对静态方法的引用                                             | `ContainingClass::staticMethodName`    |
-| Reference to an instance method of a particular object       | `containingObject::instanceMethodName` |
-| Reference to an instance method of an arbitrary object of a particular type | `ContainingType::methodName`           |
-| 对构造器的引用                                               | `ClassName::new`                       |
-
-### Reference to a Static Method
-
-The method reference `Person::compareByAge` is a reference to a static method.
-
-### Reference to an Instance Method of a Particular Object
-
-```
-class ComparisonProvider {
-    public int compareByName(Person a, Person b) {
-        return a.getName().compareTo(b.getName());
-    }
-        
-    public int compareByAge(Person a, Person b) {
-        return a.getBirthday().compareTo(b.getBirthday());
-    }
-}
-ComparisonProvider myComparisonProvider = new ComparisonProvider();
-Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
-```
-
-###  引用特定类型的任意对象的实例方法 
+###  
 
 
 
@@ -356,24 +878,6 @@ Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
 | `java.util.regex`      | not applicable                                               | `Pattern`                                                    |
 
 
-
-## 函数式接口
-
-什么是函数式接口 
-
- 只包含一个抽象方法的接口，称为函数式接口。 
-
- 你可以通过 Lambda 表达式来创建该接口的对象。（若 Lambda 表达式抛出一个受检异常，那么该异常需要在目标接口的抽象方 法上进行声明）。 
-
- 我们可以在任意函数式接口上使用 @FunctionalInterface 注解， 这样做可以检查它是否是一个函数式接口，同时 javadoc 也会包 含一条声明，说明这个接口是一个函数式接口。
-
-
-
-
-
-Java 内置四大核心函数式接口 
-
-函数式接口 参数类型 返回类型 用途 Consumer消费型接口 T void 对类型为T的对象应用操 作，包含方法： void accept(T t) Supplier供给型接口 无 T 返回类型为T的对象，包 含方法：T get(); Function函数型接口 T R 对类型为T的对象应用操 作，并返回结果。结果 是R类型的对象。包含方 法：R apply(T t); Predicate断定型接口 T boolean 确定类型为T的对象是否 满足某约束，并返回 boolean 值。包含方法 boolean test(T t);
 
 
 
