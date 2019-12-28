@@ -128,7 +128,7 @@
   padding:10px;
   position:relative;
   line-height:1.8;
-  border-radius:0px 0px 10px 10px;
+  border-radius:7px 7px 7px 7px;
   color: #0e88eb;
   background:#fff;
   box-shadow:#84A1A8 0px 10px 15px;
@@ -148,7 +148,7 @@
 /* 引用文字 */
 #nice blockquote p {
   color: #000000;
-  font-size:15px;
+  font-size:14px;
   display:inline;
 }
 #nice blockquote:after {
@@ -173,12 +173,12 @@
 /* 加粗 */
 #nice strong {
   font-weight: border;
-  //color: #1d5888;
+  //color: #FF6827;
 }
 
 /* 斜体 */
 #nice em {
-  color: #0e88eb;
+  color: #FF6827;
   letter-spacing:0.3em;
 }
 
@@ -231,7 +231,7 @@
 
 /* 行内代码 */
 #nice p code,li code {
-  color:/*自定义样式，实时生效*/
+  color:#FF6827;
 }
 
 /* 非微信代码块
@@ -254,12 +254,12 @@
 
 /* 脚注文字 */
 #nice .footnote-word {
-  color: #2d59b3;
+  color: #FF6827;
 }
 
 /* 脚注上标 */
 #nice .footnote-ref {
-  color: #6a88c5;
+  color: #FF6827;
 }
 
 /* 非微信代码块
@@ -271,17 +271,17 @@
 
 /* 脚注文字 */
 #nice .footnote-word {
-  color: #0e88eb;
+  color: #FF6827;
 }
 
 /* 脚注上标 */
 #nice .footnote-ref {
-  color: #0e88eb;
+  color: #FF6827;
 }
 
 /*脚注链接样式*/
 #nice .footnote-item em {
-  color: #082a71;
+  color: #FF6827;
   font-size:12px;
 }
 
