@@ -720,6 +720,12 @@ public static void main(String[] args) {
 | Function<T,R> | T        | R        | 对类型为T的对象应用操 作，并返回结果。结果 是R类型的对象。包含方法：R apply(T t); |
 | Predicate<T>  | T        | boolean  | 确定类型为T的对象是否 满足某约束，并返回 boolean 值。包含方法 boolean test(T t); |
 
+```java
+
+```
+
+
+
 
 
 ## 方法引用
@@ -728,7 +734,7 @@ public static void main(String[] args) {
 
 - 当要传递给 Lambda 体的操作，已经有实现的方法了，就可以使用方法引用（实现抽象方法的参数列表，必须与方法引用方法的参数列表保持一致！）
 
-- 方法引用的唯一用途是支持Lambda的简写 
+- 方法引用的唯一用途是支持Lambda的简写(可以理解为方法引用是lambda表达式的另一种表现形式)
 
  使用 **::** 操作符将**方法名**和**对象或类**的名字分隔开 
 
@@ -811,15 +817,40 @@ Arrays.sort(stringArray, String::compareToIgnoreCase);
 
 #### 4. 引用构造器
 
+将一个集合内元素复制到另一个集合中。
+
+```java
+public static <T, SOURCE extends Collection<T>, DEST extends Collection<T>>
+    DEST transferElements(
+        SOURCE sourceCollection,
+        Supplier<DEST> collectionFactory) {
+        
+        DEST result = collectionFactory.get();
+        for (T t : sourceCollection) {
+            result.add(t);
+        }
+        return result;
+}
 ```
 
+Supplier是一个函数式接口，您可以使用lambda表达式调用方法TransferElements
+
+```java
+Set<Person> rosterSetLambda =
+    transferElements(roster, () -> { return new HashSet<>(); });
 ```
 
+使用构造器引用代替lambda表达式
 
+```java
+Set<Person> rosterSet = transferElements(roster, HashSet<Person>::new);
+//Java编译器可以推断出要创建包含Person类型元素的HashSet集合，可简写
+Set<Person> rosterSet = transferElements(roster, HashSet::new);
+```
 
+todo
 
-
-
+也可以用数组引用
 
 
 
