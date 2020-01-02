@@ -207,13 +207,18 @@ Java 8新特性简介
 
 ## Lambda表达式
 
- “Lambda 表达式”(lambda expression)是一个**匿名函数**，Lambda表达式基于数学中的**λ演算**得名，直接对应于其中的 lambda 抽象(lambda abstraction)，是一个匿名函数，即没有函数名的函数。Lambda表达式可以表示**闭包**。 
+可以把Lambda表达式理解为简洁的表示可传递的匿名函数的一种方式，Lambda表达式基于数学中的**λ演算**得名：它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表。
+
+- 匿名——匿名函数（即没有函数名的函数），不像普通的方法有一个明确的名称，“写得少，想得多”
+- 函数——Lambda函数不像方法那样属于某个特定的类，但一样有参数列表、函数主体和返回类型
+- 传递——Lambda表达式可以作为参数传递给方法或者存储在变量中
+- 简洁——无需像匿名类那样写很多模板代码
 
 Lambda表达式使您能够封装单个行为单元并将其传递给其他代码。如果希望对集合的每个元素、流程完成时或流程遇到错误时执行某个操作，可以使用lambda表达式。Lambda表达式由以下特性支持: 
 
-- [Method References](http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html) are compact, easy-to-read lambda expressions for methods that already have a name.
-- [Default Methods](http://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html) enable you to add new functionality to the interfaces of your libraries and ensure binary compatibility with code written for older versions of those interfaces. They are interface methods that have an implementation and the `default` keyword at the beginning of the method signature. In addition, you can define static methods in interfaces.
-- [New and Enhanced APIs That Take Advantage of Lambda Expressions and Streams in Java SE 8](https://docs.oracle.com/javase/8/docs/technotes/guides/language/lambda_api_jdk8.html) describe new and enhanced classes that take advantage of lambda expressions and streams.
+- 方法引用： 对于已经有名称的方法，是紧凑的、易于阅读的lambda表达式 
+- 默认方法： 使您能够向库的接口添加新功能，并确保与为这些接口的旧版本编写的代码的二进制兼容性。它们是接口方法，具有实现和方法签名开头的默认关键字。此外，您可以在接口中定义静态方法。 
+-  Java SE 8中利用Lambda表达式和流的新的和增强的api描述了利用Lambda表达式和流的新的和增强的类 
 
 
 
@@ -237,7 +242,14 @@ Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符�
 
 - 右侧：指定了 Lambda 体，即 Lambda 表达式要执行的功能。
 
+#### eg(错误示范)：
 
+```java
+(Integer i) -> return "hello"+i;   //错误的Lambda，return是一个控制流语句，需要{}
+(String s) -> {"hello";}       //“hello”是一个表达式，不是语句，不需要{}，可以写成{return “hello”;}
+```
+
+#### eg(正确示范)：
 
 1. 无参，无返回值，Lambda 体只需一条语句
 
@@ -284,7 +296,11 @@ Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符�
 
 **类型推断** 
 
-上述 Lambda 表达式中的参数类型都是由编译器推断 得出的。Lambda 表达式中无需指定类型，程序依然可以编译，这是因为 javac 根据程序的上下文，在后台 推断出了参数的类型。Lambda 表达式的类型依赖于上 下文环境，是由编译器推断出来的。这就是所谓的“类型推断”
+上述 Lambda 表达式中的参数类型都是由编译器推断得出的。Lambda 表达式中无需指定类型，程序依然可以编译，这是因为 javac 根据程序的上下文，在后台推断出了参数的类型。Lambda 表达式的类型依赖于上下文环境，是由编译器推断出来的。这就是所谓的“类型推断”。Java7中引入的**菱形运算符**（**<>**）,就是利用泛型从上下文推断类型。
+
+```java
+List<String> list = new ArrayList<>();
+```
 
 
 
@@ -294,7 +310,9 @@ Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符�
 
 这时的程序员：从简单的用户遍历比较方法改为通用的搜索方法到后来都用上了工厂模式，等到第7天的时候，你不耐烦了，玛德，每个条件就一句话，我写了7个类，我可不想做`CtrlCV工程师`，这时候Lambda表达式是你的不二之选。
 
-[代码](https://github.com/Jstarfish/starfish-learning/tree/master/starfish-learn-java8/src/lambda)
+**行为参数化**就是可以帮助你处理频繁变更的需求的一种软件开发模式。
+
+官方提供的demo，一步步告诉你使用Java8的好处（从值参数化到行为参数化）。[代码](https://github.com/Jstarfish/starfish-learning/tree/master/starfish-learn-java8/src/lambda)
 
 ```java
 import java.util.List;
@@ -525,7 +543,7 @@ public class RosterTest {
         /**
          * 3. 输出年龄在18到25岁的男性成员
          * （在本地类中指定搜索条件）
-         * 您可以使用一个匿名类而不是一个本地类，并且不必为每个搜索声明一个新类
+         *   您可以使用一个匿名类而不是一个本地类，并且不必为每个搜索声明一个新类
          */
         System.out.println("Persons who are eligible for Selective Service:");
         class CheckPersonEligibleForSelectiveService implements CheckPerson {
@@ -536,9 +554,9 @@ public class RosterTest {
             }
         }
 
+        // 这个其实就是通过行为参数化传递代码
         printPersons(
                 roster, new CheckPersonEligibleForSelectiveService());
-
 
         System.out.println();
 
@@ -562,14 +580,12 @@ public class RosterTest {
         System.out.println("Persons who are eligible for Selective Service " +
                 "(lambda expression):");
 
-//        printPersons(
-//                roster,
-//                (Person p) -> p.getGender() == Person.Sex.MALE
-//                        && p.getAge() >= 18
-//                        && p.getAge() <= 25
-//        );
-
-        printPersons(roster, p -> p.getGender() == Person.Sex.MALE && p.getAge() >= 18 && p.getAge() <= 25);
+        printPersons(
+                roster,
+                (Person p) -> p.getGender() == Person.Sex.MALE
+                        && p.getAge() >= 18
+                        && p.getAge() <= 25
+        );
 
         System.out.println();
 
@@ -728,9 +744,9 @@ public class RosterTest {
 
 ## 函数式接口
 
-### 什么是函数式接口  
+### 什么是函数式接口
 
-- 只包含一个抽象方法的接口，称为函数式接口，该方法也被称为函数方法。 
+- 只包含一个抽象方法的接口，称为函数式接口，该抽象方法也被称为函数方法。 我们熟知的Comparator和Runnable、Callable就属于函数式接口。
 - 这样的接口这么简单，都不值得在程序中定义，所以，JDK8在  `java.util.function`  中定义了几个标准的函数式接口，供我们使用。[Package java.util.function](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html)
 - 可以通过 Lambda 表达式来创建该接口的对象。（若 Lambda 表达式抛出一个受检异常，那么该异常需要在目标接口的抽象方法上进行声明）。 
 - 我们可以在任意函数式接口上使用 **@FunctionalInterface** 注解， 这样做可以检查它是否是一个函数式接口，同时 javadoc 也会包含一条声明，说明这个接口是一个函数式接口。
@@ -738,7 +754,7 @@ public class RosterTest {
 ### 自定义函数式接口
 
 ```java
-@FunctionalInterface
+@FunctionalInterface    //@FunctionalInterface标注该接口会被设计成一个函数式接口，否则会编译错误
 public interface MyFunc<T> {
     T getValue(T t);
 }
@@ -755,7 +771,7 @@ public static void main(String[] args) {
 }
 ```
 
-作为参数传递 Lambda 表达式：为了将 Lambda 表达式作为参数传递，接收Lambda 表达式的参数类型必须是与该 Lambda 表达式兼容的函数式接口的类型。 
+作为参数传递 Lambda 表达式：为了将 Lambda 表达式作为参数传递，**接收Lambda 表达式的参数类型必须是与该 Lambda 表达式兼容的函数式接口的类型**。 
 
 函数接口为lambda表达式和方法引用提供目标类型 
 
@@ -861,6 +877,23 @@ public class FunctionalInterfaceTest {
 
 ![java8-function.png](https://i.loli.net/2019/12/31/tzNWejl7gdnvSrK.png)
 
+**?> Tip**
+
+Java类型要么是引用类型（Byte、Integer、Objuct、List），要么是原始类型（int、double、byte、char）。但是泛型只能绑定到引用类型。将原始类型转换为对应的引用类型，叫**装箱**，相反，将引用类型转换为对应的原始类型，叫**拆箱**。当然Java提供了自动装箱机制帮我们执行了这一操作。
+
+```java
+List<Integer> list = new ArrayList();
+	for (int i = 0; i < 10; i++) {
+	list.add(i);    //int被装箱为Integer
+}
+```
+
+但这在性能方面是要付出代价的。装箱后的值本质上就是把原始类型包裹起来，并保存在堆里。因此，装箱后的值需要更多的内存，并需要额外的内存搜索来获取被包裹的原始值。
+
+以上funciton包中的**IntPredicate、DoubleConsumer、LongBinaryOperator、ToDoubleFuncation等就是避免自动装箱的操作**。一般，针对专门的输入参数类型的函数式接口的名称都要加上对应的原始类型前缀。
+
+
+
 ------
 
 
@@ -871,7 +904,7 @@ public class FunctionalInterfaceTest {
 
 - 当要传递给 Lambda 体的操作，已经有实现的方法了，就可以使用方法引用（实现抽象方法的参数列表，必须与方法引用方法的参数列表保持一致！）
 
-- 方法引用的唯一用途是支持Lambda的简写(可以理解为方法引用是lambda表达式的另一种表现形式)
+- 方法引用的唯一用途是支持Lambda的简写(可以理解为方法引用是lambda表达式的另一种表现形式，快捷写法)
 
  使用 **::** 操作符将**方法名**和**对象或类**的名字分隔开 
 
@@ -881,7 +914,6 @@ public class FunctionalInterfaceTest {
 BinaryOperator<Double> binaryOperator = (x,y)->Math.pow(x,y);
 //等价于
 BinaryOperator<Double> binaryOperator1 = Math::pow;
-
 ```
 
 
@@ -897,7 +929,7 @@ Java 8 提供了4种方法引用
 | 特定类型的任意对象的实例方法引用 | `ContainingType::methodName`           |
 | 构造器引用                       | `ClassName::new`                       |
 
-#### 1. 引用静态方法
+#### 1. 静态方法引用
 
 ```java
 Arrays.sort(rosterAsArray, Person::compareByAge);
@@ -924,7 +956,7 @@ public void test4(){
 }
 ```
 
-#### 2. 引用特定对象的实例方法
+#### 2. 特定对象的实例方法引用
 
 ```java
 class ComparisonProvider {
@@ -953,7 +985,7 @@ public void test2() {
 }
 ```
 
-####  3. 引用特定类型的任意对象的实例方法
+####  3. 特定类型的任意对象的实例方法引用
 
 ```java
 String[] stringArray = { "Barbara", "James", "Mary", "John",
@@ -971,7 +1003,7 @@ public void test5(){
 }
 ```
 
-#### 4. 引用构造器
+#### 4. 构造器引用
 
 将一个集合内元素复制到另一个集合中。
 
@@ -1006,23 +1038,16 @@ Set<Person> rosterSet = transferElements(roster, HashSet::new);
 
 ```java
 Function<Integer,MyClass> fun = (n) -> new MyClass(n);
-？？？  带多个参数的如何引用
+//等价于
 Function<Integer,Person> fun = MyClass::new;
+// 带两个参数的构造器引用就要用BiFunction，多个参数的话，还可以自定义一个这样的函数式接口
 ```
-
-//???????????????????????
 
 ```java
 @Test
 public void test6(){
     Supplier<Person> sup = ()->new Person("Tom", IsoChronology.INSTANCE.date(1995, 6, 20), Person.Sex.MALE, "tom@qq.com");
     System.out.println(sup.get());
-    System.out.println("===等价于===");
-
-    //下边这个有问题
-    Supplier<Person> sup1 = Person::new("Tom", IsoChronology.INSTANCE.date(1995, 6, 20), Person.Sex.MALE, "tom@qq.com");
-    System.out.println(sup1.get());
-}
 ```
 
 **构造器引用还可以创建数组**
@@ -1082,13 +1107,13 @@ Arrays.sort(rosterAsArray,Comparator.comparing(Person::getBirthday));
 
 
 
-## 强大的 Stream API
+## Stream API——函数式数据处理 
 
-Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。 使用Stream API 对集合数据进行操作，就类似于使用 SQL 执行的数据库查询。也可以使用 Stream API 来并行执行操作。简而言之， Stream API 提供了一种高效且易于使用的处理数据的方式。
+Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。 使用Stream API 对集合数据进行操作，就类似于使用 SQL 执行的数据库查询。也可以使用 Stream API 来并行执行操作。简而言之， **Stream API 提供了一种高效且易于使用的处理数据的方式**。
 
 
 
-### Stream是个啥
+### 1. Stream是个啥
 
 流(Stream) 是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列。
 
@@ -1102,19 +1127,20 @@ Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望
 
 - Stream 操作是延迟执行的。这意味着他们会等到需要结果的时候才执行
 
+流操作有两个重要特点
 
+- 流水线——很多流操作本身会返回一个流，这样多个操作就可以链接起来，形成一个大的流水线
+- 内部迭代——与迭代器显示迭代集合不同，流的迭代操作都在背后进行
 
-### Stream 的操作三个步骤 
+### 2. Stream 的操作三个步骤 
 
 1. 创建 Stream 一个数据源（如：集合、数组），获取一个流
-
-2. 中间操作(一个中间操作链，对数据源的数据进行处理)
-
+2. 中间操作(一个中间操作链，对数据源的数据进行处理，形成一条流的流水线)
 3. 终止操作(一个终止操作，执行中间操作链，并产生结果)
 
-![image-20191231155436575.png](https://i.loli.net/2019/12/31/C2D5pwsTm8FWP6O.png)
+![](https://i.loli.net/2020/01/02/ktdAwhmWiNePnSJ.png)
 
-#### 1. 创建 Stream
+#### 2.1. 创建 Stream
 
  Java8 中的 Collection 接口被扩展，提供了两个获取流的方法： 
 
@@ -1154,7 +1180,7 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 
 
 
-#### 2. Stream 的中间操作 
+#### 2.2. Stream 的中间操作 
 
 多个中间操作可以连接起来形成一个流水线，除非流水线上触发终止操作，否则中间操作不会执行任何的处理！ 而在终止操作时一次性全部处理，称为<mark>“惰性求值”</mark>。
 
@@ -1186,11 +1212,11 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 
 
 
-#### 3. Stream 的终止操作
+#### 2.3. Stream 的终止操作
 
  终端操作会从流的流水线生成结果。其结果可以是任何不是流的 值，例如：List、Integer，甚至是 void
 
-##### 3.1 查找与匹配
+##### 2.3.1 查找与匹配
 
 | 方法                   | 描述                                                         |
 | ---------------------- | ------------------------------------------------------------ |
@@ -1204,7 +1230,7 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 | min(Comparator c)      | 返回流中最小值                                               |
 | forEach(Consumer c)    | **内部迭代(使用 Collection 接口需要用户去做迭 代，称为外部迭代。相反，Stream API 使用内部 迭代——它帮你把迭代做了)** |
 
-##### 3.2 规约
+##### 2.3.2 规约
 
 | 方法                             | 描述                                                   |
 | -------------------------------- | ------------------------------------------------------ |
@@ -1213,13 +1239,15 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 
  备注：map 和 reduce 的连接通常称为 map-reduce 模式，因 Google 用它 来进行网络搜索而出名。 
 
-##### 3.2 收集
+##### 2.3.3 收集
 
 | 方法                 | 描述                                                         |
 | -------------------- | ------------------------------------------------------------ |
 | collect(Collector c) | 将流转换为其他形式。接收一个 Collector接口的 实现，用于给Stream中元素做汇总的方法 |
 
-Collector接口中方法的实现决定了如何对流执行收集操作(如收 集到 List、Set、Map)。但是 Collectors 实用类提供了很多静态 方法，可以方便地创建常见收集器实例，具体方法与实例如下表：  https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html 
+#### Collectors
+
+Collector接口中方法的实现决定了如何对流执行收集操作(如收集到 List、Set、Map)。但是 **Collectors** 实用类提供了很多静态方法，可以方便地创建常见收集器实例，具体方法与实例如下表：  https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html 
 
 | 方法              | 返回类型             | 作用                                                         | 示例                                                         |
 | ----------------- | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -1240,11 +1268,28 @@ Collector接口中方法的实现决定了如何对流执行收集操作(如收 
 
 
 
-### 并行流与串行流 
+### 3. Stream 使用实例
 
-并行流就是把一个内容分成多个数据块，并用不同的线程分 别处理每个数据块的流。 
+```java
 
-Java 8 中将并行进行了优化，我们可以很容易的对数据进行并 行操作。Stream API 可以声明性地通过 parallel() 与 sequential() 在并行流与顺序流之间进行切换。
+```
+
+
+
+### 4. 并行流与串行流 
+
+**并行流就是把一个内容分成多个数据块，并用不同的线程分别处理每个数据块的流**。 
+
+Java 8 中将并行进行了优化，我们可以很容易的对数据进行并 行操作。Stream API 可以声明性地通过 `parallel()` 与 `sequential()` 在并行流与顺序流之间进行切换。
+
+```java
+public static long parallelSum(long n) {
+    return Stream.iterate(1L, i -> i + 1)
+        .limit(n)
+        .parallel()    //将流转化为并行流
+        .reduce(0L, Long::sum);
+}
+```
 
 
 
@@ -1263,6 +1308,8 @@ Fork/Join 框架：就是在必要的情况下，将一个大任务，进行拆�
 采用 “工作窃取”模式（work-stealing）： 当执行新的任务时它可以将其拆分分成更小的任务执行，并将小任务加到线 程队列中，然后再从一个随机线程的队列中偷一个并把它放在自己的队列中。 
 
 相对于一般的线程池实现，fork/join框架的优势体现在对其中包含的任务的处理方式上，在一般的线程池中，如果一个线程正在执行的任务由于某些原因无法继续运行，那么该线程会处于等待状态，而在fork/join框架实现中，如果某个子问题由于等待另外一个子问题的完成而无法继续运行，那么处理该子问题的线程会主动寻找其他尚未运行的子问题来执行，这种方式减少了线程的等待时间,提高了性能。
+
+
 
 
 
