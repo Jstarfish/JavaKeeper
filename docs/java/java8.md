@@ -1291,15 +1291,37 @@ public static long parallelSum(long n) {
 }
 ```
 
+#### 配置并行流使用的线程池
+
+使用流的parallel方法，你可能会想到，并行流用的线程是从哪儿来的？有多少个？怎么自定义？
+
+并行流内部使用了默认的ForkJoinPool(分支/合并框架)，它默认的线程数量就是你的处理器数量，这个值是由`Runtime.getrRuntime().acailable-Processors()`得到。
+
+你可以通过系统属性`java.util.concurrent.ForkJoinPool.common.parallelism`来改变线程池大小，如下
+
+`System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism","12");`，这是一个全局设置，因此会影响代码中所有的并行流（目前还无法专门为某个并行流指定该值，一般而言，让ForkJoinPool的大小等于处理器数量是个不错的默认值）。
+
+#### 高效使用并行流
+
+- 并行流并不是总是比顺序流快
+- 留意装箱。自动装箱和拆箱操作会大大降低性能，Java8中有原始类型流（IntStream、LongStream...）来避免这种操作
+- 有些操作本身在并行流上的性能就比顺序流差，特别是limit和findFirst等依赖元素顺序的操作，他们在并行流上执行的代价就非常大
+- 还要考虑流的操作流水线的总计算成本
+- 对于较小的数据量，没必要使用并行流
+- 要考虑流背后的数据结构是否易于分解，比如，ArrayList的拆分效率比LinkedList高很多，前者无需遍历
+- 还要考虑终端操作中国合并步骤的代价是大是小（比如Collector中的combiner方法）
 
 
-### Fork/Join 框架
+
+### 5. Fork/Join 框架
+
+并行流背后使用的基础框架就是Java7中引入的分支/合并框架。
+
+Fork/Join（分支/合并）框架的目的是以递归方式将可以并行的任务拆分(fork)成更小的任务，然后将每个任务的结果合并 (join)起来生成整体效果。它是ExectorService接口的一个实现，把子任务分配给线程池（称为ForkJoinPool）中的工作线程。
 
 Fork/Join 框架：就是在必要的情况下，将一个大任务，进行拆分(fork)成若干个小任务（拆到不可再拆时），再将一个个的小任务运算的结果进行 join 汇总
 
-![image-20191231163411156.png](https://i.loli.net/2019/12/31/ihAlSeYOE4gfp1q.png)
-
-
+![fork-join.png](https://i.loli.net/2020/01/03/gaFyc3oPrjxTfeC.png)
 
 
 
@@ -1309,95 +1331,34 @@ Fork/Join 框架：就是在必要的情况下，将一个大任务，进行拆�
 
 相对于一般的线程池实现，fork/join框架的优势体现在对其中包含的任务的处理方式上，在一般的线程池中，如果一个线程正在执行的任务由于某些原因无法继续运行，那么该线程会处于等待状态，而在fork/join框架实现中，如果某个子问题由于等待另外一个子问题的完成而无法继续运行，那么处理该子问题的线程会主动寻找其他尚未运行的子问题来执行，这种方式减少了线程的等待时间,提高了性能。
 
+#### 使用Fork/Join框架的最佳做法
+
+- 对一个任务调用join方法会阻塞调用方，直到该任务作出结果。因此，有必要在两个子任务的计算都开始之后再调用它
+- 不应该在RecursiveTask内部使用ForkJoinPool的invoke方法。相反，你应该始终直接调用compute或fork方法，只有顺序代码才应该用invoke来启动并行计算
 
 
 
+#### 工作窃取
+
+![fork-join-steal.jpg](https://i.loli.net/2020/01/03/N4KMeZuzEQjh2Co.png)
 
 
 
+### 6. Spliterator
 
+“可分迭代器”——spliterator，和Iterator一样，也用于遍历数据源中的元素，它是为了并行执行而设计。
 
+Java8为集合框架中包含的所有数据结构都提供了一个默认的Spliterator方法。集合实现了Spliterator接口，接口提供了一个Spliterator方法。
 
-
-
-
-
-
-
-
-
-
-
-
-The following table maps each of the operations the method `processElements` performs with the corresponding aggregate operation:
-
-| `processElements` Action                                     | Aggregate Operation                      |
-| ------------------------------------------------------------ | ---------------------------------------- |
-| Obtain a source of objects                                   | `Stream **stream**()`                    |
-| Filter objects that match a `Predicate` object               | `Stream **filter**(Predicate predicate)` |
-| Map objects to another value as specified by a `Function` object | ` Stream **map**(Function mapper)`       |
-| Perform an action as specified by a `Consumer` object        | `void **forEach**(Consumer action)`      |
-
-
-
-## 新时间日期 API
-
-#### 使用 LocalDate、LocalTime、LocalDateTime 
-
-- LocalDate、LocalTime、LocalDateTime 类的实例是**不可变的对象**，分别表示使用 ISO-8601日历系统的日期、时间、日期和时间。它们提供了简单的日期或时间，并不包含当前的时间信 息。也不包含与时区相关的信息。
-
-#### Instant 时间戳 
-
-- 用于“时间戳”的运算。它是以Unix元年(传统 的设定为UTC时区1970年1月1日午夜时分)开始所经历的描述进行运算
-
-#### Duration 和 Period 
-
-- Duration:用于计算两个“时间”间隔
-
-- Period:用于计算两个“日期”间隔
-
-#### 日期的操纵 
-
-- TemporalAdjuster : 时间校正器。有时我们可能需要获 取例如：将日期调整到“下个周日”等操作。 
-
-- TemporalAdjusters : 该类通过静态方法提供了大量的常 用 TemporalAdjuster 的实现。
-
-  ```java
-  //下周日
-  @Test
-  public void test1(){
-      LocalDate nextSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
-      System.out.println(nextSunday);
-  }
-  ```
-
-#### 解析与格式化
-
-java.time.format.DateTimeFormatter 类：该类提供了三种 格式化方法： 
-
-- 预定义的标准格式 
-
-- 语言环境相关的格式 
-
-- 自定义的格式
-
-#### 时区的处理 
-
-- Java8 中加入了对时区的支持，带时区的时间为分别为： ZonedDate、ZonedTime、ZonedDateTime 
-
-  其中每个时区都对应着 ID，地区ID都为 “{区域}/{城市}”的格式 例如 ：Asia/Shanghai 等
-
-   ZoneId：该类中包含了所有的时区信息 
-
-  - getAvailableZoneIds() : 可以获取所有时区时区信息 
-
-  - of(id) : 用指定的时区信息获取 ZoneId 对象
+![spliterator](https://i.loli.net/2020/01/03/D7mhsfeoKSpOJ9N.png)
 
 
 
 ## 接口中的默认方法与静态方法
 
-#### 接口中的默认方法 
+传统上，Java中实现接口的类必须为接口中定义的每个方法提供一个实现类，或者从父类中继承它的实现。但如果类库的设计者需要修改接口，加入新的方法，这种方式就会出现问题。所有使用该接口的实体类为了适配新的接口约定都需要进行修改（要是这么不兼容的话，迟早被淘汰）。所以，Java8为了解决这一问题引入了一种新的机制。**Java8中的接口支持在声明方法的同时提供实现**。其一，**Java8允许在接口中声明静态方法**。其二，Java8引入的新功能——**默认方法，通过默认方法可以指定接口方法的默认实现**（因此，实现接口的类如果不显式的提供该方法的具体实现，就会自动继承默认的实现，这种机制可以使你平滑的进行接口的优化和升级）。
+
+#### 默认方法
 
 Java 8中允许接口中包含具有具体实现的方法，该方法称为 “默认方法”，默认方法使用 **default** 关键字修饰。
 
@@ -1411,13 +1372,29 @@ interface MyFunc<T>{
 }
 ```
 
-**接口默认方法的”类优先”原则** 
+```java
+@Test
+public void test1(){
+    List<Integer> list = Arrays.asList(22,11,33,55,4);
+    //sort是List接口中的默认方法,naturalOrder是Comparator的静态方法
+    list.sort(Comparator.naturalOrder());
+    for (Integer integer : list) {
+        System.out.println(integer);
+    }
+}
+```
 
-若一个接口中定义了一个默认方法，而另外一个父类或接口中 又定义了一个同名的方法时 
+![default-method.png](https://i.loli.net/2020/01/03/gHvVGs7alt3UZQN.png)
 
-- 选择父类中的方法。如果一个父类提供了具体的实现，那么 接口中具有相同名称和参数的默认方法会被忽略。
 
-- 接口冲突。如果一个父接口提供一个默认方法，而另一个接 口也提供了一个具有相同名称和参数列表的方法（不管方法 是否是默认方法），那么必须覆盖该方法来解决冲突
+
+#### 默认方法的”类优先”原则
+
+若一个接口中定义了一个默认方法，而另外一个父类或接口中又定义了一个同名的方法时 
+
+- 选择父类中的方法。如果一个父类提供了具体的实现，那么接口中具有相同名称和参数的默认方法会被忽略。
+
+- 接口冲突。如果一个父接口提供一个默认方法，而另一个接口也提供了一个具有相同名称和参数列表的方法（不管方法是否是默认方法），那么必须覆盖该方法来解决冲突
 
 ```java
 interface MyFunc<T> {
@@ -1441,53 +1418,286 @@ class MyClass implements MyFunc, MyFunc1 {
 }
 ```
 
-#### 接口中的静态方法
 
-Java8 中，接口中允许添加静态方法
+
+------
+
+## Optional 类 
+
+### 1. 用 Optional 取代 null
+
+> 当你碰到程序中有一个NullPointerException时的第一冲动是不就是赶紧找到代码，添加一个if语句，检查下？？
+
+NullPointerException是Java程序开发中典型的异常。为了避免这种异常，我们的代码有可能充斥着一层又一层的深度嵌套的null检查，代码可读性极差。
+
+Optional类(java.util.Optional) 是一个容器类，代表一个值存在或不存在， 原来用 null 表示一个值不存在，现在 Optional 可以更好的表达这个概念。并且可以避免空指针异常。 
+
+变量存在时，Optional类知识对类简单封装。变量不存在时，缺失的值就会被建模成一个“空”的Optional对象，由方法`Optional.empty()`返回。
+
+常用方法： 
+
+- Optional.of(T t) : 创建一个 Optional 实例 
+- Optional.empty() : 创建一个空的 Optional 实例 
+- Optional.ofNullable(T t):若 t 不为 null,创建 Optional 实例,否则创建空实例 
+- isPresent() : 判断是否包含值 orElse(T t) : 如果调用对象包含值，返回该值，否则返回t 
+- orElseGet(Supplier s) :如果调用对象包含值，返回该值，否则返回 s 获取的值 
+- map(Function f): 如果有值对其处理，并返回处理后的Optional，否则返回 Optional.empty() 
+- flatMap(Function mapper):与 map 类似，要求返回值必须是Optional
+
+
+
+### 2. Optional 实例
+
+#### 2.1 创建Optional对象
 
 ```java
-interface MyFunc<T> {
+@Test
+public void test(){
 
-    static void show(){
-        System.out.println("hello JavaEgg");
-    }
-    default String getName() {
-        return "hello java8";
-    }
+    Optional<Person> optional = Optional.empty();  //创建一个空Optional
+
+    Optional<Person> op = Optional.of(new Person());
+    Person p = op.get();
+    System.out.println(p);   //Person{name='null', birthday=null, gender=null, emailAddress='null'}
+
+    Person person = null;
+    Optional<Person> op1 = Optional.of(person); //person为null，抛出NullPointerException
+
+    Optional<Person> op2 = Optional.ofNullable(person);   //创建允许null值得Optional对象
+
 }
 ```
+
+#### 2.2 optional 对象操作
+
+```java
+@Test
+public void test4(){
+    Person person = new Person("Tom",IsoChronology.INSTANCE.date(1999, 7, 15),Person.Sex.FEMALE, "Tom@360.com")
+    Optional<Person> op = Optional.ofNullable(person);
+
+    Optional<String> op1 = op.map(Person::getName);
+    System.out.println(op1.get());
+    
+    /**
+    * 使用 map 从 optional 对象中提取和转换值
+    * 如果想提取人员姓名，之前需要判断persion !=null,Optional提供了一个map方法，对其处理
+    **/
+    Optional<String> op2 = op.map(Person::getName);
+    System.out.println(op2.get());
+
+    //使用 flatMap 链接 optional 对象
+    Optional<String> op3 = op.flatMap((e) -> Optional.of(e.getName()));
+    System.out.println(op3.get());
+    
+    //TODO
+}
+```
+
+
+
+## CompletableFuture — 组合式异步编程
+
+### 1. Future接口
+
+Future接口在Java 5中被引入，设计初衷是对将来某个时刻会发生的结果进行建模。它建模了一种异步计算，返回一个执行运算结果的引用，当运算结束后，这个引用被返回给调用方。在 Future中触发那些潜在耗时的操作把调用线程解放出来，让它能继续执行其他有价值的工作， 不再需要等待耗时的操作完成。打个比方，你可以把它想象成这样的场景：你拿了一袋衣服到你中意的干洗店去洗衣服。干洗店员工会给你张发票，告诉你什么时候你的衣服会洗好（这就 是一个Future事件）。衣服干洗的同时，你可以去做其他的事情。Future的另一个优点是它比 更底层的Thread更易用。要使用Future，通常你只需要将耗时的操作封装在一个Callable对 象中，再将它提交给ExecutorService，就可以了。下面这段代码展示了Java 8之前使用 Future的一个例子。 
+
+```java
+ExecutorService executor = Executors.newCachedThreadPool();
+Future<Double> future = executor.submit(new Callable<Double>() {
+    public Double call() {
+        return doSomeThings();    //异步方式在新的线程中执行操作
+    }
+});
+//doSomethingElse();    //异步操作进行的同时，可以做其他事情
+try {
+    //获取异步操作的结果，如果阻塞，等1秒后退出
+    Double result = future.get(1, TimeUnit.SECONDS);   
+} catch (ExecutionException | InterruptedException | TimeoutException e) {
+}
+```
+
+#### 1.1 Future接口的局限性
+
+我们知道Future接口提供了方法来检测异步计算是否已经结束（使用 isDone方法），等待异步操作结束，以及获取计算的结果。但是这些特性还不足以让你编写简洁的并发代码。比如，我们很难表述Future结果之间的依赖性；从文字描述上这很简单，“当长时间计算任务完成时，请将该计算的结果通知到另一个长时间运行的计算任务，这两个计算任务都完成后，将计算的结果与另一个查询操作结果合并”。但是，使用Future中提供的方法完成这样的操作又是另外一回事。这也是我们需要更具描述能力的特性的原因，比如下面这些。
+
+- 将两个异步计算合并为一个——这两个异步计算之间相对独立，同时第二个又依赖于第 一个的结果
+- 等待Future集合中的所有任务都完成
+- 仅等待Future集合中最快结束的任务完成（有可能因为它们试图通过不同的方式计算同 一个值），并返回它的结果
+- 通过编程方式完成一个Future任务的执行（即以手工设定异步操作结果的方式）
+- 应对Future的完成事件（即当Future的完成事件发生时会收到通知，并能使用Future 计算的结果进行下一步的操作，不只是简单地阻塞等待操作的结果）
+
+####  1.2 使用CompletableFuture 构建异步应用
 
 ------
 
 
 
-## 其他新特性
+## 新时间日期 API
 
-### Optional 类 
+### 1. 使用 LocalDate、LocalTime、LocalDateTime 
 
-Optional类(java.util.Optional) 是一个容器类，代表一个值存在或不存在， 原来用 null 表示一个值不存在，现在 Optional 可以更好的表达这个概念。并且 可以避免空指针异常。 
+- LocalDate、LocalTime、LocalDateTime 类的实例是**不可变的对象**，分别表示使用 ISO-8601日历系统的日期、时间、日期和时间。它们提供了简单的日期或时间，并不包含当前的时间信息。也不包含与时区相关的信息。
 
-常用方法： 
+  ```java
+  @Test
+  public void test1(){
+      LocalDate date = LocalDate.of(2020,01,03);
+      Month month = date.getMonth();
+      System.out.println(month);    //JANUARY
+  
+      DayOfWeek dayOfWeek = date.getDayOfWeek();
+      System.out.println(dayOfWeek);   //FRIDAY
+  
+      int len = date.lengthOfMonth();
+      System.out.println(len);  //31
+      //使用TemporalField(ChronoField枚举实现了该接口）读取LocalDate的值
+      int year = date.get(ChronoField.YEAR);
+      System.out.println(year);  //2020
+  
+      LocalDate ld = LocalDate.parse("2020-01-03");
+      System.out.println(ld);   //2020-01-03
+  
+      LocalTime time = LocalTime.of(19,56,11);
+      System.out.println(time);  //19:56:11
+  
+      LocalDateTime ldt = LocalDateTime.now();
+      LocalDateTime l1 = LocalDateTime.of(2020,01,03,18,48);
+      System.out.println(l1);  //2020-01-03T18:48
+  
+      LocalDateTime l2 = l1.plusYears(3);
+      System.out.println(l2);     //2023-01-03T18:48
+  
+      LocalDateTime l3 = l1.minusMonths(1);
+      System.out.println(l3);  //2019-12-03T18:48
+      System.out.println(l3.getMinute()+","+l3.getYear());   //48,2019
+  }
+  ```
 
-- Optional.of(T t) : 创建一个 Optional 实例 
+### 2. Instant 时间戳 
 
-- Optional.empty() : 创建一个空的 Optional 实例 
+- 用于“时间戳”的运算。它是以Unix元年(传统的设定为UTC时区1970年1月1日午夜时分)开始所经历的秒数进行计算
 
-- Optional.ofNullable(T t):若 t 不为 null,创建 Optional 实例,否则创建空实例 
+  ```java
+  @Test
+  public void test2(){
+      Instant ins = Instant.now();  //默认使用 UTC 时区
+      OffsetDateTime odt = ins.atOffset(ZoneOffset.ofHours(8));
+      System.out.println(odt);
+      System.out.println(ins.getNano());
+      Instant ins2 = Instant.ofEpochSecond(5);
+      System.out.println(ins2);
+  }
+  ```
 
-- isPresent() : 判断是否包含值 orElse(T t) : 如果调用对象包含值，返回该值，否则返回t 
+### 3. Duration 和 Period 
 
-- orElseGet(Supplier s) :如果调用对象包含值，返回该值，否则返回 s 获取的值 
+- Duration:用于计算两个“时间”间隔
 
-- map(Function f): 如果有值对其处理，并返回处理后的Optional，否则返回 Optional.empty() 
+- Period:用于计算两个“日期”间隔
 
-- flatMap(Function mapper):与 map 类似，要求返回值必须是Optional
+  ```java
+  @Test
+  public void test3(){
+      Instant ins1 = Instant.now();
+      try {
+          Thread.sleep(1000);
+      } catch (InterruptedException e) {
+      }
+      Instant ins2 = Instant.now();
+      System.out.println("所耗费时间为：" + Duration.between(ins1, ins2));   
+  
+      System.out.println("----------------------------------");
+      LocalDate ld1 = LocalDate.now();
+      LocalDate ld2 = LocalDate.of(2019, 1, 1);
+  
+      Period pe = Period.between(ld2, ld1);
+      System.out.println(pe.getYears());  
+      System.out.println(pe.getMonths());
+      System.out.println(pe.getDays());
+  }
+  ```
 
+  
 
+### 4. 日期的操纵 
+
+- 通过 withXXX 方法修改 LocalDate 的属性
+
+- TemporalAdjuster : 时间校正器。有时我们可能需要获取例如：将日期调整到“下个周日”等操作。 
+
+- TemporalAdjusters : 该类通过静态方法提供了大量的常 用 TemporalAdjuster 的实现。
+
+  ```java
+  @Test
+  public void test(){
+      LocalDate date = LocalDate.now();
+      //通过withAttributer方法修改LocalDate的属性
+      LocalDate date1 = date.with(ChronoField.ALIGNED_WEEK_OF_YEAR,9);
+      LocalDate date2 = date.withYear(2019);
+      LocalDate date3 = date.withDayOfMonth(11);  //修改为11号
+      System.out.println(date1);
+      //下周日
+      LocalDate nextSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
+      System.out.println(nextSunday);
+  }
+  ```
+
+### 5. 解析与格式化
+
+`java.time.format.DateTimeFormatter` 类：该类提供了三种格式化方法： 
+
+- 预定义的标准格式 
+
+- 语言环境相关的格式 
+
+- 自定义的格式
+
+  ```java
+  @Test
+  public void test(){
+      //DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE;
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss E");
+  
+      LocalDateTime ldt = LocalDateTime.now();
+      String strDate = ldt.format(dtf);
+  
+      System.out.println(strDate); //2020年01月03日 20:32:14 星期五
+  
+      LocalDateTime newLdt = ldt.parse(strDate, dtf);
+      System.out.println(newLdt);  //2020-01-03T20:32:14
+  }
+  ```
+
+#### 时区的处理 
+
+- Java8 中加入了对时区的支持，带时区的时间为分别为： ZonedDate、ZonedTime、ZonedDateTime 
+
+  其中每个时区都对应着 ID，地区ID都为 “{区域}/{城市}”的格式 例如 ：Asia/Shanghai 等
+
+   ZoneId：该类中包含了所有的时区信息 
+
+  - getAvailableZoneIds() : 可以获取所有时区时区信息 
+- of(id) : 用指定的时区信息获取 ZoneId 对象
+  
+  ```java
+  @Test
+  public void test(){
+      Set<String> set = ZoneId.getAvailableZoneIds();  //遍历时区
+      set.forEach(System.out::println);
+      LocalDateTime ldt = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+      System.out.println(ldt);
+  
+      ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("US/Pacific"));
+      System.out.println(zdt);
+  }
+  ```
+  
+  
 
 ### 重复注解与类型注解
 
- Java 8对注解处理提供了两点改进：可重复的注解及可用于类 型的注解
+ Java 8对注解处理提供了两点改进：可重复的注解及可用于类型的注解
 
 ![](https://ftp.bmp.ovh/imgs/2019/12/c703840d2b401aa1.png)
 
@@ -1563,7 +1773,18 @@ double average = roster
 
 
 
+The following table maps each of the operations the method `processElements` performs with the corresponding aggregate operation:
 
+| `processElements` Action                                     | Aggregate Operation                      |
+| ------------------------------------------------------------ | ---------------------------------------- |
+| Obtain a source of objects                                   | `Stream **stream**()`                    |
+| Filter objects that match a `Predicate` object               | `Stream **filter**(Predicate predicate)` |
+| Map objects to another value as specified by a `Function` object | ` Stream **map**(Function mapper)`       |
+| Perform an action as specified by a `Consumer` object        | `void **forEach**(Consumer action)`      |
+
+
+
+## 
 
 
 
