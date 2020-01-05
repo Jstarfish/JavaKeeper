@@ -17,7 +17,7 @@ Java8早在2014年3月就发布了。
   
   -  [java.util.stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html) 
   -  具有键冲突的hashmap的性能改进 
--  [Compact Profiles](http://docs.oracle.com/javase/8/docs/technotes/guides/compactprofiles/) contain predefined subsets of the Java SE platform and enable applications that do not require the entire Platform to be deployed and run on small devices. 
+-  精简运行时(Compact Profiles) 包含JavaSE平台的预定义子集，并启用不需要整个平台的应用程序在小型设备上部署和运行. 
 -  [Security](http://docs.oracle.com/javase/8/docs/technotes/guides/security/enhancements-8.html) 
 -  [JavaFX](http://docs.oracle.com/javase/8/javase-clienttechnologies.htm) 
 -  [Tools](http://docs.oracle.com/javase/8/docs/technotes/tools/enhancements-8.html) 
@@ -1418,7 +1418,9 @@ class MyClass implements MyFunc, MyFunc1 {
 }
 ```
 
+JavaAPI的设计者们充分利用了默认方法，为集合接口和类新增了很多新的方法。
 
+![](https://tva1.sinaimg.cn/large/006tNbRwly1galzsigkj0j31g20eago3.jpg)
 
 ------
 
@@ -1695,17 +1697,158 @@ try {
   
   
 
-### 重复注解与类型注解
+## 重复注解与类型注解
 
- Java 8对注解处理提供了两点改进：可重复的注解及可用于类型的注解
+### 注解
+
+ Java 8对注解处理提供了两点改进：**可重复的注解**及**可用于类型的注解**
+
+Java中注解是一种对程序元素进行配置，提供附加信息的机制（Java8之前，注解只能被用在声明上）
+
+### 重复注解
+
+![](https://tva1.sinaimg.cn/large/006tNbRwly1galxorjm1gj31m20cy765.jpg)
+
+Java8之前不允许上边这样的重复注解，所以一般会通过一些惯用手法绕过这一限制。可以声明一个新的注解，它包含了你希望重复的注解数组。
+
+![](https://tva1.sinaimg.cn/large/006tNbRwly1galy1inqmij30qi0rwtb9.jpg)
+
+#### 创建一个重复注解
+
+1. 将注解标记为**@Repeatable**
+2. 提供一个注解的容器
+
+```java
+import java.lang.annotation.Repeatable;
+@Repeatable(Authors.class)
+public @interface Author {
+    String name();
+}
+```
+
+```java
+public @interface Authors {
+    Author[] value();
+}
+```
+
+```java
+@Author(name = "Tom")
+@Author(name = "Jack")
+public class Book {
+    public static void main(String[] args) {
+        Author[] authors = Book.class.getAnnotationsByType(Author.class);
+        Arrays.asList(authors).forEach(s->{
+            System.out.println(s.name());
+        });
+    }
+}
+```
 
 ![](https://ftp.bmp.ovh/imgs/2019/12/c703840d2b401aa1.png)
 
+### 类型注解
+
+java8开始，注解可以应用于任何类型。包括new操作符、类型转换、instanceof检查、范型类型参数，以及implemtnts和throws子句。
+
+```java
+@NotNull String name = person.getName();    //getName不返回空
+
+List<@NotNull Person> persons = new ArrayList<>();  //persons总是非空
+```
 
 
 
+## 其他语言特性
+
+### 􏵯􏵰􏴵􏵱原子操作
+
+􏵯􏵰􏴵􏵱􏵯􏵰􏴵􏵱􏵯􏵰􏴵􏵱java.util.concurrent.atomic包提供了多个对数字类型进行操作的类，比如Atomic- Integer和AtomicLong，它们支持对单一变量的原子操作。这些类在Java 8中新􏱗了更多的方 法支持。
+
+- 􏰝  getAndUpdate——以原子方式用给定的方法更新当前值，并返回变更之前的值。
+
+- 􏰝  updateAndGet——以原子方式用给定的方法更新当前值，并返回变更之后的值。 3
+
+- 􏰝  getAndAccumulate——以原子方式用给定的方法对当前及给定的值进行更新，并返回
+
+  变更之前的值。
+
+- 􏰝  accumulateAndGet——以原子方式用给定的方法对当前及给定的值进行更新，并返回
+
+  变更之后的值。
 
 
+
+**Adder**􏰗**Accumulator**
+
+多线程的环境􏵇中，如果多个线程需要频繁地进行更新操作，且很少有读取的动作(比如，在统计计算的上下文中)，Java API文􏵉中推推荐大使用新的类LongAdder、LongAccumulator、Double-Adder以及DoubleAccumulator，尽量避免使用它们对应的原子类型。这些新的类在设计之􏳨就考虑了动态􏱗增长的需求，可以有效地减少线程间的􏵲􏵳竞争。
+
+LongAddr 和 DoubleAdder 类 都支持加法操作 ， 而 LongAccumulator 和 DoubleAccu- mulator可以使用给定的方法整合多个值。
+
+### ConcurrentHashMap
+
+ConcurrentHashMap类的引入极大地提􏲰了HashMap现代化的程度，新引入的ConcurrentHashMap对并发的支持非常􏶂好。ConcurrentHashMap允许并发地进行新􏱗增和更新操作，因为它仅对内部数据结构的某些部分上􏲹锁。因此，和另一种选择，即同步式的Hashtable比较起来，它具有更高的读写性能。
+
+1. 􏴘􏶃性能
+
+为了改􏶄性能，要对ConcurrentHashMap的内部数据结构进行调整。典型情况下，map的条目会被存储在􏶅桶中，依据键生成􏶆􏲼哈希值进行访问。但是，如果大量键返回相同的哈希􏶆􏲼值，由于桶是由List实现的，它的查􏴂复杂度为O(n)，这种情况下性能会􏶇恶化。在Java 8中，当􏶅桶过于臃肿时，它们会被动态地替换为排序􏶊树(sorted tree)，新的数据结构具有更好的查􏴂询性能(排序树的查询􏴂复杂度为O(log(n)))。注意，这种优化只有当键是可以比较的(比如String或者Number类)时才可能发生。
+
+2. 类流操作
+
+􏲘􏰊􏴵􏵱ConcurrentHashMap支持三种新的操作，这些操作和你之前在流中所见的很像:
+
+- forEach——对每个键值对进行特定的操作
+- reduce——使用给定的􏰤简函数(reduction function)，将所有的键值对整合出一个结果􏰝 
+- search——对每一个键值对执行一个函数，直到函数的返回值为一个非空值
+
+以上每一种操作都支持四种形式，接受使用键、值、Map.Entry以及键值对的函数:􏰝
+
+- 使用键和值的操作(forEach、reduce、search)
+- 使用键的操作(forEachKey、reduceKeys、searchKeys)
+- 使用值的操作 (forEachValue、reduceValues、searchValues)
+
+- 使用Map.Entry对象的操作(forEachEntry、reduceEntries、searchEntries) 
+
+注意，这些操作不会对ConcurrentHashMap的􏲷状态􏲹上锁。它们只会在运行过程中对元素进行操作。应用到这些操作上的函数不应该对任何的顺序，或者其他对象，􏳙或在计算过程发生变化的值，有依赖。 􏳧除此之外，你需要为这些操作指定一个并发􏶋阈值。如果经过预预估当前map的大小小于设定的阈值，操作会顺序执行。使用值1开开启基于通用线程􏶌的最大并行。使用值Long.MAX_VALUE设定程序以单线程执行操作。下面这个例子中，我们使用reduceValues试图找出map中的最大值:
+
+```java
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>(); 
+Optional<Integer> maxValue = Optional.of(map.reduceValues(1, Integer::max));
+```
+
+注意，对int、long和double，它们的reduce操作各有不同(比如reduceValuesToInt、reduceKeysToLong等)。
+
+3. 计数
+
+ConcurrentHashMap类提供了一个新的方法，名叫mappingCount，它以长整型long返回map中映射的数目。我们应该尽量使用这个新方法，而不是􏱘的size方法，size方法返回的类型为int。这是因为映射的数量可能是int无法表示的。
+
+4. 集合视图
+
+ConcurrentHashMap类还提供了一个名为KeySet的新方法，该方法以Set的形式返回ConcurrentHashMap的一个视图(对map的修改会反映在该Set中，反之亦然)。你也可以使用新的静态方法newKeySet，由ConcurrentHashMap创建一个Set。
+
+### Arrays
+
+Arrays类提供了不同的静态方法对数组进行操作。现在，它又包括了四个新的方法(它们都有特别重载􏱄的变量)
+
+- **parallelSort**：parallelSort方法会以并发的方式对指定的数组进行排序，你可以使用自然顺序，也可以
+
+  为数组对象定义特别的Comparator
+
+- **setAll**􏰗**parallelSetAll**：setAll和parallelSetAll方法可以以顺序的方式也可以用并发的方式，使用提供的函数 计算每一个元素的值，对指定数组中的所有元素进行设置
+
+- **parallelPrefix**：parallelPrefix方法以并发的方式，用用户􏴛提供的二进制操作符对给定数组中的每个元素
+
+  进行􏶐累积计算
+
+### Number和Math
+
+### Files
+
+Files类最引人注目的改变是，你现在可以用文件直接产生流
+
+### String
+
+String类也新增􏱗了一个静态方法，名叫join。它可以用一个分隔符将多个字符串􏶘接起来。和我们以前使用的apache提供的`StringUtils.join`一样。
 
 
 
@@ -1788,6 +1931,10 @@ The following table maps each of the operations the method `processElements` per
 
 
 
+FAQ
+
+ConcurrentHashMap 在Java8和7的实现区别
+
 
 
 java8 api https://docs.oracle.com/javase/8/docs/api/
@@ -1795,3 +1942,10 @@ java8 api https://docs.oracle.com/javase/8/docs/api/
 
 
 Jdk8文档  https://docs.oracle.com/javase/8/docs/
+
+
+
+《Java 8函数式编程》
+
+《Java 8实战》
+
