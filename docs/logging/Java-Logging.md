@@ -1,6 +1,6 @@
 ## Java日志
 
- 日志就是记录程序的运行轨迹，方便查找关键信息，也方便快速定位解决问题。 
+日志就是记录程序的运行轨迹，方便查找关键信息，也方便快速定位解决问题。 
 
 
 
@@ -11,14 +11,14 @@
 - **Log4j 2** : Apache Log4j 2是apache开发的一款Log4j的升级产品，Log4j 2与Log4j 1发生了很大的变化，Log4j 2不兼容Log4j 1。
 - **Logback**  : 一套日志组件的实现(Slf4j阵营)。
 - **tinylog** : 一个轻量级的日志框架
-- **Apache Commons Logging** : Apache基金会所属的项目，是一套Java日志接口，之前叫Jakarta Commons Logging，后更名为Commons Logging。
+- **Apache Commons Logging** : Apache基金会所属的项目，是一套Java日志接口，之前叫 Jakarta Commons Logging，后更名为Commons Logging。
 - **Slf4j** : Simple Logging Facade for Java，类似于Commons Logging，是一套简易Java日志门面，本身并无日志的实现。（Simple Logging Facade for Java，缩写Slf4j）。
 
 
 
 JUL、LOG4J1、LOG4J2、LOGBACK是**日志实现框架**，而Commons Logging和SLF4J是**日志实现门面**，可以理解为一个适配器，**可以将你的应用程序从日志框架中解耦**。
 
-  【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架 SLF4J 中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。 import org.slf4j.Logger; import org.slf4j.LoggerFactory; private static final Logger logger = LoggerFactory.getLogger(Abc.class);  
+【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架 SLF4J 中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。 import org.slf4j.Logger; import org.slf4j.LoggerFactory; private static final Logger logger = LoggerFactory.getLogger(Abc.class);  
 
 
 

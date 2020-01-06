@@ -1,205 +1,66 @@
-https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html
+> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
-# Java8新特性概览 
+> Java8早在2014年3月就发布了，现在才做一个详细的总结，嗯，为时不晚，JVM、JavaFX和一些安全问题，目前用不到，就没有深究。
+>
+> 本文是用我拙劣的英文和不要脸的这抄抄那抄抄，熬出的，没有深究源码，只是对 Java8 有一个整体的认知，可以上手用起来，示例代码也都在github上
 
-Java8早在2014年3月就发布了。
+# JDK 8有什么新功能  
 
-[What's New in JDK 8]( https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html )
-
--  [Java Programming Language](http://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8) 
-  - Lambda表达式：一个新的语言特性， 它们使您能够将函数视为方法参数，或将代码视为数据 
-  - 方法引用： 方法引用为已经有名称的方法提供易于阅读的lambda表达式 
-  -  重复注释提供了将同一注释类型多次应用于同一声明或类型使用的能力 
-  -  类型注释提供了在使用类型的任何地方应用注释的能力，而不仅仅是在声明上。与可插拔类型系统一起使用，该特性支持改进的代码类型检查。 
-  -  Improved type inference 
+-  Java 编程语言（ Java Programming Language）
+  - **Lambda表达式**：一个新的语言特性， 它们使您能够将函数视为方法参数，或将代码视为数据 
+  - **方法引用**： 方法引用为已经有名称的方法提供易于阅读的lambda表达式 
+  - **默认方法**：使用 default 关键字为接口定义默认方法（有实现的方法）
+  -  **重复注解**提供了将同一注解多次应用于同一声明或类型使用的能力 
+  -  **类型注解**提供了在使用类型的任何地方应用注解的能力，而不仅仅是在声明上
+  -  Java8 增强了**类型推断**  
   -  方法参数反射 
--  [Collections](http://docs.oracle.com/javase/8/docs/technotes/guides/collections/changes8.html) 
-  
-  -  [java.util.stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html) 
-  -  具有键冲突的hashmap的性能改进 
--  精简运行时(Compact Profiles) 包含JavaSE平台的预定义子集，并启用不需要整个平台的应用程序在小型设备上部署和运行. 
--  [Security](http://docs.oracle.com/javase/8/docs/technotes/guides/security/enhancements-8.html) 
--  [JavaFX](http://docs.oracle.com/javase/8/javase-clienttechnologies.htm) 
--  [Tools](http://docs.oracle.com/javase/8/docs/technotes/tools/enhancements-8.html) 
-  
--  提供jjs命令来调用Nashorn引擎 
-  
--  [Internationalization](http://docs.oracle.com/javase/8/docs/technotes/guides/intl/enhancements.8.html) 
+  -  `java.util.function`:  一个新的包，它包含为lambda表达式和方法引用提供目标类型的通用功能接口 
+-  集合（Collections）
+  -   `java.util.stream`包中新增了 **Stream API** ，用来支持对元素流的函数式操作 
+  -   改进了有键冲突问题的 **HashMap**
+-  精简运行时（Compact Profiles）
+-  安全性（Security）
+-  JavaFX
+-  Tools（包含一些调用Nashorn引擎、 启动JavaFX应用程序 等等 ）
+-  国际化（Internationalization）
 
   -  Unicode增强，包括对Unicode 6.2.0的支持
-  -  Adoption of Unicode CLDR Data and the java.locale.providers System Property 
-  - 新的 Calendar  和  Locale  API
-  -  能够安装自定义资源包作为扩展 
+  - 提供了新的 Calendar  和  Locale  API
+-  部署（Deployment） 
 
--  [Deployment](http://docs.oracle.com/javase/8/docs/technotes/guides/jweb/enhancements-8.html) 
+-  日期-时间 包（**Date-Time Package**）：提供了更全面的时间和日期操作
+-  脚本（Scripting）：Java 8提供了一个新的 Nashorn javascript 引擎(取代了Nashorn javascript引擎)，它允许我们在JVM上运行特定的 javascript 应用
 
-  - For sandbox applets and Java Web Start applications, `URLPermission` is now used to allow connections back to the server from which they were started. `SocketPermission` is no longer granted.
-  - The Permissions attribute is required in the JAR file manifest of the main JAR file at all security levels.
+- IO 和 NIO
 
--  [Date-Time Package](http://docs.oracle.com/javase/8/docs/technotes/guides/datetime/index.html) - a new set of packages that provide a comprehensive date-time model. 
+- `java.lang` 和 `java.util` 
+-  支持数组并行排序 
+  -  支持Base64 的编码和解码
+  -  支持 无符号运算
+  - **Optional 类** ：最大化减少空指针异常
+- JDBC
 
--  [Scripting](http://docs.oracle.com/javase/8/docs/technotes/guides/scripting/enhancements.html#jdk8) 
+  - JDBC-ODBC桥已被移除 
+  - JDBC 4.2引入了新的特性 
+- Java DB（一个Java数据库）
 
-  -  Java 8提供了一个新的Nashorn javascript引擎(取代了Nashorn javascript引擎)，它允许我们在JVM上运行特定的javascript应用
+- 网络（Networking）
+- 新增了 `java.net.URLPermission` 
+- 并发（**Concurrency**）
+-  `java.util.concurrent.ConcurrentHashMap` 支持基于新添加的streams功能和lambda表达式的聚合操作 
+  -  `java.util.concurrent.atomic`  提供了一组原子变量类， 对于单个变量支持无锁、线程安全操作的工具类 
+  -  `java.util.concurrent.ForkJoinPool` 用于补充ExecutorService 
+  - `java.util.concurrent.locks.StampedLock` 提供了基于功能的锁，有三种模式用于控制读/写访问
 
-- [Pack200](http://docs.oracle.com/javase/8/docs/technotes/guides/pack200/enhancements.html)
 
-  - Pack200 Support for Constant Pool Entries and New Bytecodes Introduced by JSR 292
-  - JDK8 support for class files changes specified by JSR-292, JSR-308 and JSR-335
 
-- [IO and NIO](http://docs.oracle.com/javase/8/docs/technotes/guides/io/enhancements.html#jdk8)
+Java8 特别强大的是Lambda 表达式和Stream，通过他两新增和增强了很多类，如下
 
-  - New `SelectorProvider` implementation for Solaris based on the Solaris event port mechanism. To use, run with the system property `java.nio.channels.spi.Selector` set to the value `sun.nio.ch.EventPortSelectorProvider`.
-  - Decrease in the size of the `/jre/lib/charsets.jar` file
-  - Performance improvement for the `java.lang.String(byte[], *)` constructor and the `java.lang.String.getBytes()` method.
+新增类： `java.lang.invoke`、` java.util.function`、`java.util.stream` 
 
-- [java.lang and java.util Packages](http://docs.oracle.com/javase/8/docs/technotes/guides/lang/enhancements.html#jdk8)
+修改类：
 
-  - Parallel Array Sorting
-  - Standard Encoding and Decoding Base64
-  - Unsigned Arithmetic Support
-
-- [JDBC](http://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/)
-
-  - The JDBC-ODBC Bridge has been removed.
-  - JDBC 4.2 introduces new features.
-
-- Java DB
-
-  - JDK 8 includes Java DB 10.10.
-
-- [Networking](http://docs.oracle.com/javase/8/docs/technotes/guides/net/enhancements-8.0.html)
-
-  - The class `java.net.URLPermission` has been added.
-  - In the class `java.net.HttpURLConnection`, if a security manager is installed, calls that request to open a connection require permission.
-
-- [Concurrency](http://docs.oracle.com/javase/8/docs/technotes/guides/concurrency/changes8.html)
-
-  - Classes and interfaces have been added to the `java.util.concurrent` package.
-  - Methods have been added to the `java.util.concurrent.ConcurrentHashMap` class to support aggregate operations based on the newly added streams facility and lambda expressions.
-  - Classes have been added to the `java.util.concurrent.atomic` package to support scalable updatable variables.
-  - Methods have been added to the `java.util.concurrent.ForkJoinPool` class to support a common pool.
-  - The `java.util.concurrent.locks.StampedLock` class has been added to provide a capability-based lock with three modes for controlling read/write access.
-
-- [Java XML](http://docs.oracle.com/javase/8/docs/technotes/guides/xml/enhancements.html) - [JAXP](http://docs.oracle.com/javase/8/docs/technotes/guides/xml/jaxp/enhancements-8.html)
-
-- [HotSpot](http://docs.oracle.com/javase/8/docs/technotes/guides/vm/)
-
-  - Hardware intrinsics were added to use Advanced Encryption Standard (AES). The `UseAES` and `UseAESIntrinsics` flags are available to enable the hardware-based AES intrinsics for Intel hardware. The hardware must be 2010 or newer Westmere hardware.
-
-    **Note:** AES intrinsics are only supported by the Server VM.
-
-    For example, to enable hardware AES, use the following flags:
-
-    ```
-    -XX:+UseAES -XX:+UseAESIntrinsics
-    ```
-
-    To disable hardware AES use the following flags:
-
-    ```
-    -XX:-UseAES -XX:-UseAESIntrinsics
-    ```
-
-  - Removal of PermGen.
-
-  - Default Methods in the Java Programming Language are supported by the byte code instructions for method invocation.
-
-- [Java Mission Control 5.3 Release Notes](http://www.oracle.com/technetwork/java/javase/jmc53-release-notes-2157171.html)
-
-  - JDK 8 includes Java Mission Control 5.3.
-
-
-
-
-
-
-
-JAVA8增强的内容
-
-https://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8
-
-
-
-Java8 API
-
- https://docs.oracle.com/javase/8/docs/api/overview-summary.html 
-
-## Java8新特性
-
-Java8 新增了非常多的特性，我们主要讨论以下几个：
-
-- **Lambda 表达式** − Lambda 允许把函数作为一个方法的参数（函数作为参数传递到方法中）。
-- **方法引用** − 方法引用提供了非常有用的语法，可以直接引用已有Java类或对象（实例）的方法或构造器。与lambda联合使用，方法引用可以使语言的构造更紧凑简洁，减少冗余代码。
-- **默认方法** − 默认方法就是一个在接口里面有了一个实现的方法。
-- **新工具** − 新的编译工具，如：Nashorn引擎 jjs、 类依赖分析器jdeps。
-- **Stream API** −新添加的Stream API（java.util.stream） 把真正的函数式编程风格引入到Java中。
-- **Date Time API** − 加强对日期与时间的处理。
-- **Optional 类** − Optional 类已经成为 Java 8 类库的一部分，用来解决空指针异常。
-- **Nashorn, JavaScript 引擎** − Java 8提供了一个新的Nashorn javascript引擎，它允许我们在JVM上运行特定的javascript应用。
-
-
-
-1. Lambda 表达式 
-2. 函数式接口 
-3. 方法引用与构造器引用 
-4. Stream API
-5. 接口中的默认方法与静态方法
-6. 新时间日期 API 
-7. 其他新特性
-
-
-
-
-
-
-
-Java 8新特性简介 
-
- 速度更快 
-
- 代码更少（增加了新的语法 Lambda 表达式）
-
-  强大的 Stream API
-
-  便于并行
-
-  最大化减少空指针异常 Optional 
-
-其中最为核心的为 Lambda 表达式与Stream API
-
-
-
-
-
-# New and Enhanced APIs That Take Advantage of Lambda Expressions and Streams in Java SE 8
-
-利用Lambda表达式和Streams，新增和改良的API
-
-- `java.util`:  增加了 java.lang.invoke 包，
-- `java.util.function`:  一个新的包，它包含为lambda表达式和方法引用提供目标类型的通用功能接口 
-- `java.util.stream`:  一个新的包，它包含了为流和聚合操作提供功能的大部分接口和类 
-
-## New Packages
-
- `java.util.function`
-`java.util.stream` 
-
-
-
-## Modified Packages( [java8API](https://docs.oracle.com/javase/8/docs/api/overview-summary.html ))
-
-| Package                | New Classes                                                  | Modified Classes                                             |
-| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `java.io`              | `UncheckedIOException`                                       | `BufferedReader`                                             |
-| `java.lang`            | not applicable                                               | `AutoCloseable` `ThreadLocal` `String` `Iterable` `CharSequence` `Boolean` `Integer` `Long` `Float` `Double` |
-| `java.nio.file`        | not applicable                                               | `Files`                                                      |
-| `java.util`            | `PrimitiveIterator` `Spliterator` `DoubleSummaryStatistics` `IntSummaryStatistics` `LongSummaryStatistics` `Optional` `OptionalDouble` `OptionalInt` `OptionalLong` `Spliterators` `SplittableRandom` `StringJoiner` | `Arrays` `BitSet` `Collection` `Comparator` `Iterator` `List` `Map` `Map.Entry` `LinkedHashMap` `Random` `TreeMap` |
-| `java.util.concurrent` | not applicable                                               | `ThreadLocalRandom`                                          |
-| `java.util.jar`        | not applicable                                               | `JarFile`                                                    |
-| `java.util.zip`        | not applicable                                               | `ZipFile`                                                    |
-| `java.util.logging`    | not applicable                                               | `Logger`                                                     |
-| `java.util.regex`      | not applicable                                               | `Pattern`                                                    |
+![modify-class.png](https://i.loli.net/2020/01/06/42aBbSWoVINYkjq.png)
 
 ------
 
@@ -873,7 +734,7 @@ public class FunctionalInterfaceTest {
 
 
 
-**Package java.util.function**包下还提供了很多其他的演变方法。
+**Package java.util.function** 包下还提供了很多其他的演变方法。
 
 ![java8-function.png](https://i.loli.net/2019/12/31/tzNWejl7gdnvSrK.png)
 
@@ -1110,8 +971,6 @@ Arrays.sort(rosterAsArray,Comparator.comparing(Person::getBirthday));
 ## Stream API——函数式数据处理 
 
 Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。 使用Stream API 对集合数据进行操作，就类似于使用 SQL 执行的数据库查询。也可以使用 Stream API 来并行执行操作。简而言之， **Stream API 提供了一种高效且易于使用的处理数据的方式**。
-
-
 
 ### 1. Stream是个啥
 
@@ -1424,6 +1283,8 @@ JavaAPI的设计者们充分利用了默认方法，为集合接口和类新增�
 
 ------
 
+
+
 ## Optional 类 
 
 ### 1. 用 Optional 取代 null
@@ -1620,7 +1481,6 @@ try {
   }
   ```
 
-  
 
 ### 4. 日期的操纵 
 
@@ -1761,25 +1621,25 @@ List<@NotNull Person> persons = new ArrayList<>();  //persons总是非空
 
 ## 其他语言特性
 
-### 􏵯􏵰􏴵􏵱原子操作
+### 原子操作
 
-􏵯􏵰􏴵􏵱􏵯􏵰􏴵􏵱􏵯􏵰􏴵􏵱java.util.concurrent.atomic包提供了多个对数字类型进行操作的类，比如Atomic- Integer和AtomicLong，它们支持对单一变量的原子操作。这些类在Java 8中新􏱗了更多的方 法支持。
+java.util.concurrent.atomic 包提供了多个对数字类型进行操作的类，比如Atomic- Integer和AtomicLong，它们支持对单一变量的原子操作。这些类在Java 8中新􏱗了更多的方 法支持。
 
-- 􏰝  getAndUpdate——以原子方式用给定的方法更新当前值，并返回变更之前的值。
+- getAndUpdate——以原子方式用给定的方法更新当前值，并返回变更之前的值。
 
-- 􏰝  updateAndGet——以原子方式用给定的方法更新当前值，并返回变更之后的值。 3
+- updateAndGet——以原子方式用给定的方法更新当前值，并返回变更之后的值。 3
 
-- 􏰝  getAndAccumulate——以原子方式用给定的方法对当前及给定的值进行更新，并返回
+- getAndAccumulate——以原子方式用给定的方法对当前及给定的值进行更新，并返回
 
   变更之前的值。
 
-- 􏰝  accumulateAndGet——以原子方式用给定的方法对当前及给定的值进行更新，并返回
+- accumulateAndGet——以原子方式用给定的方法对当前及给定的值进行更新，并返回
 
   变更之后的值。
 
 
 
-**Adder**􏰗**Accumulator**
+**Adder和Accumulator**
 
 多线程的环境􏵇中，如果多个线程需要频繁地进行更新操作，且很少有读取的动作(比如，在统计计算的上下文中)，Java API文􏵉中推推荐大使用新的类LongAdder、LongAccumulator、Double-Adder以及DoubleAccumulator，尽量避免使用它们对应的原子类型。这些新的类在设计之􏳨就考虑了动态􏱗增长的需求，可以有效地减少线程间的􏵲􏵳竞争。
 
@@ -1912,26 +1772,7 @@ double average = roster
 
 
 
-
-
-
-
-The following table maps each of the operations the method `processElements` performs with the corresponding aggregate operation:
-
-| `processElements` Action                                     | Aggregate Operation                      |
-| ------------------------------------------------------------ | ---------------------------------------- |
-| Obtain a source of objects                                   | `Stream **stream**()`                    |
-| Filter objects that match a `Predicate` object               | `Stream **filter**(Predicate predicate)` |
-| Map objects to another value as specified by a `Function` object | ` Stream **map**(Function mapper)`       |
-| Perform an action as specified by a `Consumer` object        | `void **forEach**(Consumer action)`      |
-
-
-
-## 
-
-
-
-FAQ
+## FAQ
 
 ConcurrentHashMap 在Java8和7的实现区别
 
@@ -1945,7 +1786,15 @@ Jdk8文档  https://docs.oracle.com/javase/8/docs/
 
 
 
-《Java 8函数式编程》
+
+
+## 参考：
 
 《Java 8实战》
+
+某免费视频学习网站
+
+《Java 8函数式编程》
+
+
 
