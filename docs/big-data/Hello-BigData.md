@@ -56,7 +56,7 @@
 
 2）主要解决，海量数据的存储和海量数据的分析计算问题。
 
- 3）广义上来说，HADOOP 通常是指一个更广泛的概念——HADOOP 生态圈 
+3）广义上来说，HADOOP 通常是指一个更广泛的概念——HADOOP 生态圈 
 
 ### 2.2 Hadoop 发展历史 
 
@@ -70,17 +70,17 @@
 
 5）可以说 Google 是 hadoop 的思想之源(Google 在大数据方面的三篇论文)
 
-​	 **GFS** --->HDFS 
+​    **GFS** --->HDFS 
 
 ​	Map-Reduce --->MR 
 
 ​	BigTable --->Hbase
 
- 6）2003-2004 年，Google 公开了部分 GFS 和 Mapreduce 思想的细节，以此为基础 Doug Cutting 等人用了 2 年业余时间实现了 DFS 和 Mapreduce 机制，使 Nutch 性能飙升 
+6）2003-2004 年，Google 公开了部分 GFS 和 Mapreduce 思想的细节，以此为基础 Doug Cutting 等人用了 2 年业余时间实现了 DFS 和 Mapreduce 机制，使 Nutch 性能飙升 
 
 7）2005 年 Hadoop 作为 Lucene 的子项目 Nutch的一部分正式引入 Apache 基金会。2006 年 3 月份，Map-Reduce 和 Nutch Distributed File System (NDFS) 分别被纳入称为 Hadoop 的项 目中
 
- 8）名字来源于 Doug Cutting 儿子的玩具大象 
+8）名字来源于 Doug Cutting 儿子的玩具大象 
 
 9）Hadoop 就此诞生并迅速发展，标志着云计算时代来临 
 
@@ -88,9 +88,9 @@
 
 ### 2.3 Hadoop 三大发行版本
 
- Hadoop 三大发行版本: Apache、Cloudera、Hortonworks。
+Hadoop 三大发行版本: Apache、Cloudera、Hortonworks。
 
- Apache 版本最原始（最基础）的版本，对于入门学习最好。 
+Apache 版本最原始（最基础）的版本，对于入门学习最好。 
 
 Cloudera 在大型互联网企业中用的较多。 
 
@@ -104,21 +104,23 @@ Hortonworks 文档较好。
 
 2）高扩展性：在集群间分配任务数据，可方便的扩展数以千计的节点。
 
- 3）高效性：在 MapReduce 的思想下，Hadoop 是并行工作的，以加快任务处理速度。 
+3）高效性：在 MapReduce 的思想下，Hadoop 是并行工作的，以加快任务处理速度。 
 
 4）高容错性：自动保存多份副本数据，并且能够自动将失败的任务重新分配。 
 
 
 
-### 2.5 Hadoop 组成 
+### 2.5 Hadoop 组成
+
+![](https://tva1.sinaimg.cn/large/006tNbRwly1ganyr30mg7j31ey0nswvr.jpg) 
 
 1）Hadoop HDFS：一个高可靠、高吞吐量的分布式文件系统。 
 
 2）Hadoop MapReduce：一个分布式的离线并行计算框架。
 
- 3）Hadoop YARN：作业调度与集群资源管理的框架。	
+3）Hadoop YARN：作业调度与集群资源管理的框架。	
 
- 4）Hadoop Common：支持其他模块的工具模块（Configuration、RPC、序列化机制、日志 操作）。 
+4）Hadoop Common：支持其他模块的工具模块（Configuration、RPC、序列化机制、日志 操作）。 
 
 
 
@@ -134,15 +136,15 @@ Hortonworks 文档较好。
 
 #### 2.5.2 YARN 架构概述
 
- 1）ResourceManager(rm)：处理客户端请求、启动/监控 ApplicationMaster、监控 NodeManager、 资源分配与调度； 
+![](/Users/starfish/Desktop/屏幕快照 2020-01-07 下午2.17.43.png)
+
+1）ResourceManager(rm)：处理客户端请求、启动/监控 ApplicationMaster、监控 NodeManager、 资源分配与调度； 
 
 2）NodeManager(nm)：单个节点上的资源管理、处理来自 ResourceManager 的命令、处理来 自 ApplicationMaster 的命令；
 
-3）ApplicationMaster：数据切分、为应用程序申请资源，并分配给内部任务、任务监控与容 错。 
+3）ApplicationMaster：数据切分、为应用程序申请资源，并分配给内部任务、任务监控与容错。 
 
 4）Container：对任务运行环境的抽象，封装了 CPU、内存等多维资源以及环境变量、启动 命令等任务运行相关的信息。 
-
-![](../_images/big-data/yarn.png)
 
 
 
@@ -174,13 +176,13 @@ MapReduce 将计算过程分为两个阶段：Map 和 Reduce
 
 3）Kafka：Kafka 是一种高吞吐量的分布式发布订阅消息系统，有如下特性： 
 
-​	（1）通过 O(1)的磁盘数据结构提供消息的持久化，这种结构对于即使数以 TB 的消息 存储也能够保持长时间的稳定性能。 
+- 通过 O(1)的磁盘数据结构提供消息的持久化，这种结构对于即使数以 TB 的消息 存储也能够保持长时间的稳定性能。 
 
-​	（2）高吞吐量：即使是非常普通的硬件 Kafka 也可以支持每秒数百万的消息 
+- 高吞吐量：即使是非常普通的硬件 Kafka 也可以支持每秒数百万的消息 
 
-​	（3）支持通过 Kafka 服务器和消费机集群来分区消息。 
+- 支持通过 Kafka 服务器和消费机集群来分区消息。 
 
-​	（4）支持 Hadoop 并行数据加载。 
+- 支持 Hadoop 并行数据加载。 
 
 4）Storm：Storm 为分布式实时计算提供了一组通用原语，可被用于“流处理”之中，实时 处理消息并更新数据库。这是管理队列及工作者集群的另一种方式。 Storm 也可被用于“连 续计算”（continuous computation），对数据流做连续查询，在计算时就将结果以流的形式 输出给用户。
 
