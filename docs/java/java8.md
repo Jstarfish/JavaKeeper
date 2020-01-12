@@ -1009,7 +1009,7 @@ Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望
 
 ##### 由数组创建流 
 
-Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
+Java8 中的 Arrays 的静态方法 stream() 可以获取数组流：
 
 - static Streamstream(T[] array): 返回一个流 
 
@@ -1037,6 +1037,33 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 - 生成 
   - public staticStreamgenerate(Suppliers) : 
 
+```java
+//创建 Stream
+@Test
+public void test1(){
+  //1. Collection 提供了两个方法  stream() 与 parallelStream()
+  List<String> list = new ArrayList<>();
+  Stream<String> stream = list.stream(); //获取一个顺序流
+  Stream<String> parallelStream = list.parallelStream(); //获取一个并行流
+
+  //2. 通过 Arrays 中的 stream() 获取一个数组流
+  Integer[] nums = new Integer[10];
+  Stream<Integer> stream1 = Arrays.stream(nums);
+
+  //3. 通过 Stream 类中静态方法 of()
+  Stream<Integer> stream2 = Stream.of(1,2,3,4,5,6);
+
+  //4. 创建无限流
+  //迭代
+  Stream<Integer> stream3 = Stream.iterate(0, (x) -> x + 2).limit(10);
+  stream3.forEach(System.out::println);
+
+  //生成
+  Stream<Double> stream4 = Stream.generate(Math::random).limit(2);
+  stream4.forEach(System.out::println);
+}
+```
+
 
 
 #### 2.2. Stream 的中间操作 
@@ -1048,19 +1075,104 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 | 方法                | 描述                                                         |
 | ------------------- | ------------------------------------------------------------ |
 | filter(Predicate p) | 接收 Lambda ， 从流中排除某些元素                            |
-| distinct()          | 筛选，通过流所生成元素的 hashCode() 和 equals() 去 除重复元素 |
+| distinct()          | 筛选，通过流所生成元素的 hashCode() 和 equals() 去除重复元素 |
 | limit(long maxSize) | 截断流，使其元素不超过给定数量                               |
-| skip(long n)        | 跳过元素，返回一个扔掉了前 n 个元素的流。若流中元素 不足 n 个，则返回一个空流。与 limit(n) 互补 |
+| skip(long n)        | 跳过元素，返回一个扔掉了前 n 个元素的流。若流中元素不足 n 个，则返回一个空流。与 limit(n) 互补 |
+
+```java
+List<Person> persons = Person.createRoster();
+
+//内部迭代：迭代操作 Stream API 内部完成
+@Test
+public void test2(){
+  //所有的中间操作不会做任何的处理
+  Stream<Person> stream = persons.stream()
+    .filter((e) -> {
+      System.out.println("测试中间操作");
+      return e.getAge() <= 35;
+    });
+
+  //只有当做终止操作时，所有的中间操作会一次性的全部执行，称为“惰性求值”
+  stream.forEach(System.out::println);
+}
+
+//外部迭代
+@Test
+public void test3(){
+  Iterator<Person> it = persons.iterator();
+
+  while(it.hasNext()){
+    System.out.println(it.next());
+  }
+}
+
+@Test
+public void test4(){
+  persons.stream()
+    .filter((p) -> {
+      System.out.println("大于25岁的成员："); // &&  ||
+      return (p.getAge()) >= 25;
+    }).limit(3)
+    .forEach(System.out::println);
+}
+
+@Test
+public void test5(){
+  persons.parallelStream()
+    .filter((e) -> e.getAge() >= 20)
+    .skip(2)
+    .forEach(System.out::println);
+}
+
+@Test
+public void test6(){
+  persons.stream()
+    .distinct()
+    .forEach(System.out::println);
+}
+```
+
+
 
 ##### 2.2 映射
 
 | 方法                            | 描述                                                         |
 | ------------------------------- | ------------------------------------------------------------ |
-| map(Function f)                 | 接收一个函数作为参数，该函数会被应用到每个元 素上，并将其映射成一个新的元素 |
-| mapToDouble(ToDoubleFunction f) | 接收一个函数作为参数，该函数会被应用到每个元 素上，产生一个新的 DoubleStream |
-| mapToInt(ToIntFunction f)       | 接收一个函数作为参数，该函数会被应用到每个元 素上，产生一个新的 IntStream。 |
-| mapToLong(ToLongFunction f)     | 接收一个函数作为参数，该函数会被应用到每个元 素上，产生一个新的 LongStream |
-| flatMap(Function f)             | 接收一个函数作为参数，将流中的每个值都换成另 一个流，然后把所有流连接成一个流 |
+| map(Function f)                 | 接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射成一个新的元素 |
+| mapToDouble(ToDoubleFunction f) | 接收一个函数作为参数，该函数会被应用到每个元素上，产生一个新的 DoubleStream |
+| mapToInt(ToIntFunction f)       | 接收一个函数作为参数，该函数会被应用到每个元素上，产生一个新的 IntStream。 |
+| mapToLong(ToLongFunction f)     | 接收一个函数作为参数，该函数会被应用到每个元素上，产生一个新的 LongStream |
+| flatMap(Function f)             | 接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有流连接成一个流 |
+
+```java
+//映射
+@Test
+public void test1(){
+  Stream<String> str = persons.stream()
+    .map((e) -> e.getName());
+  System.out.println("-------------------------------------------");
+  List<String> strList = Arrays.asList("aaa", "bbb", "ccc", "ddd", "eee");
+  Stream<String> stream = strList.stream()
+    .map(String::toUpperCase);
+  stream.forEach(System.out::println);
+
+  System.out.println("---------------------------------------------");
+
+  Stream<Character> stream3 = strList.stream()
+    .flatMap(TestStreamAPI::filterCharacter);
+  stream3.forEach(System.out::println);
+}
+
+public static Stream<Character> filterCharacter(String str){
+  List<Character> list = new ArrayList<>();
+  for (Character ch : str.toCharArray()) {
+    list.add(ch);
+  }
+  return list.stream();
+}
+```
+
+
 
 ##### 2.3 排序
 
@@ -1068,6 +1180,27 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 | ----------------------- | ---------------------------------- |
 | sorted()                | 产生一个新流，其中按自然顺序排序   |
 | sorted(Comparator comp) | 产生一个新流，其中按比较器顺序排序 |
+
+```java
+@Test
+public void test(){
+  persons.stream()
+    .map(Person::getName)
+    .sorted()
+    .forEach(System.out::println);
+
+  System.out.println("------------------------------------");
+
+  persons.stream()
+    .sorted((x, y) -> {
+      if(x.getAge() == y.getAge()){
+        return x.getName().compareTo(y.getName());
+      }else{
+        return Integer.compare(x.getAge(), y.getAge());
+      }
+    }).forEach(System.out::println);
+}
+```
 
 
 
@@ -1089,6 +1222,82 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 | min(Comparator c)      | 返回流中最小值                                               |
 | forEach(Consumer c)    | **内部迭代(使用 Collection 接口需要用户去做迭 代，称为外部迭代。相反，Stream API 使用内部 迭代——它帮你把迭代做了)** |
 
+```java
+public class TestStreamAPI2 {
+
+	List<Person> persons = Person.createRoster();
+	
+	//3. 终止操作
+	@Test
+	public void test1(){
+			boolean bl = persons.stream()
+				.allMatch((e) -> e.getGender().equals(Person.Sex.FEMALE));
+			
+			System.out.println("所有成员都为女性吗？"+bl);
+			
+			boolean bl1 = persons.stream()
+				.anyMatch((e) -> e.getGender().equals(Person.Sex.FEMALE));
+			
+			System.out.println("成员中有女性吗？"+bl1);
+			
+			boolean bl2 = persons.stream()
+				.noneMatch((e) -> e.getGender().equals(Person.Sex.FEMALE));
+			
+			System.out.println("成员中是不是没有女性？"+bl2);
+	}
+	
+	@Test
+	public void test2(){
+		Optional<Person> op = persons.stream()
+			.sorted(Comparator.comparingInt(Person::getAge))
+			.findFirst();
+		
+		System.out.println("年龄最小的："+op.get());
+
+		
+		Optional<Person> op2 = persons.parallelStream()
+			.filter((e) -> e.getGender().equals(Person.Sex.MALE))
+			.findAny();
+		
+		System.out.println("随便找个男的："+op2.get());
+	}
+	
+	@Test
+	public void test3(){
+		long count = persons.stream()
+						 .filter((e) -> e.getGender().equals(Person.Sex.FEMALE))
+						 .count();
+		
+		System.out.println("女生的人数："+count);
+		
+		Optional<Integer> op = persons.stream()
+			.map(Person::getAge)
+			.max(Integer::compare);
+		
+		System.out.println("最大年龄："+op.get());
+		
+		Optional<Person> op2 = persons.stream()
+			.min((e1, e2) -> Integer.compare(e1.getAge(), e2.getAge()));
+		
+		System.out.println("最小年龄成员："+op2.get());
+	}
+	
+	//注意：流进行了终止操作后，不能再次使用
+	@Test
+	public void test4(){
+		Stream<Person> stream = persons.stream()
+		 .filter((e) -> e.getGender().equals(Person.Sex.FEMALE));
+		
+		long count = stream.count();
+		
+		stream.map(Person::getAge)
+			.max(Integer::compare);
+	}
+}
+```
+
+
+
 ##### 2.3.2 规约
 
 | 方法                             | 描述                                                   |
@@ -1097,6 +1306,44 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 | reduce(BinaryOperator b)         | 可以将流中元素反复结合起来，得到一个值。 返回 Optional |
 
  备注：map 和 reduce 的连接通常称为 map-reduce 模式，因 Google 用它 来进行网络搜索而出名。 
+
+```java
+List<Person> persons = Person.createRoster();
+
+//3. 终止操作:归约
+@Test
+public void test1(){
+  List<Integer> list = Arrays.asList(1,2,3,4,5,6,7,8,9,10);
+  Integer sum = list.stream()
+    .reduce(0, (x, y) -> x + y);
+
+  System.out.println(sum);
+  System.out.println("----------------------------------------");
+
+  Optional<Integer> op = persons.stream()
+    .map(Person::getAge)
+    .reduce(Integer::sum);
+  System.out.println("所有成员的年龄和："+op.get());
+}
+
+//需求：搜索名字中 “B” 出现的次数
+@Test
+public void test2(){
+  Optional<Integer> sum = persons.stream()
+    .map(Person::getName)
+    .flatMap(TestStreamAPI1::filterCharacter)
+    .map((ch) -> {
+      if(ch.equals('B'))
+        return 1;
+      else 
+        return 0;
+    }).reduce(Integer::sum);
+
+  System.out.println(sum.get());
+}
+```
+
+
 
 ##### 2.3.3 收集
 
@@ -1108,29 +1355,104 @@ Java8 中的 Arrays 的静态方法 stream() 可 以获取数组流：
 
 Collector接口中方法的实现决定了如何对流执行收集操作(如收集到 List、Set、Map)。但是 **Collectors** 实用类提供了很多静态方法，可以方便地创建常见收集器实例，具体方法与实例如下表：  https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html 
 
-| 方法              | 返回类型             | 作用                                                         | 示例                                                         |
-| ----------------- | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| toList            | List<T>              | 把流中元素收集到List                                         | List emps= list.stream().collect(Collectors.toList());       |
-| toSet             | Set<T>               | 把流中元素收集到Set                                          | Set emps= list.stream().collect(Collectors.toSet());         |
-| toCollection      | Collection<T>        | 把流中元素收集到创建的集合                                   | Collectionemps=list.stream().collect(Collectors.toCollection(ArrayList::new)); |
-| counting          | Long                 | 计算流中元素的个数                                           | long count = list.stream().collect(Collectors.counting());   |
-| summingInt        | Integer              | 对流中元素的整数属性求和                                     | int total=list.stream().collect(Collectors.summingInt(Employee::getSalary)); |
-| averagingInt      | Double               | 计算流中元素Integer属性的平均 值                             | doubleavg= list.stream().collect(Collectors.averagingInt(Employee::getSalary)); |
-| summarizingInt    | IntSummaryStatistics | 收集流中Integer属性的统计值。 如：平均值                     | IntSummaryStatisticsiss= list.stream().collect(Collectors.summarizingInt(Employee::getSalary)); |
-| joining           | String               | 连接流中每个字符串                                           | String str= list.stream().map(Employee::getName).collect(Collectors.joining()); |
-| maxBy             | Optional<T>          | 根据比较器选择最大值                                         | Optionalmax= list.stream().collect(Collectors.maxBy(comparingInt(Employee::getSalary))); |
-| minBy             | Optonal<T>           | 根据比较器选择最小值                                         | Optional min = list.stream().collect(Collectors.minBy(comparingInt(Employee::getSalary))); |
-| reducing          | 归约产生的类型       | 从一个作为累加器的初始值开始，利用BinaryOperator与 流中元素逐个结合，从而归 约成单个值 | int total=list.stream().collect(Collectors.reducing(0, Employee::getSalar, Integer::sum)); |
-| collectingAndThen | 转换函数返回的类型   | 包裹另一个收集器，对其结 果转换函数                          | int how= list.stream().collect(Collectors.collectingAndThen(Collectors.toList(), List::size)); |
-| groupingBy        | Map<K,List<T>>       | 根据某属性值对流分组，属 性为K，结果为V                      | Map> map= list.stream() .collect(Collectors.groupingBy(Employee::getStatus)); |
-| partitioningBy    | Map<Boolean,List<T>> | 根据true或false进行分区                                      | Map>vd= list.stream().collect(Collectors.partitioningBy(Employee::getManage)); |
-
-
-
-### 3. Stream 使用实例
+| 方法              | 返回类型              | 作用                                                         | 示例                                                         |
+| ----------------- | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| toList            | List<T>               | 把流中元素收集到List                                         | List list= list.stream().collect(Collectors.toList());       |
+| toSet             | Set<T>                | 把流中元素收集到Set                                          | Set set= list.stream().collect(Collectors.toSet());          |
+| toCollection      | Collection<T>         | 把流中元素收集到创建的集合                                   | Collectione mps=list.stream().collect(Collectors.toCollection(ArrayList::new)); |
+| counting          | Long                  | 计算流中元素的个数                                           | long count = list.stream().collect(Collectors.counting());   |
+| summingInt        | Integer               | 对流中元素的整数属性求和                                     | Integer sum = persons.stream()    .collect(Collectors.summingInt(Person::getAge)); |
+| averagingInt      | Double                | 计算流中元素Integer属性的平均值                              | double avg= list.stream().collect(Collectors.averagingInt(Person::getAge)); |
+| summarizingInt    | IntSummaryStatistics  | 收集流中Integer属性的统计值。 如：平均值                     | IntSummaryStatistics iss= list.stream().collect(Collectors.summarizingInt(Person::getAge)); |
+| joining           | String                | 连接流中每个字符串                                           | String str= list.stream().map(Person::getName).collect(Collectors.joining()); |
+| maxBy             | Optional\<T>          | 根据比较器选择最大值                                         | Optionalmax= list.stream().collect(Collectors.maxBy(comparingInt(Person::getAge))); |
+| minBy             | Optonal\<T>           | 根据比较器选择最小值                                         | Optional min = list.stream().collect(Collectors.minBy(comparingInt(Person::getAge))); |
+| reducing          | 归约产生的类型        | 从一个作为累加器的初始值开始，利用BinaryOperator与 流中元素逐个结合，从而归 约成单个值 | int total=list.stream().collect(Collectors.reducing(0, Person::getAge, Integer::sum)); |
+| collectingAndThen | 转换函数返回的类型    | 包裹另一个收集器，对其结 果转换函数                          | int how= list.stream().collect(Collectors.collectingAndThen(Collectors.toList(), List::size)); |
+| groupingBy        | Map<K,List\<T>>       | 根据某属性值对流分组，属 性为K，结果为V                      | Map<Person.Sex, List\<Person>> map = persons.stream()    .collect(Collectors.groupingBy(Person::getGender)); |
+| partitioningBy    | Map<Boolean,List\<T>> | 根据true或false进行分区                                      | Map<Boolean, List\<Person>> map = persons.stream()    .collect(Collectors.partitioningBy((e) -> e.getAge() >= 50)); |
 
 ```java
+@Test
+public void test3(){
+  List<String> list = persons.stream()
+    .map(Person::getName)
+    .collect(Collectors.toList());
+  list.forEach(System.out::println);
+}
 
+@Test
+public void test4(){
+  Optional<Integer> max = persons.stream()
+    .map(Person::getAge)
+    .collect(Collectors.maxBy(Integer::compare));
+
+  System.out.println("最大年龄："+max.get());
+
+  Optional<Person> op = persons.stream().min(Comparator.comparingInt(Person::getAge));
+
+  System.out.println("最小年龄的成员："+op.get());
+
+  Integer sum = persons.stream()
+    .collect(Collectors.summingInt(Person::getAge));
+
+  System.out.println("所有成员年龄和："+sum);
+
+  IntSummaryStatistics dss = persons.stream()
+    .collect(Collectors.summarizingInt(Person::getAge));
+
+  System.out.println("最大年龄："+dss.getMax());
+}
+
+//分组
+@Test
+public void test5(){
+  Map<Person.Sex, List<Person>> map = persons.stream()
+    .collect(Collectors.groupingBy(Person::getGender));
+
+  System.out.println("按性别分组："+map);
+}
+
+//多级分组
+@Test
+public void test6(){
+  Map<Person.Sex, Map<String, List<Person>>> map = persons.stream()
+    .collect(Collectors.groupingBy(Person::getGender, Collectors.groupingBy((e) -> {
+      if(e.getAge() >= 60)
+        return "老年";
+      else if(e.getAge() >= 35)
+        return "中年";
+      else
+        return "成年";
+    })));
+
+  System.out.println(map);
+}
+
+//分区
+@Test
+public void test7(){
+  Map<Boolean, List<Person>> map = persons.stream()
+    .collect(Collectors.partitioningBy((e) -> e.getAge() >= 50));
+
+  System.out.println(map);
+}
+@Test
+public void test8(){
+  String str = persons.stream()
+    .map(Person::getName)
+    .collect(Collectors.joining("," , "----", "----"));
+
+  System.out.println(str);
+}
+
+@Test
+public void test9(){
+  Optional<Integer> sum = persons.stream()
+    .map(Person::getAge)
+    .collect(Collectors.reducing(Integer::sum));
+  System.out.println(sum.get());
+}
 ```
 
 
