@@ -1,10 +1,10 @@
 > 点赞+收藏 就学会系列，文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
-> Java8早在2014年3月就发布了，现在才做一个详细的总结，嗯，为时不晚，JVM、JavaFX和一些安全问题，目前用不到，就没有深究。
+> Java8早在2014年3月就发布了，现在才想去缕清楚的我，太南了。。。
 >
 > 本文是用我拙劣的英文和不要脸的这抄抄那抄抄，熬出的，没有深究源码，只是对 Java8 有一个整体的认知，可以上手用起来，示例代码也都在github上
 
-# JDK 8有什么新功能  
+# JDK 8 有什么新功能  
 
 -  Java 编程语言（ Java Programming Language）
   - **Lambda表达式**：一个新的语言特性， 它们使您能够将函数视为方法参数，或将代码视为数据 
@@ -21,44 +21,41 @@
 -  精简运行时（Compact Profiles）
 -  安全性（Security）
 -  JavaFX
--  Tools（包含一些调用Nashorn引擎、 启动JavaFX应用程序 等等 ）
+-  Tools（包含一些调用Nashorn引擎、 启动JavaFX应用程序等等 ）
 -  国际化（Internationalization）
 
   -  Unicode增强，包括对Unicode 6.2.0的支持
   - 提供了新的 Calendar  和  Locale  API
 -  部署（Deployment） 
-
 -  日期-时间 包（**Date-Time Package**）：提供了更全面的时间和日期操作
 -  脚本（Scripting）：Java 8提供了一个新的 Nashorn javascript 引擎(取代了Nashorn javascript引擎)，它允许我们在JVM上运行特定的 javascript 应用
-
-- IO 和 NIO
-
-- `java.lang` 和 `java.util` 
--  支持数组并行排序 
-  -  支持Base64 的编码和解码
-  -  支持 无符号运算
-  - **Optional 类** ：最大化减少空指针异常
+-  改进 IO 和 NIO
+-  改进 `java.lang` 和 `java.util` 
+   -  支持数组并行排序 
+   -  支持Base64 的编码和解码
+   -  支持 无符号运算
+   -  **Optional 类** ：最大化减少空指针异常
 - JDBC
 
   - JDBC-ODBC桥已被移除 
   - JDBC 4.2引入了新的特性 
-- Java DB（一个Java数据库）
-
+-  Java DB（一个Java数据库）
 - 网络（Networking）
 - 新增了 `java.net.URLPermission` 
-- 并发（**Concurrency**）
--  `java.util.concurrent.ConcurrentHashMap` 支持基于新添加的streams功能和lambda表达式的聚合操作 
-  -  `java.util.concurrent.atomic`  提供了一组原子变量类， 对于单个变量支持无锁、线程安全操作的工具类 
-  -  `java.util.concurrent.ForkJoinPool` 用于补充ExecutorService 
-  - `java.util.concurrent.locks.StampedLock` 提供了基于功能的锁，有三种模式用于控制读/写访问
+-  并发（**Concurrency**）
+   -  `CompletableFuture` 增强了之前的`Future`
+   -  `java.util.concurrent.ConcurrentHashMap` 支持基于新添加的streams功能和lambda表达式的聚合操作 
+   -  `java.util.concurrent.atomic`  提供了一组原子变量类， 对于单个变量支持无锁、线程安全操作的工具类 
+   -  `java.util.concurrent.ForkJoinPool` 用于补充ExecutorService 
+   -  `java.util.concurrent.locks.StampedLock` 提供了基于功能的锁，有三种模式用于控制读/写访问
 
+- JVM: 移除了 PermGen ，取而代之的是Metaspace
 
+Java8 特别强大的是Lambda 表达式和Stream，通过它两新增和增强了很多包
 
-Java8 特别强大的是Lambda 表达式和Stream，通过他两新增和增强了很多类，如下
+新增： `java.lang.invoke`、` java.util.function`、`java.util.stream` 
 
-新增类： `java.lang.invoke`、` java.util.function`、`java.util.stream` 
-
-修改类：
+修改：
 
 ![modify-class.png](https://i.loli.net/2020/01/06/42aBbSWoVINYkjq.png)
 
@@ -66,48 +63,44 @@ Java8 特别强大的是Lambda 表达式和Stream，通过他两新增和增强�
 
 
 
-## Lambda表达式
+## 一、Lambda表达式
 
-可以把Lambda表达式理解为简洁的表示可传递的匿名函数的一种方式，Lambda表达式基于数学中的**λ演算**得名：它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表。
+可以把 Lambda 表达式理解为**简洁的表示可传递的匿名函数的一种方式**，Lambda表达式基于数学中的**λ演算**得名：它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表。
 
 - 匿名——匿名函数（即没有函数名的函数），不像普通的方法有一个明确的名称，“写得少，想得多”
 - 函数——Lambda函数不像方法那样属于某个特定的类，但一样有参数列表、函数主体和返回类型
 - 传递——Lambda表达式可以作为参数传递给方法或者存储在变量中
 - 简洁——无需像匿名类那样写很多模板代码
 
-Lambda表达式使您能够封装单个行为单元并将其传递给其他代码。如果希望对集合的每个元素、流程完成时或流程遇到错误时执行某个操作，可以使用lambda表达式。Lambda表达式由以下特性支持: 
-
-- 方法引用： 对于已经有名称的方法，是紧凑的、易于阅读的lambda表达式 
-- 默认方法： 使您能够向库的接口添加新功能，并确保与为这些接口的旧版本编写的代码的二进制兼容性。它们是接口方法，具有实现和方法签名开头的默认关键字。此外，您可以在接口中定义静态方法。 
--  Java SE 8中利用Lambda表达式和流的新的和增强的api描述了利用Lambda表达式和流的新的和增强的类 
+Lambda表达式使您能够封装单个行为单元并将其传递给其他代码。如果希望对集合的每个元素、流程完成时或流程遇到错误时执行某个操作，可以使用lambda表达式。
 
 
 
 ### 1. 为什么要使用Lambda表达式
 
-Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(将代码像数据一样进行传递——**行为参数化**)。可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
+Lambda 是一个匿名函数，我们可以把 Lambda表达式理解为是一段可以传递的代码(**将代码像数据一样进行传递**——**行为参数化**)。可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
 
-匿名类的一个问题是，如果您的[匿名类](https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html)的实现非常简单，例如一个接口只包含一个方法，那么匿名类的语法可能看起来很笨拙和不清楚。在这些情况下，您通常试图将功能作为参数传递给另一个方法，例如当有人单击按钮时应该采取什么操作。Lambda表达式允许您这样做，将功能视为方法参数，或将代码视为数据。 
+匿名类的一个问题是，如果您的匿名类的实现非常简单，例如一个接口只包含一个方法，那么匿名类的语法可能看起来很笨拙和不清楚。在这些情况下，您通常试图将功能作为参数传递给另一个方法，例如当有人单击按钮时应该采取什么操作。Lambda表达式允许您这样做，将功能视为方法参数，或将代码视为数据。 
 
 ![hello-lambda](https://i.loli.net/2019/12/26/WugthVbdwUEm5J2.png)
 
 
 
-### Lambda 表达式语法 
+### 2. Lambda 表达式语法 
 
 `(parameters) -> expression` 或`(parameters) ->{ statements; }`
 
-Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符。这个操作符为 <mark> “**->**”</mark> ， 该操作符被称为 **Lambda 操作符**或剪头操作符。它将 Lambda 分为两个部分：
+Lambda 表达式在 Java 语言中引入了一个新的语法元素和操作符。这个操作符为 <mark> “**->**”</mark> ， 该操作符被称为 **Lambda 操作符**或剪头操作符。它将 Lambda 分为两个部分：
 
 - 左侧：指定了 Lambda 表达式需要的所有参数 
 
-- 右侧：指定了 Lambda 体，即 Lambda 表达式要执行的功能。
+- 右侧：指定了 Lambda 体，即 Lambda 表达式要执行的功能
 
 #### eg(错误示范)：
 
 ```java
 (Integer i) -> return "hello"+i;   //错误的Lambda，return是一个控制流语句，需要{}
-(String s) -> {"hello";}       //“hello”是一个表达式，不是语句，不需要{}，可以写成{return “hello”;}
+(String s) -> {"hello";}    //“hello”是一个表达式，不是语句，不需要{}，可以写成{return “hello”;}
 ```
 
 #### eg(正确示范)：
@@ -130,7 +123,7 @@ Lambda 表达式在Java 语言中引入了一个新的语法元素和操作符�
    Consumer<String> consumer = args -> System.out.println(args);
    ```
 
-3. Lambda 需要两个参数，并且有返回值（Lambda最多两个参数）
+3. Lambda 需要两个参数，并且有返回值
 
    ```java
    BinaryOperator<Long> binaryOperator = (Long x,Long y) -> {
@@ -165,7 +158,7 @@ List<String> list = new ArrayList<>();
 
 
 
-### [Lambda表达式实例](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)
+### 3. Lambda表达式实例
 
 官方提供的示例，假设你要开发一个社交软件，那个缺打的PM成天改需求，今天要查询出成年用户的信息，明天又要查询成年女性的用户信息，后天又要按各种奇怪的搜索条件查询。
 
@@ -182,7 +175,6 @@ import java.time.chrono.IsoChronology;
 import java.time.LocalDate;
 
 public class Person {
-
     public enum Sex {
         MALE, FEMALE
     }
@@ -231,35 +223,31 @@ public class Person {
     }
 
     public static List<Person> createRoster() {
-
         List<Person> roster = new ArrayList<>();
-        roster.add(
-                new Person(
+        roster.add(new Person(
                         "Fred",
                         IsoChronology.INSTANCE.date(1980, 6, 20),
                         Person.Sex.MALE,
                         "fred@example.com"));
-        roster.add(
-                new Person(
+        roster.add(new Person(
                         "Jane",
                         IsoChronology.INSTANCE.date(1990, 7, 15),
                         Person.Sex.FEMALE, "jane@example.com"));
-        roster.add(
-                new Person(
+        roster.add(new Person(
                         "George",
                         IsoChronology.INSTANCE.date(1991, 8, 13),
                         Person.Sex.MALE, "george@example.com"));
-        roster.add(
-                new Person(
+        roster.add(new Person(
                         "Bob",
                         IsoChronology.INSTANCE.date(2000, 9, 12),
                         Person.Sex.MALE, "bob@example.com"));
-
         return roster;
     }
 }
 
 ```
+
+![](https://i04piccdn.sogoucdn.com/f55480c7c84bb963)
 
 ```java
 import java.util.ArrayList;
@@ -271,7 +259,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class RosterTest {
-
     interface CheckPerson {
         boolean test(Person p);
     }
@@ -551,7 +538,6 @@ public class RosterTest {
          *  Person::compareByAge 等同于 (a, b) -> Person.compareByAge(a, b)
          */
         Arrays.sort(rosterAsArray, Person::compareByAge);
-
         System.out.println();
 
         // Reference to an Instance Method of a Particular Object
@@ -584,7 +570,6 @@ public class RosterTest {
             System.out.println(s);
         }
 
-
         System.out.println();
 
         // 通过 stream 将计算集合的和
@@ -603,16 +588,16 @@ public class RosterTest {
 
 
 
-## 函数式接口
+## 二、函数式接口
 
-### 什么是函数式接口
+### 1. 什么是函数式接口
 
 - 只包含一个抽象方法的接口，称为函数式接口，该抽象方法也被称为函数方法。 我们熟知的Comparator和Runnable、Callable就属于函数式接口。
 - 这样的接口这么简单，都不值得在程序中定义，所以，JDK8在  `java.util.function`  中定义了几个标准的函数式接口，供我们使用。[Package java.util.function](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html)
 - 可以通过 Lambda 表达式来创建该接口的对象。（若 Lambda 表达式抛出一个受检异常，那么该异常需要在目标接口的抽象方法上进行声明）。 
 - 我们可以在任意函数式接口上使用 **@FunctionalInterface** 注解， 这样做可以检查它是否是一个函数式接口，同时 javadoc 也会包含一条声明，说明这个接口是一个函数式接口。
 
-### 自定义函数式接口
+### 2. 自定义函数式接口
 
 ```java
 @FunctionalInterface    //@FunctionalInterface标注该接口会被设计成一个函数式接口，否则会编译错误
@@ -636,14 +621,14 @@ public static void main(String[] args) {
 
 函数接口为lambda表达式和方法引用提供目标类型 
 
-### Java 内置四大核心函数式接口 
+### 3. Java 内置四大核心函数式接口
 
 | 函数式接口    | 参数类型 | 返回类型 | 用途                                                         |
 | ------------- | -------- | -------- | ------------------------------------------------------------ |
-| Consumer<T>   | T        | void     | 对类型为T的对象应用操作，包含方法：void accept(T t)          |
-| Supplier<T>   | 无       | T        | 返回类型为T的对象，包 含方法：T get();                       |
+| Consumer\<T>  | T        | void     | 对类型为T的对象应用操作，包含方法：void accept(T t)          |
+| Supplier\<T>  | 无       | T        | 返回类型为T的对象，包 含方法：T get();                       |
 | Function<T,R> | T        | R        | 对类型为T的对象应用操作，并返回结果。结果是R类型的对象。包含方法：R apply(T t); |
-| Predicate<T>  | T        | boolean  | 确定类型为T的对象是否满足某约束，并返回 boolean 值。包含方法 boolean test(T t); |
+| Predicate\<T> | T        | boolean  | 确定类型为T的对象是否满足某约束，并返回 boolean 值。包含方法 boolean test(T t); |
 
 ```java
 import org.junit.Test;
@@ -658,11 +643,8 @@ import java.util.function.Supplier;
 /*
  * Java8 内置的四大核心函数式接口
  * Consumer<T> : 消费型接口  void accept(T t);
- * 		
  * Supplier<T> : 供给型接口   T get();
- *
  * Function<T, R> : 函数型接口  R apply(T t);
- *
  * Predicate<T> : 断言型接口   boolean test(T t);
  */
 public class FunctionalInterfaceTest {
@@ -759,7 +741,7 @@ List<Integer> list = new ArrayList();
 
 
 
-## 方法引用
+## 三、方法引用
 
 - 方法引用是指通过方法的名字来指向一个方法
 
@@ -767,9 +749,9 @@ List<Integer> list = new ArrayList();
 
 - 方法引用的唯一用途是支持Lambda的简写(可以理解为方法引用是lambda表达式的另一种表现形式，快捷写法)
 
- 使用 **::** 操作符将**方法名**和**对象或类**的名字分隔开 
+ 使用 <mark>**::**</mark> 操作符将**方法名**和**对象或类**的名字分隔开 
 
-### eg:
+### 1. eg
 
 ```java
 BinaryOperator<Double> binaryOperator = (x,y)->Math.pow(x,y);
@@ -779,7 +761,7 @@ BinaryOperator<Double> binaryOperator1 = Math::pow;
 
 
 
-### 方法引用类型
+### 2. 方法引用类型
 
 Java 8 提供了4种方法引用
 
@@ -793,6 +775,7 @@ Java 8 提供了4种方法引用
 #### 1. 静态方法引用
 
 ```java
+//比较年龄的方法在Person.compareByAge的已经存在，所以可以使用方法引用
 Arrays.sort(rosterAsArray, Person::compareByAge);
 //---------------------
 @Test
@@ -928,53 +911,17 @@ public void test7(){
 }
 ```
 
-
-
-### 方法引用实例
-
-```java
-Person[] rosterAsArray =
-    roster.toArray(new Person[roster.size()]);
-
-//Comparator 是一个函数式接口？？
-class PersonAgeComparator
-    implements Comparator<Person> {
-    public int compare(Person a, Person b) {
-        return a.getBirthday().compareTo(b.getBirthday());
-    }
-}
-
-// 实现比较器方法
-Arrays.sort(rosterAsArray, new PersonAgeComparator());
-
-// 使用Lambda表达式代替创建实现Comparator的实例类
-Arrays.sort(rosterAsArray,
-            (Person a, Person b) -> {
-                return a.getBirthday().compareTo(b.getBirthday());
-            }
-           );
-
-// 比较年龄的方法在Person.compareByAge的已经存在，所以可以使用方法引用
-Arrays.sort(rosterAsArray, Person::compareByAge);
-
-// 使用方法引用 == 下边简化后的 Lambda 表达式
-Arrays.sort(rosterAsArray, (a, b) -> Person.compareByAge(a, b));
-
-// 还可以直接使用Comparator比较器的方法
-Arrays.sort(rosterAsArray,Comparator.comparing(Person::getBirthday));
-```
-
 ------
 
 
 
-## Stream API——函数式数据处理 
+## 四、Stream——函数式数据处理 
 
 Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。 使用Stream API 对集合数据进行操作，就类似于使用 SQL 执行的数据库查询。也可以使用 Stream API 来并行执行操作。简而言之， **Stream API 提供了一种高效且易于使用的处理数据的方式**。
 
 ### 1. Stream是个啥
 
-流(Stream) 是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列。
+Stream(流) 是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列。
 
  “**集合讲的是数据，流讲的是计算！**” 
 
@@ -993,9 +940,9 @@ Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望
 
 ### 2. Stream 的操作三个步骤 
 
-1. 创建 Stream 一个数据源（如：集合、数组），获取一个流
-2. 中间操作(一个中间操作链，对数据源的数据进行处理，形成一条流的流水线)
-3. 终止操作(一个终止操作，执行中间操作链，并产生结果)
+1. **创建 Stream** 一个数据源（如：集合、数组），获取一个流
+2. **中间操作**(一个中间操作链，对数据源的数据进行处理，形成一条流的流水线)
+3. **终止操作**(一个终止操作，执行中间操作链，并产生结果)
 
 ![](https://i.loli.net/2020/01/02/ktdAwhmWiNePnSJ.png)
 
@@ -1003,15 +950,15 @@ Stream 是 Java8 中处理集合的关键抽象概念，它可以指定你希望
 
  Java8 中的 Collection 接口被扩展，提供了两个获取流的方法： 
 
-- default Streamstream() : 返回一个顺序流 
+- default Stream\<E> **stream()** : 返回一个顺序流 
 
-- default StreamparallelStream() : 返回一个并行流
+- default Stream\<E> **parallelStream()** : 返回一个并行流
 
 ##### 由数组创建流 
 
 Java8 中的 Arrays 的静态方法 stream() 可以获取数组流：
 
-- static Streamstream(T[] array): 返回一个流 
+- static Stream stream(T[] array): 返回一个流 
 
 **重载形式，能够处理对应基本类型的数组：**
 
@@ -1023,19 +970,19 @@ Java8 中的 Arrays 的静态方法 stream() 可以获取数组流：
 
 ##### 由值创建流 
 
-可以使用静态方法 Stream.of(), 通过显示值 创建一个流。它可以接收任意数量的参数。 
+可以使用静态方法 Stream.of(), 通过显示值创建一个流。它可以接收任意数量的参数。 
 
-- public staticStreamof(T... values) : 返回一个流
+- public static\<T> Stream\<T> of(T... values) : 返回一个流
 
 ##### 由函数创建流：创建无限流 
 
 可以使用静态方法 Stream.iterate() 和 Stream.generate(), 创建无限流。 
 
 - 迭代 
-  - public staticStreamiterate(final T seed, final UnaryOperatorf) 
+  - public static\<T> Stream\<T> iterate(final T seed, final UnaryOperator\<T> f) 
 
 - 生成 
-  - public staticStreamgenerate(Suppliers) : 
+  - public static\<T> Stream\<T> generate(Supplier\<T> s) : 
 
 ```java
 //创建 Stream
@@ -1070,7 +1017,7 @@ public void test1(){
 
 多个中间操作可以连接起来形成一个流水线，除非流水线上触发终止操作，否则中间操作不会执行任何的处理！ 而在终止操作时一次性全部处理，称为<mark>“惰性求值”</mark>。
 
-##### 2.1 筛选与切片
+##### 2.2.1 筛选与切片
 
 | 方法                | 描述                                                         |
 | ------------------- | ------------------------------------------------------------ |
@@ -1134,7 +1081,7 @@ public void test6(){
 
 
 
-##### 2.2 映射
+##### 2.2.2 映射
 
 | 方法                            | 描述                                                         |
 | ------------------------------- | ------------------------------------------------------------ |
@@ -1174,7 +1121,7 @@ public static Stream<Character> filterCharacter(String str){
 
 
 
-##### 2.3 排序
+##### 2.2.3 排序
 
 | 方法                    | 描述                               |
 | ----------------------- | ---------------------------------- |
@@ -1206,7 +1153,7 @@ public void test(){
 
 #### 2.3. Stream 的终止操作
 
- 终端操作会从流的流水线生成结果。其结果可以是任何不是流的 值，例如：List、Integer，甚至是 void
+终端操作会从流的流水线生成结果。其结果可以是任何不是流的值，例如：List、Integer，甚至是 void
 
 ##### 2.3.1 查找与匹配
 
@@ -1225,8 +1172,7 @@ public void test(){
 ```java
 public class TestStreamAPI2 {
 
-	List<Person> persons = Person.createRoster();
-	
+	List<Person> persons = Person.createRoster();	
 	//3. 终止操作
 	@Test
 	public void test1(){
@@ -1300,12 +1246,12 @@ public class TestStreamAPI2 {
 
 ##### 2.3.2 规约
 
-| 方法                             | 描述                                                   |
-| -------------------------------- | ------------------------------------------------------ |
-| reduce(T iden, BinaryOperator b) | 可以将流中元素反复结合起来，得到一个值。 返回 T        |
-| reduce(BinaryOperator b)         | 可以将流中元素反复结合起来，得到一个值。 返回 Optional |
+| 方法                             | 描述                                                       |
+| -------------------------------- | ---------------------------------------------------------- |
+| reduce(T iden, BinaryOperator b) | 可以将流中元素反复结合起来，得到一个值。 返回 T            |
+| reduce(BinaryOperator b)         | 可以将流中元素反复结合起来，得到一个值。 返回 Optional\<T> |
 
- 备注：map 和 reduce 的连接通常称为 map-reduce 模式，因 Google 用它 来进行网络搜索而出名。 
+ 备注：map 和 reduce 的连接通常称为 map-reduce 模式，因 Google 用它来进行网络搜索而出名。 
 
 ```java
 List<Person> persons = Person.createRoster();
@@ -1368,8 +1314,8 @@ Collector接口中方法的实现决定了如何对流执行收集操作(如收�
 | maxBy             | Optional\<T>          | 根据比较器选择最大值                                         | Optionalmax= list.stream().collect(Collectors.maxBy(comparingInt(Person::getAge))); |
 | minBy             | Optonal\<T>           | 根据比较器选择最小值                                         | Optional min = list.stream().collect(Collectors.minBy(comparingInt(Person::getAge))); |
 | reducing          | 归约产生的类型        | 从一个作为累加器的初始值开始，利用BinaryOperator与 流中元素逐个结合，从而归 约成单个值 | int total=list.stream().collect(Collectors.reducing(0, Person::getAge, Integer::sum)); |
-| collectingAndThen | 转换函数返回的类型    | 包裹另一个收集器，对其结 果转换函数                          | int how= list.stream().collect(Collectors.collectingAndThen(Collectors.toList(), List::size)); |
-| groupingBy        | Map<K,List\<T>>       | 根据某属性值对流分组，属 性为K，结果为V                      | Map<Person.Sex, List\<Person>> map = persons.stream()    .collect(Collectors.groupingBy(Person::getGender)); |
+| collectingAndThen | 转换函数返回的类型    | 包裹另一个收集器，对其结果转换函数                           | int how= list.stream().collect(Collectors.collectingAndThen(Collectors.toList(), List::size)); |
+| groupingBy        | Map<K,List\<T>>       | 根据某属性值对流分组，属性为K，结果为V                       | Map<Person.Sex, List\<Person>> map = persons.stream()    .collect(Collectors.groupingBy(Person::getGender)); |
 | partitioningBy    | Map<Boolean,List\<T>> | 根据true或false进行分区                                      | Map<Boolean, List\<Person>> map = persons.stream()    .collect(Collectors.partitioningBy((e) -> e.getAge() >= 50)); |
 
 ```java
@@ -1457,11 +1403,11 @@ public void test9(){
 
 
 
-### 4. 并行流与串行流 
+### 3. 并行流与串行流 
 
 **并行流就是把一个内容分成多个数据块，并用不同的线程分别处理每个数据块的流**。 
 
-Java 8 中将并行进行了优化，我们可以很容易的对数据进行并 行操作。Stream API 可以声明性地通过 `parallel()` 与 `sequential()` 在并行流与顺序流之间进行切换。
+Java 8 中将并行进行了优化，我们可以很容易的对数据进行并行操作。Stream API 可以声明性地通过 `parallel()` 与 `sequential()` 在并行流与顺序流之间进行切换。
 
 ```java
 public static long parallelSum(long n) {
@@ -1476,7 +1422,7 @@ public static long parallelSum(long n) {
 
 使用流的parallel方法，你可能会想到，并行流用的线程是从哪儿来的？有多少个？怎么自定义？
 
-并行流内部使用了默认的ForkJoinPool(分支/合并框架)，它默认的线程数量就是你的处理器数量，这个值是由`Runtime.getrRuntime().acailable-Processors()`得到。
+并行流内部使用了默认的**ForkJoinPool**(分支/合并框架)，它默认的线程数量就是你的处理器数量，这个值是由`Runtime.getrRuntime().acailable-Processors()`得到。
 
 你可以通过系统属性`java.util.concurrent.ForkJoinPool.common.parallelism`来改变线程池大小，如下
 
@@ -1485,18 +1431,18 @@ public static long parallelSum(long n) {
 #### 高效使用并行流
 
 - 并行流并不是总是比顺序流快
-- 留意装箱。自动装箱和拆箱操作会大大降低性能，Java8中有原始类型流（IntStream、LongStream...）来避免这种操作
-- 有些操作本身在并行流上的性能就比顺序流差，特别是limit和findFirst等依赖元素顺序的操作，他们在并行流上执行的代价就非常大
+- 留意装箱。自动装箱和拆箱操作会大大降低性能，Java8 中有原始类型流（IntStream、LongStream...）来避免这种操作
+- 有些操作本身在并行流上的性能就比顺序流差，特别是 limit 和 findFirst 等依赖元素顺序的操作，他们在并行流上执行的代价就非常大
 - 还要考虑流的操作流水线的总计算成本
 - 对于较小的数据量，没必要使用并行流
-- 要考虑流背后的数据结构是否易于分解，比如，ArrayList的拆分效率比LinkedList高很多，前者无需遍历
-- 还要考虑终端操作中国合并步骤的代价是大是小（比如Collector中的combiner方法）
+- 要考虑流背后的数据结构是否易于分解，比如，ArrayList 的拆分效率比 LinkedList 高很多，前者无需遍历
+- 还要考虑终端操作中合并步骤的代价是大是小（比如Collector中的combiner方法）
 
 
 
-### 5. Fork/Join 框架
+### 4. Fork/Join 框架
 
-并行流背后使用的基础框架就是Java7中引入的分支/合并框架。
+并行流背后使用的基础框架就是 Java7 中引入的**分支/合并框架**。
 
 Fork/Join（分支/合并）框架的目的是以递归方式将可以并行的任务拆分(fork)成更小的任务，然后将每个任务的结果合并 (join)起来生成整体效果。它是ExectorService接口的一个实现，把子任务分配给线程池（称为ForkJoinPool）中的工作线程。
 
@@ -1506,16 +1452,86 @@ Fork/Join 框架：就是在必要的情况下，将一个大任务，进行拆�
 
 
 
+```java
+// 用分支/合并框架 并行求和
+public class ForkJoinSumCalculator extends RecursiveTask<Long> {
+
+    private final long[] numbers;
+    private final int start;
+    private final int end;
+
+    //不再将任务分解为子任务的数组大小
+    public static long THRESHOLD = 100;
+
+
+    //公共构造器用于创建主任务
+    public ForkJoinSumCalculator(long[] numbers) {
+        this(numbers, 0, numbers.length);
+    }
+
+    //私有构造器用于以递归方式为主任务创建子任务
+    private ForkJoinSumCalculator(long[] numbers, int start, int end) {
+        this.numbers = numbers;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        int length = end - start;
+        //如果大小小于等于阈值，顺序计算结果
+        if (length <= THRESHOLD) {
+            return computerSequntially();
+        }
+
+        ForkJoinSumCalculator leftTask = new ForkJoinSumCalculator(numbers, start, start + length / 2);
+
+        leftTask.fork();
+
+        ForkJoinSumCalculator rightTask = new ForkJoinSumCalculator(numbers, start + length / 2, end);
+
+        Long rightResult = rightTask.compute();   //同步执行第二个任务，
+
+        Long leftResult = leftTask.join();
+
+        return rightResult + leftResult;
+    }
+
+
+    // 子任务不再可分时计算和
+    private long computerSequntially() {
+        long sum = 0;
+        for (int i = start; i < end; i++) {
+            sum += numbers[i];
+        }
+        return sum;
+    }
+
+    public static long forkJoimSum(long n) {
+        long[] numbers = LongStream.rangeClosed(1, n).toArray();
+        ForkJoinTask<Long> task = new ForkJoinSumCalculator(numbers);
+        return new ForkJoinPool().invoke(task);
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println("sum:" + forkJoimSum(10000));
+    }
+}
+```
+
+
+
 #### Fork/Join 框架与传统线程池的区别 
 
-采用 “工作窃取”模式（work-stealing）： 当执行新的任务时它可以将其拆分分成更小的任务执行，并将小任务加到线 程队列中，然后再从一个随机线程的队列中偷一个并把它放在自己的队列中。 
+采用 “工作窃取”模式（work-stealing）： 当执行新的任务时它可以将其拆分成更小的任务执行，并将小任务加到线程队列中，然后再从一个随机线程的队列中偷一个并把它放在自己的队列中。 
 
-相对于一般的线程池实现，fork/join框架的优势体现在对其中包含的任务的处理方式上，在一般的线程池中，如果一个线程正在执行的任务由于某些原因无法继续运行，那么该线程会处于等待状态，而在fork/join框架实现中，如果某个子问题由于等待另外一个子问题的完成而无法继续运行，那么处理该子问题的线程会主动寻找其他尚未运行的子问题来执行，这种方式减少了线程的等待时间,提高了性能。
+相对于一般的线程池实现，fork/join框架的优势体现在对其中包含的任务的处理方式上，在一般的线程池中，如果一个线程正在执行的任务由于某些原因无法继续运行，那么该线程会处于等待状态，而在fork/join框架实现中，如果某个子问题由于等待另外一个子问题的完成而无法继续运行，那么处理该子问题的线程会主动寻找其他尚未运行的子问题来执行，这种方式减少了线程的等待时间，提高了性能。
 
 #### 使用Fork/Join框架的最佳做法
 
 - 对一个任务调用join方法会阻塞调用方，直到该任务作出结果。因此，有必要在两个子任务的计算都开始之后再调用它
-- 不应该在RecursiveTask内部使用ForkJoinPool的invoke方法。相反，你应该始终直接调用compute或fork方法，只有顺序代码才应该用invoke来启动并行计算
+- 不应该在 RecursiveTask 内部使用 ForkJoinPool 的 invoke 方法。相反，你应该始终直接调用 compute 或fork 方法，只有顺序代码才应该用 invoke 来启动并行计算
 
 
 
@@ -1525,17 +1541,17 @@ Fork/Join 框架：就是在必要的情况下，将一个大任务，进行拆�
 
 
 
-### 6. Spliterator
+### 5. Spliterator
 
 “可分迭代器”——spliterator，和Iterator一样，也用于遍历数据源中的元素，它是为了并行执行而设计。
 
-Java8为集合框架中包含的所有数据结构都提供了一个默认的Spliterator方法。集合实现了Spliterator接口，接口提供了一个Spliterator方法。
+Java8 为集合框架中包含的所有数据结构都提供了一个默认的 Spliterator 方法。集合实现了Spliterator接口，接口提供了一个Spliterator方法。
 
 ![spliterator](https://i.loli.net/2020/01/03/D7mhsfeoKSpOJ9N.png)
 
 
 
-## 接口中的默认方法与静态方法
+## 五、接口中的默认方法与静态方法
 
 传统上，Java中实现接口的类必须为接口中定义的每个方法提供一个实现类，或者从父类中继承它的实现。但如果类库的设计者需要修改接口，加入新的方法，这种方式就会出现问题。所有使用该接口的实体类为了适配新的接口约定都需要进行修改（要是这么不兼容的话，迟早被淘汰）。所以，Java8为了解决这一问题引入了一种新的机制。**Java8中的接口支持在声明方法的同时提供实现**。其一，**Java8允许在接口中声明静态方法**。其二，Java8引入的新功能——**默认方法，通过默认方法可以指定接口方法的默认实现**（因此，实现接口的类如果不显式的提供该方法的具体实现，就会自动继承默认的实现，这种机制可以使你平滑的进行接口的优化和升级）。
 
@@ -1607,11 +1623,11 @@ JavaAPI的设计者们充分利用了默认方法，为集合接口和类新增�
 
 
 
-## Optional 类 
+## 六、Optional 类 
 
 ### 1. 用 Optional 取代 null
 
-> 当你碰到程序中有一个NullPointerException时的第一冲动是不就是赶紧找到代码，添加一个if语句，检查下？？
+*当你碰到程序中有一个NullPointerException时的第一冲动是不就是赶紧找到代码，添加一个if语句，检查下？？*
 
 NullPointerException是Java程序开发中典型的异常。为了避免这种异常，我们的代码有可能充斥着一层又一层的深度嵌套的null检查，代码可读性极差。
 
@@ -1681,11 +1697,11 @@ public void test4(){
 
 
 
-## CompletableFuture — 组合式异步编程
+## 七、CompletableFuture —— 组合式异步编程
 
 ### 1. Future接口
 
-Future接口在Java 5中被引入，设计初衷是对将来某个时刻会发生的结果进行建模。它建模了一种异步计算，返回一个执行运算结果的引用，当运算结束后，这个引用被返回给调用方。在 Future中触发那些潜在耗时的操作把调用线程解放出来，让它能继续执行其他有价值的工作， 不再需要等待耗时的操作完成。打个比方，你可以把它想象成这样的场景：你拿了一袋衣服到你中意的干洗店去洗衣服。干洗店员工会给你张发票，告诉你什么时候你的衣服会洗好（这就 是一个Future事件）。衣服干洗的同时，你可以去做其他的事情。Future的另一个优点是它比 更底层的Thread更易用。要使用Future，通常你只需要将耗时的操作封装在一个Callable对 象中，再将它提交给ExecutorService，就可以了。下面这段代码展示了Java 8之前使用 Future的一个例子。 
+Future接口在 Java 5 中被引入，设计初衷是对将来某个时刻会发生的结果进行建模。它建模了一种异步计算，返回一个执行运算结果的引用，当运算结束后，这个引用被返回给调用方。在 Future中触发那些潜在耗时的操作把调用线程解放出来，让它能继续执行其他有价值的工作， 不再需要等待耗时的操作完成。打个比方，你可以把它想象成这样的场景：你拿了一袋衣服到你中意的干洗店去洗衣服。干洗店员工会给你张发票，告诉你什么时候你的衣服会洗好（这就 是一个Future事件）。衣服干洗的同时，你可以去做其他的事情。Future的另一个优点是它比 更底层的Thread更易用。要使用Future，通常你只需要将耗时的操作封装在一个Callable对象中，再将它提交给ExecutorService，就可以了。下面这段代码展示了Java 8之前使用 Future的一个例子。 
 
 ```java
 ExecutorService executor = Executors.newCachedThreadPool();
@@ -1704,9 +1720,17 @@ try {
 
 #### 1.1 Future接口的局限性
 
-我们知道Future接口提供了方法来检测异步计算是否已经结束（使用 isDone方法），等待异步操作结束，以及获取计算的结果。但是这些特性还不足以让你编写简洁的并发代码。比如，我们很难表述Future结果之间的依赖性；从文字描述上这很简单，“当长时间计算任务完成时，请将该计算的结果通知到另一个长时间运行的计算任务，这两个计算任务都完成后，将计算的结果与另一个查询操作结果合并”。但是，使用Future中提供的方法完成这样的操作又是另外一回事。这也是我们需要更具描述能力的特性的原因，比如下面这些。
+虽然Future以及相关使用方法提供了异步执行任务的能力，但是对于结果的获取却是很不方便，只能通过阻塞或者轮询的方式得到任务的结果。阻塞的方式显然和我们的异步编程的初衷相违背，轮询的方式又会耗费无谓的CPU资源，而且也不能及时地得到计算结果，为什么不能用观察者设计模式当计算结果完成及时通知监听者呢？ 
 
-- 将两个异步计算合并为一个——这两个异步计算之间相对独立，同时第二个又依赖于第 一个的结果
+Java的一些框架，比如Netty，自己扩展了Java的 `Future`接口，提供了`addListener`等多个扩展方法。Google guava也提供了通用的扩展Future:ListenableFuture、SettableFuture 以及辅助类Futures等,方便异步编程。
+
+作为正统的Java类库，是不是应该做点什么，加强一下自身库的功能呢？ 
+
+在Java 8中, 新增加了一个包含50个方法左右的类: **CompletableFuture**，提供了非常强大的Future的扩展功能，可以帮助我们简化异步编程的复杂性，提供了函数式编程的能力，可以通过回调的方式处理计算结果，并且提供了转换和组合CompletableFuture的方法。 
+
+比如实现下面一些例子: 
+
+- 将两个异步计算合并为一个——这两个异步计算之间相对独立，同时第二个又依赖于第一个的结果
 - 等待Future集合中的所有任务都完成
 - 仅等待Future集合中最快结束的任务完成（有可能因为它们试图通过不同的方式计算同 一个值），并返回它的结果
 - 通过编程方式完成一个Future任务的执行（即以手工设定异步操作结果的方式）
@@ -1714,11 +1738,47 @@ try {
 
 ####  1.2 使用CompletableFuture 构建异步应用
 
+```java
+public class TestCompletableFuture {
+    public static CompletableFuture<Integer> compute() {
+        final CompletableFuture<Integer> future = new CompletableFuture<>();
+        return future;
+    }
+    public static void main(String[] args) throws Exception {
+        final CompletableFuture<Integer> f = compute();
+        class Client extends Thread {
+            CompletableFuture<Integer> f;
+            Client(String threadName, CompletableFuture<Integer> f) {
+                super(threadName);
+                this.f = f;
+            }
+            @Override
+            public void run() {
+                try {
+                    System.out.println(this.getName() + ": " + f.get());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        new Client("Client1", f).start();
+        new Client("Client2", f).start();
+        System.out.println("waiting");
+        f.complete(100);
+        System.in.read();
+    }
+}
+```
+
+
+
 ------
 
 
 
-## 新时间日期 API
+## 八、新时间日期 API
 
 ### 1. 使用 LocalDate、LocalTime、LocalDateTime 
 
@@ -1879,11 +1939,11 @@ try {
   
   
 
-## 重复注解与类型注解
+## 九、重复注解与类型注解
 
 ### 注解
 
- Java 8对注解处理提供了两点改进：**可重复的注解**及**可用于类型的注解**
+Java 8 对注解处理提供了两点改进：**可重复的注解**及**可用于类型的注解**
 
 Java中注解是一种对程序元素进行配置，提供附加信息的机制（Java8之前，注解只能被用在声明上）
 
@@ -1891,7 +1951,7 @@ Java中注解是一种对程序元素进行配置，提供附加信息的机制�
 
 ![](https://tva1.sinaimg.cn/large/006tNbRwly1galxorjm1gj31m20cy765.jpg)
 
-Java8之前不允许上边这样的重复注解，所以一般会通过一些惯用手法绕过这一限制。可以声明一个新的注解，它包含了你希望重复的注解数组。
+Java8 之前不允许上边这样的重复注解，所以一般会通过一些惯用手法绕过这一限制。可以声明一个新的注解，它包含了你希望重复的注解数组。
 
 ![](https://tva1.sinaimg.cn/large/006tNbRwly1galy1inqmij30qi0rwtb9.jpg)
 
@@ -1915,8 +1975,8 @@ public @interface Authors {
 ```
 
 ```java
-@Author(name = "Tom")
-@Author(name = "Jack")
+@Author(name = "Java")
+@Author(name = "Android")
 public class Book {
     public static void main(String[] args) {
         Author[] authors = Book.class.getAnnotationsByType(Author.class);
@@ -1927,11 +1987,9 @@ public class Book {
 }
 ```
 
-![](https://ftp.bmp.ovh/imgs/2019/12/c703840d2b401aa1.png)
-
 ### 类型注解
 
-java8开始，注解可以应用于任何类型。包括new操作符、类型转换、instanceof检查、范型类型参数，以及implemtnts和throws子句。
+Java8 开始，注解可以应用于任何类型。包括new操作符、类型转换、instanceof检查、范型类型参数，以及implemtnts和throws子句。
 
 ```java
 @NotNull String name = person.getName();    //getName不返回空
@@ -1941,49 +1999,46 @@ List<@NotNull Person> persons = new ArrayList<>();  //persons总是非空
 
 
 
-## 其他语言特性
+## 十、其他语言特性
 
 ### 原子操作
 
-java.util.concurrent.atomic 包提供了多个对数字类型进行操作的类，比如Atomic- Integer和AtomicLong，它们支持对单一变量的原子操作。这些类在Java 8中新􏱗了更多的方 法支持。
+`java.util.concurrent.atomic` 包提供了多个对数字类型进行操作的类，比如AtomicInteger和AtomicLong，它们支持对单一变量的原子操作。这些类在Java 8中新增了更多的方法支持。
 
-- getAndUpdate——以原子方式用给定的方法更新当前值，并返回变更之前的值。
+- getAndUpdate——以原子方式用给定的方法更新当前值，并返回变更之前的值
 
-- updateAndGet——以原子方式用给定的方法更新当前值，并返回变更之后的值。 3
+- updateAndGet——以原子方式用给定的方法更新当前值，并返回变更之后的值
 
-- getAndAccumulate——以原子方式用给定的方法对当前及给定的值进行更新，并返回
+- getAndAccumulate——以原子方式用给定的方法对当前及给定的值进行更新，并返回变更之前的值
 
-  变更之前的值。
+- accumulateAndGet——以原子方式用给定的方法对当前及给定的值进行更新，并返回变更之后的值
 
-- accumulateAndGet——以原子方式用给定的方法对当前及给定的值进行更新，并返回
-
-  变更之后的值。
 
 
 
 **Adder和Accumulator**
 
-多线程的环境􏵇中，如果多个线程需要频繁地进行更新操作，且很少有读取的动作(比如，在统计计算的上下文中)，Java API文􏵉中推推荐大使用新的类LongAdder、LongAccumulator、Double-Adder以及DoubleAccumulator，尽量避免使用它们对应的原子类型。这些新的类在设计之􏳨就考虑了动态􏱗增长的需求，可以有效地减少线程间的􏵲􏵳竞争。
+多线程的环境中，如果多个线程需要频繁地进行更新操作，且很少有读取的动作(比如，在统计计算的上下文中)，Java API文档中推荐大使用新的类LongAdder、LongAccumulator、Double-Adder以及DoubleAccumulator，尽量避免使用它们对应的原子类型。这些新的类在设计之初就考虑了动态增长的需求，可以有效地减少线程间的竞争。
 
-LongAddr 和 DoubleAdder 类 都支持加法操作 ， 而 LongAccumulator 和 DoubleAccu- mulator可以使用给定的方法整合多个值。
+LongAddr 和 DoubleAdder 类都支持加法操作 ， 而 LongAccumulator 和 DoubleAccumulator可以使用给定的方法整合多个值。
 
 ### ConcurrentHashMap
 
-ConcurrentHashMap类的引入极大地提􏲰了HashMap现代化的程度，新引入的ConcurrentHashMap对并发的支持非常􏶂好。ConcurrentHashMap允许并发地进行新􏱗增和更新操作，因为它仅对内部数据结构的某些部分上􏲹锁。因此，和另一种选择，即同步式的Hashtable比较起来，它具有更高的读写性能。
+ConcurrentHashMap类的引入极大地提升了HashMap现代化的程度，新引入的ConcurrentHashMap对并发的支持非常友好。ConcurrentHashMap允许并发地进行新增和更新操作，因为它仅对内部数据结构的某些部分上锁。因此，和另一种选择，即同步式的Hashtable比较起来，它具有更高的读写性能。
 
-1. 􏴘􏶃性能
+1. **性能**
 
-为了改􏶄性能，要对ConcurrentHashMap的内部数据结构进行调整。典型情况下，map的条目会被存储在􏶅桶中，依据键生成􏶆􏲼哈希值进行访问。但是，如果大量键返回相同的哈希􏶆􏲼值，由于桶是由List实现的，它的查􏴂复杂度为O(n)，这种情况下性能会􏶇恶化。在Java 8中，当􏶅桶过于臃肿时，它们会被动态地替换为排序􏶊树(sorted tree)，新的数据结构具有更好的查􏴂询性能(排序树的查询􏴂复杂度为O(log(n)))。注意，这种优化只有当键是可以比较的(比如String或者Number类)时才可能发生。
+   为了改善性能，要对ConcurrentHashMap的内部数据结构进行调整。典型情况下，map的条目会被存储在桶中，依据键生成哈希值进行访问。但是，如果大量键返回相同的哈希值，由于桶是由List实现的，它的查询复杂度为O(n)，这种情况下性能会恶化。在Java 8中，当桶过于臃肿时，它们会被动态地替换为排序树(sorted tree)，新的数据结构具有更好的查询性能(排序树的查询复杂度为O(log(n)))。注意，这种优化只有当键是可以比较的(比如String或者Number类)时才可能发生。
 
-2. 类流操作
+2. **类流操作**
 
-􏲘􏰊􏴵􏵱ConcurrentHashMap支持三种新的操作，这些操作和你之前在流中所见的很像:
+   ConcurrentHashMap支持三种新的操作，这些操作和你之前在流中所见的很像:
 
 - forEach——对每个键值对进行特定的操作
 - reduce——使用给定的􏰤简函数(reduction function)，将所有的键值对整合出一个结果􏰝 
 - search——对每一个键值对执行一个函数，直到函数的返回值为一个非空值
 
-以上每一种操作都支持四种形式，接受使用键、值、Map.Entry以及键值对的函数:􏰝
+  以上每一种操作都支持四种形式，接受使用键、值、Map.Entry以及键值对的函数:
 
 - 使用键和值的操作(forEach、reduce、search)
 - 使用键的操作(forEachKey、reduceKeys、searchKeys)
@@ -1991,7 +2046,7 @@ ConcurrentHashMap类的引入极大地提􏲰了HashMap现代化的程度，新�
 
 - 使用Map.Entry对象的操作(forEachEntry、reduceEntries、searchEntries) 
 
-注意，这些操作不会对ConcurrentHashMap的􏲷状态􏲹上锁。它们只会在运行过程中对元素进行操作。应用到这些操作上的函数不应该对任何的顺序，或者其他对象，􏳙或在计算过程发生变化的值，有依赖。 􏳧除此之外，你需要为这些操作指定一个并发􏶋阈值。如果经过预预估当前map的大小小于设定的阈值，操作会顺序执行。使用值1开开启基于通用线程􏶌的最大并行。使用值Long.MAX_VALUE设定程序以单线程执行操作。下面这个例子中，我们使用reduceValues试图找出map中的最大值:
+注意，这些操作不会对ConcurrentHashMap的状态上锁。它们只会在运行过程中对元素进行操作。应用到这些操作上的函数不应该对任何的顺序，或者其他对象，或在计算过程发生变化的值，有依赖。 除此之外，你需要为这些操作指定一个并发阈值。如果经过预预估当前map的大小小于设定的阈值，操作会顺序执行。使用值1开开启基于通用线程池的最大并行。使用值Long.MAX_VALUE设定程序以单线程执行操作。下面这个例子中，我们使用reduceValues试图找出map中的最大值:
 
 ```java
 ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>(); 
@@ -2002,115 +2057,81 @@ Optional<Integer> maxValue = Optional.of(map.reduceValues(1, Integer::max));
 
 3. 计数
 
-ConcurrentHashMap类提供了一个新的方法，名叫mappingCount，它以长整型long返回map中映射的数目。我们应该尽量使用这个新方法，而不是􏱘的size方法，size方法返回的类型为int。这是因为映射的数量可能是int无法表示的。
+   ConcurrentHashMap类提供了一个新的方法，名叫**mappingCount**，它以长整型long返回map中映射的数目。我们应该尽量使用这个新方法，而不是老的size方法，size方法返回的类型为int。这是因为映射的数量可能是int无法表示的。
 
 4. 集合视图
 
-ConcurrentHashMap类还提供了一个名为KeySet的新方法，该方法以Set的形式返回ConcurrentHashMap的一个视图(对map的修改会反映在该Set中，反之亦然)。你也可以使用新的静态方法newKeySet，由ConcurrentHashMap创建一个Set。
+   ConcurrentHashMap类还提供了一个名为**KeySet**的新方法，该方法以Set的形式返回ConcurrentHashMap的一个视图(对map的修改会反映在该Set中，反之亦然)。你也可以使用新的静态方法**newKeySet**，由ConcurrentHashMap创建一个Set。
 
 ### Arrays
 
-Arrays类提供了不同的静态方法对数组进行操作。现在，它又包括了四个新的方法(它们都有特别重载􏱄的变量)
+Arrays类提供了不同的静态方法对数组进行操作。现在，它又包括了四个新的方法(它们都有特别重载的变量)
 
 - **parallelSort**：parallelSort方法会以并发的方式对指定的数组进行排序，你可以使用自然顺序，也可以
 
   为数组对象定义特别的Comparator
 
-- **setAll**􏰗**parallelSetAll**：setAll和parallelSetAll方法可以以顺序的方式也可以用并发的方式，使用提供的函数 计算每一个元素的值，对指定数组中的所有元素进行设置
+- **setAll和parallelSetAll**：setAll和parallelSetAll方法可以以顺序的方式也可以用并发的方式，使用提供的函数 计算每一个元素的值，对指定数组中的所有元素进行设置
 
-- **parallelPrefix**：parallelPrefix方法以并发的方式，用用户􏴛提供的二进制操作符对给定数组中的每个元素
+- **parallelPrefix**：parallelPrefix方法以并发的方式，用用户提供的二进制操作符对给定数组中的每个元素
 
-  进行􏶐累积计算
+  进行累积计算
 
-### Number和Math
+### Number
+
+ Number类中新增方法
+
+- Short、Integer、Long、Float和Double类提供了静态方法sum、min和max
+- Integer和Long类提供了compareUnsigned、divideUnsigned、remainderUnsigned 和toUnsignedLong方法来处理无符号数。 
+- Integer和Long类也分别提供了静态方法parseUnsignedInt和parseUnsignedLong 将字符解析为无符号int或者long类型。
+- Byte和Short类提供了toUnsignedInt和toUnsignedLong方法通过无符号转换将参数转化为 int 或 者 long 类型。类似地， Integer 类现在也提供了静态方法 toUnsignedLong。 
+- Double和Float类提供了静态方法isFinite，可以检查参数是否为有限浮点数。
+- Boolean类现在提供了静态方法logicalAnd、logicalOr和logicalXor，可以在两个 boolean之间执行and、or和xor操作。 
+- BigInteger 类提供了 byteValueExact 、 shortValueExact 、 intValueExact 和 longValueExact，可以将BigInteger类型的值转换为对应的基础类型。不过，如果在转换过程中有信息的丢失，方法会抛出算术异常。 
+
+### Math
+
+如果Math中的方法在操作中出现ຼ出，Math类提供了新的方法可以抛出算术异常。支持这一异常的方法包括使用int和long参数的addExact、subtractExact、multipleExact、 incrementExact、decrementExact和negateExact。此外，Math类还新增了一个静态方法 toIntExact，可以将long值转换为int值。其他的新增内容包括静态方法floorMod、floorDiv 和nextDown。 
 
 ### Files
 
 Files类最引人注目的改变是，你现在可以用文件直接产生流
 
+- Files.list——生成由指定目录中所有条目构成的Stream\<Path>。这个列表不是递归包含的。由于流是延迟消费的，处理包含内容非常庞大的目录时，这个方法非常有用
+- Files.walk——和Files.list有些类似，它也生成包含给定目录中所有条目的 Stream\<Path>。不过这个列表是递归的，你可以设定递归的深度。注意，该遍历是依照深度优先进行的
+- Files.find—— 通过递归地遍历一个目录找到符合条件的条目，并生成一个  Stream\<Path> 对象
+
 ### String
 
 String类也新增􏱗了一个静态方法，名叫join。它可以用一个分隔符将多个字符串􏶘接起来。和我们以前使用的apache提供的`StringUtils.join`一样。
 
+### Reflection  
 
+Reflection API的变化就是为了支持Java 8中注解机制的改变。 除此之外，Relection接口的另一个变化是**新增了可以查询方法参数信息的API**，比如，你现在可以使用新的`java.lang.reflect.Parameter`类查询方法参数的名称和修饰符。 
 
-# Aggregate Operations聚合操作
-
-### Pipelines and Streams
-
-通过集合roster调用stream（）方法创建流， filter() 操作返回一个新流，该流包含与其谓词匹配的元素 
-
- 管道是聚合操作的序列（下边代码包含了filter和forEach两个聚合操作，两段代码等价）
-
-```
-roster
-    .stream()
-    .filter(e -> e.getGender() == Person.Sex.MALE)
-    .forEach(e -> System.out.println(e.getName()));
-```
-
-```
-for (Person p : roster) {
-    if (p.getGender() == Person.Sex.MALE) {
-        System.out.println(p.getName());
-    }
-}
-```
-
-管道包含以下组件：
-
-- 一个 source ：可以是一个集合，一个数组，一个函数，或者是一个  I/O channel。
-- 0个或过个  *intermediate operations* ：比如filter，产生一个新的流（ 流是元素的序列。与集合不同，它不是存储元素的数据结构  相反，流通过管道携带来自source的值 ）
-- y个 *terminal operation* 
-
-
-
-计算所有男性的平均年龄
-
-```
-double average = roster
-    .stream()
-    .filter(p -> p.getGender() == Person.Sex.MALE)
-    .mapToInt(Person::getAge)
-    .average()
-    .getAsDouble();
-```
-
- `mapToInt`  返回一个新的流 `IntStream`  
-
-
-
-###  聚合操作和迭代器之间的区别 
-
- 聚合操作，比如forEach，看起来就像迭代器。然而，它们有几个根本的区别 
-
-- 内部迭代：不包含类似next的方法来指示它们处理集合的下一个元素 
-
--  它们处理来自流的元素 ： 聚合操作只操作来自流的元素，而不是直接来自集合，所以也被叫做 *stream operations*. 
-
--  它们支持将行为作为参数 ： 可以将lambda表达式指定为大多数聚合操作的参数 
-
-   
+------
 
 
 
 ## FAQ
 
-ConcurrentHashMap 在Java8和7的实现区别
+![](https://i04piccdn.sogoucdn.com/73c6ca3174ce3662)
 
+- 说说你知道的Java8 有哪写新特性？
 
+- 什么是lambda表达式？有啥优点？
+- ConcurrentHashMap 在Java8 和 Java7的实现区别？
+- 能说说 Java 8 改进的JVM 不?
+- hashMap原理，java8做了哪些改变？
+- 外部迭代和内部迭代，你晓得吧？
 
-java8 api https://docs.oracle.com/javase/8/docs/api/
-
-
-
-Jdk8文档  https://docs.oracle.com/javase/8/docs/
-
-
+------
 
 
 
 ## 参考：
+
+Java 8官方文档
 
 《Java 8实战》
 
