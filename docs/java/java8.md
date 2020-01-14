@@ -1,6 +1,6 @@
 > 点赞+收藏 就学会系列，文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
-> Java8早在2014年3月就发布了，现在才想去缕清楚的我，太南了。。。
+> Java8早在2014年3月就发布了，还不得全面了解下
 >
 > 本文是用我拙劣的英文和不要脸的这抄抄那抄抄，熬出的，没有深究源码，只是对 Java8 有一个整体的认知，可以上手用起来，示例代码也都在github上
 
@@ -40,8 +40,8 @@
   - JDBC-ODBC桥已被移除 
   - JDBC 4.2引入了新的特性 
 -  Java DB（一个Java数据库）
-- 网络（Networking）
-- 新增了 `java.net.URLPermission` 
+-  网络（Networking）
+   - 新增了 `java.net.URLPermission` 
 -  并发（**Concurrency**）
    -  `CompletableFuture` 增强了之前的`Future`
    -  `java.util.concurrent.ConcurrentHashMap` 支持基于新添加的streams功能和lambda表达式的聚合操作 
@@ -139,14 +139,6 @@ Lambda 表达式在 Java 语言中引入了一个新的语法元素和操作符�
    ```
 
    
-   
-   上联：左右遇一括号省
-   
-   下联：左侧推断类型省
-   
-   横批：能省则省
-   
-   
 
 **类型推断** 
 
@@ -173,7 +165,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.time.chrono.IsoChronology;
 import java.time.LocalDate;
-
 public class Person {
     public enum Sex {
         MALE, FEMALE
@@ -530,57 +521,6 @@ public class RosterTest {
         Arrays.sort(rosterAsArray,
                 (a, b) -> Person.compareByAge(a, b)
         );
-
-        /**
-         *  ===================================================================
-         *  方法引用：
-         * 这个lambda表达式调用现有的方法，所以您可以使用方法引用而不是lambda表达式
-         *  Person::compareByAge 等同于 (a, b) -> Person.compareByAge(a, b)
-         */
-        Arrays.sort(rosterAsArray, Person::compareByAge);
-        System.out.println();
-
-        // Reference to an Instance Method of a Particular Object
-        class ComparisonProvider {
-            public int compareByName(Person a, Person b) {
-                return a.getName().compareTo(b.getName());
-            }
-
-            public int compareByAge(Person a, Person b) {
-                return a.getBirthday().compareTo(b.getBirthday());
-            }
-        }
-        ComparisonProvider myComparisonProvider = new ComparisonProvider();
-        Arrays.sort(rosterAsArray, myComparisonProvider::compareByName);
-        for (Person person : rosterAsArray) {
-            person.printPerson();
-        }
-
-        System.out.println();
-
-        /**
-         * 引用特定类型的任意对象的实例方法
-         * String::compareToIgnoreCase 格式化 (String a, String b) ，
-         *  并去调用 a.compareToIgnoreCase(b)
-         */
-        String[] stringArray = { "Barbara", "James", "Mary", "John",
-                "Patricia", "Robert", "Michael", "Linda" };
-        Arrays.sort(stringArray, String::compareToIgnoreCase);
-        for (String s : stringArray) {
-            System.out.println(s);
-        }
-
-        System.out.println();
-
-        // 通过 stream 将计算集合的和
-        Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
-        List<Integer> listOfIntegers =
-                new ArrayList<>(Arrays.asList(intArray));
-        System.out.println("Sum of integers: " +
-                listOfIntegers
-                        .stream()
-                        .reduce(Integer::sum).get());
-    }
 }
 ```
 
@@ -1197,9 +1137,7 @@ public class TestStreamAPI2 {
 		Optional<Person> op = persons.stream()
 			.sorted(Comparator.comparingInt(Person::getAge))
 			.findFirst();
-		
 		System.out.println("年龄最小的："+op.get());
-
 		
 		Optional<Person> op2 = persons.parallelStream()
 			.filter((e) -> e.getGender().equals(Person.Sex.MALE))
@@ -1405,9 +1343,15 @@ public void test9(){
 
 ### 3. 并行流与串行流 
 
+#### 先说说并行和并发
+
+并发是两个任务共享时间段，并行则是两个任务在同一时间发生，比如运行在多核CPU上。
+
+![lbvsVU.png](https://s2.ax1x.com/2020/01/14/lbvsVU.png)
+
 **并行流就是把一个内容分成多个数据块，并用不同的线程分别处理每个数据块的流**。 
 
-Java 8 中将并行进行了优化，我们可以很容易的对数据进行并行操作。Stream API 可以声明性地通过 `parallel()` 与 `sequential()` 在并行流与顺序流之间进行切换。
+Java 8 中将并行进行了优化，我们可以很容易的对数据进行并行操作。Stream API 可以声明性地通过 `parallel()` 与 `sequential()` 在并行流与顺序流之间进行切换。如果想从一个集合类创建一个流，调用`parallerStream`就可以获取一个并行流。
 
 ```java
 public static long parallelSum(long n) {
@@ -1463,7 +1407,6 @@ public class ForkJoinSumCalculator extends RecursiveTask<Long> {
     //不再将任务分解为子任务的数组大小
     public static long THRESHOLD = 100;
 
-
     //公共构造器用于创建主任务
     public ForkJoinSumCalculator(long[] numbers) {
         this(numbers, 0, numbers.length);
@@ -1491,9 +1434,7 @@ public class ForkJoinSumCalculator extends RecursiveTask<Long> {
         ForkJoinSumCalculator rightTask = new ForkJoinSumCalculator(numbers, start + length / 2, end);
 
         Long rightResult = rightTask.compute();   //同步执行第二个任务，
-
-        Long leftResult = leftTask.join();
-
+        Long leftResult = leftTask.join(); // 读取第一个子任务的结果，如果尚未完成就等待
         return rightResult + leftResult;
     }
 
@@ -1512,7 +1453,6 @@ public class ForkJoinSumCalculator extends RecursiveTask<Long> {
         ForkJoinTask<Long> task = new ForkJoinSumCalculator(numbers);
         return new ForkJoinPool().invoke(task);
     }
-
 
     public static void main(String[] args) {
         System.out.println("sum:" + forkJoimSum(10000));
@@ -2129,15 +2069,14 @@ Reflection API的变化就是为了支持Java 8中注解机制的改变。 除�
 
 
 
-## 参考：
-
-Java 8官方文档
+## 参考
 
 《Java 8实战》
-
+《Java 8函数式编程》
+Java 8官方文档
 某免费视频学习网站
 
-《Java 8函数式编程》
+
 
 
 
