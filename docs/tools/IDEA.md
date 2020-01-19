@@ -119,7 +119,7 @@ Debug 的设置
 
 操作书签：**Navigate | Bookmarks** 可以创建匿名书签 Toggle Bookmark。创建标技书签 Toggle Bookmark With Mnemonic，查看标签 Show Bookmarks
 
-![image-20200119184029572](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119184029572.png)
+![](https://tva1.sinaimg.cn/large/006tNbRwly1gb27r9kl0xj30w40j375s.jpg)
 
 
 
