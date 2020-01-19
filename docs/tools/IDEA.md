@@ -117,7 +117,11 @@ Debug 的设置
 
 书签有匿名书签（可以有无数个）和标记书签（有数字或者字母助记符的书签）两种
 
-![image-20200119182454427](H:\Technical-Learning\docs\_images\Tools\idea-bookmark.png)
+操作书签：**Navigate | Bookmarks** 可以创建匿名书签 Toggle Bookmark。创建标技书签 Toggle Bookmark With Mnemonic，查看标签 Show Bookmarks
+
+![image-20200119184029572](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119184029572.png)
+
+
 
 
 
