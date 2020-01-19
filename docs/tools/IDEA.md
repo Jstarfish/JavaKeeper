@@ -1,0 +1,188 @@
+工欲善其事，必先利其器 ，当下有数不清的 Java 程序员将石器时代的 Eclipse 替换成了现代化的智能开发工具 InteliJ IDEA ，写代码的小日子过得不亦乐乎（玩笑话，两者各有千秋，看个人习惯使用）
+
+可可每次看到别人用IDEA 的时候，都会发现，哇哦，还能这样操作，还有每次注册码失效的时候，我都为自己在用盗版软件而“悔恨不已”，然后到处找注册码，所以这篇文章被生下来了。。。安装和写hello world 部署到服务器这些就不写了
+
+
+
+## InteliJ IDEA 介绍
+
+IDEA，全称 IntelliJ IDEA，是 Java 语言的集成开发环境，IDEA 在业界被公认为是最好的 java 开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE 支持、Ant、JUnit、CVS 整合、代码审查、创新的 GUI 设计等方面的功能可以说是超常的。 
+
+IDEA(https://www.jetbrains.com/idea/) 是 JetBrains 公司的产品，公司旗下还有其它产品，比如： WebStorm、DataGrip、GoLand...
+
+
+
+## 优势
+
+- 强大的整合能力。比如：Git、Maven、Spring 等 
+- 提示功能的快速、便捷 
+- 提示功能的范围广 
+- 好用的快捷键和代码模板 private static final psf 
+- 精准搜索（ IDEA 会将您的源代码编入索引 ）
+- 不需要频繁的Ctrl+S（）
+- 自带反编译器，方便查看源码
+
+
+
+在 Eclipse 中我们有 Workspace（工作空间）和 Project（工程）的概念，在 IDEA 中只有 Project（工程）和 Module（模块）的概念 。Eclipse 中 workspace 相当于 IDEA 中的 Project ，Eclipse 中 Project 相当于 IDEA 中的 Module 
+
+IDEA 和 Eclipse 的术语对比
+
+| Eclipse            | IntelliJ IDEA |
+| ------------------ | ------------- |
+| Workspace          | Project       |
+| Project            | Module        |
+| Facet              | Facet         |
+| Library            | Library       |
+| JRE                | SDK           |
+| Classpath variable | Path variable |
+
+
+
+
+
+
+
+快捷键就不说了，想怎么设置就怎么设置，每个人的习惯不同
+
+
+
+## 模板
+
+实时代码模板 (Live Templates)
+
+![](H:\Technical-Learning\docs\_images\Tools\idea-live-templates.gif)
+
+它的原理就是配置一些常用代码字母缩写，在输入简写时可以出现你预定义的固 定模式的代码，使得开发效率大大提高，同时也可以增加个性化。最简单的例子 就是在 Java 中输入 sout 会出现 System.out.println(); 
+
+**Editor – General – Postfix Completion**  查看已经存在的模板（不可修改）
+
+![image-20200119110606822](H:\Technical-Learning\docs\_images\Tools\idea-templates1.png)
+
+ **Editor — Live Templates**  查看或自定义模板
+
+![image-20200119115949844](H:\Technical-Learning\docs\_images\Tools\idea-templates2.png)
+
+
+
+2.1 psvm : 可生成 main 方法 
+
+2.2 sout : System.out.println() 快捷输出  
+
+ fori : 可生成 for 循环  
+
+  list.for : 可生成集合 list 的 for 循环 
+
+  ifn：可生成 if(xxx = null) 
+
+ inn：可生成 if(xxx != null) 或 xxx.nn 或 xxx.null 
+
+  prsf：可生成 private static final  
+
+
+
+## 断点调试 
+
+Debug 的设置
+
+![image-20200119135716829](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119135716829.png)
+
+设置 Debug 连接方式，默认是 Socket。Shared memory 是 Windows 特有的一 个属性，一般在 Windows 系统下建议使用此设置，内存占用相对较少。
+
+
+
+常用断点调试快捷键
+
+- step over 进入下一步，如果当前行断点是一个方法，则不进入当前方法体内 
+
+- step into 进入下一步，如果当前行断点是一个方法，则进入当前方法体内 
+- force step into 进入下一步，如果当前行断点是一个方法，则进入当前方法体内 
+- step out 跳出
+- resume program 恢复程序运行，但如果该断点下面代码还有断点则停在下一个断点上 
+- stop 停止 
+- mute breakpoints 点中，使得所有的断点失效 
+- view breakpoints 查看所有断点 对于常用的 Debug 的快捷键，需要大家熟练掌握。 
+
+
+
+服务器debug
+
+
+
+
+
+## 书签和收藏夹
+
+书签在翻看源码或者大佬代码的时候，可以方便记录代码的调用链路。
+
+书签有匿名书签（可以有无数个）和标记书签（有数字或者字母助记符的书签）两种
+
+![image-20200119182454427](H:\Technical-Learning\docs\_images\Tools\idea-bookmark.png)
+
+
+
+
+
+条件断点 
+
+说明： 调试的时候，在循环里增加条件判断，可以极大的提高效率，心情也能愉悦。 
+
+具体操作： 在断点处右击调出条件断点。可以在满足某个条件下，实施断点。 
+
+查看表达式的值(Ctrl + u)： 选择行，ctrl + u。还可以在查看框中输入编写代码时的其他方法：
+
+
+
+![image-20200119135856185](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119135856185.png) 
+
+
+
+## 插件
+
+- **Lombok** —— 开发神器，可以简化你的实体类 
+
+- **Maven Helper** ——  方便显示maven的依赖树，处理冲突的好帮手 
+
+- .**ignore** —— 忽略不需要提交的文件
+
+- **FindBugs-IDEA** ——  代码审查 
+
+- **Alibaba Java Coding Guidelines** ——  阿里的开发设计规范 
+
+- **Alibaba Cloud Toolkit** ——  帮助开发者更高效地开发、测试、诊断并部署应用。通过插件，可以将本地应用一键部署到任意服务器或云端；并且还内置了 Arthas 诊断、Dubbo工具、Terminal 终端、文件上传、函数计算和 MySQL 执行器等工具 
+
+- **Easy Code** ——  支持自定义模板的代码生成插件
+
+- **RestfulToolkit** ——  RESTful 服务开发辅助工具集（安利，可以直接在右侧的RestServices查看，所有项目的restful接口，还可以通过 `Ctrl \` 全局搜索 ）
+
+  ![image-20200119175438181](H:\Technical-Learning\docs\_images\Tools\idea-plugin-restful.png)
+
+
+
+IDEA 主题和插件排行榜： https://plugins.jetbrains.com/search?orderBy=downloads&products=idea  
+
+
+
+
+
+## 激活
+
+仅供个人学习使用~~
+
+1. 下载补丁文件 **`jetbrains-agent.jar`** 并将它放置到 Idea安装目录的bin目录下，https://pan.baidu.com/s/1Zy-vQGOdKoqDdB8sWIcQOg
+
+2. 免费试用，进入IDEA, 点击最上面的菜单栏中的 **Help - Edit Custom VM Options **，在`idea.exw.vmoptionos`文件中加入`-javaagent:D:\Program Files\JetBrains\IntelliJ IDEA 2019.2.4\bin\jetbrains-agent.jar`(换成你的jar包目录)，重启
+
+   ![image-20200119163452883](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119163452883.png)
+
+3. 重启IDEA 后，打开**Help — Register **，在License Server 填上， http://jetbrains-license-server ，失败的话就输入下边的注册码
+
+   ![image-20200119164118416](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119164118416.png)
+
+```
+520E5894E2-eyJsaWNlbnNlSWQiOiI1MjBFNTg5NEUyIiwibGljZW5zZWVOYW1lIjoicGlnNiIsImFzc2lnbmVlTmFtZSI6IiIsImFzc2lnbmVlRW1haWwiOiIiLCJsaWNlbnNlUmVzdHJpY3Rpb24iOiJVbmxpbWl0ZWQgbGljZW5zZSB0aWxsIGVuZCBvZiB0aGUgY2VudHVyeS4iLCJjaGVja0NvbmN1cnJlbnRVc2UiOmZhbHNlLCJwcm9kdWN0cyI6W3siY29kZSI6IklJIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiUlMwIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiV1MiLCJwYWlkVXBUbyI6IjIwODktMDctMDcifSx7ImNvZGUiOiJSRCIsInBhaWRVcFRvIjoiMjA4OS0wNy0wNyJ9LHsiY29kZSI6IlJDIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiREMiLCJwYWlkVXBUbyI6IjIwODktMDctMDcifSx7ImNvZGUiOiJEQiIsInBhaWRVcFRvIjoiMjA4OS0wNy0wNyJ9LHsiY29kZSI6IlJNIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiRE0iLCJwYWlkVXBUbyI6IjIwODktMDctMDcifSx7ImNvZGUiOiJBQyIsInBhaWRVcFRvIjoiMjA4OS0wNy0wNyJ9LHsiY29kZSI6IkRQTiIsInBhaWRVcFRvIjoiMjA4OS0wNy0wNyJ9LHsiY29kZSI6IkdPIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiUFMiLCJwYWlkVXBUbyI6IjIwODktMDctMDcifSx7ImNvZGUiOiJDTCIsInBhaWRVcFRvIjoiMjA4OS0wNy0wNyJ9LHsiY29kZSI6IlBDIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In0seyJjb2RlIjoiUlNVIiwicGFpZFVwVG8iOiIyMDg5LTA3LTA3In1dLCJoYXNoIjoiODkwNzA3MC8wIiwiZ3JhY2VQZXJpb2REYXlzIjowLCJhdXRvUHJvbG9uZ2F0ZWQiOmZhbHNlLCJpc0F1dG9Qcm9sb25nYXRlZCI6ZmFsc2V9-DZ/oNHBfyho0XrrCJJvAOKg5Q1tLBgOdbCmzCKwkuM+Yryce0RoOi3OOmH6Ba/uTcCh/L37meyD0FJdJIprv59y4+n+k2kIeF/XKrKqg0dEsDUQRw0lUqqMt99ohqa+zmbJ44Yufdwwx/F1CtoRGvEQ2Mn0QjuqRoZJZ3wiT5Am22JiJW8MaNUl3wg9YPj+OPGARKKJUdUJ0NGUDQBcBAv5ds8LhbSbJSbPkbkwH/a1QMz4nEdn6lRDKI1aFIn43QhBSCFqvUq6TPJlbIJ0ZjE+PyZjHFBKCgkry0DHPXU2BbtIZPsksQnN3fx240a9K6sN7peZnLpEoMoq23FEz4g==-MIIElTCCAn2gAwIBAgIBCTANBgkqhkiG9w0BAQsFADAYMRYwFAYDVQQDDA1KZXRQcm9maWxlIENBMB4XDTE4MTEwMTEyMjk0NloXDTIwMTEwMjEyMjk0NlowaDELMAkGA1UEBhMCQ1oxDjAMBgNVBAgMBU51c2xlMQ8wDQYDVQQHDAZQcmFndWUxGTAXBgNVBAoMEEpldEJyYWlucyBzLnIuby4xHTAbBgNVBAMMFHByb2QzeS1mcm9tLTIwMTgxMTAxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5ndaik1GD0nyTdqkZgURQZGW+RGxCdBITPXIwpjhhaD0SXGa4XSZBEBoiPdY6XV6pOfUJeyfi9dXsY4MmT0D+sKoST3rSw96xaf9FXPvOjn4prMTdj3Ji3CyQrGWeQU2nzYqFrp1QYNLAbaViHRKuJrYHI6GCvqCbJe0LQ8qqUiVMA9wG/PQwScpNmTF9Kp2Iej+Z5OUxF33zzm+vg/nYV31HLF7fJUAplI/1nM+ZG8K+AXWgYKChtknl3sW9PCQa3a3imPL9GVToUNxc0wcuTil8mqveWcSQCHYxsIaUajWLpFzoO2AhK4mfYBSStAqEjoXRTuj17mo8Q6M2SHOcwIDAQABo4GZMIGWMAkGA1UdEwQCMAAwHQYDVR0OBBYEFGEpG9oZGcfLMGNBkY7SgHiMGgTcMEgGA1UdIwRBMD+AFKOetkhnQhI2Qb1t4Lm0oFKLl/GzoRykGjAYMRYwFAYDVQQDDA1KZXRQcm9maWxlIENBggkA0myxg7KDeeEwEwYDVR0lBAwwCgYIKwYBBQUHAwEwCwYDVR0PBAQDAgWgMA0GCSqGSIb3DQEBCwUAA4ICAQBonMu8oa3vmNAa4RQP8gPGlX3SQaA3WCRUAj6Zrlk8AesKV1YSkh5D2l+yUk6njysgzfr1bIR5xF8eup5xXc4/G7NtVYRSMvrd6rfQcHOyK5UFJLm+8utmyMIDrZOzLQuTsT8NxFpbCVCfV5wNRu4rChrCuArYVGaKbmp9ymkw1PU6+HoO5i2wU3ikTmRv8IRjrlSStyNzXpnPTwt7bja19ousk56r40SmlmC04GdDHErr0ei2UbjUua5kw71Qn9g02tL9fERI2sSRjQrvPbn9INwRWl5+k05mlKekbtbu2ev2woJFZK4WEXAd/GaAdeZZdumv8T2idDFL7cAirJwcrbfpawPeXr52oKTPnXfi0l5+g9Gnt/wfiXCrPElX6ycTR6iL3GC2VR4jTz6YatT4Ntz59/THOT7NJQhr6AyLkhhJCdkzE2cob/KouVp4ivV7Q3Fc6HX7eepHAAF/DpxwgOrg9smX6coXLgfp0b1RU2u/tUNID04rpNxTMueTtrT8WSskqvaJd3RH8r7cnRj6Y2hltkja82HlpDURDxDTRvv+krbwMr26SB/40BjpMUrDRCeKuiBahC0DCoU/4+ze1l94wVUhdkCfL0GpJrMSCDEK+XEurU18Hb7WT+ThXbkdl6VpFdHsRvqAnhR2g4b+Qzgidmuky5NUZVfEaZqV/g==
+```
+
+4. **Help — About**，搞定 
+
+![image-20200119164415560](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200119164415560.png)
