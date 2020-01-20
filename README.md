@@ -100,12 +100,12 @@
 
 ## ⚒️ 基础工具
 
-| Project | Article |
-| :-----: | :------ |
-|  Maven  |         |
-|   Git   |         |
-|  IDEA   |         |
-| Jenkins |         |
+| Project | Article                                         |
+| :-----: | :---------------------------------------------- |
+|  Maven  | [头条一面竟然问我maven?](/docs/tools/Maven.md)  |
+|   Git   |                                                 |
+|  IDEA   | [IDEA总结——磨刀霍霍向代码](/docs/tools/IDEA.md) |
+| Jenkins |                                                 |
 
 
 
