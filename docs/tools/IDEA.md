@@ -47,19 +47,19 @@ IDEA 和 Eclipse 的术语对比
 
 实时代码模板 (Live Templates)
 
-![idea-live-templates](../_images/Tools/idea-live-templates.gif)
+![idea-live-templates](https://tva1.sinaimg.cn/large/006tNbRwly1gb3djwtijhg30ow05u190.gif)
 
 它的原理就是配置一些常用代码字母缩写，在输入简写时可以出现你预定义的固 定模式的代码，使得开发效率大大提高，同时也可以增加个性化。最简单的例子 就是在 Java 中输入 sout 会出现 System.out.println(); 
 
 **Editor – General – Postfix Completion**  查看已经存在的模板（不可修改）
 
-![idea-templates1](../_images/Tools/idea-templates1.png)
+![idea-templates1](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dai5462j30wr0lvdi9.jpg)
 
  **Editor — Live Templates**  查看或自定义模板（可以添加方式注释、类注释）
 
-![idea-templates2](../_images/Tools/idea-templates2.png)
+![idea-templates2](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dc5zx6gj30wm0lrq4n.jpg)
 
-![idea-templates4](../_images/Tools/idea-templates4.png)
+![idea-templates4](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcc5j5rj30wi0phdi0.jpg)
 
 ```
 *
@@ -72,7 +72,7 @@ IDEA 和 Eclipse 的术语对比
 
 类注释一般通过 **File — Setting — Editor — Live Templates — File and Code Templates** 设置
 
-![idea-templates3](../_images/Tools/idea-templates3.png)
+![idea-templates3](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcijz88j30we0imq56.jpg)
 
 
 
@@ -95,42 +95,42 @@ IDEA 和 Eclipse 的术语对比
 
 左键点击行号栏（快捷键： `Ctrl+F8` ）
 
-![image-20200120113747367](../_images/Tools/idea-break1.png)
+![image-20200120113747367](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcn5xgnj30oo0eu3z8.jpg)
 
 ##### 设置异常断点
 
-点击**Debug**工具窗口左侧的的 **View Breakpoints** ![View Breakpoints button](../_images\Tools\idea-debugger-viewBreakpoints.png) 或者快捷键 `Ctrl+Shift+F8` ，可以新建异常检测，或者检测所有异常（**Any Exception**） 情况，这样只要程序有相应异常，就会挂起
+点击**Debug**工具窗口左侧的的 **View Breakpoints** ![](https://tva1.sinaimg.cn/large/006tNbRwly1gb3e1iqmy8j300w00w0br.jpg) 或者快捷键 `Ctrl+Shift+F8` ，可以新建异常检测，或者检测所有异常（**Any Exception**） 情况，这样只要程序有相应异常，就会挂起
 
-![image-20200120115152419](../_images/Tools/idea-break-exception.png)
+![image-20200120115152419](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcv7jh2j317e0iiq7g.jpg)
 
 ##### 条件断点
 
 有时候我们在循环处理数据时候，可能只关心某个条件的数据，就可以在断点位置右键，设置**断点条件**，（下图，在i==6 的时候挂起程序）
 
-![idea-break-cond.jpg](https://i.loli.net/2020/01/20/q93ZPNMJsuS4aX1.png)
+![idea-break-cond.jpg](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dd05wjkj30q00g8aac.jpg)
 
 ##### 多线程断点
 
 在调试多线程代码时候，只能串行调试，因为IDEA在Debug时默认阻塞级别是ALL，会阻塞其它线程，只有在当前调试线程走完时才会走其它线程。如果像下图一样是lambda表达式的行，可以选择断点类型。
 
-![image-20200120164941965](../_images/Tools/idea-break-thread1.png)
+![idea-break-thread1](https://tva1.sinaimg.cn/large/006tNbRwly1gb3ddnim60j30r50cfmxt.jpg)
 
 可以在 View Breakpoints 里选择 Thread （右键断点），这样就可以Frames 切换线程debug了。
 
-![image-20200120165852819](../_images/Tools/idea-break-thread2.jpg)
+![idea-break-thread2](https://tva1.sinaimg.cn/large/006tNbRwly1gb3ddyql2lj30zg0l7whg.jpg)
 
 
 
 #### 3. 逐步执行程序
 
-![idea-step](../_images/Tools/idea-step.png)
+![idea-step](https://tva1.sinaimg.cn/large/006tNbRwly1gb3de46cw6j30bg00xwea.jpg)
 
-- ![idea-step-over](../_images/Tools/idea-step-over.png) **step over** —— 步过，如果当前行断点是一个方法，则不进入当前方法体内 
--  ![idea-step-into](../_images/Tools/idea-step-into.png) **step into** —— 步入，如果当前行断点是一个方法，则进入当前方法体内，一般用于进入自定义方法内，不会进入官方类库的方法 
--  ![idea-force-step](../_images/Tools/idea-force-step.png) **force step into** `Shift+Alt+F7` ——  强制步入，能进入任何方法，查看底层源码的时候可以用这个进入官方类库的方法 
--  ![idea-step-out](../_images/Tools/idea-step-out.png) **step out**  `Shift+F8` —— 步出， 从步入的方法内退出到方法调用处 
--  ![idea-drop-frame](../_images/Tools/idea-drop-frame.png)  **Drop frame** —— 回退到上一步
--   ![idea-run-curson](../_images/Tools/idea-run-curson.png) **Run to cursor**  `Alt+F9`  ——  运行到光标处，可以将光标定位到你需要查看的那一行，然后使用这个功能，代码会运行至光标行，而不需要打断点 
+- ![idea-step-over](https://tva1.sinaimg.cn/large/006tNbRwly1gb3deexlofj300w00w098.jpg) **step over** —— 步过，如果当前行断点是一个方法，则不进入当前方法体内 
+-  ![idea-step-into](https://tva1.sinaimg.cn/large/006tNbRwly1gb3deki3euj300w00w053.jpg) **step into** —— 步入，如果当前行断点是一个方法，则进入当前方法体内，一般用于进入自定义方法内，不会进入官方类库的方法 
+-  ![idea-force-step](https://tva1.sinaimg.cn/large/006tNbRwly1gb3depxltpj300w00w054.jpg) **force step into** `Shift+Alt+F7` ——  强制步入，能进入任何方法，查看底层源码的时候可以用这个进入官方类库的方法 
+-  ![idea-step-out](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dexsu5jj300w00w056.jpg) **step out**  `Shift+F8` —— 步出， 从步入的方法内退出到方法调用处 
+-  ![idea-drop-frame](https://tva1.sinaimg.cn/large/006tNbRwly1gb3df26zpvj300w00w07w.jpg)  **Drop frame** —— 回退到上一步
+-   ![idea-run-curson](https://tva1.sinaimg.cn/large/006tNbRwly1gb3df6yrw3j300w00w07t.jpg) **Run to cursor**  `Alt+F9`  ——  运行到光标处，可以将光标定位到你需要查看的那一行，然后使用这个功能，代码会运行至光标行，而不需要打断点 
 
 
 
@@ -150,11 +150,11 @@ IDEA 和 Eclipse 的术语对比
 
 `-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9527`
 
-![image-20200120174529907](../_images/Tools/idea-remote-tomcat.png)
+![image-20200120174529907](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfbv8c7j30v80ccgme.jpg)
 
 ② IDEA设置
 
-![idea-remote-idea](../_images/Tools/idea-remote-idea.png)
+![idea-remote-idea](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfgaic2j30t00iojt3.jpg)
 
 
 
@@ -162,7 +162,7 @@ IDEA 和 Eclipse 的术语对比
 
 还有一种复制Startup/Connection 中的内容到 JAVA_OPTS 中，没有尝试
 
-![idea-remote-idea-debug](../_images/Tools/idea-remote-idea-debug.png)
+![idea-remote-idea-debug](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfk23g0j30t80hejsj.jpg)
 
 
 
@@ -174,7 +174,7 @@ IDEA 和 Eclipse 的术语对比
 
 操作书签：**Navigate | Bookmarks** 可以创建匿名书签 Toggle Bookmark。创建标技书签 Toggle Bookmark With Mnemonic，查看标签 Show Bookmarks
 
-![idea-bookmark.png](https://i.loli.net/2020/01/20/hYvJ4U7dSAVexl2.png)
+![idea-bookmark.png](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfouqc0j30w40j33z9.jpg)
 
 
 
@@ -196,7 +196,7 @@ IDEA 和 Eclipse 的术语对比
 
 - **RestfulToolkit** ——  RESTful 服务开发辅助工具集（安利，可以直接在右侧的RestServices查看，所有项目的restful接口，还可以通过 `Ctrl \` 全局搜索 ）
 
-  ![idea-plugin-restful](../_images/Tools/idea-plugin-restful.png)
+  ![idea-plugin-restful](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfv5ntbj31cu0l5k1m.jpg)
 
 IDEA 主题和插件排行榜： https://plugins.jetbrains.com/search?orderBy=downloads&products=idea  
 
@@ -210,7 +210,7 @@ IDEA 主题和插件排行榜： https://plugins.jetbrains.com/search?orderBy=do
 
 2. 免费试用，进入IDEA, 点击最上面的菜单栏中的 **Help - Edit Custom VM Options **，在`idea.exw.vmoptionos`文件中加入`-javaagent:D:\Program Files\JetBrains\IntelliJ IDEA 2019.2.4\bin\jetbrains-agent.jar`(换成你的jar包目录)，重启
 
-   ![idea-acativate1](../_images\Tools\idea-acativate1.png)
+   ![idea-acativate1](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dimgueyj30yv0lkdk8.jpg)
 
 3. 重启IDEA 后，打开**Help — Register **，在License Server 填上， http://jetbrains-license-server ，失败的话就输入下边的注册码
 
@@ -222,7 +222,7 @@ IDEA 主题和插件排行榜： https://plugins.jetbrains.com/search?orderBy=do
 
 4. **Help — About**，搞定 
 
-![idea-acativate3.png](https://i.loli.net/2020/01/20/q7GzrBHpa2E1LXl.png)
+![idea-acativate3.png](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dgqb6xzj30oo0gntc2.jpg)
 
 
 
