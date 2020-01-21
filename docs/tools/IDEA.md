@@ -1,6 +1,6 @@
 工欲善其事，必先利其器 ，当下有数不清的 Java 程序员将石器时代的 Eclipse 替换成了现代化的智能开发工具 InteliJ IDEA ，写代码的小日子过得不亦乐乎（玩笑话，两者各有千秋，看个人习惯使用）
 
-可每次看到别人用IDEA 的时候，都会发现，哇哦，还能这样操作，还有每次注册码失效的时候，我都为自己在用盗版软件而“悔恨为什么不多赚钱买正版”，然后到处找注册码，所以这篇文章被来啦来啦~~。。。安装和写hello world 部署到服务器这些就不记录了，
+可每次看到别人用IDEA 的时候，都会发现，哇哦，还能这样操作，还有每次注册码失效的时候，我都为自己在用盗版软件而“悔恨为什么不多赚钱支持正版”，然后到处找注册码，所以这篇文章来啦来啦~~。。。安装和写hello world 部署到服务器这些就不记录了，
 
 ![](https://i03piccdn.sogoucdn.com/61d2ed1ddc107ba6)
 
@@ -12,7 +12,7 @@
 
 IDEA，全称 IntelliJ IDEA，是 Java 语言的集成开发环境，IDEA 在业界被公认为是最好的 java 开发工具之一，尤其在智能代码助手、代码自动提示、重构、J2EE 支持、Ant、JUnit、CVS 整合、代码审查、创新的 GUI 设计等方面的功能可以说是超常的。 
 
-IDEA(https://www.jetbrains.com/idea/) 是 JetBrains 公司的产品，公司旗下还有其它产品，比如： WebStorm、DataGrip、GoLand...
+IDEA是 JetBrains 公司的产品，公司旗下还有其它产品，比如： WebStorm、DataGrip、GoLand...
 
 
 
@@ -89,7 +89,7 @@ IDEA 和 Eclipse 的术语对比
 1. 行断点（Line Breakpoints）：最经常用的方式， 可以设置在任何可执行的代码行上 
 2. 方法断点（Method Breakpoints）： 在进入或退出指定的方法或其实现之一时挂起程序，允许您检查方法的进入/退出条件
 3. 字段断点（Field Watchpoints）： 当指定的字段被读取或写入时，挂起程序。需要注意的是，默认只有写才会停下，想要让读取时也停下，需要右击断点，在**Watch**的**Field access**上打勾才行
-4. 异常断点（Exception Breakpoints）： 当抛出Throwable或其子类时挂起程序 。可以在 **Run — View Breakpoints **中的Java Exception Breakpoints 里添加异常的具体类型。这样的话，程序中一旦发生了这种异常马上就会停下来
+4. 异常断点（Exception Breakpoints）： 当抛出Throwable或其子类时挂起程序 。可以在 **Run — View Breakpoints **中的 Java Exception Breakpoints 里添加异常的具体类型。这样的话，程序中一旦发生了这种异常马上就会停下来
 
 #### 2. 设置断点
 
@@ -101,7 +101,7 @@ IDEA 和 Eclipse 的术语对比
 
 点击**Debug**工具窗口左侧的的 **View Breakpoints** ![](https://tva1.sinaimg.cn/large/006tNbRwly1gb3e1iqmy8j300w00w0br.jpg) 或者快捷键 `Ctrl+Shift+F8` ，可以新建异常检测，或者检测所有异常（**Any Exception**） 情况，这样只要程序有相应异常，就会挂起
 
-![image-20200120115152419](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcv7jh2j317e0iiq7g.jpg)
+![idea-break-exception](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dcv7jh2j317e0iiq7g.jpg)
 
 ##### 条件断点
 
@@ -158,7 +158,7 @@ IDEA 和 Eclipse 的术语对比
 
 
 
-③ 启动tomcat后，在IDEA运行远程Tomcat就能debug了
+③ 在IDEA上启动远程 tomcat后，就能debug了
 
 还有一种复制Startup/Connection 中的内容到 JAVA_OPTS 中，没有尝试
 
@@ -181,19 +181,12 @@ IDEA 和 Eclipse 的术语对比
 ## 插件
 
 - **Lombok** —— 开发神器，可以简化你的实体类 
-
 - **Maven Helper** ——  方便显示maven的依赖树，处理冲突的好帮手 
-
 - .**ignore** —— 忽略不需要提交的文件
-
 - **FindBugs-IDEA** ——  代码审查 
-
 - **Alibaba Java Coding Guidelines** ——  阿里的开发设计规范 
-
 - **Alibaba Cloud Toolkit** ——  帮助开发者更高效地开发、测试、诊断并部署应用。通过插件，可以将本地应用一键部署到任意服务器或云端；并且还内置了 Arthas 诊断、Dubbo工具、Terminal 终端、文件上传、函数计算和 MySQL 执行器等工具 
-
 - **Easy Code** ——  支持自定义模板的代码生成插件
-
 - **RestfulToolkit** ——  RESTful 服务开发辅助工具集（安利，可以直接在右侧的RestServices查看，所有项目的restful接口，还可以通过 `Ctrl \` 全局搜索 ）
 
   ![idea-plugin-restful](https://tva1.sinaimg.cn/large/006tNbRwly1gb3dfv5ntbj31cu0l5k1m.jpg)
@@ -233,4 +226,8 @@ IntelliJ IDEA 2019.3官方指南  https://www.jetbrains.com/help/idea/installati
 idea2019激活  https://segmentfault.com/a/1190000021488264 
 
 
+
+## 干了这杯 Java 你可能会提升一些功力
+
+![](https://tva1.sinaimg.cn/large/006tNbRwly1ga44patst0j307s07s0tg.jpg)
 

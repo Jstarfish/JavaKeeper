@@ -8,7 +8,19 @@
  * 英文换行 word-break:break-all;
  */
 #nice {
+	padding: 0px;
+}
 
+.nice-wx-box-pc {
+    width: 100%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: none;
+}
+
+.nice-wx-box {
+    width: 100%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: none;
 }
 
 #nice h1, h2, h3, h4, h5, h6 {
@@ -136,7 +148,7 @@
 }
 #nice blockquote:before {
   //content:"★ ";
-  content:"👨‍💻 局长导读：“";
+  content:"👨‍💻 导读：“";
   display:inline;
   color: #000000;
   font-size:1em;
