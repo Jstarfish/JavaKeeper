@@ -72,29 +72,13 @@
 
 
 
-## 🎨 设计模式
-
-|       Project        | Article                                                      |
-| :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md)<br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md) |
-
-
-
 ## ☕ Java
 
-| Project | Version | Article                                    |
-| :-----: | :-----: | :----------------------------------------- |
-|   JVM   |         |                                            |
-|  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/> |
-|   NIO   |         |                                            |
-
-
-
-## 👨🏿‍💻 Big Data
-
-| Project  | Version | Article                                               |
-| :------: | :-----: | :---------------------------------------------------- |
-| Big Data |         | [Hello Big Data](/docs/big-data/Hello-BigData.md)<br> |
+| Project | Version | Article                                                      |
+| :-----: | :-----: | :----------------------------------------------------------- |
+|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/类加载子系统.md)<br/>运行时数据区 |
+|  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
+|   NIO   |         |                                                              |
 
 
 
@@ -106,6 +90,30 @@
 |   Git   |                                                 |
 |  IDEA   | [IDEA总结——磨刀霍霍向代码](/docs/tools/IDEA.md) |
 | Jenkins |                                                 |
+
+
+
+## 🎨 设计模式
+
+|       Project        | Article                                                      |
+| :------------------: | :----------------------------------------------------------- |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/> |
+
+
+
+## 👨🏿‍💻 Big Data
+
+| Project  | Version | Article                                           |
+| :------: | :-----: | :------------------------------------------------ |
+| Big Data |         | [Hello Big Data](/docs/big-data/Hello-BigData.md) |
+
+
+
+## 🔢 算法
+
+| Project  | Article                                     |
+| :------: | :------------------------------------------ |
+| LeetCode | [两数之和](/docs/leetcode/两数之和.md)<br/> |
 
 
 

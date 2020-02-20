@@ -145,6 +145,7 @@
   background:#fff;
   box-shadow:#84A1A8 0px 10px 15px;
   margin-bottom: 40px;
+  margin-top: -14px;
 }
 #nice blockquote:before {
   //content:"★ ";

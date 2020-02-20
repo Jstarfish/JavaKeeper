@@ -136,7 +136,7 @@ CSDN	https://www.csdn.net
 
 ### Host Switch Plus
 
-基于浏览器的Hosts代理插件
+基于浏览器的Hosts代理插件，不需要每次修改host，好处是可以把chrome当成开发浏览器，其他浏览器用来~~~
 
 ![](https://raw.githubusercontent.com/Riant/host-switch-plus/master/screenshots/screenshot-1.png)
 
