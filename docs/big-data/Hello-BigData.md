@@ -136,7 +136,7 @@ Hortonworks 文档较好。
 
 #### 2.5.2 YARN 架构概述
 
-![](/Users/starfish/Desktop/屏幕快照 2020-01-07 下午2.17.43.png)
+![](https://img-blog.csdnimg.cn/20190128170722922.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE4NzA1NDc=,size_16,color_FFFFFF,t_70)
 
 1）ResourceManager(rm)：处理客户端请求、启动/监控 ApplicationMaster、监控 NodeManager、 资源分配与调度； 
 
