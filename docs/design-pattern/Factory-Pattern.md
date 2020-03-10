@@ -1,14 +1,12 @@
-> 1、工厂模式分为几类？
+# 工厂模式——生产对象的工厂
+
+> 你知道工厂模式分为几类吗？他们都有什么区别？
 >
-> 2、GOF 23种设计模式中，工厂方法模式和抽象工厂模式有什么区别？
->
-> 3、不在GOF 23种设计模式中的简单工厂模式是什么？
->
-> 4、简单工厂模式、工厂方法模式和抽象工厂模式各自解决什么问题？有什么不同？
+> 
 
 
 
-
+![](https://tva1.sinaimg.cn/large/00831rSTly1gcmy3e9tbzg30p00ge16a.gif)
 
 ## 工厂模式
 
@@ -58,59 +56,120 @@
 
 
 
-## 简单工厂模式
+## 一、简单工厂模式
 
 在介绍简单工厂模式之前，我们尝试解决以下问题：
 
+现在我们要使用面向对象的形式定义计算器，为了实现各算法之间的解耦。我们一般会这么写：
 
+```java
+// 计算类的基类
+@Setter
+@Getter
+public abstract class Operation {
+    private double value1 = 0;
+    private double value2 = 0;
+    protected abstract double getResule();
+}
 
-那么这种重复的创建类的工作其实可以放到一个统一的工厂类中。简单工厂模式有以下优点：
+//加法
+public class OperationAdd extends Operation {
+    @Override
+    protected double getResule() {
+        return getValue1() + getValue2();
+    }
+}
+//减法
+public class OperationSub extends Operation {
+    @Override
+    protected double getResule() {
+        return getValue1() - getValue2();
+    }
+}
+//乘法
+public class OperationMul extends Operation {
+    @Override
+    protected double getResule() {
+        return getValue1() * getValue2();
+    }
+}
+//除法
+public class OperationDiv extends Operation {
+    @Override
+    protected double getResule() {
+        if (getValue2() != 0) {
+            return getValue1() / getValue2();
+        }
+        throw new IllegalArgumentException("除数不能为零");
+    }
+}
+```
+
+当我们要使用这个计算器的时候，又会这么写：
+
+```java
+public static void main(String[] args) {
+  //计算两数之和
+  OperationAdd operationAdd = new OperationAdd();
+  operationAdd.setValue1(1);
+  operationAdd.setValue2(2);
+  System.out.println("sum:"+operationAdd.getResule());
+  //计算两数乘积
+  OperationMul operationMul = new OperationMul();
+  operationMul.setValue1(3);
+  operationMul.setValue2(5);
+  System.out.println("multiply:"+operationMul.getResule());
+  //计算两数之差。。。
+}
+```
+
+想要使用不同的运算的时候就要创建不同的类，并且要明确知道该类的名字。那么这种重复的创建类的工作其实可以放到一个统一的类中去管理。这样的方法我们就叫做「**简单工厂模式**」，在简单工厂模式中用于创建实例的方法是静态(static)方法，因此简单工厂模式又被称为「**静态工厂方法**」模式。。简单工厂模式有以下优点：
 
 - 一个调用者想创建一个对象，只要知道其名称就可以了。
 - 屏蔽产品的具体实现，调用者只关心产品的接口。
 
+### 1.1 定义
 
+提供一个创建对象实例的功能，而无需关心其具体实现。被创建实例的类型可以是接口、抽象类，也可以是具体的类。
 
-定义一个工厂类，它可以根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。因为在简单工厂模式中用于创建实例的方法是静态(static)方法，因此简单工厂模式又被称为静态工厂方法(Static Factory Method)模式。
-
-### 简单工厂模式实现方式
+### 1.2 简单工厂模式实现方式
 
 没骗你，简单工厂模式，真是因为简单才被叫做简单工厂模式的。
 
 简单工厂模式包含 3 个角色（要素）：
 
-- Factory：即工厂类， 它是简单工厂模式的核心，负责实现创建所有产品实例的内部逻辑；工厂类可以被外界直接调用，创建所需的产品对象；在工厂类中提供了静态的工厂方法factoryMethod()，它的返回类型为抽象产品类型Product
+- Factory：即工厂类， 简单工厂模式的核心部分，负责实现创建所有产品的内部逻辑；工厂类可以被外界直接调用，创建所需对象
 
-- Product：抽象产品， 它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法，它的引入将提高系统的灵活性，使得在工厂类中只需定义一个通用的工厂方法，因为所有创建的具体产品对象都是其子类对象 。
+- Product：抽象类产品， 它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法，它的引入将提高系统的灵活性，使得在工厂类中只需定义一个通用的工厂方法，因为所有创建的具体产品对象都是其子类对象
 
-- ConcreteProduct：具体产品， 它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例。每一个具体产品角色都继承了抽象产品角色，需要实现在抽象产品中声明的抽象方法 。在java中由一个具体类实现。 
+- ConcreteProduct：具体产品， 它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例。它要实现抽象产品中声明的抽象方法
 
-关系图如下：
+#### UML类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcmncln3o9j311i0k6adu.jpg)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gcp76z5g27j30li0fpjsv.jpg)
 
+#### 实例
 
+现在我们定义一个工厂类，它可以根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。
 
-在原有类的基础上，定义工厂类：
-
-```
+```java
 //工厂类
 public class OperationFactory {
 
     public static Operation createOperation(String operation) {
         Operation oper = null;
         switch (operation) {
-            case "+":
+            case "add":
                 oper = new OperationAdd();
                 break;
-            case "-":
+            case "sub":
                 oper = new OperationSub();
                 break;
-            case "*":
+            case "mul":
                 oper = new OperationMul();
                 break;
 
-            case "/":
+            case "div":
                 oper = new OperationDiv();
                 break;
             default:
@@ -123,22 +182,26 @@ public class OperationFactory {
 
 有了工厂类之后，可以使用工厂创建对象：
 
+```java
+public static void main(String[] args) {
+  Operation operationAdd = OperationFactory.createOperation("add");
+  operationAdd.setValue1(1);
+  operationAdd.setValue2(2)
+  System.out.println(operationAdd.getResule());
+}
 ```
-Operation operationAdd = OperationFactory.createOperation("+");
-operationAdd.setValue1(10);
-operationAdd.setValue2(5);
-System.out.println(operationAdd.getResule());
-```
 
-通过简单工厂模式，该计算器的使用者不需要关系实现加法逻辑的那个类的具体名字，他只要知道该类对应的参数"+"就可以了。
+通过简单工厂模式，该计算器的使用者不需要关系实现加法逻辑的那个类的具体名字，只要知道该类对应的参数"add"就可以了。这就体现了之前提到的工厂模式的优点。
 
-### 简单工厂模式存在的问题
 
-当我们需要增加一种计算时，例如开平方。这个时候我们需要先定义一个类继承Operation类，其中实现平方的代码。除此之外我们还要修改OperationFactory类的代码，增加一个case。这显然是违背开闭原则的。可想而知对于新产品的加入，工厂类是很被动的。
+
+### 1.3 简单工厂模式存在的问题
+
+当我们需要增加一种计算时，例如开平方。这个时候我们需要先定义一个类继承Operation类，其中实现平方的代码。除此之外我们还要修改 OperationFactory 类的代码，增加一个case。这显然是**违背开闭原则**的。可想而知对于新产品的加入，工厂类是很被动的。
 
 我们举的例子是最简单的情况。而在实际应用中，很可能产品是一个多层次的树状结构。 简单工厂可能就不太适用了。
 
-### 简单工厂模式总结
+### 1.4 简单工厂模式总结
 
 工厂类是整个简单工厂模式的关键。包含了必要的逻辑判断，根据外界给定的信息，决定究竟应该创建哪个具体类的对象。通过使用工厂类，外界可以从直接创建具体产品对象的尴尬局面摆脱出来，仅仅需要负责“消费”对象就可以了。而不必管这些对象究竟如何创建及如何组织的。明确了各自的职责和权利，有利于整个软件体系结构的优化。
 
@@ -152,78 +215,92 @@ System.out.println(operationAdd.getResule());
 
 
 
-## 工厂方法模式
+## 二、工厂方法模式
 
-我们常说的工厂模式，就是指工厂方法模式(Factory Method Pattern)，也叫虚拟构造器(Virtual Constructor)模式或多态工厂(Polymorphic Factory)模式。
+我们常说的工厂模式，就是指「工厂方法模式」，也叫「虚拟构造器模式」或「多态工厂模式」。
 
-工厂方法模式是一种实现了“工厂”概念的面向对象设计模式。就像其他创建型模式一样，它也是处理在不指定对象具体类型的情况下创建对象的问题。
+### 2.1 定义
 
-工厂方法模式的实质是“**定义一个创建对象的接口，但让实现这个接口的类来决定实例化哪个类。工厂方法让类的实例化推迟到子类中进行**。”
+**定义一个创建对象的接口，但让实现这个接口的类来决定实例化哪个类。工厂方法让类的实例化推迟到子类中进行**。
 
+### 2.2 工厂方法模式实现方式
 
+工厂方法模式包含 4 个角色（要素）：
 
-### 介绍
+- Product：抽象产品，定义工厂方法所创建的对象的接口，也就是实际需要使用的对象的接口
+- ConcreteProduct：具体产品，具体的Product接口的实现对象
+- Factory：工厂接口，也可以叫 Creator(创建器)，申明工厂方法，通常返回一个 Product 类型的实例对象
+- ConcreteFactory：工厂实现，或者叫 ConcreteCreator(创建器对象)，覆盖 Factory 定义的工厂方法，返回具体的 Product 实例
 
+#### UML类图
 
+![](https://tva1.sinaimg.cn/large/00831rSTly1gcp774606hj30za0hagmu.jpg)
 
-**使用场景：** 1、日志记录器：记录可能记录到本地硬盘、系统事件、远程服务器等，用户可以选择记录日志到什么地方。 2、数据库访问，当用户不知道最后系统采用哪一类数据库，以及数据库可能有变化时。 3、设计一个连接服务器的框架，需要三个协议，"POP3"、"IMAP"、"HTTP"，可以把这三个作为产品类，共同实现一个接口。
+####  实例
 
-
-
-### 工厂方法模式实现
-
-工厂方法模式包含 4 个角色（要素）：**工厂接口**、**工厂实现**、**产品接口**（抽象产品）、**产品实现**（具体产品）
-
-#### UML图
-
-![](../_images/design-pattern/factory-method-uml.png)
-
-####  工厂方法模式代码
+从UML类图可以看出，每种产品实现，我们都要增加一个继承于工厂接口 `IFactory` 的工厂类 `Factory` ，修改简单工厂模式代码中的工厂类如下：
 
 ```java
-interface IProduct {
-    public void productMethod();
+//工厂接口
+public interface IFactory {
+    Operation CreateOption();
 }
 
-class Product implements IProduct {
-    public void productMethod() {
-        System.out.println("产品");
+//加法类工厂
+public class AddFactory implements IFactory {
+    public Operation CreateOption() {
+        return new OperationAdd();
     }
 }
 
-interface IFactory {
-    public IProduct createProduct();
-}
-
-class Factory implements IFactory {
-    public IProduct createProduct() {
-        return new Product();
+//减法类工厂
+public class SubFactory implements IFactory {
+    public Operation CreateOption() {
+        return new OperationSub();
     }
 }
 
-public class Client {
-    public static void main(String[] args) {
-        IFactory factory = new Factory();
-        IProduct prodect = factory.createProduct();
-        prodect.productMethod();
+//乘法类工厂
+public class MulFactory implements IFactory {
+    public Operation CreateOption() {
+        return new OperationMul();
+    }
+}
+
+//除法类工厂
+public class DivFactory implements IFactory {
+    public Operation CreateOption() {
+        return new OperationDiv();
     }
 }
 ```
 
-#### 实例
+这时，我们使用计算器的时候，要为每种运算方法增加一个工厂对象
 
-1. 您需要一辆汽车，可以直接从工厂里面提货，而不用去管这辆汽车是怎么做出来的，以及这个汽车里面的具体实现。
+```java
+public class Client {
+    public static void main(String[] args) {
+      //减法
+      IFactory subFactory = new SubFactory();
+      Operation operationSub =  subFactory.CreateOption();
+      operationSub.setValue1(22);
+      operationSub.setValue2(20);
+      System.out.println("sub:"+operationSub.getResult());
+      //除法
+      IFactory Divfactory = new DivFactory();
+      Operation operationDiv =  Divfactory.CreateOption();
+      operationDiv.setValue1(99);
+      operationDiv.setValue2(33);
+      System.out.println("div:"+operationSub.getResult());
+    }
+}
+```
 
-2. Hibernate 换数据库只需换方言和驱动就可以。
 
-### 使用场景
 
-- 日志记录器：记录可能记录到本地硬盘、系统事件、远程服务器等，用户可以选择记录日志到什么地方。
+纳尼，这不是更复杂了吗，每个产品对应一个工厂，我又不是按代码量赚钱的。。。
 
-- 数据库访问，当用户不知道最后系统采用哪一类数据库，以及数据库可能有变化时。
-- 设计一个连接服务器的框架，需要三个协议，"POP3"、"IMAP"、"HTTP"，可以把这三个作为产品类，共同实现一个接口。
-
-### 工厂方法模式用途
+### 2.3 工厂方法模式适用场景
 
 工厂方法模式和简单工厂模式虽然都是通过工厂来创建对象，他们之间最大的不同是——工厂方法模式在设计上完全完全符合“**开闭原则**”。
 
@@ -233,7 +310,16 @@ public class Client {
 - **一个类通过其子类来指定创建哪个对象**：在工厂方法模式中，对于抽象工厂类只需要提供一个创建产品的接口，而由其子类来确定具体要创建的对象，利用面向对象的多态性和里氏代换原则，在程序运行时，子类对象将覆盖父类对象，从而使得系统更容易扩展。
 - 将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定，可将具体工厂类的类名存储在配置文件或数据库中。
 
-### 工厂方法模式总结
+#### 使用场景
+
+- 日志记录器：记录可能记录到本地硬盘、系统事件、远程服务器等，用户可以选择记录日志到什么地方。
+- 数据库访问，当用户不知道最后系统采用哪一类数据库，以及数据库可能有变化时。
+- 设计一个连接服务器的框架，需要三个协议，"POP3"、"IMAP"、"HTTP"，可以把这三个作为产品类，共同实现一个接口。
+- 比如 Hibernate 换数据库只需换方言和驱动就可以
+
+
+
+### 2.4 工厂方法模式总结
 
 工厂方法模式是简单工厂模式的进一步抽象和推广。
 
@@ -255,233 +341,188 @@ public class Client {
 
 
 
-## 抽象工厂模式
+## 三、抽象工厂模式
 
 工厂方法模式通过引入工厂等级结构，解决了简单工厂模式中工厂类职责太重的问题，但由于工厂方法模式中的每个工厂只生产一类产品，可能会导致系统中存在大量的工厂类，势必会增加系统的开销。此时，我们可以考虑将一些相关的产品组成一个“**产品族**”，由同一个工厂来统一生产，这就是抽象工厂模式的基本思想。 
 
- ![img](https://img-blog.csdn.net/20130713161528750) 
+### 3.1 定义
 
+为创建一组相关或相互依赖的对象提供一个接口，而且无需指定他们的具体类。
 
+抽象工厂(Abstract Factory)模式，又称工具箱(Kit 或Toolkit)模式。
 
-抽象工厂模式(Abstract Factory Pattern)：提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类。抽象工厂(Abstract Factory)模式，又称工具箱(Kit 或Toolkit)模式。
+### 3.2 抽象工厂模式实现方式
 
-抽象工厂模式提供了一种方式，可以将同一产品族的单独的工厂封装起来。在正常使用中，客户端程序需要创建抽象工厂的具体实现，然后使用抽象工厂作为接口来创建这一主题的具体对象。客户端程序不需要知道（或关心）它从这些内部的工厂方法中获得对象的具体类型，因为客户端程序仅使用这些对象的通用接口。抽象工厂模式将一组对象的实现细节与他们的一般使用分离开来。
+抽象工厂模式是工厂方法模式的升级版本，他用来创建一组相关或者相互依赖的对象。他与工厂方法模式的区别就在于，工厂方法模式针对的是一个产品等级结构；而抽象工厂模式则是针对的多个产品等级结构。在编程中，通常一个产品结构，表现为一个接口或者抽象类，也就是说，工厂方法模式提供的所有产品都是衍生自同一个接口或抽象类，而抽象工厂模式所提供的产品则是衍生自不同的接口或抽象类。
 
-#### 创建过程如下 
+在抽象工厂模式中，有一个**产品族**的概念：所谓的产品族，是指**位于不同产品等级结构中功能相关联的产品组成的家族**。抽象工厂模式所提供的一系列产品就组成一个产品族；而工厂方法提供的一系列产品称为一个等级结构。
 
-一个具体工厂创建一个产品族，一个产品族是不同系列产品的组合，产品的创建的逻辑分在在每个具体工厂类中。所有的具体工厂继承自同一个抽象工厂。 
+也没骗你，抽象工厂模式确实是抽象。
 
-客户端创建不同产品族的工厂，产品族的工厂创建具体的产品对客户端是不可见的。 
+抽象工厂模式包含的角色（要素）：
 
-增加新的产品族时，需要增加具体工厂类,符合OCP原则。 
+- AbstractFactory：抽象工厂，用于声明生成抽象产品的方法
+- ConcreteFactory：具体工厂，实现抽象工厂定义的方法，具体实现一系列产品对象的创建
+- AbstractProduct：抽象产品，定义一类产品对象的接口
+- ConcreteProduct：具体产品，通常在具体工厂里，会选择具体的产品实现，来创建符合抽象工厂定义的方法返回的产品类型的对象。
+- Client：客户端，使用抽象工厂来获取一系列所需要的产品对象
 
-增加新产品时，需要修改具体工厂类和增加产品类，不符合OCP原则 
+#### UML类图
 
-如果没有应对“多系列对象创建”的需求变化，则没有必要使用抽象工厂模式，这时候使用简单的静态工厂完全可以。
+![](https://tva1.sinaimg.cn/large/00831rSTly1gcp778i6yhj31gu0u0ahy.jpg)
 
-**产品族**
+#### 实例
 
-来认识下什么是产品族: 位于不同产品等级结构中,功能相关的产品组成的家族。如下面的例子，就有两个产品族：跑车族和商务车族。
+我把维基百科的例子改下用于理解，假设我们要生产两种产品，键盘（Keyboard）和鼠标（Mouse） ，每一种产品都支持多种系列，比如 Mac 系列和 Windows 系列。这样每个系列的产品分别是 MacKeyboard WinKeyboard, MacMouse, WinMouse 。为了可以在运行时刻创建一个系列的产品族，我们可以为每个系列的产品族创建一个工厂 MacFactory 和 WinFactory 。每个工厂都有两个方法 CreateMouse 和 CreateKeyboard 并返回对应的产品，可以将这两个方法抽象成一个接口 HardWare 。这样在运行时刻我们可以选择创建需要的产品系列。
 
-关系图如下：
+![](https://tva1.sinaimg.cn/large/00831rSTly1gcp77dgtchj31gu0u0ag5.jpg)
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gcmncbtwkej31160mkdow.jpg)
+1. 抽象产品
 
+2. ```java
+   public interface Keyboard {
+     void input();
+   }
+   public interface Mouse {
+     void click();
+   }
+   ```
 
+2. 具体产品
 
-**抽象工厂模式用途**
+   ```java
+   //具体产品
+   public class MacKeyboard implements Keyboard {
+       @Override
+       public void input() {
+           System.out.println("Mac 专用键盘");
+       }
+   }
+   
+   public class MacMouse implements Mouse {
+       @Override
+       public void click() {
+           System.out.println("Mac 专用鼠标");
+       }
+   }
+   
+   public class WinKeyboard implements Keyboard {
+       @Override
+       public void input() {
+           System.out.println("Win 专用键盘");
+       }
+   }
+   
+   public class WinMouse implements Mouse {
+       @Override
+       public void click() {
+           System.out.println("win 专用鼠标");
+       }
+   }
+   ```
 
-抽象工厂模式和工厂方法模式一样，都符合开放-封闭原则。但是不同的是，工厂方法模式在增加一个具体产品的时候，都要增加对应的工厂。但是抽象工厂模式只有在新增一个类型的具体产品时才需要新增工厂。也就是说，工厂方法模式的一个工厂只能创建一个具体产品。而抽象工厂模式的一个工厂可以创建属于一类类型的多种具体产品。工厂创建产品的个数介于简单工厂模式和工厂方法模式之间。
+3. 抽象工厂
+
+   ```java
+   public interface Hardware {
+        Keyboard createKyeBoard();
+        Mouse createMouse();
+   }
+   ```
+
+4. 具体的工厂类
+
+   ```java
+   public class MacFactory implements Hardware{
+       @Override
+       public Keyboard createKyeBoard() {
+           return new MacKeyboard();
+       }
+   
+       @Override
+       public Mouse createMouse() {
+           return new MacMouse();
+       }
+   }
+   
+   public class WinFactory implements Hardware{
+       @Override
+       public Keyboard createKyeBoard() {
+           return new WinKeyboard();
+       }
+   
+       @Override
+       public Mouse createMouse() {
+           return new WinMouse();
+       }
+   }
+   ```
+
+5. 使用
+
+   ```java
+   public class Client {
+     public static void main(String[] args) {
+       Hardware macFactory = new MacFactory();
+       Keyboard keyboard = macFactory.createKyeBoard();
+       keyboard.input();   //Mac 专用键盘
+   
+       Hardware winFactory = new WinFactory();
+       Mouse mouse = winFactory.createMouse();
+       mouse.click();  //win 专用鼠标
+     }
+   }
+   ```
+
+### 3.3 抽象工厂模式适用场景
+
+抽象工厂模式和工厂方法模式一样，都符合开闭原则。但是不同的是，工厂方法模式在增加一个具体产品的时候，都要增加对应的工厂。但是**抽象工厂模式只有在新增一个类型的具体产品时才需要新增工厂**。也就是说，工厂方法模式的一个工厂只能创建一个具体产品。而抽象工厂模式的一个工厂可以创建属于一类类型的多种具体产品。工厂创建产品的个数介于简单工厂模式和工厂方法模式之间。
 
 在以下情况下可以使用抽象工厂模式：
 
 - 一个系统不应当依赖于产品类实例如何被创建、组合和表达的细节，这对于所有类型的工厂模式都是重要的。
 - 系统中有多于一个的产品族，而每次只使用其中某一产品族。
 - 属于同一个产品族的产品将在一起使用，这一约束必须在系统的设计中体现出来。
-- 系统提供一个产品类的库，所有的产品以同样的接口出现，从而使客户端不依赖于具体实现。
-
-**抽象工厂模式实现方式**
-
-抽象工厂模式包含如下角色：
-
-AbstractFactory(抽象工厂)：用于声明生成抽象产品的方法
-
-ConcreteFactory(具体工厂)：实现了抽象工厂声明的生成抽象产品的方法，生成一组具体产品，这些产品构成了一个产品族，每一个产品都位于某个产品等级结构中；
-
-AbstractProduct(抽象产品)：为每种产品声明接口，在抽象产品中定义了产品的抽象业务方法；
-
-Product(具体产品)：定义具体工厂生产的具体产品对象，实现抽象产品接口中定义的业务方法。
-
-本文的例子采用一个汽车代工厂造汽车的例子。假设我们是一家汽车代工厂商，我们负责给奔驰和特斯拉两家公司制造车子。
-
-我们简单的把奔驰车理解为需要加油的车，特斯拉为需要充电的车。其中奔驰车中包含跑车和商务车两种，特斯拉同样也包含奔驰车和商务车。
-
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gcmnc75l75j31100q6k0i.jpg)
-
-
-
-以上场景，我们就可以把跑车和商务车分别对待，对于跑车有单独的工厂创建，商务车也有单独的工厂。
-
-这样，以后无论是再帮任何其他厂商造车，只要是跑车或者商务车我们都不需要再引入工厂。同样，如果我们要增加一种其他类型的车，比如越野车，我们也不需要对跑车或者商务车的任何东西做修改。
-
-下面是抽象产品，奔驰车和特斯拉车：
-
-```
-public interface BenzCar {
-    //加汽油
-    public void gasUp();
-
-}
-
-public interface TeslaCar {
-    //充电
-    public void charge();
-}
-```
-
-下面是具体产品，奔驰跑车、奔驰商务车、特斯拉跑车、特斯拉商务车：
-
-```
-public class BenzSportCar implements BenzCar {
-    public void gasUp() {
-        System.out.println("给我的奔驰跑车加最好的汽油");
-    }
-}
-
-public class BenzBusinessCar implements BenzCar{
-    public void gasUp() {
-        System.out.println("给我的奔驰商务车加一般的汽油");
-    }
-}
-
-public class TeslaSportCar implements TeslaCar {
-    public void charge() {
-        System.out.println("给我特斯拉跑车冲满电");
-    }
-}
-
-public class TeslaBusinessCar implements TeslaCar {
-    public void charge() {
-        System.out.println("不用给我特斯拉商务车冲满电");
-    }
-}
-```
-
-下面是抽象工厂：
-
-```
-public interface CarFactory {
-
-    public BenzCar getBenzCar();
-    public TeslaCar getTeslaCar();
-}
-```
-
-下面是具体工厂：
-
-```
-public class SportCarFactory implements CarFactory {
-    public BenzCar getBenzCar() {
-        return new BenzSportCar();
-    }
-
-    public TeslaCar getTeslaCar() {
-        return new TeslaSportCar();
-    }
-}
-
-public class BusinessCarFactory implements CarFactory {
-    public BenzCar getBenzCar() {
-        return new BenzBusinessCar();
-    }
-
-    public TeslaCar getTeslaCar() {
-        return new TeslaBusinessCar();
-    }
-}
-```
+- 系统结构稳定，不会频繁的增加对象。
 
 **“开闭原则”的倾斜性**
 
-“开闭原则”要求系统对扩展开放，对修改封闭，通过扩展达到增强其功能的目的。对于涉及到多个产品族与多个产品等级结构的系统，其功能增强包括两方面：
+**在抽象工厂模式中，增加新的产品族很方便，但是增加新的产品等级结构很麻烦**，抽象工厂模式的这种性质称为**“开闭原则”的倾斜性**。“开闭原则”要求系统对扩展开放，对修改封闭，通过扩展达到增强其功能的目的，对于涉及到多个产品族与多个产品等级结构的系统，其功能增强包括两方面：
 
 - 增加产品族：对于增加新的产品族，工厂方法模式很好的支持了“开闭原则”，对于新增加的产品族，只需要对应增加一个新的具体工厂即可，对已有代码无须做任何修改。
-- 增加新的产品等级结构：对于增加新的产品等级结构，需要修改所有的工厂角色，包括抽象工厂类，在所有的工厂类中都需要增加生产新产品的方法，不能很好地支持“开闭原则”。
+- 增加新的产品等级结构：对于增加新的产品等级结构，需要修改所有的工厂角色，包括抽象工厂类，在所有的工厂类中都需要增加生产新产品的方法，违背了“开闭原则”。
 
-抽象工厂模式的这种性质称为“开闭原则”的倾斜性，抽象工厂模式以一种倾斜的方式支持增加新的产品，它为新产品族的增加提供方便，但不能为新的产品等级结构的增加提供这样的方便。
-
-**抽象工厂模式总结**
-
-抽象工厂模式提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类。抽象工厂模式又称为Kit模式，属于对象创建型模式。
-
-抽象工厂模式是所有形式的工厂模式中最为抽象和最具一般性的一种形态。
-
-抽象工厂模式的主要优点是隔离了具体类的生成，使得客户并不需要知道什么被创建，而且每次可以通过具体工厂类创建一个产品族中的多个对象，增加或者替换产品族比较方便，增加新的具体工厂和产品族很方便；主要缺点在于增加新的产品等级结构很复杂，需要修改抽象工厂和所有的具体工厂类，对“开闭原则”的支持呈现倾斜性。
+正因为抽象工厂模式存在“开闭原则”的倾斜性，它以一种倾斜的方式来满足“开闭原则”，为增加新产品族提供方便，但不能为增加新产品结构提供这样的方便，因此要求设计人员在设计之初就能够全面考虑，不会在设计完成之后向系统中增加新的产品等级结构，也不会删除已有的产品等级结构，否则将会导致系统出现较大的修改，为后续维护工作带来诸多麻烦。
 
 
+### 3.4 抽象工厂模式总结
 
-## **三种工厂模式对比**
+抽象工厂模式是工厂方法模式的进一步延伸，由于它提供了功能更为强大的工厂类并且具备较好的可扩展性，在软件开发中得以广泛应用，尤其是在一些框架和API类库的设计中，例如在Java语言的AWT（抽象窗口工具包）中就使用了抽象工厂模式，它使用抽象工厂模式来实现在不同的操作系统中应用程序呈现与所在操作系统一致的外观界面。抽象工厂模式也是在软件开发中最常用的设计模式之一。
 
-**简单工厂模式的优缺点**
+**优点：** 
 
-- 优点：
+- 抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建。由于这种隔离，更换一个具体工厂就变得相对容易，所有的具体工厂都实现了抽象工厂中定义的那些公共接口，因此只需改变具体工厂的实例，就可以在某种程度上改变整个软件系统的行为。 
+- 当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。
+- 增加新的产品族很方便，无须修改已有系统，符合“开闭原则”。
 
-- - 1、屏蔽产品的具体实现，调用者只关心产品的接口。
-  - 2、实现简单
+**缺点：**
 
-- 缺点：
+增加新的产品等级结构麻烦，需要对原有系统进行较大的修改，甚至需要修改抽象层代码，这显然会带来较大的不便，违背了“开闭原则”。
 
-- - 1、增加产品，需要修改工厂类，不符合开放-封闭原则
-  - 2、工厂类集中了所有实例的创建逻辑，违反了高内聚责任分配原则
+#### 工厂模式的退化
 
-**工厂方法模式的优缺点**
-
-- 优点：
-
-- - 1、继承了简单工厂模式的优点
-  - 2、符合开放-封闭原则
-
-- 缺点：
-
-- - 1、增加产品，需要增加新的工厂类，导致系统类的个数成对增加，在一定程度上增加了系统的复杂性。
-
-**抽象工厂模式的优缺点**
-
-- 优点：
-
-- - 1、隔离了具体类的生成，使得客户并不需要知道什么被创建
-  - 2、每次可以通过具体工厂类创建一个产品族中的多个对象，增加或者替换产品族比较方便，增加新的具体工厂和产品族很方便；
-
-- 缺点
-
-- - 增加新的产品等级结构很复杂，需要修改抽象工厂和所有的具体工厂类，对“开闭原则”的支持呈现倾斜性。
-
-    
+当抽象工厂模式中每一个具体工厂类只创建一个产品对象，也就是只存在一个产品等级结构时，抽象工厂模式退化成工厂方法模式；当工厂方法模式中抽象工厂与具体工厂合并，提供一个统一的工厂来创建产品对象，并将创建对象的工厂方法设计为静态方法时，工厂方法模式退化成简单工厂模式。
 
 
 
-**三种工厂模式的对比与转换**
+## 我们身边的工厂模式
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gcmnc0p64nj310u0oi45c.jpg)
-
-简单工厂 ： 用来生产同一等级结构中的任意产品。（对于增加新的产品，主要是新增产品，就要修改工厂类。符合单一职责原则。不符合开放-封闭原则）
-
-工厂方法 ：用来生产同一等级结构中的固定产品。（支持增加任意产品，新增产品时不需要更改已有的工厂，需要增加该产品对应的工厂。符合单一职责原则、符合开放-封闭原则。但是引入了复杂性）
-
-抽象工厂 ：用来生产不同产品族的全部产品。（增加新产品时，需要修改工厂，增加产品族时，需要增加工厂。符合单一职责原则，部分符合开放-封闭原则，降低了复杂性）
-
-最后，三种工厂模式各有优缺点，没有最好的，只有最合适的！
-
-
-
-
+JDK中的Calendar 使用了简单工厂模式
 
 ## 参考
 
- https://blog.csdn.net/lovelion/article/details/9319181 
+https://blog.csdn.net/lovelion/article/details/17517213 
 
+https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
 
-
- https://blog.csdn.net/lovelion/article/details/17517213 
-
- https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
+https://blog.csdn.net/lovelion/article/details/17517213
