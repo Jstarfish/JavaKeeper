@@ -24,11 +24,57 @@
 
 
 
+## API应用
+
+不管 Java 是不是最好的语言，我都要说 `I use Java. Java for ever`。所以我们要用 Java 去操作 zookeeper。 
+
+zookeeper的常用客户端有3种，分别是：zookeeper原生的、Apache Curator、开源的zkclient
+
+- zookeeper自带的客户端是官方提供的，比较底层、使用起来写代码麻烦、不够直接。
+- Apache Curator是Apache的开源项目，封装了zookeeper自带的客户端，使用相对简便，易于使用。
+- zkclient是另一个开源的ZooKeeper客户端，其地址：https://github.com/adyliu/zkclient生产环境不推荐使用。 
+
+分别简单介绍下
+
+
+
+实际项目中使用的是 curator ，所以要好好了解下这个
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 官方教程
 
 https://cwiki.apache.org/confluence/display/ZOOKEEPER/EurosysTutorial
 
-## 4.2 API应用
+## 
 
 ### 4.3.1 环境搭建
 

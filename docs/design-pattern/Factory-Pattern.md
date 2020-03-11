@@ -1,18 +1,20 @@
-# 工厂模式——生产对象的工厂
+# 工厂模式——我有不止一个对象
 
+> 3年工作经验是吧？
+>
 > 你知道工厂模式分为几类吗？他们都有什么区别？
 >
-> 
+> 那你说说你们项目中是怎么使用工厂模式的？
 
 
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcmy3e9tbzg30p00ge16a.gif)
 
 ## 工厂模式
 
 工厂模式（Factory Pattern）是 Java 中最常用的设计模式之一。这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。
 
 在工厂模式中，我们在创建对象时不会对客户端暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。
+
+<img src="https://tva1.sinaimg.cn/large/00831rSTly1gcmy3e9tbzg30p00ge16a.gif" style="zoom:33%;" />
 
 
 
@@ -139,9 +141,7 @@ public static void main(String[] args) {
 简单工厂模式包含 3 个角色（要素）：
 
 - Factory：即工厂类， 简单工厂模式的核心部分，负责实现创建所有产品的内部逻辑；工厂类可以被外界直接调用，创建所需对象
-
 - Product：抽象类产品， 它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法，它的引入将提高系统的灵活性，使得在工厂类中只需定义一个通用的工厂方法，因为所有创建的具体产品对象都是其子类对象
-
 - ConcreteProduct：具体产品， 它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例。它要实现抽象产品中声明的抽象方法
 
 #### UML类图
@@ -515,9 +515,25 @@ public class Client {
 
 
 
-## 我们身边的工厂模式
+## 四、我们身边的工厂模式
 
-JDK中的Calendar 使用了简单工厂模式
+工厂模式在Java码农身边真是无处不在，不信打开你的项目，搜索 `Factory`
+
+- 我们最常用的 Spring  就是一个最大的 Bean 工厂，IOC 通过`BeanFactory`对Bean 进行管理。
+
+- 我们使用的日志门面框架`slf4j`，点进去就可以看到熟悉的味道
+
+  ```java
+  private final static Logger logger = LoggerFactory.getLogger(HelloWord.class);
+  ```
+
+- JDK 的 `Calendar` 使用了简单工厂模式
+
+  ```java
+   Calendar calendar = Calendar.getInstance();
+  ```
+
+  
 
 ## 参考
 
@@ -525,4 +541,4 @@ https://blog.csdn.net/lovelion/article/details/17517213
 
 https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
 
-https://blog.csdn.net/lovelion/article/details/17517213
+https://blog.csdn.net/lovelion/article/details/17517213                                                                                                                                    

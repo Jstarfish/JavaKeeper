@@ -309,6 +309,8 @@ Zookeeper 的视图结构和标准的 Unix 文件系统非常类似，但没有�
 
 ### 3.3 Stat 结构体
 
+ Znodes 维护一个 stat 结构，其中包含数据更改、acl更改的版本号、时间戳等。 
+
 | 状态属性       | 说明                                                         |
 | -------------- | ------------------------------------------------------------ |
 | czxid          | 创建节点的事务zxid。 每次修改ZooKeeper状态都会收到一个zxid形式的时间戳，也就是ZooKeeper事务ID。事务ID是ZooKeeper中所有修改总的次序。每个修改都有唯一的zxid，如果zxid1小于zxid2，那么zxid1在zxid2之前发生 |
@@ -548,4 +550,8 @@ ZAB 默认采用 TCP 版本的 FastLeaderElection 选举算法。在选举投票
 《[聊聊zookeeper的ZAB算法](https://blog.sunwaiting.com/2018/08/26/聊聊zookeeper的ZAB算法/)》
 
 《[基础Paxos算法]([https://netium.gitlab.io/2018/09/25/%E5%9F%BA%E7%A1%80Paxos%E7%AE%97%E6%B3%95/](https://netium.gitlab.io/2018/09/25/基础Paxos算法/))》
+
+《尚硅谷Zookeeper》
+
+ https://zookeeper.apache.org/doc/ 
 
