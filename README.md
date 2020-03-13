@@ -1,6 +1,10 @@
-# Java大猿帅的一亩三分地 [:egg:](https://www.lazyegg.net/JavaEgg)
+# Java大猿帅的一亩三分地 [:egg:](https://www.lazyegg.net/JavaKeeper)
 
-<p>
+<p align="center">
+    <a href="https://www.apachecn.org">
+        <img  src="https://i.loli.net/2020/03/13/WOJFBDIG6kocKxh.png">
+    </a>
+    <br ><br >
 <img src="https://img.shields.io/badge/language-Java-blue.svg">
 <img src="https://img.shields.io/badge/platform-Linux-red.svg">
 <a href="https://juejin.im/user/5b8f1d426fb9a019d7477421"><img src="https://img.shields.io/badge/%E6%8E%98%E9%87%91-@lazyegg-FFA500.svg?style=flat&colorA=1970fe"></a>
@@ -8,7 +12,8 @@
 <a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/CSDN-@大新之助-fd6f32.svg?style=flat&colorA=B22222"></a>
 </p>
 
-<br/>
+<h4 align="center">记录并分享每一次成长</h4>
+
 
 ## 💾  数据存储、缓存和搜索
 
@@ -97,7 +102,7 @@
 
 |       Project        | Article                                                      |
 | :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/> |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/> |
 
 
 
@@ -149,7 +154,7 @@
 
 
 
-## 最后一起干了这杯 Java 吧
+## 这杯 Java 度数较大，建议饮用
 
-## ![](https://tva1.sinaimg.cn/large/006tNbRwly1ga44patst0j307s07s0tg.jpg)
+## <img src="https://tva1.sinaimg.cn/large/006tNbRwly1ga44patst0j307s07s0tg.jpg"  />
 
