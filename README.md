@@ -1,5 +1,3 @@
-# Java大猿帅的一亩三分地 [:egg:](https://www.lazyegg.net/JavaKeeper)
-
 <p align="center">
     <a href="https://www.lazyegg.net/JavaKeeper">
         <img  src="https://i.loli.net/2020/03/13/WOJFBDIG6kocKxh.png">
@@ -12,7 +10,15 @@
 <a href="https://blog.csdn.net/u011870547"><img src="https://img.shields.io/badge/CSDN-@大新之助-fd6f32.svg?style=flat&colorA=B22222"></a>
 </p>
 
-<h4 align="center">记录并分享每一次成长</h4>
+<h3 align="center">记录并分享每一次成长</h3>
+
+------
+
+![](https://i.loli.net/2020/03/13/VdgBjmpODuZ5v9R.png)
+
+------
+
+
 
 ## 💾  数据存储、缓存和搜索
 
@@ -153,7 +159,5 @@
 
 
 
-## 这杯 Java 度数较大，建议饮用
-
-## <img src="https://tva1.sinaimg.cn/large/006tNbRwly1ga44patst0j307s07s0tg.jpg"  />
+## 
 
