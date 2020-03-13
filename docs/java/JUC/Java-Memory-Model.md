@@ -2,7 +2,7 @@
 
 前两天看到同学和我显摆他们公司配的电脑多好多好，我默默打开了自己的电脑，` 酷睿 i7-4770 `，也不是不够用哈，4核8线程的 CPU，也是杠杠的。
 
-![image-20200313151522115](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200313151522115.png)
+![qqq.png](https://i.loli.net/2020/03/13/RrWQAhYspxlBGnd.png)
 
 扯这玩意干啥，Em~~~~
 
