@@ -35,6 +35,7 @@
 - DB调优
 - **其他**
 - [![Linux](https://icongram.jgog.in/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
+- [![]( https://icongram.jgog.in/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)

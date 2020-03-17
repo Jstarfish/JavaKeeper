@@ -30,9 +30,12 @@
 - DB调优
 - **其他**
 - [![Linux](https://icongram.jgog.in/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
-- SHELL
-- TCP与HTTP
-- [![]( https://icongram.jgog.in/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
+- [![]( https://icongram.jgog.in/entypo/key.svg?&size=16)设计模式](design-pattern/catalog.md)
+  - [设计模式前传](/design-pattern/Design-Pattern-Overview.md)
+  - [单例模式](/design-pattern/Singleton-Pattern.md)
+  - [工厂模式](/design-pattern/Factory-Pattern.md)
+  - [观察者模式](/design-pattern/Observer-Pattern.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
+
