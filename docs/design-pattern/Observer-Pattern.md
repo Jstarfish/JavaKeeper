@@ -44,6 +44,16 @@
 
 ## 实例
 
+1、定义观察者接口
+
+```java
+interface Observer {
+    public void update();
+}
+```
+
+2、定义被观察者
+
 ```java
 abstract class Subject {
     private Vector<Observer> obs = new Vector();
@@ -61,27 +71,37 @@ abstract class Subject {
     }
     public abstract void doSomething();
 }
+```
 
+3、具体的观察者
+
+```java
 class ConcreteSubject extends Subject {
     public void doSomething(){
         System.out.println("被观察者事件反生");
         this.notifyObserver();
     }
 }
-interface Observer {
-    public void update();
-}
+```
+
+4、具体的被观察者
+
+```java
 class ConcreteObserver1 implements Observer {
     public void update() {
-        System.out.println("观察者1收到信息，并进行处理。");
+        System.out.println("观察者1收到信息，并进行处理");
     }
 }
 class ConcreteObserver2 implements Observer {
     public void update() {
-        System.out.println("观察者2收到信息，并进行处理。");
+        System.out.println("观察者2收到信息，并进行处理");
     }
 }
+```
 
+5、客户端
+
+```java
 public class Client {
     public static void main(String[] args){
         Subject sub = new ConcreteSubject();
@@ -94,6 +114,8 @@ public class Client {
 
 通过运行结果可以看到，我们只调用了Subject的方法，但同时两个观察者的相关方法都被同时调用了。仔细看一下代码，其实很简单，无非就是在Subject类中关联一下Observer类，并且在doSomething方法中遍历一下Observer的update方法就行了。 
 
+
+
 ## 优缺点
 
 观察者与被观察者之间是属于轻度的关联关系，并且是抽象耦合的，这样，对于两者来说都比较容易进行扩展。
@@ -102,10 +124,23 @@ public class Client {
 
 
 
-观察者模式在 JDK 应用的源码分析
+## 应用
 
-1. JDK的`java.util` 包下有一个接口Observer，以及它的实现类Observable，对观察者角色进行了实现 
+1.  观察者模式在 Java 语言中的地位非常重要。在 JDK 的 java.util 包中，提供了 Observable 类以及 Observer 接口，它们构成了 JDK 对观察者模式的支持（可以去查看下源码，写的比较严谨）
+2. 
 
 
+
+## 项目
+
+下面的代码就比较厉害了。“东半球最大的安全公司”和“全中国最大的农村拼购平台”联合出品（em，这么说确实没错，没夸大，哈哈）。
+
+![image-20200317153750274.png](https://i.loli.net/2020/03/17/kUBxgCQDNKi3jaE.png)
+
+![image-20200317162346913.png](https://i.loli.net/2020/03/17/e3nIL14NaifVEhq.png)
+
+设计模式真的只是一种设计思想，不需要非得有多个观察者才可以用观察者模式，只有一个观察者，我也要用。
+
+需求：比如我的网站想放一些广告位，所以我从淘宝的淘宝客，拼夕夕的多多客
 
 ## 参考
