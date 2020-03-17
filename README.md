@@ -83,6 +83,7 @@
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   JVM   |         | [JVM与Java体系结构](/docs/java/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/类加载子系统.md)<br/>运行时数据区 |
 |  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
+|         |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md) |
 |   NIO   |         |                                                              |
 
 
@@ -102,7 +103,7 @@
 
 |       Project        | Article                                                      |
 | :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/> |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——我有好多对象](/docs/design-pattern/Observer-Pattern.md)<br /> |
 
 
 

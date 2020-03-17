@@ -2,6 +2,8 @@
 
 > 谈谈你对volatile 的理解？
 >
+> volatile 的工作原理？
+>
 > CAS 你知道吗？ 
 
 
