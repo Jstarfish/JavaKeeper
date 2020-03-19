@@ -12,7 +12,6 @@
 
 <h3 align="center">记录并分享每一次成长</h3>
 
-
 ------
 
 
@@ -105,7 +104,7 @@
 
 |       Project        | Article                                                      |
 | :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——我有好多对象](/docs/design-pattern/Observer-Pattern.md)<br /> |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——暗中观察](/docs/design-pattern/Observer-Pattern.md)<br /> |
 
 
 

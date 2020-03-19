@@ -6,7 +6,9 @@
 >
 > 那你说说你们项目中是怎么使用工厂模式的？
 
-
+> 带着问题，尤其是面试问题的学习才是最高效的。加油，奥利给！  
+>
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱 
 
 ## 工厂模式
 
@@ -542,3 +544,7 @@ https://blog.csdn.net/lovelion/article/details/17517213
 https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
 
 https://blog.csdn.net/lovelion/article/details/17517213                                                                                                                                    
+
+
+
+![](https://i.loli.net/2020/03/19/AkRqgTo6y5crBSx.png)
