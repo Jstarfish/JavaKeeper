@@ -12,7 +12,7 @@
 
 # 装饰模式
 
-《Head First 设计模式》中是这么形容装饰者模式——“给爱用继承的人个全新的设计眼界”
+《Head First 设计模式》中是这么形容装饰者模式——“给爱用继承的人一个全新的设计眼界”，拒绝继承滥用，从装饰者模式开始。
 
 
 
@@ -43,13 +43,13 @@
 
 ## 角色
 
-- **Component （ 抽象构件 ）**：
+- **Component （ 抽象构件 ）**： 抽象组件，是一个接口或者抽象类；就是定义的最原始的对象 
 
-- **ConcreteComponent （ 具体构件 ）**：
+- **ConcreteComponent （ 具体构件 ）**： 实现类(需要装饰) 
 
-- **Decorator （ 抽象装饰类 ）**：
+- **Decorator （ 抽象装饰类 ）**： 装饰角色，一般是抽象类，实现接口；它的属性必然有个private变量指向Conponent抽象组件 
 
-- **ConcreteDecorator （ 具体装饰类 ）**：
+- **ConcreteDecorator （ 具体装饰类 ）**： 具体的装饰对象 
 
 
 
@@ -58,6 +58,12 @@
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gcxwtvpenhj311t0lnacu.jpg)
 
 再记录下 UML 类图的注意事项，这里我的 Subject 是**抽象方法**，所以用***斜体***，抽象方法也要用斜体，具体的各种箭头意义，我之前也总结过《设计模式前传——学设计模式前你要知道这些》（被网上各种帖子毒害过的自己，认真记录~~~）。
+
+
+
+ https://mp.weixin.qq.com/s?src=11&timestamp=1584951712&ver=2233&signature=0HjSfKqKvXmGokJBJw5eHAkitAz0ZZkpXAFsBjEDdr24sp0sxT9yeENNaPr*yv45Mv0JjX1zsztiZceFgjEdG96uRt18INWlZiic75M1UDKwNf1Mcxhobucrm7h-x2B7&new=1 
+
+
 
 ## 实例
 
@@ -164,11 +170,15 @@ public class Client {
 
 
 
+ https://blog.csdn.net/wuxinliulei/article/details/22993171 
+
 ## 应用
 
-### JDK中的观察者模式
+### JDK中的装饰者模式
 
 观察者模式在 Java 语言中的地位非常重要。在 JDK 的 java.util 包中，提供了 Observable 类以及 Observer 接口，它们构成了 JDK 对观察者模式的支持（可以去查看下源码，写的比较严谨）。but，在 Java9 被弃用了。
+
+### Servlet 中的装饰者模式
 
 ### Spring 中的观察者模式
 

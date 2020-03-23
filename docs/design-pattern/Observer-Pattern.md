@@ -1,4 +1,4 @@
-# 观察者模式
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 在软件系统中经常会有这样的需求：如果一个对象的状态发生改变，某些与它相关的对象也要随之做出相应的变化。
 
@@ -268,3 +268,7 @@ ListenerB received
 https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
 
 https://www.cnblogs.com/jmcui/p/11054756.html
+
+
+
+![](https://user-gold-cdn.xitu.io/2020/3/20/170f5beacffbc730?w=750&h=390&f=jpeg&s=29031)
