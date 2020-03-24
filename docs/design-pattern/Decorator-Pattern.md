@@ -1,26 +1,12 @@
- https://design-patterns.readthedocs.io/zh_CN/latest/structural_patterns/decorator.html 
+# 装饰模式——JDK和Spring是如何杜绝继承滥用的
 
+《Head First 设计模式》中是这么形容装饰者模式——“**给爱用继承的人一个全新的设计眼界**”，拒绝继承滥用，从装饰者模式开始。
 
-
- https://www.javazhiyin.com/33987.html 
-
-
-
- http://www.spring4all.com/article/15180 
-
- https://juejin.im/post/5ba0fb04e51d450e67494256 
-
-# 装饰模式
-
-《Head First 设计模式》中是这么形容装饰者模式——“给爱用继承的人一个全新的设计眼界”，拒绝继承滥用，从装饰者模式开始。
-
-
-
-装饰器模式（Decorator Pattern）允许向一个现有的对象添加新的功能，同时又不改变其结构。这种类型的设计模式属于结构型模式，它是作为现有的类的一个包装。
+装饰者模式允许向一个现有的对象添加新的功能，同时又不改变其结构。这种类型的设计模式属于**结构型模式**，它是作为现有的类的一个包装。
 
 这种模式创建了一个装饰类，用来包装原有的类，并在保持类方法签名完整性的前提下，提供了额外的功能。
 
-我们通过下面的实例来演示装饰器模式的用法。其中，我们将把一个形状装饰上不同的颜色，同时又不改变形状类。
+------
 
 
 
@@ -31,106 +17,169 @@
 - 继承机制，使用继承机制是给现有类添加功能的一种有效途径，通过继承一个现有类可以使得子类在拥有自身方法的同时还拥有父类的方法。但是这种方法是静态的，用户不能控制增加行为的方式和时机。
 - 关联机制，即将一个类的对象嵌入另一个对象中，由另一个对象来决定是否调用嵌入对象的行为以便扩展自己的行为，我们称这个嵌入的对象为装饰器(Decorator)
 
-装饰模式以对客户透明的方式动态地给一个对象附加上更多的责任，换言之，客户端并不会觉得对象在装饰前和装饰后有什么不同。装饰模式可以在不需要创造更多子类的情况下，将对象的功能加以扩展。这就是装饰模式的模式动机。
+装饰模式以对客户透明的方式动态地给一个对象附加上更多的责任，换言之，客户端并不会觉得对象在装饰前和装饰后有什么不同。装饰模式可以在不需要创造更多子类的情况下，将对象的功能加以扩展。
+
+**意图：**动态地给一个对象添加一些额外的职责。就增加功能来说，装饰器模式相比生成子类更为灵活。
+
+**主要解决：**一般的，我们为了扩展一个类经常使用继承方式实现，由于继承为类引入静态特征，并且随着扩展功能的增多，子类会很膨胀。
+
+**何时使用：**在不想增加很多子类的情况下扩展类。
+
+**如何解决：**将具体功能职责划分，同时继承装饰者模式。
+
+------
 
 
 
 ## 定义
 
-装饰模式(Decorator Pattern) ：动态地给一个对象增加一些额外的职责(Responsibility)，就增加对象功能来说，装饰模式比生成子类实现更为灵活。其别名也可以称为包装器(Wrapper)，与适配器模式的别名相同，但它们适用于不同的场合。根据翻译的不同，装饰模式也有人称之为“油漆工模式”，它是一种对象结构型模式。 
+**装饰模式**(Decorator Pattern) ：动态地给一个对象增加一些额外的职责(Responsibility)，就增加对象功能来说，装饰模式比生成子类（继承）实现更为灵活。其别名也可以称为**包装器**(Wrapper)，与适配器模式的别名相同，但它们适用于不同的场合。
+
+------
 
 
 
 ## 角色
 
-- **Component （ 抽象构件 ）**： 抽象组件，是一个接口或者抽象类；就是定义的最原始的对象 
+- **Component**： 抽象组件，装饰者和被装饰者共同的父类，是一个接口或者抽象类，用来定义基本行为，可以给这些对象动态添加职责
 
-- **ConcreteComponent （ 具体构件 ）**： 实现类(需要装饰) 
+- **ConcreteComponent**： 具体的组件对象，实现类 ，即被装饰者，通常就是被装饰器装饰的原始对象，也就是可以给这个对象添加职责
 
-- **Decorator （ 抽象装饰类 ）**： 装饰角色，一般是抽象类，实现接口；它的属性必然有个private变量指向Conponent抽象组件 
+- **Decorator**： 所有装饰器的抽象父类，一般是抽象类，实现接口；它的属性必然有个指向Conponent抽象组件的对象 ，其实就是持有一个被装饰的对象
 
-- **ConcreteDecorator （ 具体装饰类 ）**： 具体的装饰对象 
+- **ConcreteDecorator**： 具体的装饰对象，实现具体要被装饰对象添加的功能。每一个具体装饰类都定义了一些新的行为，它可以调用在抽象装饰类中定义的方法，并可以增加新的方法用以扩充对象的行为。
+
+
+
+装饰者和被装饰者对象有相同的父类，因为装饰者和被装饰者必须是一样的类型，**这里利用继承是为了达到类型匹配，而不是利用继承获得行为**。
+
+利用继承设计子类，只能在编译时静态决定，并且所有子类都会继承相同的行为；利用组合的做法扩展对象，就可以在运行时动态的进行扩展。装饰者模式遵循开放-关闭原则：**类应该对扩展开放，对修改关闭。**利用装饰者，我们可以实现新的装饰者增加新的行为而不用修改现有代码，而如果单纯依赖继承，每当需要新行为时，还得修改现有的代码。
+
+------
 
 
 
 ## 类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcxwtvpenhj311t0lnacu.jpg)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd5a7252usj31750tpgof.jpg)
 
-再记录下 UML 类图的注意事项，这里我的 Subject 是**抽象方法**，所以用***斜体***，抽象方法也要用斜体，具体的各种箭头意义，我之前也总结过《设计模式前传——学设计模式前你要知道这些》（被网上各种帖子毒害过的自己，认真记录~~~）。
-
-
-
- https://mp.weixin.qq.com/s?src=11&timestamp=1584951712&ver=2233&signature=0HjSfKqKvXmGokJBJw5eHAkitAz0ZZkpXAFsBjEDdr24sp0sxT9yeENNaPr*yv45Mv0JjX1zsztiZceFgjEdG96uRt18INWlZiic75M1UDKwNf1Mcxhobucrm7h-x2B7&new=1 
+------
 
 
 
 ## 实例
 
-1、定义观察者接口
+看了好多资料的例子，比如
+
+- 公司发放奖金，不同的员工类型对应不同的奖金计算规则，用各种计算规则去装饰统一的奖金计算类
+- 星巴克售卖用咖啡，用摩卡、奶泡去装饰咖啡，实现不同的计费
+- 
+
+我还是比较喜欢买煎饼的例子
+
+1、定义抽象组件
 
 ```java
-interface Observer {
-    public void update();
+public abstract class Pancake {
+
+    String description = "普通煎饼";
+
+    public String getDescription(){
+        return description;
+    }
+
+    public abstract double cost();
 }
 ```
 
-2、定义被观察者
+2、定义具体的被装饰者，这里是煎饼果子，当然还可以有鸡蛋灌饼、手抓饼等其他被装饰者
 
 ```java
-abstract class Subject {
-    private Vector<Observer> obs = new Vector();
-
-    public void addObserver(Observer obs){
-        this.obs.add(obs);
+public class Battercake extends Pancake {
+    @Override
+    public double cost() {
+        return 8;
     }
-    public void delObserver(Observer obs){
-        this.obs.remove(obs);
-    }
-    protected void notifyObserver(){
-        for(Observer o: obs){
-            o.update();
-        }
-    }
-    public abstract void doSomething();
-}
-```
 
-3、具体的被观察者
-
-```java
-class ConcreteSubject extends Subject {
-    public void doSomething(){
-        System.out.println("被观察者事件发生改变");
-        this.notifyObserver();
-    }
-}
-```
-
-4、具体的被观察者
-
-```java
-class ConcreteObserver1 implements Observer {
-    public void update() {
-        System.out.println("观察者1收到信息，并进行处理");
-    }
-}
-class ConcreteObserver2 implements Observer {
-    public void update() {
-        System.out.println("观察者2收到信息，并进行处理");
+    public Battercake(){
+        description = "煎饼果子";
     }
 }
 ```
 
-5、客户端
+3、抽象的装饰器对象，定义一个调料抽象类
+
+```java
+public abstract class CondimentDecorator extends Pancake {
+
+    // 持有组件对象
+    protected Pancake pancake;
+    public CondimentDecorator(Pancake pancake){
+        this.pancake = pancake;
+    }
+
+    public abstract String getDescription();
+}
+```
+
+4、具体的装饰者，我们定义一个鸡蛋装饰器，一个火腿装饰器
+
+```java
+public class Egg extends CondimentDecorator {
+    public Egg(Pancake pancake){
+        super(pancake);
+    }
+
+    @Override
+    public String getDescription() {
+        return pancake.getDescription() + "加鸡蛋";
+    }
+
+    @Override
+    public double cost() {
+        return pancake.cost() + 1;
+    }
+}
+```
+
+```java
+public class Sausage extends CondimentDecorator{
+    public Sausage(Pancake pancake){
+        super(pancake);
+    }
+    @Override
+    public String getDescription() {
+        return pancake.getDescription() + "加火腿";
+    }
+
+    @Override
+    public double cost() {
+        return pancake.cost() + 2;
+    }
+}
+```
+
+5、测试卖煎饼
 
 ```java
 public class Client {
-    public static void main(String[] args){
-        Subject sub = new ConcreteSubject();
-        sub.addObserver(new ConcreteObserver1()); //添加观察者1
-        sub.addObserver(new ConcreteObserver2()); //添加观察者2
-        sub.doSomething();
+
+    public static void main(String[] args) {
+        //买一个普通的煎饼果子
+        Pancake battercake = new Battercake();
+        System.out.println(battercake.getDescription() + "花费："+battercake.cost() + "元");
+
+        //买一个加双蛋的煎饼果子
+        Pancake doubleEgg = new Battercake();
+        doubleEgg = new Egg(doubleEgg);
+        doubleEgg = new Egg(doubleEgg);
+        System.out.println(doubleEgg.getDescription() + "花费" + doubleEgg.cost() + "元");
+
+        //加火腿和鸡蛋
+        Pancake battercakePlus = new Battercake();
+        battercakePlus = new Egg(battercakePlus);
+        battercakePlus = new Sausage(battercakePlus);
+        System.out.println(battercakePlus.getDescription() + "花费" + battercakePlus.cost() + "元");
     }
 }
 ```
@@ -138,16 +187,120 @@ public class Client {
 输出
 
 ```
-被观察者事件发生改变
-观察者1收到信息，并进行处理
-观察者2收到信息，并进行处理
+煎饼果子花费：8.0元
+煎饼果子加鸡蛋加鸡蛋花费10.0元
+煎饼果子加鸡蛋加火腿花费11.0元
 ```
 
-通过运行结果可以看到，我们只调用了 `Subject` 的方法，但同时两个观察者的相关方法都被调用了。仔细看一下代码，其实很简单，就是在 `Subject` 类中关联一下 `Observer` 类，并且在 `doSomething()` 方法中遍历一下 `Observer` 的 `update()` 方法就行了。 
+看下通过IDEA 生成的 UML 类图
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd515ta83tj318c0pmjui.jpg)
+
+------
 
 
 
-## 优缺点
+## 应用
+
+### Java I/O 中的装饰者模式
+
+我们使用 `java.io` 包下的各种输入流、输出流、字节流、字符流、缓冲流等各种各样的流，他们中的许多类都是装饰者，下面是一个典型的对象集合，用装饰者将功能结合起来，以读取文件数据
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd51gr33b0j30ls0au74n.jpg)
+
+`BufferedInputStream` 和 `LinerNumberInputStream` 都是扩展自 `FilterInputStream`，而 `FilterInputStream` 是一个抽象的装饰类。
+
+在 idea 中选中一些常见 InputStream 类，生成 UML 图如下：
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd51yq60yxj322e0rewkg.jpg)
+
+我们平时读取一个文件中的内容其实就使用到了装饰模式的思想，还是用《Head First 设计模式》的例子，我们自定义一个装饰者，把输入流中的所有大写字符转换为小写
+
+```java
+public class LowerCaseInputStream extends FilterInputStream {
+  
+    protected LowerCaseInputStream(InputStream in) {
+        super(in);
+    }
+
+    public int read() throws IOException {
+        int c = super.read();
+        return (c == -1 ? c:Character.toLowerCase(c));
+    }
+}
+```
+
+```java
+public class InputTest {
+
+    public static void main(String[] args) throws IOException {
+        int c;
+        //装饰器的组装过程
+        InputStream in = new LowerCaseInputStream(new BufferedInputStream(new FileInputStream("java.txt"))); 
+
+        while ((c = in.read()) >= 0){
+            System.out.print((char) c);
+        }
+        in.close();
+    }
+}
+```
+
+采用装饰者模式在实例化组件时，将增加代码的复杂度，一旦使用装饰者模式，不只需要实例化组件，还把把此组件包装进装饰者中，天晓得有几个，所以在某些复杂情况下，我们还会结合工厂模式和生成器模式。比如Spring中的装饰者模式。
+
+
+
+### Servlet 中的装饰者模式
+
+Servlet API源自于4个实现类，它很少被使用，但是十分强大：`ServletRequestWrapper`、`ServletResponseWrapper`以及 `HttpServletRequestWrapper`、`HttpServletResponseWrapper`。
+
+比如`ServletRequestWrapper` 是 `ServletRequest` 接口的简单实现，开发者可以继承 `ServletRequestWrapper` 去扩展原来的`request`
+
+```java
+public class ServletRequestWrapper implements ServletRequest {
+    private ServletRequest request;
+
+    public ServletRequestWrapper(ServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        } else {
+            this.request = request;
+        }
+    }
+	//.......
+}
+```
+
+
+
+### spring 中的装饰者模式
+
+Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSource 可能是各种不同类型的， 比如不同的数据库： Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。 然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以到达切换数据源的目的。
+
+在spring的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是`类名中含有 Wrapper`， 另一种是`类名中含有Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
+
+- `org.springframework.cache.transaction` 包下的 `TransactionAwareCacheDecorator` 类
+- `org.springframework.session.web.http` 包下的 `SessionRepositoryFilter` 内部类 `SessionRepositoryRequestWrapper` 
+
+
+
+### Mybatis 缓存中的装饰者模式
+
+Mybatis的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component `接口。`org.apache.ibatis.cache` 包下的结构
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd56rvosupj30kw0r6gpg.jpg)
+
+------
+
+
+
+## 总结
+
+装饰模式的本质：动态组合
+
+动态组合是手段，组合才是目的。这里的组合有两个意思，一个是动态功能的组合，也就是动态进行装饰器的组合；另外一个是指对象组合，通过对象组合来实现为被装饰对象透明的增加功能。
+
+### 优缺点
 
 装饰模式的优点:
 
@@ -161,140 +314,21 @@ public class Client {
 - 使用装饰模式进行系统设计时将产生很多小对象，这些对象的区别在于它们之间相互连接的方式有所不同，而不是它们的类或者属性值有所不同，同时还将产生很多具体装饰类。这些装饰类和小对象的产生将增加系统的复杂度，加大学习与理解的难度。
 - 这种比继承更加灵活机动的特性，也同时意味着装饰模式比继承更加易于出错，排错也很困难，对于多次装饰的对象，调试时寻找错误可能需要逐级排查，较为烦琐。
 
+### 何时选用
 
+- 如果需要在不影响其他对象的情况下，以动态、透明的方式给对象添加职责，可以使用装饰模式
+- 当不能采用继承的方式对系统进行扩展或者采用继承不利于系统扩展和维护时可以使用装饰模式。不能采用继承的情况主要有两类：第一类是系统中存在大量独立的扩展，为支持每一种扩展或者扩展之间的组合将产生大量的子类，使得子类数目呈爆炸性增长；第二类是因为类已定义为不能被继承（如Java语言中的final类）
 
-## 总结
-
-- 与继承关系相比，关联关系的主要优势在于不会破坏类的封装性，而且继承是一种耦合度较大的静态关系，无法在程序运行时动态扩展。在软件开发阶段，关联关系虽然不会比继承关系减少编码量，但是到了软件维护阶段，由于关联关系使系统具有较好的松耦合性，因此使得系统更加容易维护。当然，关联关系的缺点是比继承关系要创建更多的对象。
-- 使用装饰模式来实现扩展比继承更加灵活，它以对客户透明的方式动态地给一个对象附加更多的责任。装饰模式可以在不需要创造更多子类的情况下，将对象的功能加以扩展。
-
-
-
- https://blog.csdn.net/wuxinliulei/article/details/22993171 
-
-## 应用
-
-### JDK中的装饰者模式
-
-观察者模式在 Java 语言中的地位非常重要。在 JDK 的 java.util 包中，提供了 Observable 类以及 Observer 接口，它们构成了 JDK 对观察者模式的支持（可以去查看下源码，写的比较严谨）。but，在 Java9 被弃用了。
-
-### Servlet 中的装饰者模式
-
-### Spring 中的观察者模式
-
-Spring 事件驱动模型也是观察者模式很经典的应用。就是我们常见的项目中最常见的事件监听器。
-
-#### 1. Spring 中观察者模式的四个角色
-
-1. **事件：ApplicationEvent** 是所有事件对象的父类。ApplicationEvent 继承自 jdk 的 EventObject, 所有的事件都需要继承 ApplicationEvent, 并且通过 source 得到事件源。
-
-   Spring 也为我们提供了很多内置事件，`ContextRefreshedEvent`、`ContextStartedEvent`、`ContextStoppedEvent`、`ContextClosedEvent`、`RequestHandledEvent`。
-
-2. **事件监听：ApplicationListener**，也就是观察者，继承自 jdk 的 EventListener，该类中只有一个方法 onApplicationEvent。当监听的事件发生后该方法会被执行。
-
-3. **事件源：ApplicationContext**，`ApplicationContext` 是 Spring 中的核心容器，在事件监听中 ApplicationContext 可以作为事件的发布者，也就是事件源。因为 ApplicationContext 继承自 ApplicationEventPublisher。在 `ApplicationEventPublisher` 中定义了事件发布的方法：`publishEvent(Object event)`
-
-4. **事件管理：ApplicationEventMulticaster**，用于事件监听器的注册和事件的广播。监听器的注册就是通过它来实现的，它的作用是把 Applicationcontext 发布的 Event 广播给它的监听器列表。
-
-#### 2. coding~~~~~~
-
-1、定义事件
-
-```java
-public class MyEvent extends ApplicationEvent {
-    public MyEvent(Object source) {
-        super(source);
-        System.out.println("my Event");
-    }
-}
-```
-
-2、实现事件监听器
-
-```java
-@Component
-class MyListenerA implements ApplicationListener<MyEvent> {
-    public void onApplicationEvent(MyEvent AyEvent) {
-        System.out.println("ListenerA received");
-    }
-}
-
-@Component
-class MyListenerB implements ApplicationListener<MyEvent> {
-    public void onApplicationEvent(MyEvent AyEvent) {
-        System.out.println("ListenerB received");
-    }
-}
-```
-
-3、事件发布者
-
-```java
-@Component
-public class MyPublisher implements ApplicationContextAware {
-    private ApplicationContext applicationContext;
-    
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext=applicationContext;
-    }
-    
-    public void publishEvent(ApplicationEvent event){
-        System.out.println("publish event");
-        applicationContext.publishEvent(event);
-    }
-}
-```
-
-4、测试，先用注解方式将 MyPublisher 注入 Spring
-
-```java
-@Configuration
-@ComponentScan
-public class AppConfig {
-
-    @Bean(name = "myPublisher")
-    public MyPublisher myPublisher(){
-        return new MyPublisher();
-    }
-}
-```
-
-```java
-public class Client {
-
-    @Test
-    public void main() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        MyPublisher myPublisher = (MyPublisher) context.getBean("myPublisher");
-        myPublisher.publishEvent(new MyEvent(this));
-    }
-}
-```
-
-5、输出
-
-```
-my Event
-publish event
-ListenerA received
-ListenerB received
-```
-
-
-
-
-## 瞎扯
-
-设计模式真的只是一种设计思想，不需要非得有多个观察者才可以用观察者模式，只有一个观察者，我也要用。
-
-再举个栗子，我是做广告投放的嘛（广告投放的商品文件一般为 xml），假如我的广告位有些空闲流量，这我得利用起来呀，所以我就从淘宝客或者拼夕夕的多多客上通过开放的 API 获取一些，这个时候我也可以用观察者模式，每次请求 10 万条商品，我就生成一个新的商品文件，这个时候我也可以用观察者模式，获取商品的类是被观察者，写商品文件的是观察者，当商品够10万条了，就通知观察者重新写到一个新的文件。
-
-大佬可能觉这么实现有点费劲，不用设计模式也好，或者用消息队列也好，其实都只是一种手段，选择适合自己业务的，开心就好。
+------
 
 
 
 ## 参考
 
+《Head First 设计模式》《研磨设计模式》
+
 https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
 
-https://www.cnblogs.com/jmcui/p/11054756.html
+https://www.runoob.com/design-pattern/decorator-pattern.html
+
+https://juejin.im/post/5ba0fb04e51d450e67494256#heading-14
