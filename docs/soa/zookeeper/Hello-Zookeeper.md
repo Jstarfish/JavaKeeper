@@ -1,6 +1,6 @@
 > zookeeper虽然在项目里有用过，奈何我要当大牛，所以要深入了解下，要把Zookeeper也放到知识库里，看了好多博客，感觉大部分都是基于《从Paxos到ZooKeeper 分布式一致性原理与实践》写的，所以自己读了一遍，加上看的其他文章和项目中的使用，做个整理。加油，奥利给！
 >
-> 文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) 中，N线互联网开发必备兵器库，欢迎 star+指导
+> 文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) 中，N线互联网开发必备技能兵器库，欢迎 star+指导
 
 ![](https://www.w3cschool.cn/attachments/image/20170110/1484044507543563.jpg)
 
@@ -8,9 +8,7 @@
 
 ## 直击面试
 
-eureka和zookeeper区别
-
-
+eureka 和 zookeeper 区别
 
 
 
@@ -20,15 +18,15 @@ eureka和zookeeper区别
 
 计算机系统从集中式到分布式的变革伴随着包括**分布式网络**、**分布式事务**、**分布式数据一致性**等在内的一系列问题和挑战，同时也催生了一大批诸如**`ACID`**、**`CAP`**和**`BASE`**等经典理论的快速发展。
 
-为了解决分布式一致性问题，涌现出了一大批经典的一致性协议和算法，最为著名的就是二阶段提交协议（2PC），三阶段提交协议（3PC）和`Paxos`算法。`Zookeeper`的一致性是通过基于 `Paxos` 算法的 `ZAB` 协议完成的。文末再说这部分内容。
+为了解决分布式一致性问题，涌现出了一大批经典的一致性协议和算法，最为著名的就是二阶段提交协议（2PC），三阶段提交协议（3PC）和`Paxos`算法。`Zookeeper`的一致性是通过基于 `Paxos` 算法的 `ZAB` 协议完成的。先上手了解了 zookeeper 文末再说这部分内容。
 
 
 
 ## 1. 概述
 
-ZooKeeper是Apache软件基金会的一个软件项目，它为大型「**分布式计算**」提供开源的分布式配置服务、同步服务和命名注册。
+ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型「**分布式计算**」提供开源的分布式配置服务、同步服务和命名注册。
 
-Zookeeper最早起源于雅虎研究院的一个研究小组。在当时，研究人员发现，在雅虎内部很多大型系统基本都需要依赖一个类似的系统来进行分布式协调，但是这些系统往往都存在分布式单点问题。所以，雅虎的开发人员就试图开发一个通用的无单点问题的**分布式协调框架**，以便让开发人员将精力集中在处理业务逻辑上，Zookeeper就这样诞生了。后来捐赠给了 `Apache` ，现已成为 `Apache` 顶级项目。
+Zookeeper 最早起源于雅虎研究院的一个研究小组。在当时，研究人员发现，在雅虎内部很多大型系统基本都需要依赖一个类似的系统来进行分布式协调，但是这些系统往往都存在分布式单点问题。所以，雅虎的开发人员就试图开发一个通用的无单点问题的**分布式协调框架**，以便让开发人员将精力集中在处理业务逻辑上，Zookeeper就这样诞生了。后来捐赠给了 `Apache` ，现已成为 `Apache` 顶级项目。
 
 
 
@@ -79,7 +77,7 @@ Zookeeper 数据模型的结构与 Unix 文件系统的结构相似，整体上�
 
 #### 统一命名服务
 
-在分布式系统中，通过使用命名服务，客户端应用能够根据指定名字来获取资源或服务的地址，提供者等信息。被命名的实体通常可以是集群中的机器，提供的服务地址，进程对象等等——这些我们都可以统称他们为名字（Name）。其中较为常见的就是一些分布式服务框架（如RPC、RMI）中的服务地址列表。通过调用 Zookeeper 提供的创建节点的API，能够很容易创建一个全局唯一的 path，这个 path 就可以作为一个名称。 
+在分布式系统中，通过使用命名服务，客户端应用能够根据指定名字来获取资源或服务的地址，提供者等信息。被命名的实体通常可以是集群中的机器，提供的服务地址，进程对象等等——这些我们都可以统称他们为名字（Name）。其中较为常见的就是一些分布式服务框架（如RPC、RMI）中的服务地址列表。通过调用 Zookeeper 提供的创建节点的 API，能够很容易创建一个全局唯一的 path，这个 path 就可以作为一个名称。 
 
 #### 统一配管理
 
@@ -135,7 +133,7 @@ Zookeeper 中特有的 「**Watcher**」 注册与异步通知机制，能够很
 
 ## 2. Hello Zookeeper
 
-Zookeeper有两种运行模式：集群模式和单机模式。自己研究又没有机器，就单机练习下，当然也可以用伪集群。
+Zookeeper 有两种运行模式：集群模式和单机模式。自己研究又没有机器，就单机练习下，当然也可以用伪集群。
 
 ### 2.1 本地模式安装部署
 
@@ -169,45 +167,55 @@ dataDir=XXX/zookeeper-3.5.6/zkData
  mkdir zkData
 ```
 
-#### 3．操作Zookeeper
+#### 3．操作 Zookeeper
 
-1. 启动Zookeeper
+1. 启动 Zookeeper:  `bin/zkServer.sh start`
 
 ```shell
-bin/zkServer.sh start
+/usr/local/bin/java
+ZooKeeper JMX enabled by default
+Using config: /home/sync360/test/apache-zookeeper-3.5.7-bin/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
 ```
 
-2. 查看进程是否启动
+2. 查看进程是否启动: `jps`
 
 ```shell
-jps
 4020 Jps
 4001 QuorumPeerMain
 ```
 
-3. 查看状态：
+3. 查看状态：`bin/zkServer.sh status`
 
 ```shell
-bin/zkServer.sh status
+/usr/local/bin/java
+ZooKeeper JMX enabled by default
+Using config: /home/apache-zookeeper-3.5.7-bin/bin/../conf/zoo.cfg
+Client port found: 2181. Client address: localhost.
+Mode: standalone
 ```
 
-4. 启动客户端：
+4. 启动客户端：`bin/zkCli.sh`
 
 ```shell
-bin/zkCli.sh
+Connecting to localhost:2181
+2020-03-25 15:41:19,112 [myid:] - INFO  [main:Environment@109] - Client environment:zookeeper.version=3.5.7-f0fdd52973d373ffd9c86b81d99842dc2c7f660e, built on 02/10/2020 11:30 GMT
+
+...
+
+2020-03-25 15:41:19,183 [myid:] - INFO  [main:ClientCnxn@1653] - zookeeper.request.timeout value is 0. feature enabled=
+Welcome to ZooKeeper!
+
+...
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:None path:null
 ```
 
-5. 退出客户端：
+5. 退出客户端：`quit`
 
-```shell
-quit
-```
-
-6. 停止Zookeeper
-
-```shell
-bin/zkServer.sh stop
-```
+6. 停止 Zookeeper:  `bin/zkServer.sh stop`
 
 
 
@@ -352,6 +360,8 @@ Zookeeper 的视图结构和标准的 Unix 文件系统非常类似，但没有�
 ### 3.5 写数据流程
 
    ![](../../_images/zookeeper/zk-write-data.png)
+
+
 
 
 

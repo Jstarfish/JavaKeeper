@@ -19,14 +19,6 @@
 
 装饰模式以对客户透明的方式动态地给一个对象附加上更多的责任，换言之，客户端并不会觉得对象在装饰前和装饰后有什么不同。装饰模式可以在不需要创造更多子类的情况下，将对象的功能加以扩展。
 
-**意图：**动态地给一个对象添加一些额外的职责。就增加功能来说，装饰器模式相比生成子类更为灵活。
-
-**主要解决：**一般的，我们为了扩展一个类经常使用继承方式实现，由于继承为类引入静态特征，并且随着扩展功能的增多，子类会很膨胀。
-
-**何时使用：**在不想增加很多子类的情况下扩展类。
-
-**如何解决：**将具体功能职责划分，同时继承装饰者模式。
-
 ------
 
 
@@ -45,7 +37,7 @@
 
 - **ConcreteComponent**： 具体的组件对象，实现类 ，即被装饰者，通常就是被装饰器装饰的原始对象，也就是可以给这个对象添加职责
 
-- **Decorator**： 所有装饰器的抽象父类，一般是抽象类，实现接口；它的属性必然有个指向Conponent抽象组件的对象 ，其实就是持有一个被装饰的对象
+- **Decorator**： 所有装饰器的抽象父类，一般是抽象类，实现接口；它的属性必然有个指向 Conponent 抽象组件的对象 ，其实就是持有一个被装饰的对象
 
 - **ConcreteDecorator**： 具体的装饰对象，实现具体要被装饰对象添加的功能。每一个具体装饰类都定义了一些新的行为，它可以调用在抽象装饰类中定义的方法，并可以增加新的方法用以扩充对象的行为。
 
@@ -73,9 +65,11 @@
 
 - 公司发放奖金，不同的员工类型对应不同的奖金计算规则，用各种计算规则去装饰统一的奖金计算类
 - 星巴克售卖用咖啡，用摩卡、奶泡去装饰咖啡，实现不同的计费
-- 
+- 变形金刚在变形之前是一辆汽车，它可以在陆地上移动。当它变成机器人之后除了能够在陆地上移动之外，还可以说话；如果需要，它还可以变成飞机，除了在陆地上移动还可以在天空中飞翔 
 
-我还是比较喜欢买煎饼的例子
+我还是比较喜欢卖煎饼的例子
+
+ ![](https://i04piccdn.sogoucdn.com/a000fc61baeaeb5b) 
 
 1、定义抽象组件
 
@@ -159,7 +153,7 @@ public class Sausage extends CondimentDecorator{
 }
 ```
 
-5、测试卖煎饼
+5、测试煎饼交易，over
 
 ```java
 public class Client {
@@ -192,7 +186,7 @@ public class Client {
 煎饼果子加鸡蛋加火腿花费11.0元
 ```
 
-看下通过IDEA 生成的 UML 类图
+顺便看下通过 IDEA 生成的 UML 类图（和我们画的类图一样哈）
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gd515ta83tj318c0pmjui.jpg)
 
@@ -214,7 +208,7 @@ public class Client {
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gd51yq60yxj322e0rewkg.jpg)
 
-我们平时读取一个文件中的内容其实就使用到了装饰模式的思想，还是用《Head First 设计模式》的例子，我们自定义一个装饰者，把输入流中的所有大写字符转换为小写
+我们平时读取一个文件中的内容其实就使用到了装饰模式的思想，简化《Head First 设计模式》的例子，我们自定义一个装饰者，把输入流中的所有大写字符转换为小写
 
 ```java
 public class LowerCaseInputStream extends FilterInputStream {
@@ -236,7 +230,7 @@ public class InputTest {
     public static void main(String[] args) throws IOException {
         int c;
         //装饰器的组装过程
-        InputStream in = new LowerCaseInputStream(new BufferedInputStream(new FileInputStream("java.txt"))); 
+        InputStream in = new LowerCaseInputStream(new BufferedInputStream(new FileInputStream("JavaKeeper.txt"))); 
 
         while ((c = in.read()) >= 0){
             System.out.print((char) c);
@@ -277,7 +271,7 @@ public class ServletRequestWrapper implements ServletRequest {
 
 Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSource 可能是各种不同类型的， 比如不同的数据库： Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。 然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以到达切换数据源的目的。
 
-在spring的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是`类名中含有 Wrapper`， 另一种是`类名中含有Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
+在 spring 的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是类名中含有 `Wrapper`， 另一种是类名中含有`Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
 
 - `org.springframework.cache.transaction` 包下的 `TransactionAwareCacheDecorator` 类
 - `org.springframework.session.web.http` 包下的 `SessionRepositoryFilter` 内部类 `SessionRepositoryRequestWrapper` 
@@ -286,7 +280,7 @@ Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSo
 
 ### Mybatis 缓存中的装饰者模式
 
-Mybatis的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component `接口。`org.apache.ibatis.cache` 包下的结构
+Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component `接口。`org.apache.ibatis.cache` 包下的结构
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gd56rvosupj30kw0r6gpg.jpg)
 

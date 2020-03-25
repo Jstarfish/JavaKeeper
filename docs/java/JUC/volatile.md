@@ -5,7 +5,8 @@
 > volatile 变量和 atomic 变量有什么不同？
 >
 > volatile 的使用场景，你能举两个例子吗？
->
+
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，包含 N 线互联网开发必备技能兵器谱 
 
 之前算是比较详细的介绍了 [Java 内存模型](https://mp.weixin.qq.com/s?__biz=MzIwOTIxNTg0OQ==&mid=2247483928&idx=1&sn=87401493c2378ae5a291fe9c07f6bd09&chksm=97760a1ea0018308ad9b5608ffa74937abf37e5ec54e7d773fd4c4199daace67a98e390ea4ce&token=954870021&lang=zh_CN#rd)——JMM， **JMM是围绕着并发过程中如何处理可见性、原子性和有序性这 3 个 特征建立起来的**，而 volatile 可以保证其中的两个特性，下面具体探讨下这个面试必问的关键字。
 
@@ -272,7 +273,7 @@ volatile 可以保证线程可见性且提供了一定的有序性，但是无�
 
 
 
-## 5. volatile 性能
+## 6. volatile 性能
 
 volatile 的读性能消耗与普通变量几乎相同，但是写操作稍慢，因为它需要在本地代码中插入许多内存屏障指令来保证处理器不发生乱序执行。
 
@@ -290,3 +291,7 @@ volatile 操作不会像锁一样造成阻塞，因此，在能够安全使用 v
  http://tutorials.jenkov.com/java-concurrency/java-memory-model.html 
  https://juejin.im/post/5dbfa0aa51882538ce1a4ebc 
 《正确使用 Volatile 变量》https://www.ibm.com/developerworks/cn/java/j-jtp06197.html
+
+
+
+![图怪兽_b2195efd95f95e83c90c74142a4b2001_47863.png](https://i.loli.net/2020/03/25/PaVfB1psAndLTOv.png)
