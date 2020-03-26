@@ -260,3 +260,4 @@ ls create get delete set…
 
 ## 一致性协议
 
+![](/Users/starfish/workspace/tech/images/blog_end.png)
