@@ -1,4 +1,6 @@
 > 高级工程师title的我，最近琢磨着好好刷刷算法题更高级一些，然鹅，当我准备回忆大学和面试时候学的数据结构之时，我发现自己对这个算法复杂度的记忆只有OOOOOooo
+>
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 算法（Algorithm）是指用来操作数据、解决程序问题的一组方法。对于同一个问题，使用不同的算法，也许最终得到的结果是一样的，但在过程中消耗的资源和时间却会有很大的区别。
 
@@ -189,9 +191,11 @@ for(i=1; i<=n; ++i)
 
 
 
-参考：
+## 参考
+
 《大话数据结构》
 https://zhuanlan.zhihu.com/p/50479555
 
 
 
+![](https://tva1.sinaimg.cn/large/00831rSTly1gd73fpmmbwj30ku0aumy2.jpg)
