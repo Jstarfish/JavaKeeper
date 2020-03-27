@@ -172,6 +172,16 @@ Curator 由多个 artifact 组成。根据需要选择引入具体的 artifact�
 
 
 
+为了可以直观的看到 Zookeeper 的节点信息，可以考虑弄一个 zk 的管控界面，常见的有 zkui 和 zkweb。
+
+zkui：[github.com/DeemOpen/zk…](https://github.com/DeemOpen/zkui)
+
+zkweb：[github.com/zhitom/zkwe…](https://github.com/zhitom/zkweb)
+
+我用的 zkweb ，虽然界面上看起来没有 zkui 精简，但是在层次展示和一些细节上感觉比 zkui 好一点
+
+
+
 ### 开干
 
 ```xml
@@ -184,11 +194,107 @@ Curator 由多个 artifact 组成。根据需要选择引入具体的 artifact�
 
 
 
- https://blog.csdn.net/wo541075754/article/details/69138878 
+建议直接 clone https://github.com/apache/curator ，`curator-examples` 下边有各种示例，选举、分布式锁、服务发现、缓存。。。
+
+Curator使用流式接口风格。
+
+#### 1. coding
+
+```java
+public class CuratorTest {
+
+    public String zookeeperConnectionString = "10.121.214.95:2181";
+    CuratorFramework client;
+
+    /**
+     *  创建客户端，两种方式，默认客户端，带参数的客户端创建
+     */
+    @Before
+    public void CreateClient() {
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        client = CuratorFrameworkFactory.newClient(zookeeperConnectionString, retryPolicy);
+        client.start();
+    }
+
+    /**
+     * 有了CuratorFramework 实例，就可以使用了,先来创建个空节点
+     */
+    @Test
+    public void createPath() {
+        try {
+            client.create().forPath("/myPath1");
+            client.create().forPath("/myPath1/myChildren1");
+            client.create().forPath("/myPath1/myChildren2");
+            //client.create().forPath("/myPath1","myData1".getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 创建临时节点
+     * 和持久节点不同的是，临时节点的生命周期和客户端会话绑定。
+     * 也就是说，如果客户端会话失效，那么这个节点就会自动被清除掉。
+     * 注意，这里提到的是会话失效，而非连接断开。另外，在临时节点下面不能创建子节点。
+     */
+    @Test
+    public void createEphemeral() throws Exception {
+        client.create().withMode(CreateMode.EPHEMERAL).forPath("/myPath2", "myData2".getBytes());
+    }
+
+    /**
+     *  为节点设置数据
+     */
+    @Test
+    public void setData() throws Exception {
+        client.setData().forPath("/myPath1", "myData1".getBytes());
+    }
+
+    /**
+     *  列出子节点
+     */
+    @Test
+    public void watchedGetChildren() throws Exception {
+        List<String> list = client.getChildren().watched().forPath("/myPath1");
+        for (String s : list) {
+            System.out.println(s);
+        }
+    }
+
+
+    /**
+     *  删除节点
+     *  sguaranteed()：接口是一个保障措施，只要客户端会话有效，
+     *  那么Curator会在后台持续进行删除操作，直到节点删除成功
+     *  deletingChildrenIfNeeded()： 删除一个节点，并递归删除其所有子节点
+     */
+    @Test
+    public void guaranteedDelete() throws Exception {
+        //client.delete().forPath("/myPath1");
+        //client.delete().guaranteed().forPath("/myPath1");
+        client.delete().deletingChildrenIfNeeded().forPath("/myPath1");
+    }
+}
+```
 
 
 
 
+
+## Curator Async
+
+### What Is Curator Async?
+
+Curator Async 是一个封装了 `CuratorFramework`  实例的 `DSL(Domain-specific language)`
+
+完全异步，基于 Java8 的`CompletionStage` 
+
+ https://curator.apache.org/curator-x-async/index.html 
+
+
+
+ https://blog.gmem.cc/apache-curator-study-note 
 
 ## 参考
 
@@ -196,6 +302,7 @@ Curator 由多个 artifact 组成。根据需要选择引入具体的 artifact�
 
 
 
+ https://juejin.im/post/5cb1ec81e51d456e3b701871 
 
 
 
@@ -209,55 +316,24 @@ Curator 由多个 artifact 组成。根据需要选择引入具体的 artifact�
 
 
 
+## 直击面试
+
+- 请简述ZooKeeper的选举机制
+
+- ZooKeeper的监听原理是什么？
+
+- ZooKeeper的部署方式有哪几种？集群中的角色有哪些？集群最少需要几台机器？
+
+  部署方式单机模式、集群模式
+
+  角色：Leader和Follower
+
+  集群最少需要机器数：3
+
+- ZooKeeper的常用命令
+
+  ls create get delete set…
 
 
 
-
-
-## 官方教程
-
-https://cwiki.apache.org/confluence/display/ZOOKEEPER/EurosysTutorial
-
-## 
-
-### 4.3.1 环境搭建
-
-### 4.3.2 创建ZooKeeper客户端
-
-### 4.3.3 创建子节点
-
-### 4.3.4 获取子节点并监听节点变化
-
-### 4.3.5 判断Znode是否存在
-
-
-
-# 企业面试真题
-
-## 5.1 请简述ZooKeeper的选举机制
-
-
-
-## 5.2 ZooKeeper的监听原理是什么？
-
-
-
-## 5.3 ZooKeeper的部署方式有哪几种？集群中的角色有哪些？集群最少需要几台机器？
-
-（1）部署方式单机模式、集群模式
-
-（2）角色：Leader和Follower
-
-（3）集群最少需要机器数：3
-
-## 5.4 ZooKeeper的常用命令
-
-ls create get delete set…
-
-
-
-
-
-## 一致性协议
-
-![](/Users/starfish/workspace/tech/images/blog_end.png)
+![](../../../images/blog_end.png)

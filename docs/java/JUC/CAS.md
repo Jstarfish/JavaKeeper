@@ -8,7 +8,54 @@
 >
 > 如何规避 ABA 问题？
 
-从 Atomic 原子类，到 CAS
+# 从 Atomic 原子类，到 CAS
+
+既然 Java 内存模型要保证可见性，原子性和有序性。
+
+在JDK 5之前Java语言是靠 synchronized 关键字保证同步的，但 synchronized 是一种独占锁，是一种悲观锁， **会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁** ，效率不是很高
+
+Java 虚拟机又提供了一个轻量级的同步机制——volatile（[面试必问的 volatile，你真的理解了吗](https://mp.weixin.qq.com/s/QLf3CyLcqOHX2B6pS-a0Uw )）
+
+但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，Java 5 之后又增加了` java.util.concurrent.atomic `包， 这个包下提供了一系列原子类。
+
+这些类可以保证多线程环境下，当某个线程在执行 atomic 的方法时，不会被其他线程打断，而别的线程就像自旋锁一样，一直等到该方法执行完成，才由 JVM 从等待队列中选择一个线程执行。Atomic类在软件层面上是非阻塞的，它的原子性其实是在硬件层面上借助相关的指令来保证的。 
+
+----思维导图
+
+
+
+ https://blog.csdn.net/J080624/article/details/84838991 
+
+Atomic包中的类可以分成4组：
+
+1. 基本类型：AtomicBoolean，AtomicInteger，AtomicLong，
+2.  数组类型：tomicIntegerArray，AtomicLongArray，AtomicReferenceArray
+3.  引用类型：AtomicReference，AtomicMarkableReference，AtomicStampedReference
+4.  对象的属性修改类型 ：AtomicIntegerFieldUpdater，AtomicLongFieldUpdater，AtomicReferenceFieldUpdater
+
+
+
+常用方法：
+
+
+
+
+
+
+
+
+
+ https://www.jianshu.com/p/7beb99c7cc7f 
+
+## CAS 是什么
+
+CAS: 全称 `Compare and swap`，它是一条 **CPU 并发原语**。
+
+他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。
+
+CAS 并发原语体现在 Java 语言中的 sum.misc.Unsafe 类中的各个方法。调用Unsafe 类中的CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。这是一种完全依赖于硬件的功能，通过它实现了原子操作。再次强调，由于CAS是一种系统原语，原语属于操作系统用于范畴，是由若干条指令组成的，用于完成某个功能的一个过程，并且原语的执行必须是连续的，在执行过程中不允许被中断，CAS是一条CPU的原子指令，不会造成数据不一致问题。
+
+
 
 i++ 在多线程环境下用 AtomicInteger 的 getAndIncrement() 为什么是线程安全的
 
@@ -48,11 +95,7 @@ public final int getAndIncrement() {
 
 ## CAS 是什么
 
-CAS: 全称Compare and swap，它是一条 **CPU 并发原语**。
 
-他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。
-
-CAS 并发原语体现在 Java 语言中的 sum.misc.Unsafe 类中的各个方法。调用Unsafe 类中的CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。这是一种完全依赖于硬件的功能，通过它实现了原子操作。再次强调，由于CAS是一种系统原语，原语属于操作系统用于范畴，是由若干条指令组成的，用于完成某个功能的一个过程，并且原语的执行必须是连续的，在执行过程中不允许被中断，CAS是一条CPU的原子指令，不会造成数据不一致问题。
 
 逐层看getAndIncrement() 的源码如下
 
@@ -83,9 +126,13 @@ var5 是用过var1 var2 找出的主内存中真实的值（通过内存偏移�
 
 
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd7gj9n5k4j31c40k6kc2.jpg)
+假设线程A和线程B两个线程同时执行getAndAddInt操作（分别泡在不同CPU上）：
 
-
+1. AtomicInteger 里面的value原始值为3，即主内存中AtomicInteger的value为3，根据JMM模型，线程A和线程B各自持有一份值为3的value的副本分别到各自的工作内存；
+2. 线程A通过getIntVolatile(var1,var2)拿到value值3，这时线程A被挂起；
+3. 线程B也通过getIntVolatile(var1,var2)方法获取到value值3，此时刚好线程B没有被挂起并执行compareAndSwapInt方法比较内存值为3，成功修改内存值为4，线程B结束，一切正常
+4. 这时线程A恢复，执行compareAndSwapInt() 方法比较，发现自己手里的3和主内存的值4不一致，说明该值已经被其他线程抢先一步修改过了，那线程A本次修改失败，重新读取；
+5. 线程A重新获取value值，因为变量value被volatile修饰，所以其他线程对它的修改，线程A总是能够看到，线程A继续执行compareAndSwapInt进行比较替换，直到成功
 
 
 
@@ -97,7 +144,7 @@ var5 是用过var1 var2 找出的主内存中真实的值（通过内存偏移�
 
 ## CAS 缺点
 
-- 循环时间长，开销很大
+- 循环时间长，开销很大。CAS算法需要不断地自旋来读取最新的内存值，长时间读取不到就会造成不必要的CPU开销。 
 
   do while 如果CAS失败，会一直进行尝试，如果CAS长时间一直不成功，可能会给CPU带来很大的开销
 
@@ -109,7 +156,15 @@ var5 是用过var1 var2 找出的主内存中真实的值（通过内存偏移�
 
 aba问题如何产生的
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd7gje4hjgj31f00gogwz.jpg)
+CAS会导致"ABA问题"
+
+CAS算法实现一个重要前提是需要取出内存中某时刻的数据并在当下时刻比较并替换，那么在这个时间差类会导致数据的变化。
+
+比如说一个线程one从内存位置V中取出A，这时候另一个线程two也从内存中取出A，并且线程two进行了一些操作将值变成了B，然后线程two又将V位置的数据变成A，这个时候线程one进行CAS操作发现内存中仍然是A，然后线程one操作成功。
+
+**尽管线程one的CAS操作成功，但是不代表这个过程就是没有问题的。**
+
+
 
 ### 原子引用
 

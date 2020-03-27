@@ -1,6 +1,6 @@
 > zookeeper虽然在项目里有用过，奈何我要当大牛，所以要深入了解下，要把Zookeeper也放到知识库里，看了好多博客，感觉大部分都是基于《从Paxos到ZooKeeper 分布式一致性原理与实践》写的，所以自己读了一遍，加上看的其他文章和项目中的使用，做个整理。加油，奥利给！
 >
-> 文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) 中，N线互联网开发必备技能兵器库，欢迎 star+指导
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 中，N线互联网开发必备技能兵器库，欢迎 star+指导
 
 ![](https://www.w3cschool.cn/attachments/image/20170110/1484044507543563.jpg)
 
