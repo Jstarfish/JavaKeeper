@@ -1,51 +1,85 @@
+# 从 Atomic 到 CAS
+
 > CAS 知道吗，如何实现？
 >
 > 讲一讲AtomicInteger，为什么要用CAS而不是synchronized？
 >
-> CAS底层原理，谈谈你对UnSafe 的理解？
+> CAS底层原理，谈谈你对 UnSafe 的理解？
 >
 > AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
 >
 > 如何规避 ABA 问题？
 
-# 从 Atomic 原子类，到 CAS
 
-既然 Java 内存模型要保证可见性，原子性和有序性。
 
-在JDK 5之前Java语言是靠 synchronized 关键字保证同步的，但 synchronized 是一种独占锁，是一种悲观锁， **会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁** ，效率不是很高
+## 前言
+
+Java 内存模型要保证可见性，原子性和有序性。
+
+在 JDK 5之前 Java 语言是靠 synchronized 关键字保证同步的，但 synchronized 是一种独占锁，是一种悲观锁， **会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁** ，效率不是很高。
 
 Java 虚拟机又提供了一个轻量级的同步机制——volatile（[面试必问的 volatile，你真的理解了吗](https://mp.weixin.qq.com/s/QLf3CyLcqOHX2B6pS-a0Uw )）
 
-但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，Java 5 之后又增加了` java.util.concurrent.atomic `包， 这个包下提供了一系列原子类。
-
-这些类可以保证多线程环境下，当某个线程在执行 atomic 的方法时，不会被其他线程打断，而别的线程就像自旋锁一样，一直等到该方法执行完成，才由 JVM 从等待队列中选择一个线程执行。Atomic类在软件层面上是非阻塞的，它的原子性其实是在硬件层面上借助相关的指令来保证的。 
-
-----思维导图
+但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，又增加了`java.util.concurrent.atomic`包， 这个包下提供了一系列原子类。
 
 
 
- https://blog.csdn.net/J080624/article/details/84838991 
+## Atomic 原子类
+
+Atomic 原子类可以保证多线程环境下，当某个线程在执行 atomic 的方法时，不会被其他线程打断，而别的线程就像自旋锁一样，一直等到该方法执行完成，才由 JVM 从等待队列中选择一个线程执行。Atomic类在软件层面上是非阻塞的，它的原子性其实是在硬件层面上借助相关的指令来保证的。 
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdc9ufejhyj30mg0n8n0f.jpg)
+
+
 
 Atomic包中的类可以分成4组：
 
-1. 基本类型：AtomicBoolean，AtomicInteger，AtomicLong，
+1. 基本类型：AtomicBoolean，AtomicInteger，AtomicLong
 2.  数组类型：tomicIntegerArray，AtomicLongArray，AtomicReferenceArray
 3.  引用类型：AtomicReference，AtomicMarkableReference，AtomicStampedReference
 4.  对象的属性修改类型 ：AtomicIntegerFieldUpdater，AtomicLongFieldUpdater，AtomicReferenceFieldUpdater
 
 
 
-常用方法：
+以 AtomicInteger 为例了解常用方法
+
+| 方法                    | 描述                                                         |
+| ----------------------- | ------------------------------------------------------------ |
+| get()                   | 直接返回值                                                   |
+| addAndGet(int)          | 增加指定的数据后返回增加后的数据                             |
+| getAndAdd(int)          | 增加指定的数据，返回变化前的数据                             |
+| getAndIncrement()       | 增加1，返回增加前的数据                                      |
+| getAndDecrement()       | 减少1，返回减少前的数据                                      |
+| getAndSet(int)          | 设置指定的数据，返回设置前的数据                             |
+| decrementAndGet()       | 减少1，返回减少后的值                                        |
+| incrementAndGet()       | 增加1，返回增加后的值                                        |
+| floatValue()            | 转化为浮点数返回                                             |
+| intValue()              | 转化为int 类型返回                                           |
+| set(int)                | 设置为给定值                                                 |
+| lazySet(int)            | 仅仅当get时才会set http://ifeve.com/juc-atomic-class-lazyset-que/ |
+| compareAndSet(int, int) | 尝试新增后对比，若增加成功则返回true否则返回false            |
+
+### Coding~~~
+
+```java
+public class CASDemo {
+    public static void main(String[] args) {
+        System.out.println(num.compareAndSet(6, 7) + "\t + current num:" + num);
+        System.out.println(num.compareAndSet(6, 7) + "\t current num:" + num);
+    }
+}
+```
+
+```
+true	 + current num:7
+false	 current num:7
+```
+
+执行两次结果却不同，Why? 
+
+`compareAndSet()` 比较并交换，判断用当前值和期望值（第一个参数），是否一致，如果一致，修改为更新值（第二个参数），这就是大名鼎鼎的 CAS
 
 
-
-
-
-
-
-
-
- https://www.jianshu.com/p/7beb99c7cc7f 
 
 ## CAS 是什么
 
