@@ -1,14 +1,10 @@
 # 从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题
 
 > CAS 知道吗，如何实现？
->
 > 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
->
 > CAS 底层原理，谈谈你对 UnSafe 的理解？
->
 > AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
->
-> 如何规避 ABA 问题？
+> CAS 有什么缺点吗？ 如何规避 ABA 问题？
 
 
 
@@ -184,7 +180,7 @@ public final int getAndAddInt(Object var1, long var2, int var4) {
 
 - var2：该对象值的引用地址，内存偏移量
 - var4： 需要变动的数量，即 ++i 的 i
-- var5：是用过var1， var2 找出的主内存中真实的值（通过内存偏移量）
+- var5：用var1， var2 找出的主内存中真实的值（通过内存偏移量）
 
 `this.compareAndSwapInt`  用该对象当前的值与 var5 比较，如果相同，更新 var5 + var4 并且返回 true，如果不同，继续取值然后再比较，直到更新完成。
 

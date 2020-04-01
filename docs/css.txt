@@ -244,7 +244,27 @@
 
 /* 行内代码 */
 #nice p code,li code {
-  color:#FF6827;
+    font-size: 14px;
+    word-wrap: break-word;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #FF6827;
+    background-color: rgba(27,31,35,.05);
+    font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
+    word-break: break-all;
+}
+
+#nice li code {
+    font-size: 14px;
+    word-wrap: break-word;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #FF6827;
+    background-color: rgba(27,31,35,.05);
+    font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
+    word-break: break-all;
 }
 
 /* 非微信代码块
