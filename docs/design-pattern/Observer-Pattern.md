@@ -88,7 +88,7 @@ class ConcreteSubject extends Subject {
 }
 ```
 
-4、具体的被观察者
+4、具体的观察者
 
 ```java
 class ConcreteObserver1 implements Observer {

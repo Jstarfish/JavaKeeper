@@ -4,7 +4,7 @@
 
 
 
-## 分布式安装部署
+分布式安装部署，作为一个后端开发正规军，公司一般也不需要你去自己安装，就不探讨了。
 
 
 
@@ -119,25 +119,25 @@ delete /test
 
 不管 Java 是不是最好的语言，我都要说 `I use Java. Java for ever`。所以我们要用 Java 去操作 zookeeper。 
 
-zookeeper的常用客户端有3种，分别是：zookeeper原生的、开源的 zkclient、Apache Curator
+zookeeper的 Java 常用客户端有 3 种，分别是：zookeeper原生API、开源的 zkclient、Apache Curator
 
 #### 1. 原生API
 
 - 创建连接的时候是异步的，所以我们在开发的时候需要人工的写代码等待创建节点的状态，如果需要的话。
 - 连接时无超时重连机制。本人觉得这个非常重要，因为在现实使用中，网络是不可信的，在创建节点的时候要考虑到网络的不稳定性。因此，超时重连机制是非常必要的。
-- zookeepr的通信是网络通信，因此在数据通信的时候会消耗一定的网络IO和带宽。但zookeeper没有序列化机制，需要开发者自行开发。
+- zookeepr 的通信是网络通信，因此在数据通信的时候会消耗一定的网络IO和带宽。但zookeeper没有序列化机制，需要开发者自行开发。
 - Watcher注册一次，触发后会自动失效。
 - 不支持递归创建树形节点。这点是比较有用的，类似Linux的命令：`mkdir -p /xxx/xxx/`
 
 #### 2. ZkClient
 
-ZkClient 是 Github上一个开源的zk客户端，由 datameer 的工程师 Stefan Groschupf 和 Peter Voss 一起开发
+ZkClient 是 Github上一个开源的 zk 客户端，由 datameer 的工程师 Stefan Groschupf 和 Peter Voss 一起开发
 
 - 解决session会话超时重连
 - Watcher反复注册
 - 简化开发api
 
-当然还有很多的很多修改的功能，使用也很简单，但是社区不活跃，连api文档都不完善，对于我们来说只能看源码来开发应用了，也略有麻烦的。有兴趣的开源上github看看。 https://github.com/sgroschupf/zkclient
+当然还有很多的很多修改的功能，使用也很简单，但是社区不活跃，连api文档都不完善，对于我们来说只能看源码来开发应用了，也略有麻烦的。有兴趣的开源上 github 看看。 https://github.com/sgroschupf/zkclient
 
 #### 3. Curator
 
@@ -145,7 +145,7 @@ Curator 是 Netflix 公司开源的一套 Zookeeper Java 客户端框架。后�
 
 http://curator.apache.org/ 
 
-目前使用最多的也是 Curator，所以用这个学习记录（基于 2019-07-14 发布的官方版本）
+目前使用最多的也是 Curator，公司用的也是这个，所以用这个学习记录（基于 2019-07-14 发布的官方版本）
 
  ![img](http://curator.apache.org/images/ph-quote.png) 
 
@@ -168,7 +168,7 @@ Curator 由多个 artifact 组成。根据需要选择引入具体的 artifact�
 
 ### 版本兼容
 
- http://curator.apache.org/zk-compatibility.html 
+http://curator.apache.org/zk-compatibility.html 
 
 
 
@@ -295,6 +295,10 @@ Curator Async 是一个封装了 `CuratorFramework`  实例的 `DSL(Domain-speci
 
 
  https://blog.gmem.cc/apache-curator-study-note 
+
+
+
+pc广告在上海 zk用作配置管理，有可投放的商品包状态变动会通知他们
 
 ## 参考
 
