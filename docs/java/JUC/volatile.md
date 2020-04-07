@@ -245,7 +245,7 @@ volatile 可以保证线程可见性且提供了一定的有序性，但是无�
 
 通过 hsdis 工具获取 JIT 编译器生成的汇编指令来看看对 volatile 进行写操作CPU会做什么事情，还是用上边的单例模式，可以看到
 
-![](https://i.loli.net/2020/03/23/dP4EVrexioGlc9m.png)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdhgvi4pz9j30xf0tgjuy.jpg)
 
 （PS：具体的汇编指令对我这个 Javaer 太南了，但是 JVM 字节码我们可以认识，`putstatic`   的含义是给一个静态变量设置值，那这里的 `putstatic instance` ,而且是第 17 行代码，更加确定是给 instance 赋值了。果然像各种资料里说的，找到了 `lock add1` 据说还得翻阅。这里可以看下这两篇 https://www.jianshu.com/p/6ab7c3db13c3 、 https://www.cnblogs.com/xrq730/p/7048693.html ）
 
