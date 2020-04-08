@@ -12,7 +12,6 @@
 
 <h3 align="center">记录并分享每一次成长</h3>
 
-
 ------
 
 
@@ -85,19 +84,19 @@
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   JVM   |         | [JVM与Java体系结构](/docs/java/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/类加载子系统.md)<br/>运行时数据区 |
 |  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
-|         |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md) |
+|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
 |   NIO   |         |                                                              |
 
 
 
 ## ⚒️ 基础工具
 
-| Project | Article                                         |
-| :-----: | :---------------------------------------------- |
-|  Maven  | [头条一面竟然问我maven?](/docs/tools/Maven.md)  |
-|   Git   |                                                 |
-|  IDEA   | [IDEA总结——磨刀霍霍向代码](/docs/tools/IDEA.md) |
-| Jenkins |                                                 |
+| Project | Article                                                      |
+| :-----: | :----------------------------------------------------------- |
+|  Maven  | [头条一面竟然问我maven?](/docs/tools/Maven.md)               |
+|   Git   | [github 竟然有这些骚操作，真是涨姿势](/docs/tools/github.md) |
+|  IDEA   | [IDEA总结——磨刀霍霍向代码](/docs/tools/IDEA.md)              |
+| Jenkins |                                                              |
 
 
 
