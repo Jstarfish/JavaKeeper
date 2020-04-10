@@ -34,7 +34,7 @@ Atomic 包中的类可以分成 4 组：
 2.  数组类型：tomicIntegerArray，AtomicLongArray，AtomicReferenceArray
 3.  引用类型：AtomicReference，AtomicMarkableReference，AtomicStampedReference
 4.  对象的属性修改类型 ：AtomicIntegerFieldUpdater，AtomicLongFieldUpdater，AtomicReferenceFieldUpdater
-5.  JDK1.8新增：DoubleAccumulator、LongAccumulator、DoubleAdder、LongAdder、Striped64
+5.  JDK1.8 新增：DoubleAccumulator、LongAccumulator、DoubleAdder、LongAdder、Striped64
 
 
 
@@ -90,7 +90,7 @@ false	 current num:7
   - 要修改的更新值 B 
 - 当且仅当 V 的值等于 A 时，CAS 通过原子方式用新值 B 来更新 V 的 值，否则不会执行任何操作（他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。）
 
-CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方法。调用 Unsafe 类中的 CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。这是一种完全依赖于硬件的功能，通过它实现了原子操作。再次强调，由于 CAS是一种系统原语，**原语属于操作系统用于范畴，是由若干条指令组成的，用于完成某个功能的一个过程，并且原语的执行必须是连续的**，**在执行过程中不允许被中断**，CAS 是一条 CPU 的原子指令，不会造成数据不一致问题。
+CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方法。调用 Unsafe 类中的 CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。这是一种完全依赖于硬件的功能，通过它实现了原子操作。再次强调，由于 CAS是一种系统原语，**原语属于操作系统用于范畴，是由若干条指令组成的，用于完成某个功能的一个过程，并且原语的执行必须是连续的，在执行过程中不允许被中断**，CAS 是一条 CPU 的原子指令，不会造成数据不一致问题。
 
 我们常用的 `java.util.concurrent` 包就建立在CAS之上。
 
