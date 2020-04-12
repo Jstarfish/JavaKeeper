@@ -14,6 +14,8 @@
 > synchoronized的底层是怎么实现的？
 >
 > synchronized 使用的几种方式和区别？
+>
+> synchronized说一下，有哪些实用形式？对类加锁时调用方法一定会加锁吗？
 
 底层实现：
 

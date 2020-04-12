@@ -1,6 +1,12 @@
+HashMap说一下，其中的Key需要重写hashCode()和equals()吗？
 
+HashMap中key和value可以为null吗？允许几个为null呀？
 
-![img](https://www.runoob.com/wp-content/uploads/2014/01/2243690-9cd9c896e0d512ed.gif)
+HashMap线程安全吗?ConcurrentHashMap和hashTable有什么区别？ 
+
+List和Set说一下，现在有一个ArrayList，对其中的所有元素按照某一属性大小排序，应该怎么做？
+
+![img](https://tva1.sinaimg.cn/large/00831rSTly1gdp03vldkkg30hv0gzwet.gif)
 
 从上面的集合框架图可以看到，Java 集合框架主要包括两种类型的容器，一种是集合（Collection），存储一个元素集合，另一种是图（Map），存储键/值对映射。Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一些抽象类，最后是具体实现类，常用的有 ArrayList、LinkedList、HashSet、LinkedHashSet、HashMap、LinkedHashMap 等等。
 
@@ -18,7 +24,7 @@
 
 
 
-![img](https://www.runoob.com/wp-content/uploads/2014/01/java-coll.png)
+![img](https://tva1.sinaimg.cn/large/00831rSTly1gdp03wdsf7j30s10g4dhp.jpg)
 
 
 
