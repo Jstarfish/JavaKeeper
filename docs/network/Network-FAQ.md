@@ -1,10 +1,26 @@
-> 输入一个网站，都发生了什么？
+> 你好，我是 π大新，目前在一家名字等于周角的公司就职，精通Java，熟悉计算机网络，，
+
+然后就~~~~
+
+> 在浏览器中输入一个 URL 至页面呈现，网络上都发生了什么事？
 >
-> TCP/IP 与 HTTP 区别是什么？
+> 能说说 ISO 七层模型和 TCP/IP 四层模型吗？
+>
+> TCP/IP 与 HTTP 有什么关系吗？
 >
 > TCP协议与UDP协议的区别？
 >
-> 请详细介绍一下 TCP 的三次握手机制，为什么要三次握手？
+> 请详细介绍一下 TCP 的三次握手机制，为什么要三次握手？挥手却又是四次呢？
+>
+> 详细讲一下TCP的滑动窗口？知道流量控制和拥塞控制吗？
+>
+> 说一下对称加密与非对称加密？
+>
+> 状态码 206 是什么意思？
+>
+> 你们用的 https 是吧，https 工作原理是什么？
+>
+> ......
 
 ## 一、计算机网络
 
@@ -20,7 +36,7 @@
 
 这七层模型是设计层面的概念，每一层都有固定要完成的职责和功能，分层的好处在于清晰和功能独立性，但分层过多会使层次变的更加复杂，虽然不需要实现本层的功能，但是也需要构造本层的上下文，空耗系统资源，所以在落地实施网络通信模型的时候将这七层模型简化合并为四层模型分别是**应用层、传输层、网络层、网络接口层**（各层之间的模型、协议统称为：**TCP/IP协议簇**）。
 
-![有帮助的截图](https://arch-long.cn/assets/tcp_ip.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds66rxwnaj30ku0dr0tn.jpg)
 
 从上图可以看到，TCP/IP模型合并了OSI模型的应用层、表示层和会话层，将OSI模型的数据链路层和物理层合并为网络访问层。
 
@@ -38,7 +54,7 @@
 
 当我们某一个网站上不去的时候。通常会ping一下这个网站
 
-`ping` 可以说是ICMP的最著名的应用，是TCP/IP协议的一部分。利用“ping”命令可以检查网络是否连通，可以很好地帮助我们分析和判定网络故障。
+`ping` 可以说是ICMP的最著名的应用，是TCP/IP协议的一部分。利用`ping`命令可以检查网络是否连通，可以很好地帮助我们分析和判定网络故障。
 
 
 
@@ -50,7 +66,7 @@
 
 TCP/IP的模型的每一层都需要下一层所提供的协议来完成自己的目的。我们来看下数据是怎么通过TCP/IP协议模型从一台主机发送到另一台主机的。
 
-![img](https://arch-long.cn/assets/tcp_ip_data_transfer.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds66lxjnqj30i00f6t9b.jpg)
 
 当用户通过HTTP协议发起一个请求，应用层、传输层、网络互联层和网络访问层的相关协议依次对该请求进行包装并携带对应的首部，最终在网络访问层生成以太网数据包，以太网数据包通过物理介质传输给对方主机，对方接收到数据包以后，然后再一层一层采用对应的协议进行拆包，最后把应用层数据交给应用程序处理。
 
@@ -87,7 +103,7 @@ UDP（User Data Protocol，用户数据报协议）是一个非连接的协议�
 
 TCP和UDP协议的一些应用
 
-![](/Users/starfish/Desktop/截屏2020-04-12下午6.12.52.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds67b566dj30yw0r6gza.jpg)
 
 
 
@@ -97,7 +113,7 @@ TCP虽然是面向字节流的，但TCP传送的数据单元却是报文段。�
 
 TCP报文段首部的前20个字节是固定的（下图），后面有4n字节是根据需要而增加的选项（n是整数）。因此TCP首部的最小长度是20字节。
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gdr6e2kp1lj30u60jsdhn.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdr6e2kp1lj30u60jsdhn.jpg)
 
 #### TCP报文首部
 
@@ -127,7 +143,7 @@ TCP是一种面向连接的单播协议，在发送数据前，通信双方必�
 
 三次握手的目的是连接服务器指定端口，建立 TCP 连接，并同步连接双方的序列号和确认号，交换 TCP 窗口大小信息。
 
-![](https://raw.githubusercontent.com/HIT-Alibaba/interview/master/img/tcp-connection-made-three-way-handshake.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds67rwlvsj30ra0e9n07.jpg)
 
 - **第一次握手**(SYN=1, seq=x)
 
@@ -155,7 +171,7 @@ TCP是一种面向连接的单播协议，在发送数据前，通信双方必�
 
 TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way handshake)，也叫做改进的三次握手。**客户端或服务器均可主动发起挥手动作**。
 
-![four-way-handshake](https://raw.githubusercontent.com/HIT-Alibaba/interview/master/img/tcp-connection-closed-four-way-handshake.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds6835mzjj30qw0g4dit.jpg)
 
 - 第一次挥手(FIN=1，seq=x)
 
@@ -187,7 +203,7 @@ TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way 
 
 
 
-> 为什么TIME_WAIT状态需要经过2MSL(最大报文段生存时间)才能返回到CLOSE状态？
+> **为什么TIME_WAIT状态需要经过2MSL(最大报文段生存时间)才能返回到CLOSE状态？**
 
 虽然按道理，四个报文都发送完毕，我们可以直接进入CLOSE状态了，但是我们必须假象网络是不可靠的，有可以最后一个ACK丢失。所以TIME_WAIT状态就是用来重发可能丢失的ACK报文。
 
@@ -220,7 +236,7 @@ TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way 
 
 利用**滑动窗口机制**可以很方便地在TCP连接上实现对发送方的流量控制。
 
-![](http://www.justdojava.com/assets/images/2019/java/image-tssh/network/1.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds6d75md5j30si0ermyk.jpg)
 
 从上面的图可以看到滑动窗口左边的是已发送并且被确认的分组，滑动窗口右边是还没有轮到的分组。滑动窗口里面也分为两块，一块是已经发送但是未被确认的分组，另一块是窗口内等待发送的分组。随着已发送的分组不断被确认，窗口内等待发送的分组也会不断被发送。整个窗口就会往右移动，让还没轮到的分组进入窗口内。
 
@@ -273,7 +289,7 @@ TCP 是全双工的，客户端和服务器均可作为发送方或接收方，�
 
 
 
-## HTTP
+## 三、HTTP
 
 > HTTP1.0、HTTP1.1、HTTP2.0 的区别
 >
@@ -299,7 +315,7 @@ URI 的第二种形式就是统一资源名（URN）。URN 是作为特定内容
 
 #### HTTP事务：
 
-![img](https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=38453539,3864880197&fm=11&gp=0.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds68n7iduj30jx08caag.jpg)
 
 #### 报文：
 
@@ -361,27 +377,27 @@ HTTP响应结构： 状态码 + 原因短语 + 协议及其版本
 
 - **204 No Content**：表示客户端发送给客户端的请求得到了成功处理，但在返回的响应报文中不含实体的主体部分（没有资源可以返回）
 
-- **206 Patial Content：**表示客户端进行了范围请求，并且服务器成功执行了这部分的GET请求，响应报文中包含由Content-Range指定范围的实体内容。
+- **206 Patial Content**：表示客户端进行了范围请求，并且服务器成功执行了这部分的GET请求，响应报文中包含由Content-Range指定范围的实体内容。
 
-- **301 Moved Permanently：**永久性重定向，表示请求的资源被分配了新的URL，之后应使用更改的URL；
+- **301 Moved Permanently**：永久性重定向，表示请求的资源被分配了新的URL，之后应使用更改的URL；
 
-- **302 Found：**临时性重定向，表示请求的资源被分配了新的URL，希望本次访问使用新的URL；
+- **302 Found**：临时性重定向，表示请求的资源被分配了新的URL，希望本次访问使用新的URL；
 
-- **303 See Other：**表示请求的资源被分配了新的URL，应使用GET方法定向获取请求的资源
+- **303 See Other**：表示请求的资源被分配了新的URL，应使用GET方法定向获取请求的资源
 
 - 304 Not Modified：表示客户端发送附带条件（是指采用GET方法的请求报文中包含if-Match、If-Modified-Since、If-None-Match、If-Range、If-Unmodified-Since中任一首部）的请求时，服务器端允许访问资源，但是请求为满足条件的情况下返回改状态码；
 
-- **400 Bad Request：**表示请求报文中存在语法错误；
+- **400 Bad Request**:表示请求报文中存在语法错误；
 
-- **401 Unauthorized：**未经许可，需要通过HTTP认证；
+- **401 Unauthorized**：经许可，需要通过HTTP认证；
 
-- **403 Forbidden：**服务器拒绝该次访问（访问权限出现问题）
+- **403 Forbidden**：服务器拒绝该次访问（访问权限出现问题）
 
-- **404 Not Found：**表示服务器上无法找到请求的资源，除此之外，也可以在服务器拒绝请求但不想给拒绝原因时使用；
+- **404 Not Found**：表示服务器上无法找到请求的资源，除此之外，也可以在服务器拒绝请求但不想给拒绝原因时使用；
 
-- **500 Inter Server Error：**表示服务器在执行请求时发生了错误，也有可能是web应用存在的bug或某些临时的错误时；
+- **500 Inter Server Error**：表示服务器在执行请求时发生了错误，也有可能是web应用存在的bug或某些临时的错误时；
 
-- **503 Server Unavailable：**表示服务器暂时处于超负载或正在进行停机维护，无法处理请求；
+- **503 Server Unavailable**：表示服务器暂时处于超负载或正在进行停机维护，无法处理请求；
 
    
 
@@ -416,19 +432,14 @@ HTTP 是个应用层协议。HTTP 无需操心网络通信的具体细节，而�
 - **HTTP/1.1**
 
   - http1.1是目前最为主流的http协议版本，从1997年发布至今，仍是主流的http协议版本。
-
   - 引入了持久连接，或叫长连接（ persistent connection），即TCP连接默认不关闭，可以被多个请求复用，不用声明Connection: keep-alive。
-
   - 引入了管道机制（ pipelining），即在同一个TCP连接里，客户端可以同时发送多个请求，进一步改进了HTTP协议的效率。
-
   - 新增方法：PUT、 PATCH、 OPTIONS、 DELETE。
-
   - http协议不带有状态，每次请求都必须附上所有信息。请求的很多字段都是重复的，浪费带宽，影响速度。
 
 - **HTTP/2.0（又名 HTTP-NG）**
 
   - http/2发布于2015年，目前应用还比较少。
-
   - http/2是一个彻底的二进制协议，头信息和数据体都是二进制，并且统称为"帧"（frame）：头信息帧和数据帧。
   - 复用TCP连接，在一个连接里，客户端和浏览器都可以同时发送多个请求或回应，且不用按顺序一一对应，避免了队头堵塞的问题,此双向的实时通信称为多工（ Multiplexing）。
   - HTTP/2 允许服务器未经请求，主动向客户端发送资源，即服务器推送。
@@ -436,7 +447,7 @@ HTTP 是个应用层协议。HTTP 无需操心网络通信的具体细节，而�
 
 
 
-## HTTPS
+## 四、HTTPS
 
 HTTP缺点：
 
@@ -454,7 +465,7 @@ HTTP缺点：
 
 
 
-![img](https://images2015.cnblogs.com/blog/765838/201702/765838-20170221161935945-153449544.png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gds4ejm6cuj30r60cm40n.jpg)
 
 ### HTTP和HTTPS对比
 
@@ -477,7 +488,7 @@ HTTPS和HTTP的区别主要如下：
 
 加密与解密使用同一个密钥，常见的对称加密算法：DES，AES，3DES等。
 
-![img](https://images2015.cnblogs.com/blog/765838/201702/765838-20170221170142679-1624889667.png)  
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gds4ee4n2nj30pd0fhgoc.jpg)  
 
 也就是说在加密的同时，也会把密钥发送给对方。在发送密钥过程中可能会造成密钥被窃取，那么如何解决这一问题呢？
 
@@ -487,7 +498,7 @@ HTTPS和HTTP的区别主要如下：
 
 也就是说，发送密文方使用对方的公开密钥进行加密，对方接受到信息后，使用私有密钥进行解密。
 
-![img](https://images2015.cnblogs.com/blog/765838/201702/765838-20170223201337820-1247308503.png) 
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds4ewaqefj30ff0bpjtq.jpg) 
 
 
 
@@ -537,7 +548,7 @@ HTTPS相比HTTP，在请求前多了一个「握手」的环节。
 
 ### 证书
 
-![img](https://img2018.cnblogs.com/blog/1364097/201901/1364097-20190112115151343-601021716.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds4f2pq0cj30bc0d2dg2.jpg)
 
 实际上，我们使用的证书分很多种类型，SSL证书只是其中的一种。证书的格式是由 X.509 标准定义。SSL 证书负责传输公钥，是一种PKI（Public Key Infrastructure，公钥基础结构）证书。
 
@@ -623,19 +634,12 @@ Bob信任CA，CA信任Susan 使得 Bob信任Susan，[信任链](https://en.wikip
 ### HTTPS的工作原理
 
 1. Client 使用https的URL访问 Server，要求与 Server 建立 SSL 连接
-
 2. Server 把事先配置好的公钥证书返回给客户端。
-
 3. Client验证公钥证书：比如是否在有效期内，证书的用途是不是匹配Client请求的站点，是不是在CRL吊销列表里面，它的上一级证书是否有效，这是一个递归的过程，直到验证到根证书（操作系统内置的Root证书或者Client内置的Root证书）。如果验证通过则继续，不通过则显示警告信息。
-
 4. Client使用伪随机数生成器生成加密所使用的对称密钥，然后用证书的公钥加密这个对称密钥，发给Server。
-
 5. Server使用自己的私钥（private key）解密这个消息，得到对称密钥。至此，Client和Server双方都持有了相同的对称密钥。
-
 6. Server使用对称密钥加密“明文内容A”，发送给Client。
-
 7. Client使用对称密钥解密响应的密文，得到“明文内容A”。
-
 8. Client再次发起HTTPS的请求，使用对称密钥加密请求的“明文内容B”，然后Server使用对称密钥解密密文，得到“明文内容B”。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdqyp5t210j31ey0u0n0y.jpg)
@@ -722,7 +726,7 @@ session 是一种维持客户端与服务器端会话的机制。但是与 **coo
 
 
 
-## FAQ　　　　　
+## Other FAQ　　　　　
 
 ### 从输入网址到获得页面的过程
 
@@ -737,7 +741,7 @@ session 是一种维持客户端与服务器端会话的机制。但是与 **coo
 
 ### XSS 攻击
 
-XSS是一种经常出现在web应用中的计算机安全漏洞，与SQL注入一起成为web中最主流的攻击方式。XSS是指恶意攻击者利用网站没有对用户提交数据进行转义处理或者过滤不足的缺点，进而添加一些脚本代码嵌入到web页面中去，使别的用户访问都会执行相应的嵌入代码，从而盗取用户资料、利用用户身份进行某种动作或者对访问者进行病毒侵害的一种攻击方式。
+XSS 是一种经常出现在web应用中的计算机安全漏洞，与SQL注入一起成为web中最主流的攻击方式。XSS是指恶意攻击者利用网站没有对用户提交数据进行转义处理或者过滤不足的缺点，进而添加一些脚本代码嵌入到web页面中去，使别的用户访问都会执行相应的嵌入代码，从而盗取用户资料、利用用户身份进行某种动作或者对访问者进行病毒侵害的一种攻击方式。
 
 　　　　　　　　　　
 
@@ -757,13 +761,13 @@ D类地址：以1110开头，第一个字节范围为224~239；
 
 E类地址：以1111开头，保留地址
 
-
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds4m1xeinj30ee0apdkh.jpg)
 
  
 
 ## 参考与感谢
 
-- [https://arch-long.cn/articles/network/OSI%E6%A8%A1%E5%9E%8BTCPIP%E5%8D%8F%E8%AE%AE%E6%A0%88.html](https://arch-long.cn/articles/network/OSI模型TCPIP协议栈.html)
-
+- 《HTTP 权威指南》
+- https://arch-long.cn/articles/network/OSI模型TCPIP协议栈.html
 - https://blog.csdn.net/qq_32998153/article/details/79680704
 
