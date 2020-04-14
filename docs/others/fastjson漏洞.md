@@ -1,4 +1,14 @@
-# fastjson 再见吧，我真的累了，你他么漏洞太多了
+# 坑爹的 fastjson 又又又出漏洞
+
+# 再见吧，我真的累了，你他么漏洞太多了
+
+作为一名安全公司
+
+
+
+都知道 Struts2 是业界有名的漏洞之王，Fastjson 近来也不甘示弱，连续被爆出了非常多的漏洞，吓的像我这样的老程序员都不敢使用了！拼实力坑爹，Fastjson 当仁不让！
+
+
 
 https://sec.corp.qihoo.net/flatpages/Fastjson-67
 

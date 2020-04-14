@@ -56,7 +56,7 @@ public void test(int i, Request request){
 
 ## 类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdaind2f9sj31eg0mk0uv.jpg)
+![](../_images/design-pattern/responsibility-pattern-uml.png)
 
 ### coding
 
@@ -313,3 +313,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 https://wiki.jikexueyuan.com/project/java-design-pattern/chain-responsibility-pattern.html
 
 https://refactoringguru.cn/design-patterns/chain-of-responsibility
+
+
+
+![blog_end.png](https://i.loli.net/2020/04/14/IH5sCS42xveP3Ud.png)
