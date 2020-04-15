@@ -191,8 +191,9 @@ public ThreadPoolExecutor(int corePoolSize,
 - **maximumPoolSize：** 线程池最大线程数大小，该值必须大于等于 1
 
 - **keepAliveTime：** 线程池中非核心线程空闲的存活时间
-  - 当前线程池数量超过 corePoolSize 时，当空闲时间达到 keepAliveTime 值时，非核心线程会被销毁直到只剩下 corePoolSize 个线程为止
-
+  
+- 当前线程池数量超过 corePoolSize 时，当空闲时间达到 keepAliveTime 值时，非核心线程会被销毁直到只剩下 corePoolSize 个线程为止
+  
 - **unit：** keepAliveTime 的时间单位
 
 - **workQueue：** 存放任务的阻塞队列，被提交但尚未被执行的任务
@@ -648,7 +649,7 @@ try {
 
   CPU 密集型任务配置尽可能少的线程数量：
 
-  一搬公式：CPU 合数 + 1 个线程的线程池
+  一般公式：CPU 合数 + 1 个线程的线程池
 
 - IO 密集型
   - IO密集型任务线程并不是一直在执行任务，则应配置尽可能多的线程，如 CPU 核心数*2

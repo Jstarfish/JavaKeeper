@@ -33,10 +33,6 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 集合分为两大块：`java.util` 包下的非线程安全集合和 `java.util.concurrent` 下的线程安全集合。
 
-
-
-
-
 ------
 
 
@@ -47,14 +43,14 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 - 这两个类都实现了List接口，它们都是**有序**的集合(存储有序)，**底层是数组**。我们可以按位置索引号取出某个元素，**允许元素重复和为null**。
 
-- 同步性：ArrayList是非同步的，Vector类中所有方法都是是同步的
-- 扩容大小：Vector增长原来的一倍，ArrayList增长原来的0.5倍
+- 同步性：ArrayList 是非同步的，Vector 类中所有方法都是是同步的
+- 扩容大小：Vector 增长原来的一倍，ArrayList 增长原来的0.5倍
 
 
 
 ### Arraylist 与 LinkedList 异同 
 
-ArrayList和LinkedList两者都实现了List接口
+ArrayList 和 LinkedList两者都实现了List接口
 
 - **是否保证线程安全**： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
 - **底层数据结构**： Arraylist 底层使用的是Object数组；LinkedList 底层使用的是双向循环链表数据结构；

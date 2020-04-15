@@ -1,10 +1,12 @@
-# github 竟然有这些骚操作，真是涨姿势
+# GitHub 竟然有这些骚操作，真是涨姿势
 
 GitHub，不用过多介绍。一个面向开源及私有软件项目的托管平台，因为只支持 git 作为唯一的版本库格式进行托管，故名 GitHub。
 
 作为「全球最大的程序员“交友”社区」，程序员的你，真的可以把它的使用发挥到极致吗？
 
 
+
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 ## 搜索
 
@@ -127,4 +129,10 @@ https://github.com/trending  可以按语言，日期范围（本天、本周、
 
 octotree 用于将 Github 项目代码以树形格式展示，可以像 IDE 一样，看代码。而且在展示的列表中，我们可以下载指定的文件，而不需要下载整个项目。
 
-![img](/Users/starfish/Desktop/00831rSTly1gdjvk42mdkg311w0lcb2f.png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gdu75x2rj1j30hs0b4gn4.jpg)
+
+
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdu79z432kj30ku0aumy2.jpg)
