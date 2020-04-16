@@ -12,7 +12,17 @@
 >
 > ArrayList 和 Vector 的区别
 
+
+
+前言瞎扯：经常看到网上各种帖子，各种大厂面试题集锦，自己都进不了大厂，成天标题党，搞得我找资源老费劲了，都是一两句话，最后都论为为了面试而去背题了，当面试高级点岗位的时候，一到被深入的问某个问题，就懵逼了。所以在我准备面试的时候，还得一个问题一个问题的准备，坑。
+
+
+
+面向对象语言对事物的体现都是以对象的形式，所以为了方便对多个对象的操作，需要将对象进行存储，集合就是存储对象最常用的一种方式，也叫容器。
+
 ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdp03vldkkg30hv0gzwet.gif)
+
+
 
 从上面的集合框架图可以看到，Java 集合框架主要包括两种类型的容器
 
@@ -37,28 +47,332 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 
 
-## List
+## 说说常用的集合有哪些吧？
 
-### ArrayList 和 Vector 的区别
+Map 接口和 Collection 接口是所有集合框架的父接口：
 
-- 这两个类都实现了List接口，它们都是**有序**的集合(存储有序)，**底层是数组**。我们可以按位置索引号取出某个元素，**允许元素重复和为null**。
+1. Collection接口的子接口包括：Set、List、Queue
+2. List是有序的不允许有重复元素的Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
+3. Set是一种不包含重复元素且无序的Collection，实现类主要有：HashSet、TreeSet、LinkedHashSet等
+4. Map没有继承Collection接口，Map提供key到value的映射。实现类主要有：HashMap、TreeMap、Hashtable、ConcurrentHashMap 以及 Properties 等
 
-- 同步性：ArrayList 是非同步的，Vector 类中所有方法都是是同步的
-- 扩容大小：Vector 增长原来的一倍，ArrayList 增长原来的0.5倍
+
+
+## ArrayList 和 Vector 的区别
+
+相同点：
+
+- ArrayList 和 Vector 都是继承了相同的父类和实现了相同的接口（都实现了List，有序、允许重复和null）
+
+  ```java
+  extends AbstractList<E>
+          implements List<E>, RandomAccess, Cloneable, java.io.Serializable
+  ```
+
+- 底层都是数组（Object[]）实现的
+
+- 初始默认长度都为**10**
+
+不同点：
+
+- 同步性：Vector 中的 public 方法多数添加了 synchronized 关键字、以确保方法同步、也即是 Vector 线程安全、ArrayList 线程不安全
+
+- 性能：Vector 存在 synchronized 的锁等待情况、需要等待释放锁这个过程、所以性能相对较差
+
+- 扩容大小：ArrayList在底层数组不够用时在原来的基础上扩展 0.5 倍，Vector默认是扩展 1 倍
+
+  扩容机制，扩容方法其实就是新创建一个数组，然后将旧数组的元素都复制到新数组里面。其底层的扩容方法都在 **grow()** 中（基于JDK8）
+
+  - ArrayList 的 grow()，在满足扩容条件时、ArrayList以**1.5** 倍的方式在扩容（oldCapacity >> **1** ，右移运算，相当于除以 2，结果为二分之一的 oldCapacity）
+
+    ```java
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        //newCapacity = oldCapacity + O.5*oldCapacity,此处扩容0.5倍
+        int newCapacity = oldCapacity + (oldCapacity >> 1); 
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        // minCapacity is usually close to size, so this is a win:
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+    ```
+
+  - Vector 的 grow()，Vector 比 ArrayList多一个属性，扩展因子capacityIncrement，可以扩容大小。当扩容容量增量大于**0**时、新数组长度为原数组长度**+**扩容容量增量、否则新数组长度为原数组长度的**2**倍
+
+    ```java
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        //
+        int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+                                         capacityIncrement : oldCapacity);
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+    ```
+
+    
 
 
 
-### Arraylist 与 LinkedList 异同 
+## Arraylist 与 LinkedList 区别
 
-ArrayList 和 LinkedList两者都实现了List接口
-
-- **是否保证线程安全**： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
-- **底层数据结构**： Arraylist 底层使用的是Object数组；LinkedList 底层使用的是双向循环链表数据结构；
+- 是否保证线程安全： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
+- **底层数据结构**： Arraylist 底层使用的是 Object 数组；LinkedList 底层使用的是双向循环链表数据结构；
 - **插入和删除是否受元素位置的影响：**
   -  **ArrayList 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。** 比如：执行 `add(E e)`方法的时候， ArrayList 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是O(1)。但是如果要在指定位置 i 插入和删除元素的话（ `add(intindex,E element)`）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。
-  - **LinkedList 采用链表存储，所以插入，删除元素时间复杂度不受元素位置的影响，都是近似 $O(1)$，而数组为近似 $O(n)$。**
-- **是否支持快速随机访问**： LinkedList 不支持高效的随机元素访问，而 ArrayList 实现了RandomAccess 接口，所以有随机访问功能。快速随机访问就是通过元素的序号快速获取元素对象(对应于 `get(intindex)`方法)。
+  -  **LinkedList 采用链表存储，所以插入，删除元素时间复杂度不受元素位置的影响，都是近似 $O(1)$，而数组为近似 $O(n)$。**
+- **是否支持快速随机访问**： LinkedList 不支持高效的随机元素访问，而 ArrayList 实现了 RandomAccess 接口，所以有随机访问功能。快速随机访问就是通过元素的序号快速获取元素对象(对应于 `get(intindex)`方法)。
 - **内存空间占用**： ArrayList 的空间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
+
+
+
+高级工程师的我，可不得看看源码，具体分析下：
+
+ArrayList 和 LinkedList 两者都实现了 List 接口
+
+```java
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
+```
+
+```java
+public class LinkedList<E>
+    extends AbstractSequentialList<E>
+    implements List<E>, Deque<E>, Cloneable, java.io.Serializable
+```
+
+
+
+ArrayList 提供了 3 个构造器，①无参构造器 ②带初始容量构造器 ③参数为集合构造器
+
+```java
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
+   
+    public ArrayList(int initialCapacity) {
+        if (initialCapacity > 0) {
+            // 创建初始容量的数组
+            this.elementData = new Object[initialCapacity];
+        } else if (initialCapacity == 0) {
+            this.elementData = EMPTY_ELEMENTDATA;
+        } else {
+            throw new IllegalArgumentException("Illegal Capacity: "+
+                                               initialCapacity);
+        }
+}
+
+    public ArrayList() {
+        // 默认为空数组
+        this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+    }
+    
+    public ArrayList(Collection<? extends E> c) { //...}       
+}
+```
+
+LinkedList 提供了 2 个构造器，因为基于链表，所以也就没有初始化大小，也没有扩容的机制，就是一直在前面或者后面插插插~~
+
+```java
+public LinkedList() {
+}
+
+public LinkedList(Collection<? extends E> c) {
+    this();
+    addAll(c);
+}
+// 
+private static class Node<E> {
+    E item;
+    Node<E> next;
+    Node<E> prev;
+
+    Node(Node<E> prev, E element, Node<E> next) {
+        this.item = element;
+        this.next = next;
+        this.prev = prev;
+    }
+}
+```
+
+### 插入
+
+**ArrayList**:
+
+```java
+public boolean add(E e) {
+    // 确保数组的容量，保证可以添加该元素
+    ensureCapacityInternal(size + 1);  // Increments modCount!!
+    // 将该元素放入数组中
+    elementData[size++] = e;
+    return true;
+}
+private void ensureCapacityInternal(int minCapacity) {
+    // 如果数组是空的，那么会初始化该数组
+    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+        // DEFAULT_CAPACITY 为 10,所以调用无参默认 ArrayList 构造方法初始化的话，默认的数组容量为 10
+        minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
+    }
+
+    ensureExplicitCapacity(minCapacity);
+}
+
+private void ensureExplicitCapacity(int minCapacity) {
+    modCount++;
+
+    // 确保数组的容量，如果不够的话，调用 grow 方法扩容
+    if (minCapacity - elementData.length > 0)
+        grow(minCapacity);
+}
+//扩容具体的方法
+private void grow(int minCapacity) {
+    // 当前数组的容量
+    int oldCapacity = elementData.length;
+    // 新数组扩容为原来容量的 1.5 倍
+    int newCapacity = oldCapacity + (oldCapacity >> 1);
+    // 如果新数组扩容容量还是比最少需要的容量还要小的话，就设置扩充容量为最小需要的容量
+    if (newCapacity - minCapacity < 0)
+        newCapacity = minCapacity;
+    //判断新数组容量是否已经超出最大数组范围，MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8
+    if (newCapacity - MAX_ARRAY_SIZE > 0)
+        newCapacity = hugeCapacity(minCapacity);
+    // minCapacity is usually close to size, so this is a win:
+    // 复制元素到新的数组中
+    elementData = Arrays.copyOf(elementData, newCapacity);
+}
+```
+
+当然也可以插入指定位置，还有一个重载的方法 `add(int index, E element)` 
+
+```java
+public void add(int index, E element) {
+    // 判断 index 有没有超出索引的范围
+    rangeCheckForAdd(index);
+    // 和之前的操作是一样的，都是保证数组的容量足够
+    ensureCapacityInternal(size + 1);  // Increments modCount!!
+    // 将指定位置及其后面数据向后移动一位
+    System.arraycopy(elementData, index, elementData, index + 1,
+                     size - index);
+    // 将该元素添加到指定的数组位置
+    elementData[index] = element;
+    // ArrayList 的大小改变
+    size++;
+}
+```
+
+可以看到每次插入指定位置都要移动元素，效率较低。
+
+再来看 **LinkedList** 的插入，也有插入末尾，插入指定位置两种，由于基于链表，肯定得先有个 Node
+
+```java
+private static class Node<E> {
+    E item;
+    Node<E> next;
+    Node<E> prev;
+
+    Node(Node<E> prev, E element, Node<E> next) {
+        this.item = element;
+        this.next = next;
+        this.prev = prev;
+    }
+}
+```
+
+```java
+public boolean add(E e) {
+    // 直接往队尾加元素
+    linkLast(e);
+    return true;
+}
+
+void linkLast(E e) {
+    // 保存原来链表尾部节点，last 是全局变量，用来表示队尾元素
+    final Node<E> l = last;
+    // 为该元素 e 新建一个节点
+    final Node<E> newNode = new Node<>(l, e, null);
+    // 将新节点设为队尾
+    last = newNode;
+    // 如果原来的队尾元素为空，那么说明原来的整个列表是空的，就把新节点赋值给头结点
+    if (l == null)
+        first = newNode;
+    else
+    // 原来尾结点的后面为新生成的结点
+        l.next = newNode;
+    // 节点数 +1
+    size++;
+    modCount++;
+}
+
+public void add(int index, E element) {
+    // 检查 index 有没有超出索引范围
+    checkPositionIndex(index);
+    // 如果追加到尾部，那么就跟 add(E e) 一样了
+    if (index == size)
+        linkLast(element);
+    else
+    // 否则就是插在其他位置
+     linkBefore(element, node(index));
+}
+
+//linkBefore方法中调用了这个node方法，类似二分查找的优化
+Node<E> node(int index) {
+    // assert isElementIndex(index);
+    // 如果 index 在前半段，从前往后遍历获取 node
+    if (index < (size >> 1)) {
+        Node<E> x = first;
+        for (int i = 0; i < index; i++)
+            x = x.next;
+        return x;
+    } else {
+        // 如果 index 在后半段，从后往前遍历获取 node
+        Node<E> x = last;
+        for (int i = size - 1; i > index; i--)
+            x = x.prev;
+        return x;
+    }
+}
+
+void linkBefore(E e, Node<E> succ) {
+    // assert succ != null;
+    // 保存 index 节点的前节点
+    final Node<E> pred = succ.prev;
+    // 新建一个目标节点
+    final Node<E> newNode = new Node<>(pred, e, succ);
+    succ.prev = newNode;
+    // 如果是在开头处插入的话
+    if (pred == null)
+        first = newNode;
+    else
+        pred.next = newNode;
+    size++;
+    modCount++;
+}
+```
+
+### 获取
+
+ArrayList 也叫数组列表，底层使用的数组实现的，严格来说是动态数组。
+
+ArrayList工作原理其实很简单，底层是动态数组，每次创建一个 ArrayList 实例时会分配一个初始容量（没有指定初始容量的话，默认是 10），以add方法为例，如果没有指定初始容量，当执行add方法，先判断当前数组是否为空，如果为空则给保存对象的数组分配一个最小容量，默认为10。当添加大容量元素时，会先增加数组的大小，以提高添加的效率
+
+1. ArrayList底层是基于数组来实现的，因此在 get 的时候效率高，而 add 或者 remove 的时候，效率低。get方法的时间复杂度为O(1)，add和remove操作的时间复杂度为O(n)；
+2. 调用默认的 ArrayList 无参构造方法的话，数组的初始容量为 10 ；
+3. ArrayList 会自动扩容，扩容的时候，会将容量扩至原来的 1.5 倍；
+4. ArrayList 不是线程安全的
+5. ArrayList一般应用于查询较多但插入以及删除较少情况，如果插入以及从删除较多则建议使用LinkedList
+
+LinkedList 是有序并且支持元素重复的集合，底层是基于双向链表的，即每个节点既包含指向其后继的引用也包括指向其前驱的引用，LinkedList 实现了 List 接口，继承了 AbstractSequentialList 类，在频繁进行插入以及删除的情况下效率较高。此外 LinkedList 还实现了 Deque（继承自Queue接口）接口，可以当做队列使用。
+
+也正因为是链表，所以也就没有动态扩容的步骤
+
+
+ 
 
 #### 补充：数据结构基础之双向链表
 
@@ -255,3 +569,5 @@ https://www.javatpoint.com/java-arraylist
 https://www.runoob.com/java/java-collections.html
 
 https://www.javazhiyin.com/21717.html
+
+https://yuqirong.me/2018/01/31/LinkedList内部原理解析/
