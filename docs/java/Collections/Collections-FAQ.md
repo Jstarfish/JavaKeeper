@@ -1,6 +1,6 @@
 「我是大厂面试官」—— Java 集合，你肯定会被问到这些
 
-作为一位”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合
+作为一位小菜 ”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合，所以整理下 Java 集合面试题
 
 > 说说常见的集合有哪些吧？
 >
@@ -36,10 +36,6 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 - **实现（类）**：是集合接口的具体实现。从本质上讲，它们是可重复使用的数据结构，例如：ArrayList、LinkedList、HashSet、HashMap。
 
 - **算法**：是实现集合接口的对象里的方法执行的一些有用的计算，例如：搜索和排序。这些算法被称为多态，那是因为相同的方法可以在相似的接口上有着不同的实现。
-
-
-
-集合分为两大块：`java.util` 包下的非线程安全集合和 `java.util.concurrent` 下的线程安全集合。
 
 ------
 
@@ -1311,6 +1307,33 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 
 
+### 如何避免**fail-fast** ？
+
+- 在单线程的遍历过程中，如果要进行remove操作，可以调用迭代器 ListIterator 的 remove 方法而不是集合类的 remove方法。看看 ArrayList中迭代器的 remove方法的源码，该方法不能指定元素删除，只能remove当前遍历元素。
+
+```java
+public void remove() {
+    if (lastRet < 0)
+        throw new IllegalStateException();
+    checkForComodification();
+
+    try {
+        SubList.this.remove(lastRet);
+        cursor = lastRet;
+        lastRet = -1;
+        expectedModCount = ArrayList.this.modCount;  //
+    } catch (IndexOutOfBoundsException ex) {
+        throw new ConcurrentModificationException();
+    }
+}
+```
+
+- 使用并发包(`java.util.concurrent`)中的类来代替 ArrayList 和 hashMap
+  - CopyOnWriterArrayList 代替 ArrayList
+  - ConcurrentHashMap 代替 HashMap
+
+
+
 ## Iterator 和 Enumeration 区别
 
 在Java集合中，我们通常都通过 “Iterator(迭代器)” 或 “Enumeration(枚举类)” 去遍历集合。
@@ -1407,6 +1430,8 @@ HashSet的底层其实就是HashMap，只不过我们**HashSet是实现了Set接
 - ListIterator和Iterator都有hasNext()和next()方法，可以实现顺序向后遍历，但是ListIterator有hasPrevious()和previous()方法，可以实现逆向（顺序向前）遍历。Iterator不可以
 - ListIterator可以定位当前索引的位置，nextIndex()和previousIndex()可以实现。Iterator没有此功能
 - 都可实现删除操作，但是 ListIterator可以实现对象的修改，set()方法可以实现。Iterator仅能遍历，不能修改
+
+
 
 
 
