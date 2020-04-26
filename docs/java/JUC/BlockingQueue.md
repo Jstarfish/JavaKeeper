@@ -1,8 +1,4 @@
-阻塞队列——手写生产者消费者模式、线程池原理、消息中间件原理的元凶哦哦
-
-![java中的阻塞队列和非阻塞队列](http://p3.pstatp.com/large/pgc-image/e9b1a11d65f8455296c662a4dfb4dd1a)
-
-![这里写图片描述](https://img-blog.csdn.net/20180405212220898?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTM4ODcwMDg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+# 阻塞队列——手写生产者消费者模式、线程池原理面试题真正的答案
 
 ## 队列和阻塞队列
 
@@ -15,21 +11,17 @@
 
 超市的收银台就是一个队列：
 
-![queue](https://www.liaoxuefeng.com/files/attachments/1285667604660289/l)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1ge7jl0dafej30ge03yq2x.jpg)
 
 
 
-![2jpg](http://www.aixx123.com/upload/271c9337969d4f358e6247ff893d9e75_2.jpg)
-
-我们常用的 LinkedList 就可以当队列使用，实现了Dequeue接口，ConcurrentLinkedQueue，都属于非阻塞队列。
+我们常用的 LinkedList 就可以当队列使用，实现了Dequeue接口，还有 ConcurrentLinkedQueue，他们都属于非阻塞队列。
 
 ### 阻塞队列
 
-阻塞队列，顾名思义，首先它是一个队列，而一个阻塞队列在数据结构中所起的作用大致如下
+阻塞队列，顾名思义，首先它是一个队列，而一个阻塞队列在数据结构中所起的作用大致如下 
 
-![img](http://misc.linkedkeeper.com/misc/img/blog/201706/linkedkeeper0_2c8d5504-1fd9-4865-9a46-b4b2e1500670.jpg)
-
-
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1ge7f11uoroj32bs0tidj8.jpg)
 
 线程 1 往阻塞队列中添加元素，而线程 2 从阻塞队列中移除元素
 
@@ -37,63 +29,55 @@
 
 - 当阻塞队列是满时，从队列中添加元素的操作将会被阻塞。
 
-> 类似我们去海底捞排队，海底捞往往饱满装填，阻塞队列相当于候客区，可以用餐的话就take一波，去餐厅用餐，候客区满的话，等待的客人就会被阻塞在外边等着。
-
 试图从空的阻塞队列中获取元素的线程将会阻塞，直到其他的线程往空的队列插入新的元素，同样，试图往已满的阻塞队列添加新元素的线程同样也会阻塞，直到其他的线程从列中移除一个或多个元素或者完全清空队列后继续新增。
+
+> 类似我们去海底捞排队，海底捞爆满情况下，阻塞队列相当于用餐区，用餐区满了的话，就阻塞在候客区等着，可以用餐的话 put 一波去用餐，吃完就 take 出去。
 
 
 
 ## 为什么要用阻塞队列，有什么好处吗
 
-在多线程领域：所谓阻塞，在某些情况下会挂起线程（即阻塞），一旦条件满足，被挂起的线程又会自动被唤醒
+在多线程领域：所谓阻塞，是指在某些情况下会挂起线程（即阻塞），一旦条件满足，被挂起的线程又会自动被唤醒。
 
+**那为什么需要 BlockingQueue 呢**
 
+好处是我们不需要关心什么时候需要阻塞线程，什么时候需要唤醒线程，因为这些 BlockingQueue 都包办了。
 
-### 为什么需要 BlockingQueue
-
-好处是我们不需要关心什么时候需要阻塞线程，什么时候需要唤醒线程，因为这些 BlockingQueue 都包办了
-
-在 concurrent 包发布以前，多线程环境下，我们每个程序员都必须去自己控制这些细节，尤其还要兼顾效率和线程安全，而这会给我们的程序带来不小的复杂性。
-
-
-
-从手动挡换成了自动挡
+在 concurrent 包发布以前，多线程环境下，我们每个程序员都必须自己去实现这些细节，尤其还要兼顾效率和线程安全，这会给我们的程序带来不小的复杂性。现在有了阻塞队列，我们的操作就从手动挡换成了自动挡。
 
 
 
 ## Java 里的阻塞队列
 
-![LinkedTransferQueue.png](https://i.loli.net/2020/04/24/Oj6cAbLfDpmgIU1.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1ge6zgkm1lxj31j10f6gm6.jpg)
 
+Collection的子类除了我们熟悉的 List 和 Set，还有一个 Queue，阻塞队列 BlockingQueue 继承自 Queue。
 
-
-Collection的子类除了我们熟悉的List和Set，还有一个 Queue有一个BlockingQueue
-
-BlockingQueue 是个接口，你需要使用它的实现之一来使用BlockingQueue，java.util.concurrent包下具有以下 BlockingQueue 接口的实现类：
+BlockingQueue 是个接口，需要使用它的实现之一来使用 BlockingQueue，`java.util.concurrent` 包下具有以下 BlockingQueue 接口的实现类：
 
 JDK 提供了 7 个阻塞队列。分别是
 
-- ArrayBlockingQueue ：一个由数组结构组成的有界阻塞队列。
-- LinkedBlockingQueue ：一个由链表结构组成的有界阻塞队列。
-- PriorityBlockingQueue ：一个支持优先级排序的无界阻塞队列。
-- DelayQueue：一个使用优先级队列实现的无界阻塞队列。
-- SynchronousQueue：一个不存储元素的阻塞队列。
-- LinkedTransferQueue：一个由链表结构组成的无界阻塞队列。
-- LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列。
+- ArrayBlockingQueue ：一个由数组结构组成的有界阻塞队列
+- LinkedBlockingQueue ：一个由链表结构组成的有界阻塞队列
+- PriorityBlockingQueue ：一个支持优先级排序的无界阻塞队列
+- DelayQueue：一个使用优先级队列实现的无界阻塞队列
+- SynchronousQueue：一个不存储元素的阻塞队列
+- LinkedTransferQueue：一个由链表结构组成的无界阻塞队列（实现了继承于 BlockingQueue的 TransferQueue）
+- LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
 
-
-以 ArrayBlockingQueue 来说明 Java 阻塞队列提供的4对方法
-
-相比Queue接口有两种形式的api，BlockingQueue则有四种形式的api，阻塞队列定义如果调用了某个函数可能当时不能立即满足结果 ，但很有可能在未来的某个时刻会满足。
 
 ## BlockingQueue 核心方法
+
+相比 Queue 接口，BlockingQueue 有四种形式的 API。
 
 | 方法类型     | 抛出异常  | 返回特殊值 | 一直阻塞 | 超时退出           |
 | ------------ | --------- | ---------- | -------- | ------------------ |
 | 插入         | add(e)    | offer(e)   | put(e)   | offer(e,time,unit) |
 | 移除（取出） | remove()  | poll()     | take()   | poll(time,unit)    |
 | 检查         | element() | peek()     | 不可用   | 不可用             |
+
+以 ArrayBlockingQueue 来看下 Java 阻塞队列提供的常用方法
 
 - 抛出异常：
 
@@ -113,28 +97,23 @@ JDK 提供了 7 个阻塞队列。分别是
 
 - 一直阻塞：
 
-  - 当阻塞队列满时，如果生产者线程继续往队列里 put 元素，队列会一直阻塞生产者线程，直到拿到数据，或者响应中断退出；
-  - 当阻塞队列空时，消费者线程试图从队列里 take 元素，队列也会一直阻塞消费者线程，直到队列可用。
+  - 当阻塞队列满时，如果生产线程继续往队列里 put 元素，队列会一直阻塞生产线程，直到拿到数据，或者响应中断退出；
+  - 当阻塞队列空时，消费线程试图从队列里 take 元素，队列也会一直阻塞消费线程，直到队列可用。
 
   ![](https://imgkr.cn-bj.ufileos.com/003143ab-68bb-4f2b-943b-bc870ac96900.png)
 
 - 超时退出：
 
-  - 当阻塞队列满时，队列会阻塞生产者线程一定时间，如果超过一定的时间，生产者线程就会退出。
-
+  - 当阻塞队列满时，队列会阻塞生产线程一定时间，如果超过一定的时间，生产线程就会退出，返回 false
+- 当阻塞队列空时，队列会阻塞消费线程一定时间，如果超过一定的时间，消费线程会退出，返回 null
+  
   ![](https://imgkr.cn-bj.ufileos.com/b82734a0-8dbe-4ae9-8e4e-ea44445f46ff.png)
 
 
 
+## BlockingQueue 实现类
 
-
-
-
-
-
-
-
-https://cloud.tencent.com/developer/article/1350854
+逐个分析下这 7 个阻塞队列，常用的几个顺便探究下源码。
 
 ### ArrayBlockingQueue 
 
@@ -144,7 +123,7 @@ ArrayBlockingQueue 为**有界且固定**，其大小在构造时由构造函数
 
 ArrayBlockingQueue 支持对等待的生产者线程和使用者线程进行排序的可选公平策略，但是在默认情况下不保证线程公平的访问，在构造时可以选择公平策略（`fair = true`）。公平性通常会降低吞吐量，但是减少了可变性和避免了“不平衡性”。（ArrayBlockingQueue 内部的阻塞队列是通过 ReentrantLock 和 Condition 条件队列实现的， 所以 ArrayBlockingQueue 中的元素存在公平和非公平访问的区别）
 
-所谓公平访问队列是指阻塞的所有生产者线程或消费者线程，当队列可用时，可以按照阻塞的先后顺序访问队列，即先阻塞的生产者线程，可以先往队列里插入元素，先阻塞的消费者线程，可以先从队列里获取元素。
+所谓公平访问队列是指阻塞的所有生产者线程或消费者线程，当队列可用时，可以按照阻塞的先后顺序访问队列，即先阻塞的生产者线程，可以先往队列里插入元素，先阻塞的消费者线程，可以先从队列里获取元素，可以保证先进先出，避免饥饿现象。
 
 #### 源码解读
 
@@ -165,6 +144,7 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
     //有2个条件对象，分别表示队列不为空和队列不满的情况
     private final Condition notEmpty;
     private final Condition notFull;
+    //迭代器
     transient Itrs itrs;
 
     //offer方法用于向队列中添加数据
@@ -263,7 +243,7 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
-    ////poll方法用于从队列中取数据，不会阻塞当前线程
+    //poll方法用于从队列中取数据，不会阻塞当前线程
     public E poll() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -327,6 +307,8 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
             lock.unlock();
         }
     }
+    
+    // 此外，还有一些其他方法
 
     //返回队列剩余空间，还能加几个元素
     public int remainingCapacity() {
@@ -338,6 +320,21 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
             lock.unlock();
         }
     }
+    
+    // 判断队列中是否存在当前元素o
+		public boolean contains(Object o){}
+    
+    // 返回一个按正确顺序，包含队列中所有元素的数组
+		public Object[] toArray(){}
+		
+		// 自动清空队列中的所有元素
+		public void clear(){}
+		
+		// 移除队列中所有可用元素，并将他们加入到给定的 Collection 中    
+		public int drainTo(Collection<? super E> c){}
+		
+		// 返回此队列中按正确顺序进行迭代的，包含所有元素的迭代器
+		public Iterator<E> iterator()
 }
 ```
 
@@ -374,21 +371,21 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     // 头节点，不存数据
     transient Node<E> head;
 
- 	// 尾节点，便于入队
+ 		// 尾节点，便于入队
     private transient Node<E> last;
 
     // take锁，出队锁，只有take，poll方法会持有
     private final ReentrantLock takeLock = new ReentrantLock();
 
     // 出队等待条件
-	// 当队列无元素时，take锁会阻塞在notEmpty条件上，等待其它线程唤醒
+		// 当队列无元素时，take锁会阻塞在notEmpty条件上，等待其它线程唤醒
     private final Condition notEmpty = takeLock.newCondition();
 
     // 入队锁，只有put，offer会持有
     private final ReentrantLock putLock = new ReentrantLock();
 
     // 入队等待条件
-	// 当队列满了时，put锁会会阻塞在notFull上，等待其它线程唤醒
+	  // 当队列满了时，put锁会会阻塞在notFull上，等待其它线程唤醒
     private final Condition notFull = putLock.newCondition();
 
     //同样提供三个构造器
@@ -400,13 +397,11 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
     
     public LinkedBlockingQueue() {
-        //// 如果没传容量，就使用最大int值初始化其容量
+        // 如果没传容量，就使用最大int值初始化其容量
         this(Integer.MAX_VALUE);
     }
 
-    public LinkedBlockingQueue(Collection<? extends E> c) {
-
-    }
+    public LinkedBlockingQueue(Collection<? extends E> c) {}
     
     //入队
     public void put(E e) throws InterruptedException {
@@ -421,7 +416,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
         // 使用put锁加锁
         putLock.lockInterruptibly();
         try {
-			// 如果队列满了，就阻塞在notFull条件上
+					// 如果队列满了，就阻塞在notFull条件上
         	// 等待被其它线程唤醒
             while (count.get() == capacity) {
                 notFull.await();
@@ -431,7 +426,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
             // 队列长度加1
             c = count.getAndIncrement();
             // 如果现队列长度小于容量
-        	// 就再唤醒一个阻塞在notFull条件上的线程
+        		// 就再唤醒一个阻塞在notFull条件上的线程
             // 这里为啥要唤醒一下呢？
             // 因为可能有很多线程阻塞在notFull这个条件上的
             // 而取元素时只有取之前队列是满的才会唤醒notFull
@@ -522,7 +517,6 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
         return true;
     }
 
-
     public E take() throws InterruptedException {
         E x;
         int c = -1;
@@ -545,7 +539,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
             takeLock.unlock();
         }
         // 如果取之前队列长度等于容量
-    	// 则唤醒notFull
+    	 // 则唤醒notFull
         if (c == capacity)
             signalNotFull();
         return x;
@@ -641,16 +635,6 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     public boolean contains(Object o) {
-        if (o == null) return false;
-        fullyLock();
-        try {
-            for (Node<E> p = head.next; p != null; p = p.next)
-                if (o.equals(p.item))
-                    return true;
-            return false;
-        } finally {
-            fullyUnlock();
-        }
     }
    
     static final class LBQSpliterator<E> implements Spliterator<E> {
@@ -670,18 +654,20 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
 
 ### PriorityBlockingQueue 
 
-PriorityBlockingQueue 是一个支持优先级的无界阻塞队列。默认情况下元素采取自然顺序排列，也可以通过比较器 comparator 来指定元素的排序规则。元素按照升序排列。
+PriorityBlockingQueue 是一个支持优先级的无界阻塞队列。(虽说是无界队列，但是由于资源耗尽的话，也会OutOfMemoryError，无法添加元素)
+
+默认情况下元素采用自然顺序升序排列。也可以自定义类实现 compareTo() 方法来指定元素排序规则，或者初始化 PriorityBlockingQueue 时，指定构造参数 Comparator 来对元素进行排序。但需要注意的是不能保证同优先级元素的顺序。PriorityBlockingQueue 是基于**最小二叉堆**实现，使用基于 CAS 实现的自旋锁来控制队列的动态扩容，保证了扩容操作不会阻塞 take 操作的执行。
 
 
 
-### DelayQueue 
+### DelayQueue
 
 DelayQueue 是一个使用优先级队列实现的延迟无界阻塞队列。
 
 队列使用 PriorityQueue 来实现。队列中的元素必须实现 Delayed 接口，在创建元素时可以指定多久才能从队列中获取当前元素。只有在延迟期满时才能从队列中提取元素。我们可以将 DelayQueue 运用在以下应用场景：
 
 - 缓存系统的设计：可以用 DelayQueue 保存缓存元素的有效期，使用一个线程循环查询 DelayQueue，一旦能从 DelayQueue 中获取元素时，表示缓存有效期到了。
-- 定时任务调度。使用 DelayQueue 保存当天将会执行的任务和执行时间，一旦从 DelayQueue 中获取到任务就开始执行，从比如 TimerQueue 就是使用 DelayQueue 实现的。
+- 定时任务调度。使用 DelayQueue 保存当天将会执行的任务和执行时间，一旦从 DelayQueue 中获取到任务就开始执行，从比如 Timer 就是使用 DelayQueue 实现的。
 
 
 
@@ -691,19 +677,24 @@ SynchronousQueue 是一个不存储元素的阻塞队列，也即是单个元素
 
 每一个 put 操作必须等待一个 take 操作，否则不能继续添加元素。SynchronousQueue 可以看成是一个传球手，负责把生产者线程处理的数据直接传递给消费者线程。队列本身并不存储任何元素，非常适合于传递性场景, 比如在一个线程中使用的数据，传递给另外一个线程使用，SynchronousQueue 的吞吐量高于 LinkedBlockingQueue 和 ArrayBlockingQueue。
 
-没有容量，与其他BlockingQueue不用，SynchronousQueue 是一个不存储元素的BlockingQueue。
+#### Coding
 
-每一个put 操作必须要等待一个 take 操作，否则不能继续添加，反之亦然
+synchronousQueue 是一个没有数据缓冲的阻塞队列，生产者线程对其的插入操作 put() 必须等待消费者的移除操作 take()，反过来也一样。
+
+对应 peek, contains, clear, isEmpty ... 等方法其实是无效的。
+
+但是 poll() 和 offer() 就不会阻塞，举例来说就是 offer 的时候如果有消费者在等待那么就会立马满足返回 true，如果没有就会返回 false，不会等待消费者到来。
 
 ```java
 public class SynchronousQueueDemo {
-
-
     public static void main(String[] args) {
-
-
         BlockingQueue<String> queue = new SynchronousQueue<>();
+				
+      	//System.out.println(queue.offer("aaa"));   //false
+        //System.out.println(queue.poll());         //null
 
+        System.out.println(queue.add("bbb"));      //IllegalStateException: Queue full
+      
         new Thread(()->{
             try {
                 System.out.println("Thread 1 put a");
@@ -718,7 +709,6 @@ public class SynchronousQueueDemo {
                 e.printStackTrace();
             }
         }).start();
-
 
         new Thread(()->{
             try {
@@ -747,242 +737,228 @@ Thread 1 put c
 Thread 2 get:c
 ```
 
+#### 源码解读
+
+不像ArrayBlockingQueue、LinkedBlockingDeque之类的阻塞队列依赖AQS实现并发操作，SynchronousQueue直接使用CAS实现线程的安全访问。
+
+synchronousQueue 提供了两个构造器（公平与否），内部是通过 Transferer 来实现的，具体分为两个Transferer，分别是 TransferStack 和 TransferQueue。
+
+TransferStack：非公平竞争模式使用的数据结构是后进先出栈(LIFO Stack)
+
+TransferQueue：公平竞争模式则使用先进先出队列（FIFO Queue）
+
+性能上两者是相当的，一般情况下，FIFO 通常可以支持更大的吞吐量，但 LIFO 可以更大程度的保持线程的本地化。
+
+```java
+private transient volatile Transferer<E> transferer;
+
+public SynchronousQueue() {
+    this(false);
+}
+
+public SynchronousQueue(boolean fair) {
+    transferer = fair ? new TransferQueue<E>() : new TransferStack<E>();
+}
+```
+
+分析 TransferQueue 的实现
+
+```java
+//构造函数中会初始化一个出队的节点，并且首尾都指向这个节点
+TransferQueue() {
+    QNode h = new QNode(null, false); // initialize to dummy node.
+    head = h;
+    tail = h;
+}
+//队列节点,
+static final class QNode {
+  volatile QNode next;          // next node in queue
+  volatile Object item;         // CAS'ed to or from null
+  volatile Thread waiter;       // to control park/unpark
+  final boolean isData;
+
+  QNode(Object item, boolean isData) {
+    this.item = item;
+    this.isData = isData;
+  }
+	// 设置next和item的值，用于进行并发更新, cas 无锁操作
+  boolean casNext(QNode cmp, QNode val) {
+    return next == cmp &&
+      UNSAFE.compareAndSwapObject(this, nextOffset, cmp, val);
+  }
+
+  boolean casItem(Object cmp, Object val) {
+    return item == cmp &&
+      UNSAFE.compareAndSwapObject(this, itemOffset, cmp, val);
+  }
+
+  void tryCancel(Object cmp) {
+    UNSAFE.compareAndSwapObject(this, itemOffset, cmp, this);
+  }
+
+  boolean isCancelled() {
+    return item == this;
+  }
+
+  boolean isOffList() {
+    return next == this;
+  }
+
+  // Unsafe mechanics
+  private static final sun.misc.Unsafe UNSAFE;
+  private static final long itemOffset;
+  private static final long nextOffset;
+
+  static {
+    try {
+      UNSAFE = sun.misc.Unsafe.getUnsafe();
+      Class<?> k = QNode.class;
+      itemOffset = UNSAFE.objectFieldOffset
+        (k.getDeclaredField("item"));
+      nextOffset = UNSAFE.objectFieldOffset
+        (k.getDeclaredField("next"));
+    } catch (Exception e) {
+      throw new Error(e);
+    }
+  }
+}
+```
+
+从 put() 方法和 take() 方法可以看出最终调用的都是 TransferQueue 的 transfer() 方法。
+
+```java
+public void put(E e) throws InterruptedException {
+    if (e == null) throw new NullPointerException();
+    if (transferer.transfer(e, false, 0) == null) {
+        Thread.interrupted();
+        throw new InterruptedException();
+    }
+}
+
+public E take() throws InterruptedException {
+  E e = transferer.transfer(null, false, 0);
+  if (e != null)
+    return e;
+  Thread.interrupted();
+  throw new InterruptedException();
+}
+
+//transfer方法用于提交数据或者是获取数据
+E transfer(E e, boolean timed, long nanos) {
+
+  QNode s = null; // constructed/reused as needed
+  //如果e不为null，就说明是添加数据的入队操作
+  boolean isData = (e != null);
+
+  for (;;) {
+    QNode t = tail;
+    QNode h = head;
+    if (t == null || h == null)         // saw uninitialized value
+      continue;                       // spin
+
+    //如果当前操作和 tail 节点的操作是一样的；或者头尾相同（表明队列中啥都没有）。
+    if (h == t || t.isData == isData) { // empty or same-mode
+      QNode tn = t.next;
+      // 如果 t 和 tail 不一样，说明，tail 被其他的线程改了，重来
+      if (t != tail)                  // inconsistent read
+        continue;
+      // 如果 tail 的 next 不是空。就需要将 next 追加到 tail 后面了
+      if (tn != null) {               // lagging tail
+        // 使用 CAS 将 tail.next 变成 tail,
+        advanceTail(t, tn);
+        continue;
+      }
+      // 时间到了，不等待，返回 null，插入失败，获取也是失败的
+      if (timed && nanos <= 0)        // can't wait
+        return null;
+      if (s == null)
+        s = new QNode(e, isData);
+      if (!t.casNext(null, s))        // failed to link in
+        continue;
+
+      advanceTail(t, s);              // swing tail and wait
+      Object x = awaitFulfill(s, e, timed, nanos);
+      if (x == s) {                   // wait was cancelled
+        clean(t, s);
+        return null;
+      }
+
+      if (!s.isOffList()) {           // not already unlinked
+        advanceHead(t, s);          // unlink if head
+        if (x != null)              // and forget fields
+          s.item = s;
+        s.waiter = null;
+      }
+      return (x != null) ? (E)x : e;
+
+    } else {                            // complementary-mode
+      QNode m = h.next;               // node to fulfill
+      if (t != tail || m == null || h != head)
+        continue;                   // inconsistent read
+
+      Object x = m.item;
+      if (isData == (x != null) ||    // m already fulfilled
+          x == m ||                   // m cancelled
+          !m.casItem(x, e)) {         // lost CAS
+        advanceHead(h, m);          // dequeue and retry
+        continue;
+      }
+
+      advanceHead(h, m);              // successfully fulfilled
+      LockSupport.unpark(m.waiter);
+      return (x != null) ? (E)x : e;
+    }
+  }
+}
+```
+
 
 
 ### LinkedTransferQueue 
 
-LinkedTransferQueue 是一个由链表结构组成的无界阻塞 TransferQueue 队列。相对于其他阻塞队列，LinkedTransferQueue 多了 tryTransfer 和 transfer 方法。
+LinkedTransferQueue 是一个由链表结构组成的无界阻塞 TransferQueue 队列。
 
-transfer 方法。如果当前有消费者正在等待接收元素（消费者使用 take() 方法或带时间限制的 poll() 方法时），transfer 方法可以把生产者传入的元素立刻 transfer（传输）给消费者。如果没有消费者在等待接收元素，transfer 方法会将元素存放在队列的 tail 节点，并等到该元素被消费者消费了才返回。transfer 方法的关键代码如下：
+LinkedTransferQueue采用一种预占模式。意思就是消费者线程取元素时，如果队列不为空，则直接取走数据，若队列为空，那就生成一个节点（节点元素为null）入队，然后消费者线程被等待在这个节点上，后面生产者线程入队时发现有一个元素为null的节点，生产者线程就不入队了，直接就将元素填充到该节点，并唤醒该节点等待的线程，被唤醒的消费者线程取走元素，从调用的方法返回。我们称这种节点操作为“匹配”方式。
 
-```
-Node pred = tryAppend(s, haveData);
-return awaitMatch(s, pred, e, (how == TIMED), nanos);
-```
-
-第一行代码是试图把存放当前元素的 s 节点作为 tail 节点。第二行代码是让 CPU 自旋等待消费者消费元素。因为自旋会消耗 CPU，所以自旋一定的次数后使用 Thread.yield() 方法来暂停当前正在执行的线程，并执行其他线程。
-
-tryTransfer 方法。则是用来试探下生产者传入的元素是否能直接传给消费者。如果没有消费者等待接收元素，则返回 false。和 transfer 方法的区别是 tryTransfer 方法无论消费者是否接收，方法立即返回。而 transfer 方法是必须等到消费者消费了才返回。
-
-对于带有时间限制的 tryTransfer(E e, long timeout, TimeUnit unit) 方法，则是试图把生产者传入的元素直接传给消费者，但是如果没有消费者消费该元素则等待指定的时间再返回，如果超时还没消费元素，则返回 false，如果在超时时间内消费了元素，则返回 true。
+队列实现了 TransferQueue 接口重写了 tryTransfer 和 transfer 方法，这组方法和 SynchronousQueue 公平模式的队列类似，具有匹配的功能
 
 
 
 ### LinkedBlockingDeque 
 
-LinkedBlockingDeque 是一个由链表结构组成的双向阻塞队列。所谓双向队列指的你可以从队列的两端插入和移出元素。双端队列因为多了一个操作队列的入口，在多线程同时入队时，也就减少了一半的竞争。相比其他的阻塞队列，LinkedBlockingDeque 多了 addFirst，addLast，offerFirst，offerLast，peekFirst，peekLast 等方法，以 First 单词结尾的方法，表示插入，获取（peek）或移除双端队列的第一个元素。以 Last 单词结尾的方法，表示插入，获取或移除双端队列的最后一个元素。另外插入方法 add 等同于 addLast，移除方法 remove 等效于 removeFirst。但是 take 方法却等同于 takeFirst，不知道是不是 Jdk 的 bug，使用时还是用带有 First 和 Last 后缀的方法更清楚。
+LinkedBlockingDeque 是一个由链表结构组成的双向阻塞队列。
 
-在初始化 LinkedBlockingDeque 时可以设置容量防止其过渡膨胀。另外双向阻塞队列可以运用在“工作窃取”模式中。
+所谓双向队列指的你可以从队列的两端插入和移出元素。双端队列因为多了一个操作队列的入口，在多线程同时入队时，也就减少了一半的竞争。相比其他的阻塞队列，LinkedBlockingDeque 多了 addFirst，addLast，offerFirst，offerLast，peekFirst，peekLast 等方法，以 First 单词结尾的方法，表示插入，获取（peek）或移除双端队列的第一个元素。以 Last 单词结尾的方法，表示插入，获取或移除双端队列的最后一个元素。另外插入方法 add 等同于 addLast，移除方法 remove 等效于 removeFirst。
 
-
-
-## 阻塞队列的实现原理
-
-https://juejin.im/post/5df240f16fb9a0161d742b60
-
-http://www.linkedkeeper.com/1003.html
-
-如果队列是空的，消费者会一直等待，当生产者添加元素时候，消费者是如何知道当前队列有元素的呢？如果让你来设计阻塞队列你会如何设计，让生产者和消费者能够高效率的进行通讯呢？让我们先来看看 JDK 是如何实现的。
-
-使用通知模式实现。所谓通知模式，就是当生产者往满的队列里添加元素时会阻塞住生产者，当消费者消费了一个队列中的元素后，会通知生产者当前队列可用。通过查看 JDK 源码发现 ArrayBlockingQueue 使用了 Condition 来实现，代码如下：
-
-```
-private final Condition notFull;
-private final Condition notEmpty;
-
-public ArrayBlockingQueue(int capacity, boolean fair) {
-        // 省略其他代码 
-        notEmpty = lock.newCondition();
-        notFull =  lock.newCondition();
-    }
-
-public void put(E e) throws InterruptedException {
-        checkNotNull(e);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            while (count == items.length)
-                notFull.await();
-            insert(e);
-        } finally {
-            lock.unlock();
-        }
-}
-
-public E take() throws InterruptedException {
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            while (count == 0)
-                notEmpty.await();
-            return extract();
-  } finally {
-            lock.unlock();
-        }
-}
-
-private void insert(E x) {
-        items[putIndex] = x;
-        putIndex = inc(putIndex);
-        ++count;
-        notEmpty.signal();
-    }
-```
-
-当我们往队列里插入一个元素时，如果队列不可用，阻塞生产者主要通过 LockSupport.park(this); 来实现
-
-```
-public final void await() throws InterruptedException {
-            if (Thread.interrupted())
-                throw new InterruptedException();
-            Node node = addConditionWaiter();
-            int savedState = fullyRelease(node);
-            int interruptMode = 0;
-            while (!isOnSyncQueue(node)) {
-                LockSupport.park(this);
-                if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
-                    break;
-            }
-            if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
-                interruptMode = REINTERRUPT;
-            if (node.nextWaiter != null) // clean up if cancelled
-                unlinkCancelledWaiters();
-            if (interruptMode != 0)
-
-reportInterruptAfterWait(interruptMode);
-        }
-```
-
-继续进入源码，发现调用 setBlocker 先保存下将要阻塞的线程，然后调用 unsafe.park 阻塞当前线程。
-
-```
-public static void park(Object blocker) {
-        Thread t = Thread.currentThread();
-        setBlocker(t, blocker);
-        unsafe.park(false, 0L);
-        setBlocker(t, null);
-    }
-```
-
-unsafe.park 是个 native 方法，代码如下：
-
-```
-public native void park(boolean isAbsolute, long time);
-```
-
-park 这个方法会阻塞当前线程，只有以下四种情况中的一种发生时，该方法才会返回。
-
-- 与 park 对应的 unpark 执行或已经执行时。注意：已经执行是指 unpark 先执行，然后再执行的 park。
-- 线程被中断时。
-- 如果参数中的 time 不是零，等待了指定的毫秒数时。
-- 发生异常现象时。这些异常事先无法确定。
-
-我们继续看一下 JVM 是如何实现 park 方法的，park 在不同的操作系统使用不同的方式实现，在 linux 下是使用的是系统方法 pthread_cond_wait 实现。实现代码在 JVM 源码路径 src/os/linux/vm/os_linux.cpp 里的 os::PlatformEvent::park 方法，代码如下：
-
-```
-void os::PlatformEvent::park() {      
-     	     int v ;
-	     for (;;) {
-		v = _Event ;
-	     if (Atomic::cmpxchg (v-1, &_Event, v) == v) break ;
-	     }
-	     guarantee (v >= 0, "invariant") ;
-	     if (v == 0) {
-	     // Do this the hard way by blocking ...
-	     int status = pthread_mutex_lock(_mutex);
-	     assert_status(status == 0, status, "mutex_lock");
-	     guarantee (_nParked == 0, "invariant") ;
-	     ++ _nParked ;
-	     while (_Event < 0) {
-	     status = pthread_cond_wait(_cond, _mutex);
-	     // for some reason, under 2.7 lwp_cond_wait() may return ETIME ...
-	     // Treat this the same as if the wait was interrupted
-	     if (status == ETIME) { status = EINTR; }
-	     assert_status(status == 0 || status == EINTR, status, "cond_wait");
-	     }
-	     -- _nParked ;
-	     
-	     // In theory we could move the ST of 0 into _Event past the unlock(),
-	     // but then we'd need a MEMBAR after the ST.
-	     _Event = 0 ;
-	     status = pthread_mutex_unlock(_mutex);
-	     assert_status(status == 0, status, "mutex_unlock");
-	     }
-	     guarantee (_Event >= 0, "invariant") ;
-	     }
-
-     }
-```
-
-pthread_cond_wait 是一个多线程的条件变量函数，cond 是 condition 的缩写，字面意思可以理解为线程在等待一个条件发生，这个条件是一个全局变量。这个方法接收两个参数，一个共享变量 _cond，一个互斥量 _mutex。而 unpark 方法在 linux 下是使用 pthread_cond_signal 实现的。park 在 windows 下则是使用 WaitForSingleObject 实现的。
-
-当队列满时，生产者往阻塞队列里插入一个元素，生产者线程会进入 WAITING (parking) 状态。我们可以使用 jstack dump 阻塞的生产者线程看到这点：
-
-```
-"main" prio=5 tid=0x00007fc83c000000 nid=0x10164e000 waiting on condition [0x000000010164d000]
-   java.lang.Thread.State: WAITING (parking)
-        at sun.misc.Unsafe.park(Native Method)
-        - parking to wait for  <0x0000000140559fe8> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
-        at java.util.concurrent.locks.LockSupport.park(LockSupport.java:186)
-        at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2043)
-        at java.util.concurrent.ArrayBlockingQueue.put(ArrayBlockingQueue.java:324)
-        at blockingqueue.ArrayBlockingQueueTest.main(ArrayBlockingQueueTest.java:11)
-```
+在初始化 LinkedBlockingDeque 时可以设置容量防止其过渡膨胀，默认容量也是 Integer.MAX_VALUE。另外双向阻塞队列可以运用在“工作窃取”模式中。
 
 
 
-## 阻塞队列使用在哪
+## 阻塞队列使用场景
 
-JDK api文档给出了一个典型的应用 https://docs.oracle.com/javase/8/docs/api/index.html
+我们常用的生产者消费者模式就可以基于阻塞队列实现；
 
-```
- class Producer implements Runnable {
-   private final BlockingQueue queue;
-   Producer(BlockingQueue q) { queue = q; }
-   public void run() {
-     try {
-       while (true) { queue.put(produce()); }
-     } catch (InterruptedException ex) { ... handle ...}
-   }
-   Object produce() { ... }
- }
+线程池中活跃线程数达到 corePoolSize 时，线程池将会将后续的 task 提交到 BlockingQueue 中；
 
- class Consumer implements Runnable {
-   private final BlockingQueue queue;
-   Consumer(BlockingQueue q) { queue = q; }
-   public void run() {
-     try {
-       while (true) { consume(queue.take()); }
-     } catch (InterruptedException ex) { ... handle ...}
-   }
-   void consume(Object x) { ... }
- }
 
- class Setup {
-   void main() {
-     BlockingQueue q = new SomeQueueImplementation();
-     Producer p = new Producer(q);
-     Consumer c1 = new Consumer(q);
-     Consumer c2 = new Consumer(q);
-     new Thread(p).start();
-     new Thread(c1).start();
-     new Thread(c2).start();
-   }
- }
-```
 
 ### 生产者消费者模式
 
-- 传统版
-- 阻塞队列版
+JDK API文档的 BlockingQueue 给出了一个典型的应用
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1ge7bmj64cxj30zm0u0tfe.jpg)
+
+
+
+> 面试题：一个初始值为 0 的变量，两个线程对齐交替操作，一个+1，一个-1，5 轮
 
 ```java
-/**
- * 题目：一个初始值为 0 的变量，两个线程对齐交替操作，一个+1，一个-1，5 轮
- */
 public class ProdCounsume_TraditionDemo {
+
     public static void main(String[] args) {
+
         ShareData shareData = new ShareData();
+
         new Thread(() -> {
             for (int i = 0; i <= 5; i++) {
                 shareData.increment();
@@ -1006,8 +982,8 @@ class ShareData {
     public void increment() {
         lock.lock();
         try {
-          //判断，不能用 if
             while (num != 0) {
+
                 //等待，不能生产
                 condition.await();
             }
@@ -1026,7 +1002,6 @@ class ShareData {
     }
 
     public void decrement() {
-
         lock.lock();
         try {
             while (num == 0) {
@@ -1049,8 +1024,34 @@ class ShareData {
 }
 ```
 
-防止虚假唤醒，多线程判断用 while，不是 if
+
 
 ### 线程池
 
-### 消息中间件
+线程池的核心方法 ThreadPoolExecutor，用 BlockingQueue 存放任务的阻塞队列，被提交但尚未被执行的任务
+
+```java
+public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue,
+                          ThreadFactory threadFactory,
+                          RejectedExecutionHandler handler)
+```
+
+线程池在内部实际也是构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程。
+
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdl1arsqkbj30u50d8dgz.jpg)
+
+
+
+不同的线程池实现用的是不同的阻塞队列，newFixedThreadPool 和 newSingleThreadExecutor 用的是LinkedBlockingQueue，newCachedThreadPool 用的是 SynchronousQueue。
+
+
+
+## 参考与感谢
+
+https://www.liaoxuefeng.com/
+
+SynchronousQueue源码 https://juejin.im/post/5ae754c7f265da0ba76f8534
