@@ -1,6 +1,6 @@
 # Mysql Storage Engines
 
-​		存储引擎是MySQL的组件，用于处理不同表类型的SQL操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
+存储引擎是MySQL的组件，用于处理不同表类型的SQL操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
 
 使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
 
@@ -15,7 +15,7 @@
 SHOW ENGINES
 
 -- 查看默认存储引擎
-SHOW VARIABLES LIKE 'storage_engine
+SHOW VARIABLES LIKE 'storage_engine'
 
 --查看具体某一个表所使用的存储引擎，这个默认存储引擎被修改了！
 show create table tablename
