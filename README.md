@@ -84,7 +84,7 @@
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>运行时数据区 |
 |  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
-|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
+|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
 |   NIO   |         |                                                              |
 
 
