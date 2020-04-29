@@ -16,13 +16,24 @@
 
 
 
+## ☕ Java
+
+| Project | Version | Article                                                      |
+| :-----: | :-----: | :----------------------------------------------------------- |
+|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>运行时数据区 |
+|  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
+|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
+|   NIO   |         |                                                              |
+
+
+
 ## 💾  数据存储、缓存和搜索
 
 
 |                           Project                            | Version | Article                                                      |
 | :----------------------------------------------------------: | :-----: | :----------------------------------------------------------- |
 | ![](https://icongram.jgog.in/devicon/mysql-original.svg?size=20) **MySQL** | 5.7.25  | [1、MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2、MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3、索引](docs/mysql/MySQL-Index.md)<br/>[4、事务](docs/mysql/MySQL-Transaction.md)<br/>5、表设计<br/>[6、性能优化](docs/mysql/MySQL-Optimization.md)<br/>7、锁机制<br/>8、分区分表分库<br/>9 、主从复制<br/> |
-| ![](https://icongram.jgog.in/devicon/redis-original.svg?size=20)   **Redis** |  5.0.6  | [1、NoSQL概述](docs/redis/1.Nosql-Overview.md)<br/>[2、Redis概述](docs/redis/2.readRedis.md)<br/>[3、Redis数据类型](docs/redis/3.Redis-Datatype.md)<br/>[4、Redis配置](docs/redis/4.Redis-Conf.md)<br/>[5、深入理解 Redis 的持久化](docs/redis/5.Redis-Persistence.md)<br/> |
+| ![](https://icongram.jgog.in/devicon/redis-original.svg?size=20)   **Redis** |  5.0.6  | [1、NoSQL概述](docs/data-store/Redis/1.Nosql-Overview.md)<br/>[2、Redis概述](docs/data-store/Redis/2.readRedis.md)<br/>[3、Redis数据类型](docs/data-store/Redis/3.Redis-Datatype.md)<br/>[4、Redis配置](docs/data-store/Redis/4.Redis-Conf.md)<br/>[5、深入理解 Redis 的持久化](docs/data-store/Redis/5.Redis-Persistence.md)<br/> |
 |                      **Elasticsearch**                       |         |                                                              |
 |                        **Amazon S3**                         |         |                                                              |
 |                           MongoDB                            |         |                                                              |
@@ -75,17 +86,6 @@
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   RPC   |  gRPC   | [1 —— Hello protocol-buffers](/docs/rpc/Hello-Protocol-Buffers.md)<br> |
-
-
-
-## ☕ Java
-
-| Project | Version | Article                                                      |
-| :-----: | :-----: | :----------------------------------------------------------- |
-|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>运行时数据区 |
-|  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
-|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
-|   NIO   |         |                                                              |
 
 
 
