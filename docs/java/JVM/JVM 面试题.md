@@ -114,6 +114,18 @@ G1 垃圾收集器？
     - jinfo -flag PrintGCDetails 1981
     - jinfo -flag MetaspaceSize 2044
 
+这些都是命令级别的查看，我们如何在程序运行中查看
+
+```java
+    long totalMemory = Runtime.getRuntime().totalMemory();
+    long maxMemory = Runtime.getRuntime().maxMemory();
+
+    System.out.println("total_memory(-xms)="+totalMemory+"字节，" +(totalMemory/(double)1024/1024)+"MB");
+    System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double)1024/1024)+"MB");
+
+}
+```
+
 ### 盘点家底查看JVM默认值
 
 - -XX:+PrintFlagsInitial
@@ -126,7 +138,7 @@ G1 垃圾收集器？
 
   - ![](https://tva1.sinaimg.cn/large/00831rSTly1gdee0ndg33j31ci0m6k5w.jpg)
 
-    等号前有冒号 :=  说明 jvm 参数有人为修改过或者 JVM加载修改
+    **等号前有冒号** :=  说明 jvm 参数有人为修改过或者 JVM加载修改
 
     false 说明是Boolean 类型 参数，数字说明是 KV 类型参数
 
@@ -142,6 +154,7 @@ G1 垃圾收集器？
   - 打印命令行参数
   - java -XX:+PrintCommondLineFlags -version
   - 可以方便的看到垃圾回收器
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1e54soj31e006qjz6.jpg)
 
 ## 3. 你平时工作用过的 JVM 常用基本配置参数有哪些？
 
@@ -163,6 +176,7 @@ G1 垃圾收集器？
 
   - 设置单个线程的大小，一般默认为 512k~1024k
   - 等价于 -XX:ThreadStackSize
+  - 如果通过 `jinfo ThreadStackSize 线程 ID` 查看会显示为 0，指的是默认出厂设置
 
 - -Xmn
 
@@ -178,10 +192,23 @@ G1 垃圾收集器？
 
   - 输出详细的 GC 收集日志信息 
 
+  - 测试时候，可以将参数调到最小，
+
+    `-Xms10m -Xmx10m -XX:+PrintGCDetails`
+
+    定义一个大对象，撑爆堆内存，
+
     ```java
-    //-Xms10m -Xmx10m -XX:PrintGCDetails
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println("==hello gc===");
     
-    byte[] bytes = new byte[11 * 1024 * 1024];
+        //Thread.sleep(Integer.MAX_VALUE);
+    
+        //-Xms10m -Xmx10m -XX:PrintGCDetails
+    
+        byte[] bytes = new byte[11 * 1024 * 1024];
+    
+    }![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehkvas3vzj31a90u0n7t.jpg)
     ```
 
   - GC![](https://tva1.sinaimg.cn/large/00831rSTly1gdefrf0dfqj31fs0honjk.jpg)
@@ -207,6 +234,8 @@ G1 垃圾收集器？
   - 设置垃圾的最大年龄（java8 固定设置最大 15）
   - ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefr4xeq1j31g80lek6e.jpg)
 
+参数不懂，推荐直接去看官网，
+
 https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
 
 
@@ -219,15 +248,23 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 
 
+
+
+
+
 ## 4. 强引用、软引用、弱引用、虚引用分别是什么？
 
 架构图
+
+java.lang.ref 包下
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefxosx2vj30z40icq5r.jpg)
 
 ### 强引用（默认支持模式）
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefyz7qaqj31gq0k84f9.jpg)
+
+obj2一直存在，不会被垃圾回收
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg092uj0j319g0k4n46.jpg)
 
@@ -280,3 +317,125 @@ Mybatis 缓存类就有用到
 
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gdeh76fxptj31c60mwq9n.jpg)
+
+
+
+
+
+## 5. 请谈谈你对 OOM 的认识
+
+- java.lang.StackOverflowError
+
+  - ```
+    public class StackOverflowErrorDemo {
+    
+        public static void main(String[] args) {
+            stackoverflowError();
+        }
+    
+        private static void stackoverflowError() {
+            stackoverflowError();
+        }
+    }
+    ```
+
+- java.lang.OutOfMemoryError: Java heap space
+
+  - new个大对象,就会出现
+
+- java.lang.OutOfMemoryError: GC overhead limit exceeded  (GC上头，哈哈)
+
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehmrz0dvaj311w0muk0e.jpg)
+
+  - ```java
+    public class StackOverflowErrorDemo {
+    
+        public static void main(String[] args) {
+            stackoverflowError();
+        }
+    
+        private static void stackoverflowError() {
+            stackoverflowError();
+        }
+    }
+    ```
+
+- java.lang.OutOfMemoryError: Direct buffer memory
+
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehn18eix6j31a00m2wup.jpg)
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehn52fphnj31as0lidyh.jpg)
+
+- java.lang.OutOfMemoryError: unable to create new native thread
+
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehn7osaz1j31940kc4c8.jpg)
+
+- java.lang.OutOfMemoryError：Metaspace
+
+  - http://openjdk.java.net/jeps/122
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehnc3d4g3j319e0msguj.jpg)
+  - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehndijxo8j31920madt6.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehmmia4gaj30xw0gudid.jpg)
+
+
+
+
+
+## 6. GC垃圾回收算法和垃圾收集器的关系？分别是什么，请你谈谈？
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1geho5bjeg5j31e409m0xb.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1geho87aqmuj31260dqdl2.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehoafwkoaj31a00my7js.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehobkwiegj31da0mc7ds.jpg)
+
+
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehofhsuglj31a20ka116.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehohen24lj31f20n2du8.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1geholtp9p9j31bu0i8dsm.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehop8c2u8j30uu0kgk46.jpg)
+
+
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehptemx4oj31520js47e.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehps6jzcsj31go0mok5q.jpg)
+
+
+
+
+
+
+
+## 7.怎么查看服务器默认的垃圾收集器是哪个？生产上如何配置垃圾收集器？谈谈你对垃圾收集器的理解？
+
+## 8.G1 垃圾收集器？
+
+
+
+## 9.生产环境服务器变慢，诊断思路和性能评估谈谈？
+
+## 10.假设生产环境出现 CPU占用过高，请谈谈你的分析思路和定位
+
+## 11. 对于JDK 自带的JVM 监控和性能分析工具用过哪些？你是怎么用的？
+
