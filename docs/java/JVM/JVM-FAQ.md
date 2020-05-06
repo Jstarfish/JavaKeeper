@@ -260,41 +260,11 @@ java.lang.ref 包下
 
 ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefxosx2vj30z40icq5r.jpg)
 
-### 强引用（默认支持模式）
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdefyz7qaqj31gq0k84f9.jpg)
 
-obj2一直存在，不会被垃圾回收
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg092uj0j319g0k4n46.jpg)
 
-### 软引用
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg2fh6ftj31da0jc10v.jpg)
-
-Mybatis 缓存类就有用到
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg7z2o6oj31ds0ma7ff.jpg)
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg851g7zj315e0n8k2r.jpg)
-
-### 弱引用
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeg9wc2d6j31c00c243c.jpg)
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegasmdi6j30zc0kmn4a.jpg)
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegg6qqm6j31fq0logzr.jpg)
-
-你知道弱引用的话，能说下 WeakHashMap吗
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdego93wwdj31f00m0k18.jpg)
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegpyj70yj31ek0oy4bt.jpg)
-
-### 虚引用
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegs2tppxj31ge0os1ew.jpg)
 
 #### 引用队列
 
