@@ -1,27 +1,41 @@
-阿里面试题： 说说强引用、软引用、弱引用、虚引用分别是什么？
+## 阿里面试回顾： 说说强引用、软引用、弱引用、虚引用分别是什么？
+
+我们都知道 JVM 垃圾回收中，GC判断堆中的对象实例或数据是不是垃圾的方法有**引用计数法**和**可达性算法**两种。
 
 无论是通过引用计数算法判断对象的引用数量，还是通过根搜索算法判断对象的引用链是否可达，判定对象是否存活都与“引用”有关。
 
-在JDK 1.2之前，Java中的引用的定义很传统：如果reference类型的数据中存储的数值代表的是另外一块内存的起始地址，就称该 refrence 数据是代表某块内存、某个对象的引用。这种定义很纯粹，但是太过狭隘，一个对象在这种定义下只有被引用或者没有被引用两种状态，对于如何描述一些“食之无味，弃之可惜”的对象就显得无能为力。
+在 JDK 1.2 之前，Java 中的引用的定义很传统：如果 reference 类型的数据中存储的数值代表的是另外一块内存的起始地址，就称该 refrence 数据是代表某块内存、某个对象的引用。这种定义很纯粹，但是太过狭隘，一个对象在这种定义下只有被引用或者没有被引用两种状态，对于如何描述一些“食之无味，弃之可惜”的对象就显得无能为力。
 
-我们希望能描述这样一类对象：当内存空间还足够时，则能保留在内存之中；如果内存在进行垃圾收集后还是非常紧张，则可以抛弃这些对象。很多系统的缓存功能都符合这样的应用场景。
+比如我们希望能描述这样一类对象：当内存空间还足够时，则能保留在内存之中；如果内存在进行垃圾收集后还是非常紧张，则可以抛弃这些对象。很多系统的缓存功能都符合这样的应用场景。
 
-在JDK 1.2之后，Java对引用的概念进行了扩充，将引用分为强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）四种，这四种引用强度依次逐渐减弱。  
+在 JDK 1.2 之后，Java 对引用的概念进行了扩充，将引用分为
 
-- 强引用就是指在程序代码之中普遍存在的，类似“Object obj = new Object()”这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。
--  软引用用来描述一些还有用，但并非必需的对象。对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中并进行第二次回收。如果这次回收还是没有足够的内存，才会抛出内存溢出异常。在JDK 1.2之后，提供了SoftReference类来实现软引用。
-- 弱引用也是用来描述非必需对象的，但是它的强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生之前。当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。在JDK 1.2之后，提供了WeakReference类来实现弱引用。
-- 虚引用也称为“幽灵引用”或者“幻影引用”，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。在JDK 1.2之后，提供了PhantomReference类来实现虚引用。
+- 强引用（Strong Reference）
+- 软引用（Soft Reference）
+- 弱引用（Weak Reference）
+- 虚引用（Phantom Reference）
+
+这四种引用强度依次逐渐减弱。  
+
+
+
+### JDK 8中的 UML关系图
+
+![Finalizer.png](https://i.loli.net/2020/05/07/AqsHUeYCOf2hzZc.png)
 
 
 
 ### 强引用
 
-当内存不足，JVM 开始垃圾回收，对于强引用的对象，**就算是出现了 OOM 也不会对该对象进行回收，打死都不收。**
+在 Java 中最常见的就是强引用，把一个对象赋给一个引用变量，这个引用变量就是一个强引用。类似 `“Object obj = new Object()”` 这类的引用，只要还有强引用指向一个对象，就能表明对象还“活着”，垃圾收集器就不会碰这种对象。
 
-强引用是我们最常见的普通对象引用，只要还有强引用指向一个对象，就能表明对象还“活着”，垃圾收集器不会碰这种对象。在 Java 中最常见的就是强引用，把一个对象赋给一个引用变量，这个引用变量就是一个强引用。当一个对象被强引用变量引用时，它处于可达状态，是不可能被垃圾回收器回收的，即使该对象永远不会被用到也不会被回收。因此强引用是造成 Java 内存泄露的主要原因之一。
+当一个对象被强引用变量引用时，它处于可达状态，是不可能被垃圾回收器回收的，即使该对象永远不会被用到也不会被回收。
+
+当内存不足，JVM 开始垃圾回收，对于强引用的对象，**就算是出现了 OOM 也不会对该对象进行回收，打死都不收。**因此强引用是造成 Java 内存泄露的主要原因之一。
 
 对于一个普通的对象，如果没有其他的引用关系，只要超过了引用的作用域或者显示地将相应（强）引用赋值为 null，一般认为就是可以被垃圾收集器回收。（具体回收时机还要要看垃圾收集策略）。
+
+#### coding~
 
 ```java
 public class StrongRefenenceDemo {
@@ -37,31 +51,33 @@ public class StrongRefenenceDemo {
 }
 ```
 
-o2一直存在，不会被垃圾回收
+TODO : demo中尽管o1已经被回收，但是o2一直存在，不会被垃圾回收
 
 
 
 ### 软引用
 
-软引用是一种相对强引用弱化了一些的引用，需要用`java.lang.ref.SoftReference` 类来实现，可以让对象豁免一些垃圾收集。对于只有软引用的对象来说，
+软引用是一种相对强引用弱化了一些的引用，需要用`java.lang.ref.SoftReference` 类来实现，可以让对象豁免一些垃圾收集。
+
+软引用用来描述一些还有用，但并非必需的对象。对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中并进行第二次回收。如果这次回收还是没有足够的内存，才会抛出内存溢出异常。
+
+对于只有软引用的对象来说
 
 - 当系统内存充足时它不会被回收
 - 当系统内存不足时它才会被回收
 
 软引用通常用在对内存敏感的程序中，比如高速缓存就有用到软引用，内存够用的时候就保留，不够用就回收。
 
-eg:
-
-VM options配置  `-Xms5m -Xmx5m`
+#### coding~
 
 ```java
+//VM options: -Xms5m -Xmx5m
 public class SoftRefenenceDemo {
 
     public static void main(String[] args) {
         softRefMemoryEnough();
         System.out.println("------内存不够用的情况------");
         softRefMemoryNotEnough();
-
     }
 
     private static void softRefMemoryEnough() {
@@ -122,9 +138,13 @@ TODO
 
 ### 弱引用
 
-弱引用需要用`java.lang.red.WeakReference`类来实现，它比软引用的生存期更短。
+弱引用也是用来描述非必需对象的，但是它的强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生之前。当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。
+
+弱引用需要用`java.lang.ref.WeakReference`类来实现，它比软引用的生存期更短。
 
 对于只有软引用的对象来说，只要垃圾回收机制一运行，不管 JVM 的内存空间是否足够，都会回收该对象占用的内存。
+
+#### coding~
 
 ```java
 public class WeakReferenceDemo {
@@ -149,48 +169,96 @@ public class WeakReferenceDemo {
 
 #### 软引用和弱引用的适用场景
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegg6qqm6j31fq0logzr.jpg)
+假如有一个应用需要读取大量的本地图片：
+
+- 如果每次读取图片都从硬盘读取则会严重影响性能
+- 如果一次性全部加载到内存中又可能造成内存溢出
+
+此时使用软引用就可以解决这个问题。
+
+设计思路：用一个HashMap来保存图片的路径和相应图片对象关联的软引用之间的映射关系，在内存不足时，JVM会自动回收这些缓存图片对象所占用的空间，从而有效的避免了OOM的问题。
+
+Map<String,SoftReference<Bitmap>> imageCache = new HashMap<String,SoftReference<Bitmap>>();
 
 
 
 > 你知道弱引用的话，能说下 WeakHashMap吗
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdego93wwdj31f00m0k18.jpg)
+```java
+public class WeakHashMapDemo {
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdegpyj70yj31ek0oy4bt.jpg)
+    public static void main(String[] args) {
+        myHashMap();
+        myWeakHashMap();
+
+    }
+
+    public static void myHashMap() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        String key = "k1";
+        String value = "v1";
+        map.put(key, value);
+        System.out.println(map);
+
+        key = null;
+        System.out.println(map);
+
+        System.gc();
+        System.out.println(map);
+    }
+
+    public static void myWeakHashMap() {
+        WeakHashMap<String, String> map = new WeakHashMap<String, String>();
+        String key = "weak";
+        String value = "map";
+        map.put(key, value);
+        System.out.println(map);
+
+        key = null;
+        System.out.println(map);
+
+        System.gc();
+        System.out.println(map);
+    }
+
+}
+```
 
 
 
 ### 虚引用
 
+虚引用也称为“**幽灵引用**”或者“**幻影引用**”，它是最弱的一种引用关系。
+
+虚引用，顾名思义，就是形同虚设，与其他几种引用都不太一样，一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。
+
+为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。
+
 虚引用需要`java.lang.ref.PhantomReference` 来实现。
 
-虚引用，顾名思义，就是形同虚设，与其他几种引用都不太一样，虚引用并不会决定对象的生命周期。
+
 
 如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收器回收，它不能单独使用也不能通过它访问对象，虚引用必须和引用队列（RefenenceQueue）联合使用。
 
+虚引用的主要作用是跟踪对象垃圾回收的状态。仅仅是提供了一种确保对象被finalize以后，做某些事情的机制。
 
+PhantomReference的get方法总是返回null，因此无法访问对应的引用对象。其意义在于说明一个对象已经进入finalization阶段，可以被gc回收，用来实现比finalization机制更灵活的回收操作。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegs2tppxj31ge0os1ew.jpg)
+换句话说，设置虚引用的唯一目的，就是在这个对象被回收器回收的时候收到一个系统通知或者后续添加进一步的处理。
 
-
-
-
-
-
-
+Java技术允许使用finalize() 方法在垃圾收集器将对象从内存中清除出去之前做必要的清理工作。
 
 
 
 
 
 
-JDK 1.2 版之后引入了软（SoftReference）、弱（WeakReference）、虚（PhantomReference）三种引用。
 
-- 强引用：最传统的「引用」的定义，是指在程序代码之中普遍存在的引用赋值，即类似`Object obj=new Object()`这种引用关系。只要强引用关系还存在，垃圾收集器就永远不会回收掉被引用的对象。
-- 软引用：描述一些还有用，但非必须的对象。只被软引用关联着的对象，在系统将要发生内存溢出异常前，会把这些对象列进回收范围之中进行第二次回收，如果这次回收还没有足够的内存，才会抛出内存溢出异常。
-- 弱引用：描述那些非必须对象，但是它的强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。
-- 虚引用：是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的只是为了能在这个对象被收集器回收时收到一个系统通知。
+
+
+
+
+
 
 ## 二、引用到底有什么作用
 

@@ -1,6 +1,10 @@
 「我是大厂面试官」—— Java 集合，你肯定会被问到这些
 
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+
 作为一位小菜 ”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合，所以整理下 Java 集合面试题
+
+![](https://i02piccdn.sogoucdn.com/fe487f455e5b1eb6)
 
 > 说说常见的集合有哪些吧？
 >
@@ -46,7 +50,7 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 Map 接口和 Collection 接口是所有集合框架的父接口：
 
 1. Collection接口的子接口包括：Set、List、Queue
-2. List是有序的不允许有重复元素的Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
+2. List是有序的允许有重复元素的Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
 3. Set是一种不包含重复元素且无序的Collection，实现类主要有：HashSet、TreeSet、LinkedHashSet等
 4. Map没有继承Collection接口，Map提供key到value的映射。实现类主要有：HashMap、TreeMap、Hashtable、ConcurrentHashMap 以及 Properties 等
 
@@ -120,7 +124,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 - **插入和删除是否受元素位置的影响：**
   -  **ArrayList 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。** 比如：执行 `add(E e)`方法的时候， ArrayList 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是O(1)。但是如果要在指定位置 i 插入和删除元素的话（ `add(intindex,E element)`）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。
   -  **LinkedList 采用链表存储，所以插入，删除元素时间复杂度不受元素位置的影响，都是近似 $O(1)$，而数组为近似 $O(n)$。**
-  -  ArrayList 一般应用于查询较多但插入以及删除较少情况，如果插入以及从删除较多则建议使用 LinkedList
+  -  ArrayList 一般应用于查询较多但插入以及删除较少情况，如果插入以及删除较多则建议使用 LinkedList
 - **是否支持快速随机访问**： LinkedList 不支持高效的随机元素访问，而 ArrayList 实现了 RandomAccess 接口，所以有随机访问功能。快速随机访问就是通过元素的序号快速获取元素对象(对应于 `get(intindex)`方法)。
 - **内存空间占用**： ArrayList 的空间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
 
@@ -1464,7 +1468,7 @@ HashSet的底层其实就是HashMap，只不过我们**HashSet是实现了Set接
 
 
 
-
+![](https://user-gold-cdn.xitu.io/2020/3/20/170f5beacffbc730?w=750&h=390&f=jpeg&s=29031)
 
 ## 参考与感谢
 
