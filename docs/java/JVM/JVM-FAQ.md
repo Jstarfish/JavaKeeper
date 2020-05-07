@@ -256,9 +256,7 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 架构图
 
-java.lang.ref 包下
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdefxosx2vj30z40icq5r.jpg)
 
 
 
