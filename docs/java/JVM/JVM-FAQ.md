@@ -254,38 +254,6 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 ## 4. 强引用、软引用、弱引用、虚引用分别是什么？
 
-架构图
-
-
-
-
-
-
-
-
-
-#### 引用队列
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegupkoqkj317s0kgn2k.jpg)
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdegymw5yqj31hi0l6tn9.jpg)
-
-
-
-
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeh4uokkmj31fy0o4kbm.jpg)
-
-
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeh63pwhrj315i0mo4al.jpg)
-
-
-
-
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeh76fxptj31c60mwq9n.jpg)
-
 
 
 

@@ -1,5 +1,7 @@
 # 阻塞队列——手写生产者消费者模式、线程池原理面试题真正的答案
 
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+
 ## 队列和阻塞队列
 
 ### 队列
@@ -1048,7 +1050,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 不同的线程池实现用的是不同的阻塞队列，newFixedThreadPool 和 newSingleThreadExecutor 用的是LinkedBlockingQueue，newCachedThreadPool 用的是 SynchronousQueue。
 
-
+![](https://user-gold-cdn.xitu.io/2020/3/20/170f5beacffbc730?w=750&h=390&f=jpeg&s=29031)
 
 ## 参考与感谢
 
