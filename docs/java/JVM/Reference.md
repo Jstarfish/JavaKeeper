@@ -86,7 +86,7 @@ public class StrongRefenenceDemo {
 }
 ```
 
-TODO : demo中尽管o1已经被回收，但是o2一直存在，不会被垃圾回收
+demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，不会被垃圾回收
 
 
 
@@ -223,7 +223,7 @@ public class WeakReferenceDemo {
 
 
 
-> 既然你都知道弱引用，那能说下 WeakHashMap 吗
+> 既然你都知道弱引用，那能说说 WeakHashMap 吗
 
 ```java
 public class WeakHashMapDemo {
@@ -349,7 +349,7 @@ SoftReference、WeakReference、PhantomReference 都有一个可以传递 Refere
 
 当关联的引用队列中有数据的时候，意味着指向的堆内存中的对象被回收。通过这种方式，JVM 允许我们在对象被销毁后，做一些我们自己想做的事情。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdeh76fxptj31c60mwq9n.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1geleex85g0j319i0u0nke.jpg)
 
 
 
