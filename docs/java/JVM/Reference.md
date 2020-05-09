@@ -6,7 +6,7 @@
 
 ### 引用
 
-先说说引用，Java中的引用，类似C语言中的指针。初学 Java时，我们就知道 Java 数据类型分两大类，基本类型和引用类型。
+先说说引用，Java中的引用，类似 C 语言中的指针。初学 Java时，我们就知道 Java 数据类型分两大类，基本类型和引用类型。
 
 >基本类型：编程语言中内置的最小粒度的数据类型。它包括四大类八种类型：
 >
@@ -29,7 +29,7 @@
 Person person = new Person("张三");
 ```
 
-这里的 person 就是指向Person 实例“张三”的引用。
+这里的 person 就是指向Person 实例“张三”的引用，我们一般都是通过 person 来操作“张三”实例。
 
 
 
@@ -86,7 +86,7 @@ public class StrongRefenenceDemo {
 }
 ```
 
-demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，不会被垃圾回收
+demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，所以不会被GC回收
 
 
 
@@ -221,9 +221,7 @@ public class WeakReferenceDemo {
 
 官方文档这么写的，弱引用常被用来实现规范化映射，JDK 中的 WeakHashMap 就是一个这样的例子
 
-
-
-> 既然你都知道弱引用，那能说说 WeakHashMap 吗
+> 面试官：既然你都知道弱引用，那能说说 WeakHashMap 吗
 
 ```java
 public class WeakHashMapDemo {
@@ -249,7 +247,8 @@ public class WeakHashMapDemo {
     public static void myWeakHashMap() throws InterruptedException {
         WeakHashMap<String, String> map = new WeakHashMap<String, String>();
         //String key = "weak";
-        // 思考一下，写成上边那样会怎么样？那可不是引用了
+        // 刚开始写成了上边的代码
+        //思考一下，写成上边那样会怎么样？ 那可不是引用了
         String key = new String("weak");
         String value = "map";
         map.put(key, value);
@@ -290,19 +289,17 @@ static class ThreadLocalMap {
 
 虚引用，顾名思义，就是形同虚设，与其他几种引用都不太一样，一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。
 
-为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。
-
 虚引用需要`java.lang.ref.PhantomReference` 来实现。
 
 如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收器回收，它不能单独使用也不能通过它访问对象，虚引用必须和引用队列（RefenenceQueue）联合使用。
 
-虚引用的主要作用是跟踪对象垃圾回收的状态。仅仅是提供了一种确保对象被finalize以后，做某些事情的机制。
+虚引用的主要作用是跟踪对象垃圾回收的状态。仅仅是提供了一种确保对象被 finalize 以后，做某些事情的机制。
 
 PhantomReference 的 get 方法总是返回 null，因此无法访问对应的引用对象。其意义在于说明一个对象已经进入 finalization 阶段，可以被 GC 回收，用来实现比 finalization 机制更灵活的回收操作。
 
-换句话说，设置虚引用的唯一目的，就是在这个对象被回收器回收的时候收到一个系统通知或者后续添加进一步的处理。
+换句话说，**设置虚引用的唯一目的，就是在这个对象被回收器回收的时候收到一个系统通知或者后续添加进一步的处理**。
 
-Java 技术允许使用 finalize() 方法在垃圾收集器将对象从内存中清除出去之前做必要的清理工作。
+Java 允许使用 finalize() 方法在垃圾收集器将对象从内存中清除出去之前做必要的清理工作。
 
 ```java
 public class PhantomReferenceDemo {
@@ -353,9 +350,9 @@ SoftReference、WeakReference、PhantomReference 都有一个可以传递 Refere
 
 
 
-就知道点这，也太浅了吧，继续。
+最后，稍微了解下源码中的实现
 
-### Reference源码
+### Reference源码(JDK8)
 
 强软弱虚四种引用，我们有了个大概的认识，我们也知道除了强引用没有对应的类型表示，是普遍存在的。剩下的三种引用都是 `java.lang.ref.Reference` 的直接子类。
 
@@ -365,13 +362,318 @@ SoftReference、WeakReference、PhantomReference 都有一个可以传递 Refere
 
 JDK 官方文档是这么说的，`Reference`是所有引用对象的基类。这个类定义了所有引用对象的通用操作。因为引用对象是与垃圾收集器紧密协作而实现的，所以这个类可能不能直接子类化。
 
+#### Reference 的4种状态
+
+- Active：新创建的引用实例处于Active状态，但当GC检测到该实例引用的实际对象的可达性发生某些改变(实际对象处于 GC roots 不可达)后，它的状态将变化为`Pending`或者`Inactive`。如果 Reference 注册了ReferenceQueue，则会切换为`Pending`，并且Reference会加入`pending-Reference`链表中，如果没有注册ReferenceQueue，会切换为`Inactive`。
+- Pending：当引用实例被放置在pending-Reference 链表中时，它处于Pending状态。此时，该实例在等待一个叫Reference-handler的线程将此实例进行enqueue操作。如果某个引用实例没有注册在一个引用队列中，该实例将永远不会进入Pending状态
+- Enqueued：在ReferenceQueue队列中的Reference的状态，如果Reference从队列中移除，会进入`Inactive`状态
+- Inactive：一旦某个引用实例处于Inactive状态，它的状态将不再会发生改变，同时说明该引用实例所指向的实际对象一定会被GC所回收
+
+![img](http://imushan.com/img/image-20180820230137796.png)
 
 
 
+#### `Reference`的构造函数和成员变量
+
+```java
+public abstract class Reference<T> {
+   //引用指向的对象
+   private T referent;    
+   // reference被回收后，当前Reference实例会被添加到这个队列中
+   volatile ReferenceQueue<? super T> queue;
+   //下一个Reference实例的引用，Reference实例通过此构造单向的链表
+   volatile Reference next;
+   //由transient修饰，基于状态表示不同链表中的下一个待处理的对象，主要是pending-reference列表的下一个元素，通过JVM直接调用赋值
+   private transient Reference<T> discovered;
+   // 等待加入队列的引用列表，这里明明是个Reference类型的对象，官方文档确说是个list?
+   //因为GC检测到某个引用实例指向的实际对象不可达后，会将该pending指向该引用实例，
+   //discovered字段则是用来表示下一个需要被处理的实例，因此我们只要不断地在处理完当前pending之后，将discovered指向的实例赋予给pending即可。所以这个pending就相当于是一个链表。
+   private static Reference<Object> pending = null;
+    
+    /* -- Constructors -- */
+    Reference(T referent) {
+        this(referent, null);
+    }
+
+    Reference(T referent, ReferenceQueue<? super T> queue) {
+        this.referent = referent;
+        this.queue = (queue == null) ? ReferenceQueue.NULL : queue;
+    }
+}
+```
+
+Reference 提供了两个构造器，一个带引用队列 ReferenceQueue，一个不带。
+
+带 ReferenceQueue 的意义在于我们可以从外部通过对 ReferenceQueue 的操作来了解到引用实例所指向的实际对象是否被回收了，同时我们也可以通过 ReferenceQueue  对引用实例进行一些额外的操作；但如果我们的引用实例在创建时没有指定一个引用队列，那我们要想知道实际对象是否被回收，就只能够不停地轮询引用实例的get() 方法是否为空了。
+
+值得注意的是虚引用 PhantomReference，由于它的 get() 方法永远返回 null，因此它的构造函数必须指定一个引用队列。
+
+这两种查询实际对象是否被回收的方法都有应用，如 WeakHashMap 中就选择去查询 queue 的数据，来判定是否有对象将被回收；而 ThreadLocalMap，则采用判断 get() 是否为 null 来作处理。
+
+#### 实例方法(和ReferenceHandler线程不相关的方法)
+
+```java
+private static Lock lock = new Lock();
+// 获取持有的referent实例
+public T get() {
+    return this.referent;
+}
+// 把持有的referent实例置为null
+public void clear() {
+    this.referent = null;
+}
+// 判断是否处于enqeued状态
+public boolean isEnqueued() {
+    return (this.queue == ReferenceQueue.ENQUEUED);
+}
+// 入队参数，同时会把referent置为null
+public boolean enqueue() {
+    return this.queue.enqueue(this);
+}
+```
+
+#### ReferenceHandler线程
+
+通过上文的讨论，我们知道一个Reference实例化后状态为Active，其引用的对象被回收后，垃圾回收器将其加入到`pending-Reference`链表，等待加入ReferenceQueue。
+
+ReferenceHandler线程是由`Reference`静态代码块中建立并且运行的线程，它的运行方法中依赖了比较多的本地(native)方法，ReferenceHandler线程的主要功能就pending list中的引用实例添加到引用队列中，并将pending指向下一个引用实例。
+
+```java
+// 控制垃圾回收器操作与Pending状态的Reference入队操作不冲突执行的全局锁
+// 垃圾回收器开始一轮垃圾回收前要获取此锁
+// 所以所有占用这个锁的代码必须尽快完成，不能生成新对象，也不能调用用户代码
+static private class Lock { }
+private static Lock lock = new Lock();
+
+private static class ReferenceHandler extends Thread {
+
+    private static void ensureClassInitialized(Class<?> clazz) {
+        try {
+            Class.forName(clazz.getName(), true, clazz.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw (Error) new NoClassDefFoundError(e.getMessage()).initCause(e);
+        }
+    }
+
+    static {
+        ensureClassInitialized(InterruptedException.class);
+        ensureClassInitialized(Cleaner.class);
+    }
+
+    ReferenceHandler(ThreadGroup g, String name) {
+        super(g, name);
+    }
+
+    public void run() {
+        while (true) {
+            tryHandlePending(true);
+        }
+    }
+}
+
+static boolean tryHandlePending(boolean waitForNotify) {
+    Reference<Object> r;
+    Cleaner c;
+    try {
+        synchronized (lock) {
+            // 判断pending-Reference链表是否有数据
+            if (pending != null) {
+                // 如果有Pending Reference，从列表中取出
+                r = pending;
+                c = r instanceof Cleaner ? (Cleaner) r : null;
+                // unlink 'r' from 'pending' chain
+                pending = r.discovered;
+                r.discovered = null;
+            } else {
+				// 如果没有Pending Reference，调用wait等待
+                if (waitForNotify) {
+                    lock.wait();
+                }
+                // retry if waited
+                return waitForNotify;
+            }
+        }
+    } catch (OutOfMemoryError x) {
+        Thread.yield();
+        return true;
+    } catch (InterruptedException x) {
+        return true;
+    }
+
+    // Fast path for cleaners
+    if (c != null) {
+        c.clean();
+        return true;
+    }
+
+    ReferenceQueue<? super Object> q = r.queue;
+    if (q != ReferenceQueue.NULL) q.enqueue(r);
+    return true;
+}
+
+//ReferenceHandler线程是在Reference的static块中启动的
+static {
+    // ThreadGroup继承当前执行线程(一般是主线程)的线程组
+    ThreadGroup tg = Thread.currentThread().getThreadGroup();
+    for (ThreadGroup tgn = tg;
+         tgn != null;
+         tg = tgn, tgn = tg.getParent());
+    // 创建线程实例，命名为Reference Handler，配置最高优先级和后台运行(守护线程)，然后启动
+    Thread handler = new ReferenceHandler(tg, "Reference Handler");
+    // ReferenceHandler线程有最高优先级
+    handler.setPriority(Thread.MAX_PRIORITY);
+    handler.setDaemon(true);
+    handler.start();
+
+    // provide access in SharedSecrets
+    SharedSecrets.setJavaLangRefAccess(new JavaLangRefAccess() {
+        @Override
+        public boolean tryHandlePendingReference() {
+            return tryHandlePending(false);
+        }
+    });
+}
+```
+
+由于ReferenceHandler线程是`Reference`的静态代码创建的，所以只要`Reference`这个父类被初始化，该线程就会创建和运行，由于它是守护线程，除非 JVM 进程终结，否则它会一直在后台运行(注意它的`run()`方法里面使用了死循环)。
 
 
 
+### ReferenceQueue源码
 
+```java
+public class ReferenceQueue<T> {
+
+    public ReferenceQueue() { }
+	// 内部类Null类继承自ReferenceQueue，覆盖了enqueue方法返回false
+    private static class Null<S> extends ReferenceQueue<S> {
+        boolean enqueue(Reference<? extends S> r) {
+            return false;
+        }
+    }
+ 	// 用于标识没有注册Queue
+    static ReferenceQueue<Object> NULL = new Null<>();
+    // 用于标识已经处于对应的Queue中
+    static ReferenceQueue<Object> ENQUEUED = new Null<>();
+
+    // 静态内部类，作为锁对象
+    static private class Lock { };
+    /* 互斥锁，用于同步ReferenceHandler的enqueue和用户线程操作的remove和poll出队操作 */
+    private Lock lock = new Lock();
+    // 引用链表的头节点
+    private volatile Reference<? extends T> head = null;
+    // 引用队列长度，入队则增加1，出队则减少1
+    private long queueLength = 0;
+
+    // 入队操作，只会被Reference实例调用
+    boolean enqueue(Reference<? extends T> r) { /* Called only by Reference class */
+        synchronized (lock) {
+			// 如果引用实例持有的队列为ReferenceQueue.NULL或者ReferenceQueue.ENQUEUED则入队失败返回false
+            ReferenceQueue<?> queue = r.queue;
+            if ((queue == NULL) || (queue == ENQUEUED)) {
+                return false;
+            }
+            assert queue == this;
+            // 当前引用实例已经入队，那么它本身持有的引用队列实例置为ReferenceQueue.ENQUEUED
+            r.queue = ENQUEUED;
+            // 如果链表没有元素，则此引用实例直接作为头节点，否则把前一个引用实例作为下一个节点
+            r.next = (head == null) ? r : head;
+            // 当前实例更新为头节点，也就是每一个新入队的引用实例都是作为头节点，已有的引用实例会作为后继节点
+            head = r;
+            // 队列长度增加1
+            queueLength++;
+            // 特殊处理FinalReference，VM进行计数
+            if (r instanceof FinalReference) {
+                sun.misc.VM.addFinalRefCount(1);
+            }
+            // 唤醒所有等待的线程
+            lock.notifyAll();
+            return true;
+        }
+    }
+
+    // 引用队列的poll操作，此方法必须在加锁情况下调用
+    private Reference<? extends T> reallyPoll() {       /* Must hold lock */
+        Reference<? extends T> r = head;
+        if (r != null) {
+            @SuppressWarnings("unchecked")
+            Reference<? extends T> rn = r.next;
+            // 更新next节点为头节点，如果next节点为自身，说明已经走过一次出队，则返回null
+            head = (rn == r) ? null : rn;
+            r.queue = NULL;
+            // 当前头节点变更为环状队列，考虑到FinalReference尚为inactive和避免重复出队的问题
+            r.next = r;
+            // 队列长度减少1
+            queueLength--;
+            if (r instanceof FinalReference) {
+                sun.misc.VM.addFinalRefCount(-1);
+            }
+            return r;
+        }
+        return null;
+    }
+
+    // 队列的公有poll操作，主要是加锁后调用reallyPoll
+    public Reference<? extends T> poll() {
+        if (head == null)
+            return null;
+        synchronized (lock) {
+            return reallyPoll();
+        }
+    }
+// 移除引用队列中的下一个引用元素，实际上也是依赖于reallyPoll的Object提供的阻塞机制
+    public Reference<? extends T> remove(long timeout)
+        throws IllegalArgumentException, InterruptedException
+    {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("Negative timeout value");
+        }
+        synchronized (lock) {
+            Reference<? extends T> r = reallyPoll();
+            if (r != null) return r;
+            long start = (timeout == 0) ? 0 : System.nanoTime();
+            for (;;) {
+                lock.wait(timeout);
+                r = reallyPoll();
+                if (r != null) return r;
+                if (timeout != 0) {
+                    long end = System.nanoTime();
+                    timeout -= (end - start) / 1000_000;
+                    if (timeout <= 0) return null;
+                    start = end;
+                }
+            }
+        }
+    }
+
+    public Reference<? extends T> remove() throws InterruptedException {
+        return remove(0);
+    }
+
+    void forEach(Consumer<? super Reference<? extends T>> action) {
+        for (Reference<? extends T> r = head; r != null;) {
+            action.accept(r);
+            @SuppressWarnings("unchecked")
+            Reference<? extends T> rn = r.next;
+            if (rn == r) {
+                if (r.queue == ENQUEUED) {
+                    // still enqueued -> we reached end of chain
+                    r = null;
+                } else {
+                    // already dequeued: r.queue == NULL; ->
+                    // restart from head when overtaken by queue poller(s)
+                    r = head;
+                }
+            } else {
+                // next in chain
+                r = rn;
+            }
+        }
+    }
+}
+```
+
+`ReferenceQueue`只存储了`Reference`链表的头节点，真正的`Reference`链表的所有节点是存储在`Reference`实例本身，通过属性 next 拼接的，`ReferenceQueue`提供了对`Reference`链表的入队、poll、remove等操作
 
 
 
@@ -381,7 +683,9 @@ https://juejin.im/post/5bce68226fb9a05ce46a0476
 
 http://www.kdgregory.com/index.php?page=java.refobj
 
+https://blog.csdn.net/Jesministrator/article/details/78786162
 
+http://throwable.club/2019/02/16/java-reference/
 
-
+《深入理解java虚拟机》
 
