@@ -1,8 +1,188 @@
+> 什么是ThreadLocal？ThreadLocal出现的背景是什么？解决了什么问题？
+> ThreadLocal的使用方法是什么？使用的效果如何？
+> ThreadLocal是如何实现它的功能的，即ThreadLocal的原理是什么？
+
 ## ThreadLocal
 
 ThreadLocal是一个关于创建线程局部变量的类。是`java.lang` 包下的类
 
 通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。而使用ThreadLocal创建的变量只能被当前线程访问，其他线程则无法访问和修改。
+
+
+
+## 使用
+
+动态数据源选择，
+
+```java
+public class DynamicDataSource extends AbstractRoutingDataSource {
+
+   private final static Logger log = Logger.getLogger(DynamicDataSource.class);
+
+   public final static int WRITE_MODE = 0;
+
+   public final static int READ_MODE = 1;
+
+   public final static int RANDOM_MODE = 2;
+
+   private final static Random random = new Random();
+
+   private static final ThreadLocal<Integer> DB_MODE = new ThreadLocal<Integer>();
+
+   /**
+    * 数据源的key
+    */
+   private final List<Object> datasourceKeyList = new ArrayList<Object>();
+
+   /**
+    * 获得数据源的key
+    */
+   @Override
+   protected Object determineCurrentLookupKey() {
+
+      // 生成index
+      int index = 0;
+      int mode = getDBMode();
+
+      if (datasourceKeyList.size() > 1) {
+         switch (mode) {
+            case WRITE_MODE:
+               index = 0;
+               break;
+
+            case READ_MODE:
+               index = random.nextInt(datasourceKeyList.size() - 1) + 1;
+               break;
+
+            default:
+               index = random.nextInt(datasourceKeyList.size() - 1) + 1;
+               break;
+         }
+      }
+
+      if (log.isDebugEnabled()) {
+         log.debug("determineCurrentLookupKey: " + datasourceKeyList.get(index) + " mode:" + mode);
+      }
+
+      return datasourceKeyList.get(index);
+   }
+
+   /**
+    * 处理数据源的key
+    */
+   @Override
+   protected Object resolveSpecifiedLookupKey(Object lookupKey) {
+
+      datasourceKeyList.add(lookupKey);
+
+      return lookupKey;
+   }
+
+   public static void setWriteMode() {
+      DB_MODE.set(WRITE_MODE);
+   }
+
+   public static void setReadMode() {
+      DB_MODE.set(READ_MODE);
+   }
+
+   public static int getDBMode() {
+      return DB_MODE.get() == null ? RANDOM_MODE : DB_MODE.get();
+   }
+
+   public static void clearDBMode() {
+      DB_MODE.remove();
+   }
+}
+```
+
+
+
+用户信息
+
+```java
+public class QUsercenterUtils {
+
+   private final static Logger log = Logger.getLogger(QUsercenterUtils.class);
+
+   public final static String COOKIE_Q = "Q";
+   public final static String COOKIE_T = "T";
+
+   private final static ThreadLocal<QUser> qUser = new ThreadLocal<QUser>();
+
+   public static QUser getQUser() {
+
+      QUser user = qUser.get();
+
+      if (user == null) {
+         log.warn("QUser is null");
+         throw new UnionBusinessException(Status.UNAUTHORIZED);
+      }
+
+      return user;
+   }
+
+   public static boolean isQuserExists() {
+      QUser user = qUser.get();
+
+      return null != user;
+   }
+
+   public static void setQUser(QUser user) {
+
+      qUser.set(user);
+      log.debug("quser setted.");
+   }
+
+   public static void removeQUser() {
+
+      qUser.remove();
+      log.debug("quser removed.");
+   }
+
+   public static class QUser {
+
+      public long getQid() {
+         return qid;
+      }
+
+      public void setQid(long qid) {
+         this.qid = qid;
+      }
+
+      public String getUserName() {
+         return userName;
+      }
+
+      public void setUserName(String userName) {
+         this.userName = userName;
+      }
+
+      public String getLoginEmail() {
+         return loginEmail;
+      }
+
+      public void setLoginEmail(String loginEmail) {
+         this.loginEmail = loginEmail;
+      }
+
+      public long qid;
+      public String userName;
+      public String loginEmail;
+
+      public String cookieQ;
+      public String cookieT;
+
+      public Map<String, String> data;
+
+      public int power;
+      public int status;
+      public Collection<Category> permissions = Collections.emptyList();
+   }
+}
+```
+
+
 
 
 
