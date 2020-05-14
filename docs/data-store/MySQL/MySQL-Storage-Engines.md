@@ -27,7 +27,7 @@ show table status from database where name="tablename"
 
 
 
-![mysql-engines](../_images/mysql/mysql-engines.png)
+![mysql-engines](../../_images/mysql/mysql-engines.png)
 
 
 
@@ -76,7 +76,9 @@ SET default_storage_engine=NDBCLUSTER;
 
 #### MyISAM
 
- 每个MyISAM表存储在磁盘上的三个文件中 。这些文件的名称以表名开头，并有一个扩展名来指示文件类型 。
+在 5.1 版本之前，MyISAM 是 MySQL 的默认存储引擎，MyISAM 并发性比较差，使用的场景比较少，主要特点是
+
+每个MyISAM表存储在磁盘上的三个文件中 。这些文件的名称以表名开头，并有一个扩展名来指示文件类型 。
 
 `.frm`文件存储表的格式。 `.MYD` (`MYData`) 文件存储表的数据。 `.MYI` (`MYIndex`) 文件存储索引。
 
@@ -155,7 +157,7 @@ SET default_storage_engine=NDBCLUSTER;
 
 在 InnoDB 存储引擎中，所有的数据都被逻辑地存放在表空间中，表空间（tablespace）是存储引擎中最高的存储逻辑单位，在表空间的下面又包括段（segment）、区（extent）、页（page）
 
- ![tablespace-segment-extent-page-row](../_images/mysql/tablespace-segment-extent-page-row.jpg) 
+ ![tablespace-segment-extent-page-row](../../_images/mysql/tablespace-segment-extent-page-row.jpg) 
 
  同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为 16KB，当然也可以通过改变 `innodb_page_size` 选项对默认大小进行修改，需要注意的是不同的页大小最终也会导致区大小的不同 
 
@@ -181,7 +183,7 @@ MySQL 使用 InnoDB 存储表时，会将表的定义和数据索引等信息分
 
 当我们使用上面的代码创建表时，会在磁盘上的 `datadir` 文件夹中生成一个 `test_frm.frm` 的文件，这个文件中就包含了表结构相关的信息：
 
-![frm-file-hex](../_images/mysql/frm-file-hex.png)
+![frm-file-hex](../../_images/mysql/frm-file-hex.png)
 
 > MySQL 官方文档中的 [11.1 MySQL .frm File Format](https://dev.mysql.com/doc/internals/en/frm-file-format.html) 一文对于 `.frm` 文件格式中的二进制的内容有着非常详细的表述。
 
@@ -197,13 +199,13 @@ InnoDB 中用于存储数据的文件总共有两个部分，一是系统表空�
 
 当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：
 
-![Antelope-Barracuda-Row-Format](../_images/mysql/Antelope-Barracuda-Row-Format.jpg)
+![Antelope-Barracuda-Row-Format](../../_images/mysql/Antelope-Barracuda-Row-Format.jpg)
 
 Antelope 是 InnoDB 最开始支持的文件格式，它包含两种行格式 Compact 和 Redundant，它最开始并没有名字；Antelope 的名字是在新的文件格式 Barracuda 出现后才起的，Barracuda 的出现引入了两种新的行格式 Compressed 和 Dynamic；InnoDB 对于文件格式都会向前兼容，而官方文档中也对之后会出现的新文件格式预先定义好了名字：Cheetah、Dragon、Elk 等等。
 
 两种行记录格式 Compact 和 Redundant 在磁盘上按照以下方式存储：
 
-![COMPACT-And-REDUNDANT-Row-Format](../_images/mysql/COMPACT-And-REDUNDANT-Row-Format.jpg)
+![COMPACT-And-REDUNDANT-Row-Format](../../_images/mysql/COMPACT-And-REDUNDANT-Row-Format.jpg)
 
 Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上上看，Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
 
@@ -211,11 +213,11 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 
 当 InnoDB 使用 Compact 或者 Redundant 格式存储极长的 VARCHAR 或者 BLOB 这类大对象时，我们并不会直接将所有的内容都存放在数据页节点中，而是将行数据中的前 768 个字节存储在数据页中，后面会通过偏移量指向溢出页。
 
-![Row-Overflo](../_images/mysql/Row-Overflow.jpg)
+![Row-Overflo](../../_images/mysql/Row-Overflow.jpg)
 
 但是当我们使用新的行记录格式 Compressed 或者 Dynamic 时都只会在行记录中保存 20 个字节的指针，实际的数据都会存放在溢出页面中。
 
-![Row-Overflow-in-Barracuda](../_images/mysql/Row-Overflow-in-Barracuda.jpg)
+![Row-Overflow-in-Barracuda](../../_images/mysql/Row-Overflow-in-Barracuda.jpg)
 
 当然在实际存储中，可能会对不同长度的 TEXT 和 BLOB 列进行优化，不过这就不是本文关注的重点了。
 
@@ -225,13 +227,13 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 
 页是 InnoDB 存储引擎管理数据的最小磁盘单位，而 B-Tree 节点就是实际存放表中数据的页面，我们在这里将要介绍页是如何组织和存储记录的；首先，一个 InnoDB 页有以下七个部分：
 
-![InnoDB-B-Tree-Node](../_images/mysql/InnoDB-B-Tree-Node.jpg)
+![InnoDB-B-Tree-Node](../../_images/mysql/InnoDB-B-Tree-Node.jpg)
 
 每一个页中包含了两对 header/trailer：内部的 Page Header/Page Directory 关心的是页的状态信息，而 Fil Header/Fil Trailer 关心的是记录页的头信息。
 
 在页的头部和尾部之间就是用户记录和空闲空间了，每一个数据页中都包含 Infimum 和 Supremum 这两个虚拟的记录（可以理解为占位符），Infimum 记录是比该页中任何主键值都要小的值，Supremum 是该页中的最大值：
 
-![Infimum-Rows-Supremum](../_images/mysql/Infimum-Rows-Supremum.jpg)
+![Infimum-Rows-Supremum](../../_images/mysql/Infimum-Rows-Supremum.jpg)
 
 User Records 就是整个页面中真正用于存放行记录的部分，而 Free Space 就是空余空间了，它是一个链表的数据结构，为了保证插入和删除的效率，整个页面并不会按照主键顺序对所有记录进行排序，它会自动从左侧向右寻找空白节点进行插入，行记录在物理存储上并不是按照顺序的，它们之间的顺序是由 `next_record` 这一指针控制的。
 
