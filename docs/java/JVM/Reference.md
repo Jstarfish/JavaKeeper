@@ -54,7 +54,7 @@ Java 中引入四种引用的目的是让程序自己决定对象的生命周期
 
 ### JDK 8中的 UML关系图
 
-![Finalizer.png](https://i.loli.net/2020/05/07/AqsHUeYCOf2hzZc.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1genmesm4hej30lw08lmx1.jpg)
 
 FinalReference 类是包内可见，其他三种引用类型均为 public，可以在应用程序中直接使用。
 
