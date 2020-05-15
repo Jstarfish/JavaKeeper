@@ -260,7 +260,7 @@ lock table和unlock table
 
 MySQL 从 5.0.3 开始支持分布式事务，**当前分布式事务只支持 InnoDB 存储引擎**。一个分布式事务会涉及多个行动，这些行动本身是事务性的。所有行动都必须一起成功完成，或者一起被回滚。
 
-![img](../_images/mysql/mysql-xa-transactions.png)
+![img](../../_images/mysql/mysql-xa-transactions.png)
 
 如图，mysql的分布式事务模型。模型中分三块：应用程序（AP）、资源管理器（RM）、事务管理器（TM）:
 
