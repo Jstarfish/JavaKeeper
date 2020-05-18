@@ -32,13 +32,13 @@
 
 - 总结
 
-  ![sql-parse](../_images/mysql/sql-parse.png)
+  ![sql-parse](../../_images/mysql/sql-parse.png)
 
   
 
 ### Join图
 
-![sql-joins](../_images/mysql/sql-joins.jpg)
+![sql-joins](../../_images/mysql/sql-joins.jpg)
 
 ### demo
 
@@ -111,15 +111,16 @@ INSERT INTO tbl_emp(NAME,deptId) VALUES('s9',51);
    ```
 
 6. AB全有
-   
+  
+
 **MySQL Full Join的实现 因为MySQL不支持FULL JOIN,替代方法:left join + union(可去除重复数据)+ right join**
-   
+
    ```mysql
    SELECT * FROM tbl_emp A LEFT JOIN tbl_dept B ON A.deptId = B.id
    UNION
    SELECT * FROM tbl_emp A RIGHT JOIN tbl_dept B ON A.deptId = B.id
-```
-   
+   ```
+
 7. A的独有+B的独有
 
    ```mysql
