@@ -1,41 +1,14 @@
+MySQL 3万字总结 + 面试100问，吊打面试官绰绰有余（不收藏算我输）
 
-
-Mysql面试100问，吊打面试官足够了
-
-我竟然都有准备（n万字长文，建议收藏，以防上头）
-
-
-
-不涉及数据库备份、恢复这些，
-
-B树和B+树 区别，索引结构
+![](https://imgkr.cn-bj.ufileos.com/9e22c4b4-0db5-4f4f-9636-974875d4018f.jpg)
 
 1. limit 100000 加载很慢的话，你是怎么解决的呢？
 
-count(column) 和 count(*) 是一样的吗
 
-这个误区甚至在很多的资深工程师或者是 DBA 中都普遍存在，很多人都会认为这是理所当然的。实际上，count(column) 和 count(*) 是一个完全不一样的操作，所代表的意义也完全不一样。
 
-count(column) 是表示结果集中有多少个column字段不为空的记录
-
-count(*) 是表示整个结果集有多少条记录
-
-SQL优化，常用的索引？
-
-1. 查询中哪些情况不会使用索引？
-2. 数据库索引，底层是怎样实现的，为什么要用B树索引？
-3. Mysql主从同步的实现原理？
-4. MySQL是怎么用B+树？
-5. 谈谈数据库乐观锁与悲观锁？
-6. MySQL几种常用的存储引擎区别
-7. 数据库的隔离级别
 8. 数据库和缓存的一致性问题。先更新数据库，再更新缓存，若更新完数据库了，还没有更新缓存，此时有请求过来了，访问到了缓存中的数据，怎么办？
-9. 聚簇索引/非聚簇索引，mysql索引底层实现，为什么不用B-tree，为什么不用hash，叶子结点存放的是数据还是指向数据的内存地址，使用索引需要注意的几个地方
-10. mysql默认的事务隔离级别，mvcc，rr怎么实现的，rc如何实现的
-11. mysql间隙锁有没有了解，死锁有没有了解，写一段会造成死锁的sql语句，死锁发生了如何解决，mysql有没有提供什么机制去解决死锁
-12. 对mysql索引的理解、对组合索引的理解、索引的最佳实践
-13. mysql事务隔离级别，幻读，脏读，项目中用什么事务隔离级别，为什么
-14. 对mysql 索引的理解，为什么mysql索引中用b+tree，不用b-tree 或者其他树，为什么不用hash 索引
+
+11. 
 
 
 
@@ -47,7 +20,6 @@ SQL优化，常用的索引？
 2. 在高并发情况下，如何做到安全的修改同一行数据？
 3. select for update有什么含义，会锁表还是锁行还是其他
 4. 如果某个表有近千万数据，CRUD比较慢，如何优化
-5. mysql中in 和exists的区别
 6. 数据库自增主键可能遇到什么问题
 7. 数据库中间件了解过吗，sharding jdbc，mycat？
 8. MYSQL的主从延迟，你怎么解决？
@@ -55,17 +27,15 @@ SQL优化，常用的索引？
 10. 什么是数据库连接池?为什么需要数据库连接池呢?
 11. 数据库存储日期格式时，如何考虑时区转换问题？
 12. MYSQL数据库服务器性能分析的方法命令有哪些?
-13. mysql里记录货币用什么字段类型比较好？
+13. 
 14. mysql 的内连接、左连接、右连接有什么区别？
 15. 什么是内连接、外连接、交叉连接、笛卡尔积呢？
 16. mysql有关权限的表有哪几个呢？
 17. Mysql的binlog有几种录入格式？分别有什么区别？
 18. 百万级别或以上的数据，你是如何删除的？
 19. 覆盖索引、回表等这些，了解过吗？
-20. 什么是聚簇索引？何时使用聚簇索引与非聚簇索引
 21. 联合索引是什么？为什么需要注意联合索引中的顺序？
 22. 隔离级别与锁的关系
-23. count(1)、count(*) 与 count(列名) 的区别？
 24. 什么是存储过程？有哪些优缺点？
 25. SQL 约束有哪几种呢？
 26. 谈谈六种关联查询，使用场景。
@@ -88,21 +58,20 @@ SQL优化，常用的索引？
 
 
 
-- 最上层是一些客户端和连接服务。**主要完成一些类似于连接处理、授权认证、及相关的安全方案**。在该层上引入了线程池的概念，为通过认证安全接入的客户端提供线程。同样在该层上可以实现基于SSL的安全链接。服务器也会为安全接入的每个客户端验证它所具有的操作权限。
+- **连接层**：最上层是一些客户端和连接服务。**主要完成一些类似于连接处理、授权认证、及相关的安全方案**。在该层上引入了线程池的概念，为通过认证安全接入的客户端提供线程。同样在该层上可以实现基于SSL的安全链接。服务器也会为安全接入的每个客户端验证它所具有的操作权限。
 
-- 第二层服务层，主要完成大部分的核心服务功能， 包括查询解析、分析、优化、缓存、以及所有的内置函数，所有跨存储引擎的功能也都在这一层实现，包括触发器、存储过程、视图等 
+- **服务层**：第二层服务层，主要完成大部分的核心服务功能， 包括查询解析、分析、优化、缓存、以及所有的内置函数，所有跨存储引擎的功能也都在这一层实现，包括触发器、存储过程、视图等 
 
-- 第三层存储引擎层，存储引擎真正的负责了MySQL中数据的存储和提取，服务器通过API与存储引擎进行通信。不同的存储引擎具有的功能不同，这样我们可以根据自己的实际需要进行选取
+- **引擎层**：第三层存储引擎层，存储引擎真正的负责了MySQL中数据的存储和提取，服务器通过API与存储引擎进行通信。不同的存储引擎具有的功能不同，这样我们可以根据自己的实际需要进行选取
 
-- 第四层为数据存储层，主要是将数据存储在运行于该设备的文件系统之上，并完成与存储引擎的交互
+- **存储层**：第四层为数据存储层，主要是将数据存储在运行于该设备的文件系统之上，并完成与存储引擎的交互
 
 
 
 > 画出 MySQL 架构图，这种变态问题都能问的出来
 >
-> MySQL 的查询流程具体是？
+> MySQL 的查询流程具体是？or 一条SQL语句在MySQL中如何执行的？
 >
-> 一条SQL语句在MySQL中如何执行的？
 
 客户端请求 ---> 连接器（验证用户身份，给予权限）  ---> 查询缓存（存在缓存则直接返回，不存在则执行后续操作） ---> 分析器（对SQL进行词法分析和语法分析操作）  ---> 优化器（主要对执行的sql优化选择最优的执行方案方法）  ---> 执行器（执行时会先看用户是否有执行权限，有才去使用这个引擎提供的接口） ---> 去引擎层获取数据返回（如果开启查询缓存则会缓存查询结果）
 
@@ -118,11 +87,9 @@ SQL优化，常用的索引？
 
 存储引擎是MySQL的组件，用于处理不同表类型的SQL操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
 
-使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
+使用哪一种引擎可以灵活选择，**<mark>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</mark>**，使用合适的存储引擎，将会提高整个数据库的性能 。
 
- MySQL服务器使用可插拔的存储引擎体系结构，可以从运行中的MySQL服务器加载或卸载存储引擎 。
-
-
+ MySQL服务器使用可插拔的存储引擎体系结构，可以从运行中的 MySQL 服务器加载或卸载存储引擎 。
 
 ### 查看存储引擎
 
@@ -140,8 +107,6 @@ show create table tablename
 show table status like 'tablename'
 show table status from database where name="tablename"
 ```
-
-
 
 ### 设置存储引擎
 
@@ -164,7 +129,7 @@ SET default_storage_engine=NDBCLUSTER;
 
 ### 存储引擎对比
 
-常问的存储引擎就 InnoDB、MyISAM
+常问的存储引擎就 InnoDB、MyISAM、Memory、NDB
 
 InnoDB 现在是 MySQL 默认的存储引擎，支持**事务、行级锁定和外键**
 
@@ -276,7 +241,9 @@ BLOB 保存二进制数据，TEXT 保存字符数据。
 >
 >InnoDB引擎中的索引策略，了解过吗？
 >
->创建索引的三种方式
+>创建索引的方式有哪些？
+>
+>聚簇索引/非聚簇索引，mysql索引底层实现，为什么不用B-tree，为什么不用hash，叶子结点存放的是数据还是指向数据的内存地址，使用索引需要注意的几个地方？
 
 ## 四、索引
 
@@ -383,15 +350,17 @@ MyISAM和 InnoDB 存储引擎，都使用 B+Tree的数据结构，它相对与 B
 
 **先了解下 B-Tree 和 B+Tree 的区别**
 
+##### B-Tree
+
 B-Tree是为磁盘等外存储设备设计的一种平衡查找树。
 
 系统从磁盘读取数据到内存时是以磁盘块（block）为基本单位的，位于同一个磁盘块中的数据会被一次性读取出来，而不是需要什么取什么。
 
-InnoDB存储引擎中有页（Page）的概念，页是其磁盘管理的最小单位。InnoDB存储引擎中默认每个页的大小为16KB，可通过参数innodb_page_size将页的大小设置为4K、8K、16K，在[MySQL](http://lib.csdn.net/base/mysql)中可通过如下命令查看页的大小：`show variables like *'innodb_page_size';`*
+InnoDB存储引擎中有页（Page）的概念，页是其磁盘管理的最小单位。InnoDB 存储引擎中默认每个页的大小为16KB，可通过参数 `innodb_page_size` 将页的大小设置为 4K、8K、16K，在 MySQL 中可通过如下命令查看页的大小：`show variables like *'innodb_page_size';`
 
-而系统一个磁盘块的存储空间往往没有这么大，因此InnoDB每次申请磁盘空间时都会是若干地址连续磁盘块来达到页的大小16KB。InnoDB在把磁盘数据读入到磁盘时会以页为基本单位，在查询数据时如果一个页中的每条数据都能有助于定位数据记录的位置，这将会减少磁盘I/O次数，提高查询效率。
+而系统一个磁盘块的存储空间往往没有这么大，因此 InnoDB 每次申请磁盘空间时都会是若干地址连续磁盘块来达到页的大小 16KB。InnoDB 在把磁盘数据读入到磁盘时会以页为基本单位，在查询数据时如果一个页中的每条数据都能有助于定位数据记录的位置，这将会减少磁盘I/O次数，提高查询效率。
 
-B-Tree结构的数据可以让系统高效的找到数据所在的磁盘块。为了描述B-Tree，首先定义一条记录为一个二元组[key, data] ，key为记录的键值，对应表中的主键值，data为一行记录中除主键外的数据。对于不同的记录，key值互不相同。
+B-Tree 结构的数据可以让系统高效的找到数据所在的磁盘块。为了描述 B-Tree，首先定义一条记录为一个二元组[key, data] ，key为记录的键值，对应表中的主键值，data 为一行记录中除主键外的数据。对于不同的记录，key值互不相同。
 
 一棵m阶的B-Tree有如下特性： 
 1. 每个节点最多有m个孩子。 
@@ -403,7 +372,7 @@ B-Tree结构的数据可以让系统高效的找到数据所在的磁盘块。�
 7. ki(i=1,…n)为关键字，且关键字升序排序。 
 8. Pi(i=1,…n)为指向子树根节点的指针。P(i-1)指向的子树的所有节点关键字均小于ki，但都大于k(i-1)
 
-B-Tree中的每个节点根据实际情况可以包含大量的关键字信息和分支，如下图所示为一个3阶的B-Tree：
+B-Tree 中的每个节点根据实际情况可以包含大量的关键字信息和分支，如下图所示为一个 3 阶的 B-Tree：
 
 ![索引](https://img-blog.csdn.net/20160202204827368)
 
@@ -420,15 +389,17 @@ B-Tree中的每个节点根据实际情况可以包含大量的关键字信息�
 
 分析上面过程，发现需要3次磁盘I/O操作，和3次内存查找操作。由于内存中的关键字是一个有序表结构，可以利用二分法查找提高效率。而3次磁盘I/O操作是影响整个B-Tree查找效率的决定因素。B-Tree相对于AVLTree缩减了节点个数，使每次磁盘I/O取到内存的数据都发挥了作用，从而提高了查询效率。
 
+##### B+Tree
+
 B+Tree是在B-Tree基础上的一种优化，使其更适合实现外存储索引结构，InnoDB存储引擎就是用B+Tree实现其索引结构。
 
 从上一节中的B-Tree结构图中可以看到每个节点中不仅包含数据的key值，还有data值。而每一个页的存储空间是有限的，如果data数据较大时将会导致每个节点（即一个页）能存储的key的数量很小，当存储的数据量很大时同样会导致B-Tree的深度较大，增大查询时的磁盘I/O次数，进而影响查询效率。在B+Tree中，所有数据记录节点都是按照键值大小顺序存放在同一层的叶子节点上，而非叶子节点上只存储key值信息，这样可以大大加大每个节点存储的key值数量，降低B+Tree的高度。
 
 B+Tree相对于B-Tree有几点不同：
 
-1. 非叶子节点只存储键值信息。
-2. 所有叶子节点之间都有一个链指针。
-3. 数据记录都存放在叶子节点中。
+1. 非叶子节点只存储键值信息；
+2. 所有叶子节点之间都有一个链指针；
+3. 数据记录都存放在叶子节点中
 
 将上一节中的B-Tree优化，由于B+Tree的非叶子节点只存储键值信息，假设每个磁盘块能存储4个键值及指针信息，则变成B+Tree后其结构如下图所示： 
 ![索引](https://img-blog.csdn.net/20160202205105560)
@@ -439,7 +410,7 @@ B+Tree相对于B-Tree有几点不同：
 
 InnoDB存储引擎中页的大小为16KB，一般表的主键类型为INT（占用4个字节）或BIGINT（占用8个字节），指针类型也一般为4或8个字节，也就是说一个页（B+Tree中的一个节点）中大概存储16KB/(8B+8B)=1K个键值（因为是估值，为方便计算，这里的K取值为〖10〗^3）。也就是说一个深度为3的B+Tree索引可以维护10^3 * 10^3 * 10^3 = 10亿 条记录。
 
-实际情况中每个节点可能不能填充满，因此在数据库中，B+Tree的高度一般都在2~4层。MySQL的InnoDB存储引擎在设计时是将根节点常驻内存的，也就是说查找某一键值的行记录时最多只需要1~3次磁盘I/O操作。
+实际情况中每个节点可能不能填充满，因此在数据库中，B+Tree的高度一般都在2-4层。MySQL的InnoDB存储引擎在设计时是将根节点常驻内存的，也就是说查找某一键值的行记录时最多只需要1~3次磁盘I/O操作。
 
 B+Tree性质
 
@@ -464,7 +435,7 @@ MyISAM引擎的索引文件和数据文件是分离的。**<mark>MyISAM引擎索
 
 ##### InnoDB主键索引与辅助索引的结构
 
-**InnoDB引擎索引结构的叶子节点的数据域，存放的就是实际的数据记录**（对于主索引，此处会存放表中所有的数据记录；对于辅助索引此处会引用主键，检索的时候通过主键到主键索引中找到对应数据行），或者说，InnoDB的数据文件本身就是主键索引文件，这样的索引被称为“聚簇索引”，一个表只能有一个聚簇索引
+**InnoDB引擎索引结构的叶子节点的数据域，存放的就是实际的数据记录**（对于主索引，此处会存放表中所有的数据记录；对于辅助索引此处会引用主键，检索的时候通过主键到主键索引中找到对应数据行），或者说，InnoDB的数据文件本身就是主键索引文件，这样的索引被称为"<mark>“聚簇索引”</mark>，一个表只能有一个聚簇索引。
 
 ###### 主键索引：
 
@@ -477,6 +448,8 @@ MyISAM引擎的索引文件和数据文件是分离的。**<mark>MyISAM引擎索
 ###### 辅助（非主键）索引：
 
 这次我们以示例中学生表中的name列建立辅助索引，它的索引结构跟主键索引的结构有很大差别，在最底层的叶子结点有两行数据，第一行的字符串是辅助索引，按照ASCII码进行排序，第二行的整数是主键的值。
+
+这就意味着，对name列进行条件搜索，需要两个步骤：①在辅助索引上检索name，到达其叶子节点获取对应的主键；②使用主键在主索引上再进行对应的检索操作
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gewsc7l623j320r0u0gwt.jpg)
 
@@ -583,15 +556,87 @@ MyISAM引擎的索引文件和数据文件是分离的。**<mark>MyISAM引擎索
 
 ## 五、MySQL查询
 
+> count(*) 和 count(1)和count(列名)区别  ps：这道题结果还有待确定
+
+执行效果上：
+
+- count(*)包括了所有的列，相当于行数，在统计结果的时候，不会忽略列值为NULL 
+- count(1)包括了忽略所有列，用1代表代码行，在统计结果的时候，不会忽略列值为NULL 
+- count(列名)只包括列名那一列，在统计结果的时候，会忽略列值为空（这里的空不是只空字符串或者0，而是表示null）的计数，即某个字段值为NULL时，不统计。
+
+执行效率上：
+
+- 列名为主键，count(列名)会比count(1)快 
+- 列名不为主键，count(1)会比count(列名)快
+- 如果表多个列并且没有主键，则 count（1） 的执行效率优于 count（*）
+- 如果有主键，则 select count（主键）的执行效率是最优的 
+- 如果表只有一个字段，则 select count（*）最优。
 
 
 
+> MySQL中 in和 exists 的区别？
+
+- exists：exists对外表用loop逐条查询，每次查询都会查看exists的条件语句，当exists里的条件语句能够返回记录行时（无论记录行是的多少，只要能返回），条件就为真，返回当前loop到的这条记录；反之，如果exists里的条件语句不能返回记录行，则当前loop到的这条记录被丢弃，exists的条件就像一个bool条件，当能返回结果集则为true，不能返回结果集则为false
+- in：in查询相当于多个or条件的叠加
+
+```mysql
+SELECT * FROM A WHERE A.id IN (SELECT id FROM B);
+SELECT * FROM A WHERE EXISTS (SELECT * from B WHERE B.id = A.id);
+```
+
+**如果查询的两个表大小相当，那么用in和exists差别不大**。 
+
+如果两个表中一个较小，一个是大表，则子查询表大的用exists，子查询表小的用in：
 
 
+
+### SQL执行顺序
+
+- 手写
+
+  ```mysql
+  SELECT DISTINCT <select_list>
+  FROM  <left_table> <join_type>
+  JOIN  <right_table> ON <join_condition>
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
+
+- 机读
+
+  ```mysql
+  FROM  <left_table>
+  ON <join_condition>
+  <join_type> JOIN  <right_table> 
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  SELECT
+  DISTINCT <select_list>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
+
+- 总结
+
+  ![sql-parse](../../../docs/_images/mysql/sql-parse.png)
+
+  
+
+### Join图
+
+![sql-joins](../../../docs/_images/mysql/sql-joins.jpg)
+
+### 
 
 ------
 
 
+
+## 六、MySQL 事务
 
 > 事务的隔离级别有哪些？MySQL的默认隔离级别是什么？
 >
@@ -600,8 +645,6 @@ MyISAM引擎的索引文件和数据文件是分离的。**<mark>MyISAM引擎索
 > MySQL事务得四大特性以及实现原理
 >
 > MVCC熟悉吗，它的底层原理？
-
-## 六、MySQL 事务
 
 MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说，在人员管理系统中，你删除一个人员，你即需要删除人员的基本资料，也要删除和该人员相关的信息，如信箱，文章等等，这样，这些数据库操作语句就构成一个事务！ 
 
@@ -725,7 +768,7 @@ Serializable 是最高的事务隔离级别，在该级别下，事务串行化�
 
 MySQL InnoDB 存储引擎的默认支持的隔离级别是 **REPEATABLE-READ（可重读）**。我们可以通过`SELECT @@tx_isolation;`命令来查看,MySQL 8.0 该命令改为`SELECT @@transaction_isolation;`
 
-这里需要注意的是：与 SQL 标准不同的地方在于InnoDB 存储引擎在 **REPEATABLE-READ（可重读）**事务隔离级别下使用的是Next-Key Lock 锁算法，因此可以避免幻读的产生，这与其他数据库系统(如 SQL Server)是不同的。所以说InnoDB 存储引擎的默认支持的隔离级别是 REPEATABLE-READ（可重读）已经可以完全保证事务的隔离性要求，即达到了 SQL标准的 **SERIALIZABLE(可串行化)**隔离级别，而且保留了比较好的并发性能。
+这里需要注意的是：与 SQL 标准不同的地方在于InnoDB 存储引擎在 **REPEATABLE-READ（可重读）**事务隔离级别下使用的是Next-Key Lock 算法，因此可以避免幻读的产生，这与其他数据库系统(如 SQL Server)是不同的。所以说InnoDB 存储引擎的默认支持的隔离级别是 REPEATABLE-READ（可重读）已经可以完全保证事务的隔离性要求，即达到了 SQL标准的 **SERIALIZABLE(可串行化)**隔离级别，而且保留了比较好的并发性能。
 
 因为隔离级别越低，事务请求的锁越少，所以大部分数据库系统的隔离级别都是**READ-COMMITTED(读已提交):**，但是你要知道的是InnoDB 存储引擎默认使用 **REPEATABLE-READ（可重读）**并不会有任何性能损失。
 
@@ -876,6 +919,8 @@ MySQL 从 5.0.3  InnoDB 存储引擎开始支持支持XA协议的分布式事务
 > MySQL 中有哪几种锁，列举一下？
 >
 > MySQL中InnoDB引擎的行锁是怎么实现的？
+>
+> MySQL 间隙锁有没有了解，死锁有没有了解，写一段会造成死锁的 sql 语句，死锁发生了如何解决，MySQL 有没有提供什么机制去解决死锁
 
 ## 七、MySQL锁机制
 
@@ -954,15 +999,15 @@ InnoDB 实现了以下两种类型的**行锁**：
 
 
 
-TODO
-
 #### 锁模式
 
-- 记录锁： 对索引项加锁，锁定符合条件的行。其他事务不能修改和删除加锁项； 
+- **记录锁(Record Locks)**： 对索引项加锁，锁定符合条件的行。其他事务不能修改和删除加锁项； 
 - gap锁： 对索引项之间的“间隙”加锁，锁定记录的范围（对第一条记录前的间隙或最后一条将记录后的间隙加锁），不包含索引项本身。其他事务不能在锁范围内插入数据，这样就防止了别的事务新增幻影行。 
-- next-key锁： 锁定索引项本身和索引范围。即Record Lock和Gap Lock的结合。可解决幻读问题。 
+- **临键锁(Next-key Locks)**： **临键锁**，是**记录锁与间隙锁的组合**，它的封锁范围，既包含索引记录，又包含索引区间。(临键锁的主要目的，也是为了避免**幻读**(Phantom Read)。如果把事务的隔离级别降级为RC，临键锁则也会失效。)
 - 意向锁
 - 插入意向锁
+
+
 
 
 
@@ -1004,6 +1049,8 @@ TODO
 
 
 
+## 八、MySQL调优
+
 > 日常工作中你是怎么优化SQL的？
 >
 > SQL优化的一般步骤是什么，怎么看执行计划（explain），如何理解其中各个字段的含义？
@@ -1014,14 +1061,12 @@ TODO
 >
 > 什么是最左前缀原则？什么是最左匹配原则？
 
-## 八、MySQL调优
-
 ### 影响mysql的性能因素
 
-- 业务需求对mysql的影响(合适合度)
+- 业务需求对MySQL的影响(合适合度)
 
-- 存储定位对mysql的影响
-  - 不适合放进mysql的数据
+- 存储定位对MySQL的影响
+  - 不适合放进MySQL的数据
     - 二进制多媒体数据
     - 流水队列数据
     - 超大文本数据
@@ -1040,62 +1085,40 @@ TODO
 
 
 
-## 2. 性能分析
+### 性能分析
 
-### 2.1 MySQL常见瓶颈
+#### MySQL Query Optimizer
+
+1. MySQL 中有专门负责优化 SELECT 语句的优化器模块，主要功能：通过计算分析系统中收集到的统计信息，为客户端请求的 Query 提供他认为最优的执行计划（他认为最优的数据检索方式，但不见得是 DBA 认为是最优的，这部分最耗费时间）
+
+2. 当客户端向 MySQL 请求一条 Query，命令解析器模块完成请求分类，区别出是 SELECT 并转发给 MySQL Query Optimize r时，MySQL Query Optimizer 首先会对整条 Query 进行优化，处理掉一些常量表达式的预算，直接换算成常量值。并对 Query 中的查询条件进行简化和转换，如去掉一些无用或显而易见的条件、结构调整等。然后分析 Query 中的 Hint 信息（如果有），看显示 Hint 信息是否可以完全确定该 Query 的执行计划。如果没有 Hint 或 Hint 信息还不足以完全确定执行计划，则会读取所涉及对象的统计信息，根据 Query 进行写相应的计算分析，然后再得出最后的执行计划。
+
+#### MySQL常见瓶颈
 
 - CPU：CPU在饱和的时候一般发生在数据装入内存或从磁盘上读取数据时候
 
 - IO：磁盘I/O瓶颈发生在装入数据远大于内存容量的时候
 
-- 服务器硬件的性能瓶颈：top,free, iostat和vmstat来查看系统的性能状态
+- 服务器硬件的性能瓶颈：top，free，iostat 和 vmstat来查看系统的性能状态
 
-
-
-**查看Linux系统性能的常用命令**
-
-MySQL数据库是常见的两个瓶颈是CPU和I/O的瓶颈。CPU在饱和的时候一般发生在数据装入内存或从磁盘上读取数据时候，磁盘I/O瓶颈发生在装入数据远大于内存容量的时候，如果应用分布在网络上，那么查询量相当大的时候那么瓶颈就会出现在网络上。Linux中我们常用mpstat、vmstat、iostat、sar和top来查看系统的性能状态。
-
-`mpstat`： mpstat是Multiprocessor Statistics的缩写，是实时系统监控工具。其报告为CPU的一些统计信息，这些信息存放在/proc/stat文件中。在多CPUs系统里，其不但能查看所有CPU的平均状况信息，而且能够查看特定CPU的信息。mpstat最大的特点是可以查看多核心cpu中每个计算核心的统计数据，而类似工具vmstat只能查看系统整体cpu情况。
-
-`vmstat`：vmstat命令是最常见的Linux/Unix监控工具，可以展现给定时间间隔的服务器的状态值，包括服务器的CPU使用率，内存使用，虚拟内存交换情况，IO读写情况。这个命令是我查看Linux/Unix最喜爱的命令，一个是Linux/Unix都支持，二是相比top，我可以看到整个机器的CPU、内存、IO的使用情况，而不是单单看到各个进程的CPU使用率和内存使用率(使用场景不一样)。
-
-`iostat`: 主要用于监控系统设备的IO负载情况，iostat首次运行时显示自系统启动开始的各项统计信息，之后运行iostat将显示自上次运行该命令以后的统计信息。用户可以通过指定统计的次数和时间来获得所需的统计信息。
-
-`sar`： sar（System Activity Reporter系统活动情况报告）是目前 Linux 上最为全面的系统性能分析工具之一，可以从多方面对系统的活动进行报告，包括：文件的读写情况、系统调用的使用情况、磁盘I/O、CPU效率、内存使用状况、进程活动及IPC有关的活动等。
-
-`top`：top命令是Linux下常用的性能分析工具，能够实时显示系统中各个进程的资源占用状况，类似于Windows的任务管理器。top显示系统当前的进程和其他状况，是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令，它将独占前台，直到用户终止该程序为止。比较准确的说，top命令提供了实时的对系统处理器的状态监视。它将显示系统中CPU最“敏感”的任务列表。该命令可以按CPU使用。内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定。
-
-除了服务器硬件的性能瓶颈，对于MySQL系统本身，我们可以使用工具来优化数据库的性能，通常有三种：使用索引，使用EXPLAIN分析查询以及调整MySQL的内部配置。
-
-
-
-### 2.2 性能下降SQL慢 执行时间长 等待时间长 原因分析
+#### 性能下降SQL慢 执行时间长 等待时间长 原因分析
 
 - 查询语句写的烂
-- 索引失效（单值 复合）
+- 索引失效（单值、复合）
 - 关联查询太多join（设计缺陷或不得已的需求）
 - 服务器调优及各个参数设置（缓冲、线程数等）
 
 
 
-### 2.3 MySql Query Optimizer
-
-1. Mysql中有专门负责优化SELECT语句的优化器模块，主要功能：通过计算分析系统中收集到的统计信息，为客户端请求的Query提供他认为最优的执行计划（他认为最优的数据检索方式，但不见得是DBA认为是最优的，这部分最耗费时间）
-
-2. 当客户端向MySQL 请求一条Query，命令解析器模块完成请求分类，区别出是 SELECT 并转发给MySQL Query Optimizer时，MySQL Query Optimizer 首先会对整条Query进行优化，处理掉一些常量表达式的预算，直接换算成常量值。并对 Query 中的查询条件进行简化和转换，如去掉一些无用或显而易见的条件、结构调整等。然后分析 Query 中的 Hint 信息（如果有），看显示Hint信息是否可以完全确定该Query 的执行计划。如果没有 Hint 或Hint 信息还不足以完全确定执行计划，则会读取所涉及对象的统计信息，根据 Query 进行写相应的计算分析，然后再得出最后的执行计划。
-
-
-
-### 2.4 MySQL常见性能分析手段
+#### MySQL常见性能分析手段
 
 在优化MySQL时，通常需要对数据库进行分析，常见的分析手段有**慢查询日志**，**EXPLAIN 分析查询**，**profiling分析**以及**show命令查询系统状态及系统变量**，通过定位分析性能的瓶颈，才能更好的优化数据库系统的性能。
 
-####  2.4.1 性能瓶颈定位 
+#####  性能瓶颈定位 
 
-我们可以通过show命令查看MySQL状态及变量，找到系统的瓶颈：
+我们可以通过 show 命令查看 MySQL 状态及变量，找到系统的瓶颈：
 
-```shell
+```mysql
 Mysql> show status ——显示状态信息（扩展show status like ‘XXX’）
 
 Mysql> show variables ——显示系统变量（扩展show variables like ‘XXX’）
@@ -1111,101 +1134,100 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 
 
-#### 2.4.2 Explain(执行计划)
+##### Explain(执行计划)
 
-- 是什么：使用Explain关键字可以模拟优化器执行SQL查询语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈
-- 能干吗
-  - 表的读取顺序
-  - 数据读取操作的操作类型
-  - 哪些索引可以使用
-  - 哪些索引被实际使用
-  - 表之间的引用
-  - 每张表有多少行被优化器查询
+是什么：使用 **Explain** 关键字可以模拟优化器执行SQL查询语句，从而知道 MySQL 是如何处理你的 SQL 语句的。分析你的查询语句或是表结构的性能瓶颈
 
-- 怎么玩
+能干吗：
+- 表的读取顺序
+- 数据读取操作的操作类型
+- 哪些索引可以使用
+- 哪些索引被实际使用
+- 表之间的引用
+- 每张表有多少行被优化器查询
 
-  - Explain + SQL语句
-  - 执行计划包含的信息
+怎么玩：
 
-![expalin](H:/Technical-Learning/docs/_images/mysql/expalin.jpg)
+- Explain + SQL语句
+- 执行计划包含的信息（如果有分区表的话还会有**partitions**）
 
-- 各字段解释
+![expalin](../../..//docs/_images/mysql/expalin.jpg)
 
-  - <mark>**id**</mark>（select查询的序列号，包含一组数字，表示查询中执行select子句或操作表的顺序）
+各字段解释
 
-    - id相同，执行顺序从上往下
-    - id不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行
-    - id相同不同，同时存在
+- <mark>**id**</mark>（select 查询的序列号，包含一组数字，表示查询中执行select子句或操作表的顺序）
 
-  - <mark> **select_type**</mark>（查询的类型，用于区别普通查询、联合查询、子查询等复杂查询）
+  - id相同，执行顺序从上往下
+  - id全不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行
+  - id部分相同，执行顺序是先按照数字大的先执行，然后数字相同的按照从上往下的顺序执行
 
-    - **SIMPLE** ：简单的select查询，查询中不包含子查询或UNION
-    - **PRIMARY**：查询中若包含任何复杂的子部分，最外层查询被标记为PRIMARY
-    - **SUBQUERY**：在select或where列表中包含了子查询
-    - **DERIVED**：在from列表中包含的子查询被标记为DERIVED，mysql会递归执行这些子查询，把结果放在临时表里
-    - **UNION**：若第二个select出现在UNION之后，则被标记为UNION，若UNION包含在from子句的子查询中，外层select将被标记为DERIVED
-    - **UNION RESULT**：从UNION表获取结果的select
+- <mark> **select_type**</mark>（查询类型，用于区别普通查询、联合查询、子查询等复杂查询）
 
-  - <mark> **table**</mark>（显示这一行的数据是关于哪张表的）
+  - **SIMPLE** ：简单的select查询，查询中不包含子查询或UNION
+  - **PRIMARY**：查询中若包含任何复杂的子部分，最外层查询被标记为PRIMARY
+  - **SUBQUERY**：在select或where列表中包含了子查询
+  - **DERIVED**：在from列表中包含的子查询被标记为DERIVED，MySQL会递归执行这些子查询，把结果放在临时表里
+  - **UNION**：若第二个select出现在UNION之后，则被标记为UNION，若UNION包含在from子句的子查询中，外层select将被标记为DERIVED
+  - **UNION RESULT**：从UNION表获取结果的select
 
-  - <mark> **type**</mark>（显示查询使用了那种类型，从最好到最差依次排列	**system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL** ）
+- <mark> **table**</mark>（显示这一行的数据是关于哪张表的）
 
-    - system：表只有一行记录（等于系统表），是const类型的特例，平时不会出现
-    - const：表示通过索引一次就找到了，const用于比较primary key或unique索引，因为只要匹配一行数据，所以很快，如将主键置于where列表中，mysql就能将该查询转换为一个常量
-    - eq_ref：唯一性索引扫描，对于每个索引键，表中只有一条记录与之匹配，常见于主键或唯一索引扫描
-    - ref：非唯一性索引扫描，范围匹配某个单独值得所有行。本质上也是一种索引访问，他返回所有匹配某个单独值的行，然而，它可能也会找到多个符合条件的行，多以他应该属于查找和扫描的混合体
-    - range：只检索给定范围的行，使用一个索引来选择行。key列显示使用了哪个索引，一般就是在你的where语句中出现了between、<、>、in等的查询，这种范围扫描索引比全表扫描要好，因为它只需开始于索引的某一点，而结束于另一点，不用扫描全部索引
-    - index：Full Index Scan，index于ALL区别为index类型只遍历索引树。通常比ALL快，因为索引文件通常比数据文件小。（**也就是说虽然all和index都是读全表，但index是从索引中读取的，而all是从硬盘中读的**）
-    - all：Full Table Scan，将遍历全表找到匹配的行
+- <mark> **type**</mark>（显示查询使用了那种类型，从最好到最差依次排列	**system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL** ）
 
-     ?> 一般来说，得保证查询至少达到range级别，最好到达ref
+  - system：表只有一行记录（等于系统表），是 const 类型的特例，平时不会出现
+  - const：表示通过索引一次就找到了，const 用于比较 primary key 或 unique 索引，因为只要匹配一行数据，所以很快，如将主键置于 where 列表中，mysql 就能将该查询转换为一个常量
+  - eq_ref：唯一性索引扫描，对于每个索引键，表中只有一条记录与之匹配，常见于主键或唯一索引扫描
+  - ref：非唯一性索引扫描，范围匹配某个单独值得所有行。本质上也是一种索引访问，他返回所有匹配某个单独值的行，然而，它可能也会找到多个符合条件的行，多以他应该属于查找和扫描的混合体
+  - range：只检索给定范围的行，使用一个索引来选择行。key列显示使用了哪个索引，一般就是在你的where语句中出现了between、<、>、in等的查询，这种范围扫描索引比全表扫描要好，因为它只需开始于索引的某一点，而结束于另一点，不用扫描全部索引
+  - index：Full Index Scan，index于ALL区别为index类型只遍历索引树。通常比ALL快，因为索引文件通常比数据文件小。（**也就是说虽然all和index都是读全表，但index是从索引中读取的，而all是从硬盘中读的**）
+  - ALL：Full Table Scan，将遍历全表找到匹配的行
 
-  - <mark> **possible_keys**</mark>（显示可能应用在这张表中的索引，一个或多个，查询涉及到的字段若存在索引，则该索引将被列出，但不一定被查询实际使用）
+  tip: 一般来说，得保证查询至少达到range级别，最好到达ref
 
-  - <mark> **key**</mark> 
+- <mark> **possible_keys**</mark>（显示可能应用在这张表中的索引，一个或多个，查询涉及到的字段若存在索引，则该索引将被列出，但不一定被查询实际使用）
 
-    - （实际使用的索引，如果为NULL，则没有使用索引）
+- <mark> **key**</mark> 
 
-    - **查询中若使用了覆盖索引，则该索引和查询的select字段重叠，仅出现在key列表中**
+  - 实际使用的索引，如果为NULL，则没有使用索引
 
-  ![explain-key](H:/Technical-Learning/docs/_images/mysql/explain-key.png)
+  - **查询中若使用了覆盖索引，则该索引和查询的 select 字段重叠，仅出现在key列表中**
 
-  - <mark> **key_len**</mark>
+![explain-key](../../../docs/_images/mysql/explain-key.png)
 
-    - 表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。在不损失精确性的情况下，长度越短越好
-    - key_len显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的
+- <mark> **key_len**</mark>
 
-  - <mark> **ref**</mark> （显示索引的哪一列被使用了，如果可能的话，是一个常数。哪些列或常量被用于查找索引列上的值）
+  - 表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。在不损失精确性的情况下，长度越短越好
+  - key_len显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的
 
-  - <mark> **rows**</mark> （根据表统计信息及索引选用情况，大致估算找到所需的记录所需要读取的行数）
+- <mark> **ref**</mark> （显示索引的哪一列被使用了，如果可能的话，是一个常数。哪些列或常量被用于查找索引列上的值）
 
-  - <mark> **Extra**</mark>（包含不适合在其他列中显示但十分重要的额外信息）
+- <mark> **rows**</mark> （根据表统计信息及索引选用情况，大致估算找到所需的记录所需要读取的行数）
 
-    1. <font color=red>using filesort</font>: 说明mysql会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。mysql中无法利用索引完成的排序操作称为“文件排序”![img](H:/Technical-Learning/docs/_images/mysql/explain-extra-1.png)
+- <mark> **Extra**</mark>（包含不适合在其他列中显示但十分重要的额外信息）
 
-    2. <font color=red>Using temporary</font>：使用了临时表保存中间结果，mysql在对查询结果排序时使用临时表。常见于排序order by和分组查询group by。![explain-extra-2](H:/Technical-Learning/docs/_images/mysql/explain-extra-2.png)
+  1. <font color=red>using filesort</font>: 说明mysql会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。mysql中无法利用索引完成的排序操作称为“文件排序”。常见于order by和group by语句中
 
-    3. <font color=red>using index</font>：表示相应的select操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现using where，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作![explain-extra-3](H:/Technical-Learning/docs/_images/mysql/explain-extra-3.png)
+  2. <font color=red>Using temporary</font>：使用了临时表保存中间结果，mysql在对查询结果排序时使用临时表。常见于排序order by和分组查询group by。
 
-    4. using where：使用了where过滤
+  3. <font color=red>using index</font>：表示相应的select操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现using where，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作
 
-    5. using join buffer：使用了连接缓存
+  4. using where：使用了where过滤
 
-    6. impossible where：where子句的值总是false，不能用来获取任何元祖
+  5. using join buffer：使用了连接缓存
 
-    7. select tables optimized away：在没有group by子句的情况下，基于索引优化操作或对于MyISAM存储引擎优化COUNT(*)操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化
+  6. impossible where：where子句的值总是false，不能用来获取任何元祖
 
-    8. distinct：优化distinct操作，在找到第一匹配的元祖后即停止找同样值的动作
+  7. select tables optimized away：在没有group by子句的情况下，基于索引优化操作或对于MyISAM存储引擎优化COUNT(*)操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化
 
-       
+  8. distinct：优化distinct操作，在找到第一匹配的元祖后即停止找同样值的动作
 
-- case:
+     
 
-![explain-demo](H:/Technical-Learning/docs/_images/mysql/explain-demo.png)
+**case**:
 
- 
+![explain-demo](../../../docs/_images/mysql/explain-demo.png)
 
-1. 第一行（执行顺序4）：id列为1，表示是union里的第一个select，select_type列的primary表 示该查询为外层查询，table列被标记为<derived3>，表示查询结果来自一个衍生表，其中derived3中3代表该查询衍生自第三个select查询，即id为3的select。【select d1.name......】
+1. 第一行（执行顺序4）：id列为1，表示是union里的第一个select，select_type列的primary表示该查询为外层查询，table列被标记为<derived3>，表示查询结果来自一个衍生表，其中derived3中3代表该查询衍生自第三个select查询，即id为3的select。【select d1.name......】
 
 2. 第二行（执行顺序2）：id为3，是整个查询中第三个select的一部分。因查询包含在from中，所以为derived。【select id,name from t1 where other_column=''】
 3. 第三行（执行顺序3）：select列表中的子查询select_type为subquery，为整个查询中的第二个select。【select id from t3】
@@ -1214,17 +1236,18 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 
 
-#### 2.4.3 慢查询日志
+##### 慢查询日志
 
-MySQL的慢查询日志是MySQL提供的一种日志记录，它用来记录在MySQL中响应时间超过阈值的语句，具体指运行时间超过long_query_time值的SQL，则会被记录到慢查询日志中。
+MySQL 的慢查询日志是 MySQL 提供的一种日志记录，它用来记录在 MySQL 中响应时间超过阈值的语句，具体指运行时间超过 `long_query_time` 值的 SQL，则会被记录到慢查询日志中。
 
-- long_query_time的默认值为10，意思是运行10秒以上的语句。
-- 默认情况下，MySQL数据库没有开启慢查询日志，需要手动设置参数开启。
-- 如果不是调优需要的话，一般不建议启动该参数。
+- `long_query_time` 的默认值为10，意思是运行10秒以上的语句
+- 默认情况下，MySQL数据库没有开启慢查询日志，需要手动设置参数开启
 
 **查看开启状态**
 
-`SHOW VARIABLES LIKE '%slow_query_log%'`
+```mysql
+SHOW VARIABLES LIKE '%slow_query_log%'
+```
 
 **开启慢查询日志**
 
@@ -1244,20 +1267,20 @@ mysql> set global long_query_time=2;
 
   修改配置文件my.cnf或my.ini，在[mysqld]一行下面加入两个配置参数
 
-```cnf
+```mysql
 [mysqld]
 slow_query_log = ON
 slow_query_log_file = /var/lib/mysql/hostname-slow.log
 long_query_time = 3
 ```
 
-​	注：log-slow-queries参数为慢查询日志存放的位置，一般这个目录要有mysql的运行帐号的可写权限，一般都	将这个目录设置为mysql的数据存放目录；long_query_time=2中的2表示查询超过两秒才记录；在my.cnf或者	my.ini中添加log-queries-not-using-indexes参数，表示记录下没有使用索引的查询。
+注：log-slow-queries 参数为慢查询日志存放的位置，一般这个目录要有 MySQL 的运行帐号的可写权限，一般都将这个目录设置为 MySQL 的数据存放目录；long_query_time=2 中的 2 表示查询超过两秒才记录；在my.cnf或者 my.ini 中添加 log-queries-not-using-indexes 参数，表示记录下没有使用索引的查询。
 
 可以用 `select sleep(4)` 验证是否成功开启。
 
-在生产环境中，如果手工分析日志，查找、分析SQL，还是比较费劲的，所以MySQL提供了日志分析工具mysqldumpslow。
+在生产环境中，如果手工分析日志，查找、分析SQL，还是比较费劲的，所以MySQL提供了日志分析工具**mysqldumpslow**。
 
-通过 mysqldumpslow --help查看操作帮助信息
+通过 mysqldumpslow --help 查看操作帮助信息
 
 - 得到返回记录集最多的10个SQL
 
@@ -1279,11 +1302,11 @@ long_query_time = 3
 
 
 
-#### 2.4.4 Show Profile分析查询
+##### Show Profile 分析查询
 
-通过慢日志查询可以知道哪些SQL语句执行效率低下，通过explain我们可以得知SQL语句的具体执行情况，索引使用等，还可以结合Show Profile命令查看执行状态。
+通过慢日志查询可以知道哪些 SQL 语句执行效率低下，通过 explain 我们可以得知 SQL 语句的具体执行情况，索引使用等，还可以结合Show Profile命令查看执行状态。
 
-- Show Profile是mysql提供可以用来分析当前会话中语句执行的资源消耗情况。可以用于SQL的调优的测量
+- Show Profile 是 MySQL 提供可以用来分析当前会话中语句执行的资源消耗情况。可以用于SQL的调优的测量
 
 - 默认情况下，参数处于关闭状态，并保存最近15次的运行结果
 
@@ -1303,36 +1326,49 @@ long_query_time = 3
 
   3. 运行SQL
 
-  4. 查看结果，show profiles;
+  4. 查看结果
 
-  5. 诊断SQL，show profile cpu,block io for query 上一步前面的问题SQL数字号码;
-
+     ```mysql
+   mysql> show profiles;
+     +----------+------------+---------------------------------+
+   | Query_ID | Duration   | Query                           |
+     +----------+------------+---------------------------------+
+   |        1 | 0.00385450 | show variables like "profiling" |
+     |        2 | 0.00170050 | show variables like "profiling" |
+   |        3 | 0.00038025 | select * from t_base_user       |
+     +----------+------------+---------------------------------+
+   ```
+  
+  5. 诊断SQL，show profile cpu,block io for query  id(上一步前面的问题SQL数字号码)
+  
   6. 日常开发需要注意的结论
-
+  
      - converting HEAP to MyISAM 查询结果太大，内存都不够用了往磁盘上搬了。
-
+  
      - create tmp table 创建临时表，这个要注意
-
+  
      - Copying to tmp table on disk   把内存临时表复制到磁盘
-
+  
      - locked
 
 
 
-## 3. 性能优化
+> 查询中哪些情况不会使用索引？
 
-### 3.1 索引优化
+### 性能优化
+
+#### 索引优化
 
 1. 全值匹配我最爱
-2. 最佳左前缀法则
+2. 最佳左前缀法则，比如建立了一个联合索引(a,b,c)，那么其实我们可利用的索引就有(a), (a,b), (a,b,c)
 3. 不在索引列上做任何操作（计算、函数、(自动or手动)类型转换），会导致索引失效而转向全表扫描
 4. 存储引擎不能使用索引中范围条件右边的列
 5. 尽量使用覆盖索引(只访问索引的查询(索引列和查询列一致))，减少select 
-6. mysql 在使用不等于(!= 或者<>)的时候无法使用索引会导致全表扫描
 7. is null ,is not null 也无法使用索引
-8. like以通配符开头('%abc...')mysql索引失效会变成全表扫描的操作
+8. like "xxxx%" 是可以用到索引的，like "%xxxx" 则不行(like "%xxx%" 同理)。like以通配符开头('%abc...')索引失效会变成全表扫描的操作，
 9. 字符串不加单引号索引失效
-10. 少用or,用它来连接时会索引失效
+10. 少用or，用它来连接时会索引失效
+10. <，<=，=，>，>=，BETWEEN，IN 可用到索引，<>，not in ，!= 则不行，会导致全表扫描
 
 
 
@@ -1350,69 +1386,63 @@ long_query_time = 3
 
   
 
-### 3.2 查询优化
+#### 查询优化
 
-- **永远小标驱动大表（小的数据集驱动大的数据集）**
+**永远小标驱动大表（小的数据集驱动大的数据集）**
 
-  `slect * from A where id in (select id from B)`
+```mysql
+slect * from A where id in (select id from B)`等价于
+#等价于
+select id from B
+select * from A where A.id=B.id
+```
 
-  等价于
+当 B 表的数据集必须小于 A 表的数据集时，用 in 优于 exists
 
-  `select id from B`
+```mysql
+select * from A where exists (select 1 from B where B.id=A.id)
+#等价于
+select * from A
+select * from B where B.id = A.id`
+```
 
-  `select * from A where A.id=B.id`
+当 A 表的数据集小于B表的数据集时，用 exists优于用 in
 
-  当B表的数据集必须小于A表的数据集时，用in优于exists
-
-  `select * from A where exists (select 1 from B where B.id=A.id)`
-
-  等价于
-
-  `select *from A`
-
-  `select * from B where B.id = A.id`
-
-  当A表的数据集小于B表的数据集时，用exists优于用in
-
-  注意：A表与B表的ID字段应建立索引。
-
-  
-
-- order by关键字优化
-
-- - order by子句，尽量使用Index方式排序，避免使用FileSort方式排序
-
-- - - mysql支持两种方式的排序，FileSort和Index,Index效率高，它指MySQL扫描索引本身完成排序，FileSort效率较低；
-    - ORDER BY 满足两种情况，会使用Index方式排序；①ORDER BY语句使用索引最左前列 ②使用where子句与ORDER BY子句条件列组合满足索引最左前列
-
-![optimization-orderby](H:/Technical-Learning/docs/_images/mysql/optimization-orderby.png)
-
-- - 尽可能在索引列上完成排序操作，遵照索引建的最佳最前缀
-  - 如果不在索引列上，filesort有两种算法，mysql就要启动双路排序和单路排序
-
-- - - 双路排序
-    - 单路排序
-    - 由于单路是后出的，总体而言好过双路
-
-- - 优化策略
-
-- - - 增大sort_buffer_size参数的设置
-
-    - 增大max_lencth_for_sort_data参数的设置
-
-      ![optimization-orderby2](H:/Technical-Learning/docs/_images/mysql/optimization-orderby2.png)
-
-- GROUP BY关键字优化
-
-  - group by实质是先排序后进行分组，遵照索引建的最佳左前缀
-  - 当无法使用索引列，增大max_length_for_sort_data参数的设置+增大sort_buffer_size参数的设置
-  - where高于having，能写在where限定的条件就不要去having限定了。
+注意：A表与B表的ID字段应建立索引。
 
 
 
-### 3.3 数据类型优化
+**order by关键字优化**
 
-MySQL支持的数据类型非常多，选择正确的数据类型对于获取高性能至关重要。不管存储哪种类型的数据，下面几个简单的原则都有助于做出更好的选择。
+- order by子句，尽量使用 Index 方式排序，避免使用 FileSort 方式排序
+
+- MySQL 支持两种方式的排序，FileSort 和 Index，Index效率高，它指 MySQL 扫描索引本身完成排序，FileSort 效率较低；
+- ORDER BY 满足两种情况，会使用Index方式排序；①ORDER BY语句使用索引最左前列 ②使用where子句与ORDER BY子句条件列组合满足索引最左前列
+
+- 尽可能在索引列上完成排序操作，遵照索引建的最佳最前缀
+- 如果不在索引列上，filesort 有两种算法，mysql就要启动双路排序和单路排序
+  - 双路排序：MySQL 4.1之前是使用双路排序,字面意思就是两次扫描磁盘，最终得到数据
+  - 单路排序：从磁盘读取查询需要的所有列，按照order by 列在 buffer对它们进行排序，然后扫描排序后的列表进行输出，效率高于双路排序
+
+- 优化策略
+
+  - 增大sort_buffer_size参数的设置
+  - 增大max_lencth_for_sort_data参数的设置
+
+
+
+
+**GROUP BY关键字优化**
+
+- group by实质是先排序后进行分组，遵照索引建的最佳左前缀
+- 当无法使用索引列，增大 `max_length_for_sort_data` 参数的设置，增大`sort_buffer_size`参数的设置
+- where高于having，能写在where限定的条件就不要去having限定了
+
+
+
+#### 数据类型优化
+
+MySQL 支持的数据类型非常多，选择正确的数据类型对于获取高性能至关重要。不管存储哪种类型的数据，下面几个简单的原则都有助于做出更好的选择。
 
 - 更小的通常更好：一般情况下，应该尽量使用可以正确存储数据的最小数据类型。
 
@@ -1424,11 +1454,13 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 
 >  https://www.jianshu.com/p/3c79039e82aa 
 
-
-
 ------
 
-## MySQL分区
+
+
+## 九、分区、分表、分库
+
+### MySQL分区
 
 一般情况下我们创建的表对应一组存储文件，使用`MyISAM`存储引擎时是一个`.MYI`和`.MYD`文件，使用`Innodb`存储引擎时是一个`.ibd`和`.frm`（表结构）文件。
 
@@ -1492,7 +1524,7 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 
 >说说分库与分表的设计
 
-## MySQL分表
+### MySQL分表
 
 分表有两种分割方式，一种垂直拆分，另一种水平拆分。
 
@@ -1515,7 +1547,7 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 
 
 
-## MySQL分库
+### MySQL分库
 
 > 为什么要分库?
 
@@ -1545,7 +1577,7 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 
 > 配主从，正经公司的话，也不会让 Javaer 去搞的，但还是要知道
 
-## 九、主从复制
+## 十、主从复制
 
 ### 复制的基本原理
 
@@ -1573,7 +1605,7 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 
 
 
-## 十、其他问题
+## 十一、其他问题
 
 ### 说一说三个范式
 
@@ -1581,22 +1613,6 @@ MySQL支持的数据类型非常多，选择正确的数据类型对于获取高
 - 第二范式（2NF）：数据库表中不存在非关键字段对任一候选关键字段的部分函数依赖（部分函数依赖指的是存在组合关键字中的某些字段决定非关键字段的情况），也即所有非关键字段都完全依赖于任意一组候选关键字。
 - 第三范式（3NF）：在第二范式的基础上，数据表中如果不存在非关键字段对任一候选关键字段的传递函数依赖则符合第三范式。所谓传递函数依赖，指的是如 果存在"A → B → C"的决定关系，则C传递函数依赖于A。因此，满足第三范式的数据库表应该不存在如下依赖关系： 关键字段 → 非关键字段 x → 非关键字段y
 
-
-
-
-
-
-
-
-异构索引表 
-
-
-
-TODO
-
-
-
- https://tech.meituan.com/2016/11/18/dianping-order-db-sharding.html 
 
 
 
