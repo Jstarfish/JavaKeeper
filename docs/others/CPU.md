@@ -1,54 +1,16 @@
 假如生产环境出现CPU占用过高，请谈谈你的分析思路和定位？
 
-你是你说看日志，那就只能回家等通知了，
+曾经年少的我碰到这种问题，答案会脱口而出：“看日志”。
 
-
-
-1. 先用 top 命令找到 CPU 占比最高的
-
-   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gesbmulx11j316w0m4qdc.jpg)
-
-2. ps -ef 或者 jps 进一步定位，得知是一个怎样的一个后台
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gesbo6ikkdj31100d242b.jpg)
-
-2. 定位到具体代码或线程
-
-   ps -mp 进程 -o THREAD,tid,time
-
-   参数解释：
-
-   - -m 显示所有进程
-   - -p pid 进程使用 cpu 的时间
-   - -o 该参数后是用户自定义格式
-
-   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gesbqgwjjvj30x80n8th3.jpg)
-
-3. 将需要的线程 ID 转换为 16进制格式（英文小写格式）
-
-   线程在内存中跑是 16 进制的，pritf "%x\n" 有问题的线程 ID （或者计算器转换下）
-
-4. jstack 进程 ID | grep tid(16进制线程 ID 小写英文) -A60 
-
-   -A60 打印出前 60 行
-
-   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gesbvn06ypj31b80loap1.jpg)
+然后就是回家漫长的等通知。
 
 
 
 
 
+查看Linux系统性能的常用命令
 
-
-https://fredal.xin/java-error-check#toc_h1_0
-
-
-
-
-
-**查看Linux系统性能的常用命令**
-
-MySQL数据库是常见的两个瓶颈是CPU和I/O的瓶颈。CPU在饱和的时候一般发生在数据装入内存或从磁盘上读取数据时候，磁盘I/O瓶颈发生在装入数据远大于内存容量的时候，如果应用分布在网络上，那么查询量相当大的时候那么瓶颈就会出现在网络上。Linux中我们常用mpstat、vmstat、iostat、sar和top来查看系统的性能状态。
+Linux中我们常用mpstat、vmstat、iostat、sar和top来查看系统的性能状态。
 
 `mpstat`： mpstat是Multiprocessor Statistics的缩写，是实时系统监控工具。其报告为CPU的一些统计信息，这些信息存放在/proc/stat文件中。在多CPUs系统里，其不但能查看所有CPU的平均状况信息，而且能够查看特定CPU的信息。mpstat最大的特点是可以查看多核心cpu中每个计算核心的统计数据，而类似工具vmstat只能查看系统整体cpu情况。
 
@@ -61,3 +23,74 @@ MySQL数据库是常见的两个瓶颈是CPU和I/O的瓶颈。CPU在饱和的时
 `top`：top命令是Linux下常用的性能分析工具，能够实时显示系统中各个进程的资源占用状况，类似于Windows的任务管理器。top显示系统当前的进程和其他状况，是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令，它将独占前台，直到用户终止该程序为止。比较准确的说，top命令提供了实时的对系统处理器的状态监视。它将显示系统中CPU最“敏感”的任务列表。该命令可以按CPU使用。内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定。
 
 除了服务器硬件的性能瓶颈，对于MySQL系统本身，我们可以使用工具来优化数据库的性能，通常有三种：使用索引，使用 EXPLAIN 分析查询以及调整 MySQL 的内部配置。
+
+
+
+## 线上机器CPU占用过高的故事（案例）
+
+### 1. 出现问题
+
+在这个代表爱情的日子里，我正憧憬着怎么赶紧写完下午的bug，早早下班回家的时候，突然收到一封系统邮件，大致意思是“有一台机器CPU使用太高了”，打开监控平台，果然
+
+![image-20200520142648150](C:\Users\jiahaixin\Downloads\chart (1).png)
+
+### 2. 定位问题
+
+#### 定位进程
+
+遇到问题，我没有丝毫慌张，不紧不慢的登录服务器，只是简单的输入了3个英文字母：**top**
+
+![](C:\Users\jiahaixin\Desktop\360\111.jpg)
+
+如下，果然看到有一个java进程CPU的使用率竟然达到了325%
+
+`ps -ef` 或者 `jps -l` 进一步定位具体对应的pid，看看是一个什么进程
+
+![](C:\Users\jiahaixin\Desktop\360\222.jpg)
+
+
+
+#### 定位线程
+
+定位到具体线程(tid)
+
+`ps -mp pid -o THREAD,tid,time`
+
+参数解释：
+
+- -m 显示所有进程
+- -p pid 进程使用 cpu 的时间
+- -o 该参数后是用户自定义格式
+
+![](C:\Users\jiahaixin\Desktop\360\777.jpg)
+
+或者通过`top -H -p pid` ，直接找到CPU使用率比较高的一些线程
+
+![](C:\Users\jiahaixin\Desktop\360\666.jpg)
+
+这两种方式均可以看到CPU使用率最高的线程都是20817
+
+
+
+#### 定位代码
+
+因为线程在内存中跑是 16 进制的，将需要的线程 ID 转换为 16进制格式（英文小写格式）
+
+`printf '%x\n' tid`（tid是有问题的线程ID），这一步也可以用计算器换算下
+
+![](C:\Users\jiahaixin\Desktop\360\888.jpg)
+
+通过jstack查看该线程的栈信息
+
+`jstack tid | grep nid -A100` （nid是16进制的线程ID，-A100表示打印前100行）
+
+![](C:\Users\jiahaixin\Desktop\360\999.jpg)
+
+
+
+https://fredal.xin/java-error-check#toc_h1_0
+
+
+
+
+
