@@ -14,13 +14,13 @@
 ## 2. 为什么需要消息队列 
 
 1. **解耦**： 允许你独立的扩展或修改两边的处理过程，只要确保它们遵守同样的接口约束。
-2. **冗余**：消息队列把数据进行持久化直到它们已经被完全处理，通过这一方式规避了数据丢失风 险。许多消息队列所采用的"插入-获取-删除"范式中，在把一个消息从队列中删除之前，需 要你的处理系统明确的指出该消息已经被处理完毕，从而确保你的数据被安全的保存直到你使用完毕。 
-3. **扩展性**： 因为消息队列解耦了你的处理过程，所以增大消息入队和处理的频率是很容易的，只要 另外增加处理过程即可。 
+2. **冗余**：消息队列把数据进行持久化直到它们已经被完全处理，通过这一方式规避了数据丢失风险。许多消息队列所采用的"插入-获取-删除"范式中，在把一个消息从队列中删除之前，需要你的处理系统明确的指出该消息已经被处理完毕，从而确保你的数据被安全的保存直到你使用完毕。 
+3. **扩展性**： 因为消息队列解耦了你的处理过程，所以增大消息入队和处理的频率是很容易的，只要另外增加处理过程即可。 
 4. **灵活性 & 峰值处理能力**： 在访问量剧增的情况下，应用仍然需要继续发挥作用，但是这样的突发流量并不常见。 如果为以能处理这类峰值访问为标准来投入资源随时待命无疑是巨大的浪费。使用消息队列 能够使关键组件顶住突发的访问压力，而不会因为突发的超负荷的请求而完全崩溃。 
-5. **可恢复性**： 系统的一部分组件失效时，不会影响到整个系统。消息队列降低了进程间的耦合度，所 以即使一个处理消息的进程挂掉，加入队列中的消息仍然可以在系统恢复后被处理。
-6. **顺序保证**： 在大多使用场景下，数据处理的顺序都很重要。大部分消息队列本来就是排序的，并且 能保证数据会按照特定的顺序来处理。（Kafka 保证一个 Partition 内的消息的有序性）
-7. **缓冲**： 有助于控制和优化数据流经过系统的速度， 解决生产消息和消费消息的处理速度不一致 的情况。 
-8. **异步通信**： 很多时候，用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要 的时候再去处理它们    
+5. **可恢复性**： 系统的一部分组件失效时，不会影响到整个系统。消息队列降低了进程间的耦合度，所以即使一个处理消息的进程挂掉，加入队列中的消息仍然可以在系统恢复后被处理。
+6. **顺序保证**： 在大多使用场景下，数据处理的顺序都很重要。大部分消息队列本来就是排序的，并且能保证数据会按照特定的顺序来处理。（Kafka 保证一个 Partition 内的消息的有序性）
+7. **缓冲**： 有助于控制和优化数据流经过系统的速度， 解决生产消息和消费消息的处理速度不一致的情况。 
+8. **异步通信**： 很多时候，用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要的时候再去处理它们    
 
 ------
 
@@ -247,11 +247,9 @@ Kafka可以作为分布式系统的一种外部提交日志。日志有助于在
 
 **Kafka中消息是以topic进行分类的**，生产者生产消息，消费者消费消息，都是面向topic的。
 
-topic是逻辑上的概念，二patition是物理上的概念，每个patition对应一个log文件，而log文件中存储的就是producer生产的数据，patition生产的数据会被不断的添加到log文件的末端，且每条数据都有自己的offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
+topic是逻辑上的概念，而patition是物理上的概念，每个patition对应一个log文件，而log文件中存储的就是producer生产的数据，patition生产的数据会被不断的添加到log文件的末端，且每条数据都有自己的offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
 
 ![img](../../_images/message-queue/Kafka/kafka-partition.jpg)
-
-
 
 
 
@@ -290,7 +288,7 @@ producer 写入消息流程如下：
 
 #### 4.1.2 写入方式 
 
-​	producer 采用推（push） 模式将消息发布到 broker，每条消息都被追加（append） 到分区（patition） 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 kafka 吞吐率）。
+producer 采用推（push） 模式将消息发布到 broker，每条消息都被追加（append） 到分区（patition） 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 kafka 吞吐率）。
 
 ####  4.1.3 分区（Partition） 
 
@@ -313,11 +311,11 @@ producer 写入消息流程如下：
 
 #### 4.1.4 副本（Replication）
 
- 	同 一 个 partition 可 能 会 有 多 个 replication （ 对 应 server.properties 配 置 中 的 default.replication.factor=N）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据    
+同 一 个 partition 可 能 会 有 多 个 replication （ 对 应 server.properties 配 置 中 的 default.replication.factor=N）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据    
 
 #### 4.1.5 数据可靠性保证
 
-​	为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
+为保证producer发送的数据，能可靠的发送到指定的topic，topic的每个partition收到producer数据后，都需要向producer发送ack（acknowledgement确认收到），如果producer收到ack，就会进行下一轮的发送，否则重新发送数据。
 
 ![img](../../_images/message-queue/Kafka/kafka-ack-slg.png)
 
@@ -335,15 +333,15 @@ Kafka选择了第二种方案，原因如下：
 
 ##### 2) ISR
 
-​	采用第二种方案之后，设想一下情景：leader收到数据，所有follower都开始同步数据，但有一个follower挂了，迟迟不能与leader保持同步，那leader就要一直等下去，直到它完成同步，才能发送ack，这个问题怎么解决呢？
+采用第二种方案之后，设想一下情景：leader收到数据，所有follower都开始同步数据，但有一个follower挂了，迟迟不能与leader保持同步，那leader就要一直等下去，直到它完成同步，才能发送ack，这个问题怎么解决呢？
 
-​	leader维护了一个动态的in-sync replica set(ISR),意为和leader保持同步的follower集合。当ISR中的follower完成数据的同步之后，leader就会给follower发送ack。如果follower长时间未向leader同步数据，则该follower将会被踢出ISR，该时间阈值由replica.lag.time.max.ms参数设定。leader发生故障之后，就会从ISR中选举新的leader。（之前还有另一个参数，0.9 版本之后 replica.lag.max.messages 参数被移除了）
+leader维护了一个动态的in-sync replica set(ISR)，意为和leader保持同步的follower集合。当ISR中的follower完成数据的同步之后，leader就会给follower发送ack。如果follower长时间未向leader同步数据，则该follower将会被踢出ISR，该时间阈值由replica.lag.time.max.ms参数设定。leader发生故障之后，就会从ISR中选举新的leader。（之前还有另一个参数，0.9 版本之后 replica.lag.max.messages 参数被移除了）
 
 ##### 3) ack应答机制
 
-​	对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等ISR中的follower全部接收成功。
+对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等ISR中的follower全部接收成功。
 
-​	所以Kafka为用户提供了**三种可靠性级别**，用户根据对可靠性和延迟的要求进行权衡，选择以下的配置。
+所以Kafka为用户提供了**三种可靠性级别**，用户根据对可靠性和延迟的要求进行权衡，选择以下的配置。
 
 **acks参数配置：**
 
@@ -370,25 +368,25 @@ Kafka选择了第二种方案，原因如下：
 
 （1）**followew故障**
 
-​	follower发生故障后会被临时踢出ISR,待该follower恢复后，follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向leader进行同步。等**该followew的LEO大于该Partition的HW**，即follower追上leader之后，就可以重新加入ISR了。
+follower发生故障后会被临时踢出ISR，待该follower恢复后，follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向leader进行同步。等**该followew的LEO大于该Partition的HW**，即follower追上leader之后，就可以重新加入ISR了。
 
 （2） **leader故障**
 
-​	leader发生故障之后，会从ISR中选出一个新的leader，之后，为保证多个副本之间的数据一致性，其余的follower会先将各自的log文件高于HW的部分截掉，然后从新的leader同步数据。
+leader发生故障之后，会从ISR中选出一个新的leader，之后，为保证多个副本之间的数据一致性，其余的follower会先将各自的log文件高于HW的部分截掉，然后从新的leader同步数据。
 
-​	注意：这**只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复**。
+注意：这**只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复**。
 
 #### 4.1.6 Exactly Once语义
 
-​	将服务器的ACK级别设置为-1，可以保证Producer到Server之间不会丢失数据，即At Least Once语义。相对的，将服务器ACK级别设置为0，可以保证生产者每条消息只会被发送一次，即At Most Once语义。
+将服务器的ACK级别设置为-1，可以保证Producer到Server之间不会丢失数据，即At Least Once语义。相对的，将服务器ACK级别设置为0，可以保证生产者每条消息只会被发送一次，即At Most Once语义。
 
-​	At Least Once可以保证数据不丢失，但是不能保证数据不重复。相对的，At Least Once可以保证数据不重复，但是不能保证数据不丢失。但是，对于一些非常重要的信息，比如说交易数据，下游数据消费者要求数据既不重复也不丢失，即Exactly Once语义。在0.11版本以前的Kafka，对此是无能为力的，智能保证数据不丢失，再在下游消费者对数据做全局去重。对于多个下游应用的情况，每个都需要单独做全局去重，这就对性能造成了很大的影响。
+At Least Once可以保证数据不丢失，但是不能保证数据不重复。相对的，At Least Once可以保证数据不重复，但是不能保证数据不丢失。但是，对于一些非常重要的信息，比如说交易数据，下游数据消费者要求数据既不重复也不丢失，即Exactly Once语义。在0.11版本以前的Kafka，对此是无能为力的，只能保证数据不丢失，再在下游消费者对数据做全局去重。对于多个下游应用的情况，每个都需要单独做全局去重，这就对性能造成了很大的影响。
 
-​	0.11版本的Kafka，引入了一项重大特性：幂等性。所谓的幂等性就是指	Producer不论向Server发送多少次重复数据。Server端都会只持久化一条，幂等性结合At Least Once语义，就构成了Kafka的Exactily Once语义，即： **<u>At Least Once + 幂等性 = Exactly Once</u>**
+0.11版本的Kafka，引入了一项重大特性：幂等性。所谓的幂等性就是指	Producer不论向Server发送多少次重复数据。Server端都会只持久化一条，幂等性结合At Least Once语义，就构成了Kafka的Exactily Once语义，即： **<u>At Least Once + 幂等性 = Exactly Once</u>**
 
-​	要启用幂等性，只需要将Producer的参数中enable.idompotence设置为true即可。Kafka的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的Producer在初始化的时候会被分配一个PID，发往同一Partition的消息会附带Sequence Number。而Broker端会对<PID,Partition,SeqNumber>做缓存，当具有相同主键的消息提交时，Broker只会持久化一条。
+要启用幂等性，只需要将Producer的参数中`enable.idompotence`设置为true即可。Kafka的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的Producer在初始化的时候会被分配一个PID，发往同一Partition的消息会附带Sequence Number。而Broker端会对<PID,Partition,SeqNumber>做缓存，当具有相同主键的消息提交时，Broker只会持久化一条。
 
-​	但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区会话的Exactly Once。
+但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区会话的Exactly Once。
 
 
 
@@ -397,11 +395,11 @@ Kafka选择了第二种方案，原因如下：
 
 #### 4.2.1 存储方式 
 
-​	物理上把 topic 分成一个或多个 patition（对应 server.properties 中的 num.partitions=3 配 置），每个 patition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文 件）。    
+物理上把 topic 分成一个或多个 patition（对应 server.properties 中的 num.partitions=3 配 置），每个 patition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文件）。    
 
 #### 4.2.2 存储策略 
 
-​	无论消息是否被消费， kafka 都会保留所有消息。有两种策略可以删除旧数据： 
+无论消息是否被消费， kafka 都会保留所有消息。有两种策略可以删除旧数据： 
 
 1. 基于时间： log.retention.hours=168 
 
@@ -421,11 +419,11 @@ Kafka选择了第二种方案，原因如下：
 
 -  Zookeeper在Kafka中的作用
 
-  ​	Kafka集群中有一个broker会被选举为Controller，**负责管理集群broker的上线下，所有topic的分区副本分配和leader选举等工作**。
+  Kafka集群中有一个broker会被选举为Controller，**负责管理集群broker的上线下，所有topic的分区副本分配和leader选举等工作**。
 
-  ​	Controller的管理工作都是依赖于Zookeeper的。
+  Controller的管理工作都是依赖于Zookeeper的。
 
-  ​	下图为partition的leader选举过程：
+  下图为partition的leader选举过程：
 
 ![img](../../_images/message-queue/Kafka/controller-leader.png)
 
@@ -437,31 +435,31 @@ Kafka选择了第二种方案，原因如下：
 
 ![img](../../_images/message-queue/Kafka/kafka-consume-group.png)
 
-​	消费者是以 consumer group 消费者组的方式工作，由一个或者多个消费者组成一个组， 共同消费一个 topic。每个分区在同一时间只能由 group 中的一个消费者读取，但是多个 group 可以同时消费这个 partition。在图中，有一个由三个消费者组成的 group，有一个消费者读 取主题中的两个分区，另外两个分别读取一个分区。某个消费者读取某个分区，也可以叫做 某个消费者是某个分区的拥有者。
+消费者是以 consumer group 消费者组的方式工作，由一个或者多个消费者组成一个组， 共同消费一个 topic。每个分区在同一时间只能由 group 中的一个消费者读取，但是多个 group 可以同时消费这个 partition。在图中，有一个由三个消费者组成的 group，有一个消费者读 取主题中的两个分区，另外两个分别读取一个分区。某个消费者读取某个分区，也可以叫做 某个消费者是某个分区的拥有者。
 
-​	在这种情况下，消费者可以通过水平扩展的方式同时读取大量的消息。另外，如果一个 消费者失败了，那么其他的 group 成员会自动负载均衡读取之前失败的消费者读取的分区。    
+在这种情况下，消费者可以通过水平扩展的方式同时读取大量的消息。另外，如果一个消费者失败了，那么其他的 group 成员会自动负载均衡读取之前失败的消费者读取的分区。    
 
 #### 4.3.2 消费方式
 
 **consumer 采用 pull（拉） 模式从 broker 中读取数据。** 
 
-​	push（推）模式很难适应消费速率不同的消费者，因为消息发送速率是由 broker 决定的。 它的目标是尽可能以最快速度传递消息，但是这样很容易造成 consumer 来不及处理消息， 典型的表现就是拒绝服务以及网络拥塞。而 pull 模式则可以根据 consumer 的消费能力以适当的速率消费消息。 
+push（推）模式很难适应消费速率不同的消费者，因为消息发送速率是由 broker 决定的。 它的目标是尽可能以最快速度传递消息，但是这样很容易造成 consumer 来不及处理消息， 典型的表现就是拒绝服务以及网络拥塞。而 pull 模式则可以根据 consumer 的消费能力以适当的速率消费消息。 
 
-​	对于 Kafka 而言， pull 模式更合适，它可简化 broker 的设计， consumer 可自主控制消费消息的速率，同时 consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时 还能选择不同的提交方式从而实现不同的传输语义。 
+对于 Kafka 而言， pull 模式更合适，它可简化 broker 的设计， consumer 可自主控制消费消息的速率，同时 consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时 还能选择不同的提交方式从而实现不同的传输语义。 
 
-​	pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷入循环中，一直等待数据到达，一直返回空数据。为了避免这种情况，我们在我们的拉请求中有参数，允许消费者请求在等待数据到达 的“长轮询”中进行阻塞（并且可选地等待到给定的字节数，以确保大的传输大小）。    
+pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷入循环中，一直等待数据到达，一直返回空数据。为了避免这种情况，我们在我们的拉请求中有参数，允许消费者请求在等待数据到达 的“长轮询”中进行阻塞（并且可选地等待到给定的字节数，以确保大的传输大小）。    
 
 #### 4.3.3 分区分配策略
 
-​	一个consumer group中有多个consumer，一个topic有多个partition，所以必然会涉及到partition的分配问题，即确定哪个partition由哪个consumer来消费。
+一个consumer group中有多个consumer，一个topic有多个partition，所以必然会涉及到partition的分配问题，即确定哪个partition由哪个consumer来消费。
 
-​	Kafka有两种分配策略，一是RoundRobin，一是Range。
+Kafka有两种分配策略，一是RoundRobin，一是Range。
 
 #### 4.3.4 offset的维护
 
-​	由于consumer在消费过程中可能会出现断电宕机等故障，consumer恢复后，需要从故障前的位置继续消费，所以consumer需要实时记录自己消费到了哪个offset，以便故障恢复后继续消费。
+由于consumer在消费过程中可能会出现断电宕机等故障，consumer恢复后，需要从故障前的位置继续消费，所以consumer需要实时记录自己消费到了哪个offset，以便故障恢复后继续消费。
 
-​	Kafka 0.9版本之前，consumer默认将offset保存在Zookeeper中，从0.9版本开始，consumer默认将offset保存在Kafka一个内置的topic中，该topic为**_consumer_offsets**。
+Kafka 0.9版本之前，consumer默认将offset保存在Zookeeper中，从0.9版本开始，consumer默认将offset保存在Kafka一个内置的topic中，该topic为**_consumer_offsets**。
 
 - 修改配置文件consumer.properties
 
@@ -493,7 +491,7 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 #### 4.4.1 顺序写磁盘
 
-​	Kafka的producer生产数据，要写入到log文件中，写的过程是一直追加到文件末端，为顺序写。官网有数据表明，同样的磁盘，顺序写能到到600M/s，而随机写只有100k/s。这与磁盘的机械机构有关，顺序写之所以快，是因为其省去了大量磁头寻址的时间 。
+Kafka的producer生产数据，要写入到log文件中，写的过程是一直追加到文件末端，为顺序写。官网有数据表明，同样的磁盘，顺序写能到到600M/s，而随机写只有100k/s。这与磁盘的机械机构有关，顺序写之所以快，是因为其省去了大量磁头寻址的时间 。
 
 #### 4.4.2 零拷贝技术（todo...）
 
@@ -507,17 +505,17 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 ### 4.5 Kafka事务
 
-​	Kafka从0.11版本开始引入了事务支持。事务可以保证Kafka在Exactly Once语义的基础上，生产和消费可以跨分区和会话，要么全部成功，要么全部失败。
+Kafka从0.11版本开始引入了事务支持。事务可以保证Kafka在Exactly Once语义的基础上，生产和消费可以跨分区和会话，要么全部成功，要么全部失败。
 
 #### 4.5.1 Producer事务
 
-​	为了了实现跨分区跨会话的事务，需要引入一个全局唯一的TransactionID，并将Producer获得的PID和Transaction ID绑定。这样当Producer重启后就可以通过正在进行的TransactionID获得原来的PID。
+为了了实现跨分区跨会话的事务，需要引入一个全局唯一的TransactionID，并将Producer获得的PID和Transaction ID绑定。这样当Producer重启后就可以通过正在进行的TransactionID获得原来的PID。
 
-​	为了管理Transaction，Kafka引入了一个新的组件Transaction Coordinator。Producer就是通过和Transaction Coordinator交互获得Transaction ID对应的任务状态。Transaction Coordinator还负责将事务所有写入Kafka的一个内部Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
+为了管理Transaction，Kafka引入了一个新的组件Transaction Coordinator。Producer就是通过和Transaction Coordinator交互获得Transaction ID对应的任务状态。Transaction Coordinator还负责将事务所有写入Kafka的一个内部Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
 
 #### 4.5.2 Consumer事务
 
-​	对Consumer而言，事务的保证就会相对较弱，尤其是无法保证Commit的消息被准确消费。这是由于Consumer可以通过offset访问任意信息，而且不同的SegmentFile生命周期不同，同一事务的消息可能会出现重启后被删除的情况。
+对Consumer而言，事务的保证就会相对较弱，尤其是无法保证Commit的消息被准确消费。这是由于Consumer可以通过offset访问任意信息，而且不同的SegmentFile生命周期不同，同一事务的消息可能会出现重启后被删除的情况。
 
 ------
 
@@ -546,7 +544,7 @@ bin/kafka-console-consumer.sh --topic __consumer_offsets --zookeeper localhost:2
 
 ### 5.3 创建生产者
 
-​	Kafka的Producer发送消息采用的是**异步发送**的方式。在消息发送过程中，涉及到了两个线程：**main线程和Sender线程**，以及一个线程共享变量：**RecordAccumulator**。main线程将消息发送给RecordAccumulator，Sender线程不断从RecordAccumulator中拉取消息发送到Kafka broker。
+Kafka的Producer发送消息采用的是**异步发送**的方式。在消息发送过程中，涉及到了两个线程：**main线程和Sender线程**，以及一个线程共享变量：**RecordAccumulator**。main线程将消息发送给RecordAccumulator，Sender线程不断从RecordAccumulator中拉取消息发送到Kafka broker。
 
 ![img](../../_images/message-queue/Kafka/kafka-producer-thread.png)
 
@@ -813,7 +811,7 @@ while (true) {
 
 ### 6.1 拦截器原理
 
-​	Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定制化控制逻辑。 	对于 producer 而言， interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会 对消息做一些定制化需求，比如**修改消息**等。同时， producer 允许用户指定多个 interceptor 按序作用于同一条消息从而形成一个拦截链(interceptor chain)。 Intercetpor 的实现接口是 **org.apache.kafka.clients.producer.ProducerInterceptor**，其定义的方法包括： 
+Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定制化控制逻辑。 	对于 producer 而言， interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会 对消息做一些定制化需求，比如**修改消息**等。同时， producer 允许用户指定多个 interceptor 按序作用于同一条消息从而形成一个拦截链(interceptor chain)。 Intercetpor 的实现接口是 **org.apache.kafka.clients.producer.ProducerInterceptor**，其定义的方法包括： 
 
 1. configure(configs) ：获取配置信息和初始化数据时调用。 
 

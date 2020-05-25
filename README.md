@@ -152,6 +152,7 @@
 | Spring  | 「 直击面试」—— Spring高频面试题                             |
 |  网络   | [「 直击面试」—— 搞定计算机网络](/docs/network/Network-FAQ.md) |
 |  基础   | [「 直击面试」—— 搞定 Java 集合](/docs/java/Collections/Collections-FAQ.md) |
+|  MySQL  | [「 直击面试」—— MySQL三文字总结+面试100问](https://mp.weixin.qq.com/s/MCFHNOQnTtJ6MGVjM3DP4A) |
 
 
 
