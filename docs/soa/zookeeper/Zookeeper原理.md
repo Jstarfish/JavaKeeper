@@ -327,6 +327,84 @@ Zookeeper 采用 ACL（Access Control Lists）策略来进行权限控制，类�
 
 
 
+## 3. Zookeeper内部原理
+
+### 3.1 选举机制
+
+- 半数机制：集群中半数以上机器存活，集群可用。所以 Zookeeper 适合安装奇数台服务器。
+
+- Zookeeper 虽然在配置文件中并没有指定 Master 和 Slave。但是，Zookeeper 工作时，是有一个节点为Leader，其他均为 Follower，Leader 是通过内部的选举机制临时产生的。
+
+- 以一个简单的例子来说明整个选举的过程。
+
+  假设有五台服务器组成的 Zookeeper 集群，它们的 id从1-5，同时它们都是最新启动的，也就是没有历史数据，在存放数据量这一点上，都是一样的。假设这些服务器依序启动，来看看会发生什么，如下图所示。
+
+![zk-vote](https://tva1.sinaimg.cn/large/007S8ZIlly1ged7gzchv0j31j30u0dwy.jpg)
+
+1. 服务器1启动，此时只有它一台服务器启动了，它发出去的报文没有任何响应，所以它的选举状态一直是LOOKING 状态。
+2. 服务器2启动，它与最开始启动的服务器1进行通信，互相交换自己的选举结果，由于两者都没有历史数据，所以 id 值较大的服务器2胜出，但是由于没有达到超过半数以上的服务器都同意选举它(这个例子中的半数以上是3)，所以服务器1、2还是继续保持 LOOKING 状态。
+3. 服务器3启动，根据前面的理论分析，服务器3成为服务器1、2、3中的老大，而与上面不同的是，此时有三台服务器选举了它，所以它成为了这次选举的Leader。
+4. 服务器4启动，根据前面的分析，理论上服务器4应该是服务器1、2、3、4中最大的，但是由于前面已经有半数以上的服务器选举了服务器3，所以它只能接受当小弟的命了。
+5. 服务器5启动，同4一样当小弟。
+
+### 3.2 节点类型
+
+Zookeeper 的视图结构和标准的 Unix 文件系统非常类似，但没有引入传统文件系统的目录和文件等概念，而是使用"数据节点"概念 ZNode。Znode 是Zookeeper 中数据的最小单元，每个 ZNode 上都可以保存数据，同时还可以挂载子节点，因此构成了一个层次化的命名空间，我们称为树。
+
+每个节点都是有生命周期的，生命周期的长短取决于数据节点的节点类型。节点类型可分为**持久节点**、**临时节点**和**顺序节点**三大类。
+
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds0gjk436j30ca071js2.jpg)
+
+### 3.3 Stat 结构体
+
+ Znodes 维护一个 stat 结构，其中包含数据更改、acl更改的版本号、时间戳等。 
+
+| 状态属性       | 说明                                                         |
+| -------------- | ------------------------------------------------------------ |
+| czxid          | 创建节点的事务zxid。 每次修改ZooKeeper状态都会收到一个zxid形式的时间戳，也就是ZooKeeper事务ID。事务ID是ZooKeeper中所有修改总的次序。每个修改都有唯一的zxid，如果zxid1小于zxid2，那么zxid1在zxid2之前发生 |
+| ctime          | znode被创建的毫秒数(从1970年开始)                            |
+| mzxid          | znode最后更新的事务zxid                                      |
+| mtime          | znode最后修改的毫秒数(从1970年开始)                          |
+| pzxid          | znode最后更新的子节点zxid                                    |
+| version        | 数据节点版本号                                               |
+| cversion       | 子节点版本号，znode子节点修改次数                            |
+| aversion       | znode访问控制列表的变化号                                    |
+| ephemeralOwner | 如果是临时节点，这个是znode拥有者的session id。如果不是临时节点则是0 |
+| dataLength     | znode的数据长度                                              |
+| numChildren    | znode子节点数量                                              |
+
+### 3.4 Watcher 监听器原理
+
+在 Zookeeper 中，引入了 Watcher 机制来实现分布式的通知功能。
+
+监听原理详解：
+
+1. 首先客户端要有一个主线程
+2. 在主线程中创建 Zookeeper 客户端，这时就会创建两个线程，一个负责网络连接通信（connet），一个负责监听（listener）
+3. 通过 connect 线程将注册的监听事件发送给 Zookeeper
+4. 在 Zookeeper 的注册监听器列表中将注册的监听事件添加到列表中。
+5. Zookeeper 监听到有数据或路径变化，就会将这个消息发送给 listener 线程
+6. listener 线程内部调用了 process() 方法
+
+常见的监听
+
+1. 监听节点数据的变化： get path [watch]
+2.  监听子节点增减的变化： ls path [watch]
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gegg92svv6j314709dq3q.jpg)
+
+
+
+### 3.5 写数据流程
+
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gds0gpjvwkj317h0l0764.jpg)
+
+
+
+------
+
+
+
 ## 参考：
 
 《从Paxos到ZooKeeper 分布式一致性原理与实践》
