@@ -55,6 +55,17 @@
 
 
 
+- Linux的fork指令对数据的拷贝是马上就拷贝的吗？
+- linux看网络状况用什么，看日志用什么？
+
+
+
+
+
+
+
+
+
 -   [InterviewFAQ-Linux](#interviewfaq-linux)
     -   [Linux](#linux)
         -   [常用命令](#常用命令)

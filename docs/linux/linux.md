@@ -4,11 +4,11 @@
 
 > Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
-Linux是一个基于POSIX和Unix的多用户、多任务、支持多线程和多CPU的性能稳定的操作系统，可免费使用并自由传播。 
+Linux 是一个基于 POSIX 和 Unix 的多用户、多任务、支持多线程和多 CPU 的性能稳定的操作系统，可免费使用并自由传播。 
 
-Linux是众多操作系统之一 , 目前流行的服务器和 PC 端操作系统有 Linux、Windows、UNIX 等 
+Linux 是众多操作系统之一 , 目前流行的服务器和 PC 端操作系统有 Linux、Windows、UNIX 等 。
 
-Linux**的创始人** Linus Torvalds  林纳斯 (同时也是git的开发者)
+Linux **的创始人** Linus Torvalds  林纳斯 (同时也是git的开发者)，真正的大佬。
 
 ![linux-creater.png](https://i.loli.net/2019/11/25/pUP5s7orvtfH6A8.png)
 
@@ -26,7 +26,7 @@ Ubuntu(乌班图)、RedHat(红帽)、**CentOS**、Debain[蝶变]、Fedora、SuSE
 
 
 
- **[理查德·斯托曼](https://zh.wikipedia.org/wiki/理查德·斯托曼)发起的GNU计划**
+ **理查德·斯托曼发起的GNU计划**
 
 - 在自由的时代用户应该免费享有对软件源代码阅读、修改的权利。
 
@@ -35,7 +35,7 @@ Ubuntu(乌班图)、RedHat(红帽)、**CentOS**、Debain[蝶变]、Fedora、SuSE
 
 ![gnu.png](https://i.loli.net/2019/11/25/DIBWoTAfyFLJZ8q.png)
 
-**Linux和Unix的关系**
+**Linux 和 Unix 的关系**
 
 ![linux-unix.png](https://i.loli.net/2019/11/25/BXmIaiGeqkgj4Jt.png)
 
@@ -43,17 +43,9 @@ Ubuntu(乌班图)、RedHat(红帽)、**CentOS**、Debain[蝶变]、Fedora、SuSE
 
 
 
-**Refrences:**
-
- [w3cschool](https://www.w3cschool.cn/linux/). 
-
- [鸟哥的Linux私房菜]( http://shouce.jb51.net/vbird-linux-basic-4/). 
-
-
-
 ## 1.Linux的文件权限
 
-在linux中的每个用户必须属于一个组，不能独立于组外。在linux中每个文件有所有者、所在组、其它组的概念
+在 linux 中的每个用户必须属于一个组，不能独立于组外。在 linux 中每个文件有**所有者**、**所在组**、**其它组**的概念
 
 **ls -al（l）**:
 
@@ -61,7 +53,7 @@ ls -l(别名ll 就可以查看)
 
 ![linux-ls.png](https://i.loli.net/2019/11/19/FajuBx9hKcLfEiv.png)
 
-从左到又每一列的信息依次为 **权限、 连接数、 所有者 、 用户组 、 文件容量 、 修改日期 、 文件名**
+从左到右每一列的信息依次为 **权限、 连接数、 所有者 、 用户组 、 文件容量 、 修改日期 、 文件名**
 
 第一列的十位字母代表的是文件的类型和权限，第一个字符代表这个文件是“目录、文件或链接文件等”含义：
 
@@ -78,14 +70,13 @@ ls -l(别名ll 就可以查看)
 
 后边9个字符，每3个字符为一组，“rwx”（可读、可写、可执行eXecute）这三个参数的组合，（rwx3者的顺序不能改变，换句话说，第一个要么是r,要么啥都没有，不能是w或者x），三个组合分别代表“文件所有者的权限”、“同用户组的权限”、“其他非本用户组的权限”。
 
-![linux-permission.png](https://i.loli.net/2019/11/19/1rkOtD9GxQ7BAZ6.png)
+![linux-permission](https://i.loli.net/2019/11/19/1rkOtD9GxQ7BAZ6.png)
 
 **权限的重要性：**
 
 - 系统保护的功能；
 
 - 团队开发软件或数据共享的功能；
-
 
 **改变文件属性和权限：**
 
@@ -165,7 +156,7 @@ ls -l(别名ll 就可以查看)
 
 **能不能进入某一目录，只与该目录的x 权限有关**。
 
- Linux的单一文件或者目录的最大容许文件名为255个字符,包含完整路径名记（/）的完整文件名为4096个字符。
+ Linux 的单一文件或者目录的最大容许文件名为255个字符,包含完整路径名记（/）的完整文件名为4096个字符。
 
 ------
 
@@ -173,7 +164,7 @@ ls -l(别名ll 就可以查看)
 
 ## 2.Linux系统目录结构
 
-<font color=blue>linux的文件系统是采用**级层式**的树状目录结构，在此结构中的最上层是根目录“/”，然后在此目录下再创建其他的目录。在Linux世界里，一切皆文件</font>
+<mark>linux的文件系统是采用**级层式**的树状目录结构，在此结构中的最上层是根目录“/”，然后在此目录下再创建其他的目录。在Linux世界里，一切皆文件</mark>
 
 【**Linux系统目录结构**】
 
@@ -605,7 +596,7 @@ vim其实可以视为vi的高级版本。
 
 ## 5.linux磁盘管理
 
-Linux磁盘管理好坏管理直接关系到整个系统的性能问题。
+Linux 磁盘管理好坏直接关系到整个系统的性能问题。
 
 Linux磁盘管理常用三个命令为df、du和fdisk。
 
@@ -784,7 +775,7 @@ Linux 的磁盘挂载使用 mount 命令，卸载使用 umount 命令。
 
 ## 6.文件与文件系统的压缩与打包
 
-在linux环境中，压缩文件的扩展名大多是.tar, .tar.gz, .tgz, .gz, .Z, .bz2;
+在 linux 环境中，压缩文件的扩展名大多是.tar, .tar.gz, .tgz, .gz, .Z, .bz2;
 
 Linux支持的压缩命令很多，且不同的命令所用的压缩技术不同，彼此可能无法相互压缩/解压文件。
 
@@ -1856,7 +1847,11 @@ service crond restart #重新启动crond服务
 
 
 
+## Refrences:
 
+ [w3cschool](https://www.w3cschool.cn/linux/). 
+
+ [鸟哥的Linux私房菜]( http://shouce.jb51.net/vbird-linux-basic-4/). 
 
 
 
