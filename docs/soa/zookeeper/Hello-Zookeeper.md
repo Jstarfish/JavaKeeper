@@ -125,7 +125,7 @@ Zookeeper Server三种角色：Leader，Follower，Observer
    - 可将节点信息写入 ZooKeeper 上的一个 Znode
    - 监听这个 Znode 可获取它的实时状态变化
 
-![](/Users/starfish/Pictures/zk-cluster.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gf8h91o6t6j31c70u014z.jpg)
 
 ##### Master选举
 
