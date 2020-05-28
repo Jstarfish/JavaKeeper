@@ -11,7 +11,6 @@
 </p>
 
 <h3 align="center">记录并分享每一次成长</h3>
-
 ------
 
 
@@ -169,5 +168,5 @@
 
 ## 最后欣赏《毕加索 亚威农少女》，求个关注，不会让你失望的
 
-![](https://imgkr.cn-bj.ufileos.com/2206fe61-3514-4470-ae0d-458b1a4d1375.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gf8izv6q5jj30ft0ft4ir.jpg)
 
