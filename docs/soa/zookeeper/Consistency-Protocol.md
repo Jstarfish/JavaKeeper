@@ -172,7 +172,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 1. Leader从客户端收到一个事务请求（如果是集群中其他机器接收到客户端的事务请求，会直接转发给 Leader 服务器）
 2. Leader 服务器生成一个对应的事务 Proposal，并为这个事务生成一个全局递增的唯一的ZXID（通过其 ZXID 来进行排序保证顺序性）
 3. Leader 将这个事务发送给所有的 Follows 节点
-4. Follower 节点将收到的事务请求加入到历史队列(Leader 会为每个 Follower 分配一个单独的队列先进先出，顺序保证消息的因果关系)中，并发送 ack 给 Leader
+4. Follower 节点将收到的事务请求加入到历史队列（Leader 会为每个 Follower 分配一个单独的队列先进先出，顺序保证消息的因果关系）中，并发送 ack 给 Leader
 5. 当 Leader 收到超过半数 Follower 的 ack 消息，Leader会广播一个 commit 消息
 6. 当 Follower 收到 commit 请求时，会判断该事务的 ZXID 是不是比历史队列中的任何事务的 ZXID 都小，如果是则提交，如果不是则等待比它更小的事务的 commit
 
