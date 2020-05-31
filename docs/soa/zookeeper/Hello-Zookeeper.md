@@ -1,4 +1,4 @@
-不懂 ZooKeeper？没关系，这一篇给你讲的清清楚楚
+不懂 ZooKeeper？没关系，这一篇给你讲的明明白白
 
 > ZooKeeper虽然在项目里有用过，奈何我要当大牛，所以要深入了解下，要把Zookeeper也放到知识库里，看了好多博客，感觉大部分都是基于《从Paxos到ZooKeeper 分布式一致性原理与实践》写的，所以自己读了一遍，加上项目中的使用，做个整理。加油，奥利给！
 
@@ -39,6 +39,8 @@ ZooKeeper 的目标是将这些不同服务的精华提炼为一个非常简单�
 ### 1.3 ZooKeeper工作机制
 
 ![](https://imgkr.cn-bj.ufileos.com/f148f7ea-a2a5-42f4-9382-74fdb8b86e0c.png)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfc191t6cvj31e50u0awk.jpg)
 
 ### 1.4 特性
 
@@ -136,9 +138,7 @@ Zookeeper 数据模型的结构与 Unix 文件系统的结构相似，整体上�
 
 分布式系统中，负载均衡是一种很普遍的技术，为了保证高可用性，通常同一个应用或同一个服务的提供方都会部署多份，达到对等服务。可以是硬件的负载均衡，如 F5，也可以是软件的负载，我们熟知的 Nginx，或者这里介绍的 Zookeeper。
 
-[todo 机器画的一样了]
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ged05xf1krj31gw0u0tm4.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfbe1t699oj31gw0u0nat.jpg)
 
 #### 分布式协调/通知
 
@@ -339,7 +339,7 @@ Zookeeper 中的配置文件 `zoo.cfg` 中参数含义解读如下：
 
 
 
-### 2.4 概念
+## 3. 你要知道的概念
 
 - ZooKeeper 本身就是一个分布式程序（只要半数以上节点存活，ZooKeeper 就能正常服务）。
 - 为了保证高可用，最好是以集群形态来部署 ZooKeeper，这样只要集群中大部分机器是可用的（能够容忍一定的机器故障），那么 ZooKeeper 本身仍然是可用的。
@@ -353,19 +353,19 @@ Zookeeper 中的配置文件 `zoo.cfg` 中参数含义解读如下：
 
 这里引入一个简单的例子，逐个介绍一些 ZK 中的概念。
 
-在分布式系统中经常会遇到这种情况，多个应用读取同一个配置。例如：A，B 两个应用都会读取配置 C 中的内容，一旦 C 中的内容出现变化，就会通知 A 和 B。
+在分布式系统中经常会遇到这种情况，多个应用读取同一个配置。例如：Client1，Client2 两个应用都会读取配置 B 中的内容，一旦 B 中的内容出现变化，就会通知 Client1 和 Client2。
 
-一般的做法是在 A，B 中按照时钟频率询问 C 的变化，或者使用观察者模式来监听 C 的变化，发现变化以后再更新 A 和 B。那么 ZooKeeper 如何协调这种场景？
+一般的做法是在 Client1，Client2 中按照时钟频率询问 B 的变化，或者使用观察者模式来监听 B 的变化，发现变化以后再更新两个客户端。那么 ZooKeeper 如何协调这种场景？
 
-这两个客户端连接到 ZooKeeper 的服务器，并获取其中存放的 C。保存 C 值的地方在 ZooKeeper 服务端中称为 ZNode。
+这两个客户端连接到 ZooKeeper 的服务器，并获取其中存放的 B。保存 B 值的地方在 ZooKeeper 服务端中就称为 **ZNode**。
 
-![](https://imgkr.cn-bj.ufileos.com/ac0d8d5b-faa2-4e34-9f9a-2dada6ced1d4.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfbvc9a07cj31c70u0tif.jpg)
 
 
 
 #### 2.4.2 数据节点（Znode）
 
-在谈到分布式的时候，我们通常说的“节点"是指组成集群的每一台机器。然而，在 Zookeeper 中，“节点"分为两类，第一类同样是指构成集群的机器，我们称之为「**机器节点**」；第二类则是指数据模型中的数据单元，我们称之为「**数据节点**」一一**ZNode**。上图中的 C 就是一个数据结点。
+在谈到分布式的时候，我们通常说的“节点"是指组成集群的每一台机器。然而，在 Zookeeper 中，“节点"分为两类，第一类同样是指构成集群的机器，我们称之为「**机器节点**」；第二类则是指数据模型中的数据单元，我们称之为「**数据节点**」一一**ZNode**。上图中的 A、B 就是一个数据结点。
 
 Zookeeper 将所有数据存储在内存中，数据模型是一棵树（Znode Tree)，由斜杠（/）进行分割的路径，就是一个 Znode，例如 `/path/C`。每个 Znode 上都会保存自己的数据内容，同时还会保存一系列属性信息。
 
@@ -380,15 +380,15 @@ Zookeeper 将所有数据存储在内存中，数据模型是一棵树（Znode T
 
 #### 2.4.3 事件监听器（Watcher）
 
-上面说了 ZooKeeper 用来存放数据的 ZNode，并且把 C 的值存储在里面。如果 C 被更新了，两个客户端（ClientA、ClientB）如何获得通知呢？
+上面说了 ZooKeeper 用来存放数据的 ZNode，并且把 B 的值存储在里面。如果 B 被更新了，两个客户端（Client1、Client2）如何获得通知呢？
 
-Zookeeper 允许用户在指定节点上注册一些 Watcher，当 znode 发生变化时，将触发并删除一个 watch。当 watch 被触发时客户端会收到一个数据包，指示 znode 已经被修改。如果客户端和 ZooKeeper 服务器之间的连接中断，客户端将收到本地通知。**该机制是 Zookeeper实现分布式协调服务的重要特性**。
+Zookeeper 允许用户在指定节点上注册一些 Watcher，当 Znode 发生变化时，将触发并删除一个 watch。当 watch 被触发时客户端会收到一个数据包，指示 znode 已经被修改。如果客户端和 ZooKeeper 服务器之间的连接中断，客户端将收到本地通知。**该机制是 Zookeeper实现分布式协调服务的重要特性**。
 
 **3.6.0中的新增功能：**客户端还可以在 znode 上设置永久性的递归监视，这些监视在触发时不会删除，并且会以递归方式触发已注册 znode 以及所有子 znode 的更改。
 
 ZooKeeper 客户端（Client）会在指定的节点（/RootNote/C）上注册一个 Watcher，ZNode 上的 C 被更新的时候，服务端就会通知 ClientA 和 ClientB。
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/MOwlO0INfQq6iayMT65eanRiafdNrRkYSUSU1g1miaiaq2yCplrMrbI4jp9No6s6ribft2rP2MxKscS1joc5uF2KKEA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfbzxka44aj31c70u04am.jpg)
 
 #### 2.4.4 版本
 
@@ -457,8 +457,6 @@ Zookeeper 采用 ACL（Access Control Lists）策略来进行权限控制，类�
 - Follower： 为客户端提供读服务，如果是写服务则转发给 Leader。在选举过程中参与投票 
 - Observer： 为客户端提供读服务器，如果是写服务则转发给 Leader。不参与选举过程中的投票，也不参与“过半写成功”策略。在不影响写性能的情况下提升集群的读性能。此角色是在 zookeeper3.3 系列新增的角色。
 
-![img](https://pic3.zhimg.com/80/v2-383f57600ffcf5a0c6f592ca5435bf1a_720w.jpg)
-
 ##### server 状态
 
 - LOOKING：寻找Leader状态
@@ -469,8 +467,6 @@ Zookeeper 采用 ACL（Access Control Lists）策略来进行权限控制，类�
 
 
 ### 选举机制
-
-【TODO 结合上图】
 
 ![zk-vote](https://tva1.sinaimg.cn/large/007S8ZIlly1ged7gzchv0j31j30u0dwy.jpg)
 
@@ -502,7 +498,7 @@ Zookeeper 所有的读操作——**getData()**，**getChildren()**， 和 **exi
 
 Zookeeper 中的监视是轻量级的，因此容易设置、维护和分发。当客户端与 Zookeeper 服务器端失去联系时，客户端并不会收到监视事件的通知，只有当客户端重新连接后，若在必要的情况下，以前注册的监视会重新被注册并触发，对于开发人员来说这通常是透明的。只有一种情况会导致监视事件的丢失，即：通过 `exists()` 设置了某个 znode 节点的监视，但是如果某个客户端在此 znode 节点被创建和删除的时间间隔内与 zookeeper 服务器失去了联系，该客户端即使稍后重新连接 zookeepe r服务器后也得不到事件通知。
 
-![img](https://www.yht7.com/upload/image/20200225/up-091052521680481615ca62218a4deacfa1f.JPEG)
+![img:yht7](https://www.yht7.com/upload/image/20200225/up-091052521680481615ca62218a4deacfa1f.JPEG)
 
 
 
