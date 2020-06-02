@@ -12,7 +12,6 @@
 
 <h3 align="center">记录并分享每一次成长</h3>
 
-
 ------
 
 
@@ -33,8 +32,8 @@
 
 |                           Project                            | Version | Article                                                      |
 | :----------------------------------------------------------: | :-----: | :----------------------------------------------------------- |
-| ![](https://icongram.jgog.in/devicon/mysql-original.svg?size=20) **MySQL** | 5.7.25  | [1、MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2、MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3、索引](docs/mysql/MySQL-Index.md)<br/>[4、事务](docs/mysql/MySQL-Transaction.md)<br/>5、表设计<br/>[6、性能优化](docs/mysql/MySQL-Optimization.md)<br/>7、锁机制<br/>8、分区分表分库<br/>9 、主从复制<br/> |
-| ![](https://icongram.jgog.in/devicon/redis-original.svg?size=20)   **Redis** |  5.0.6  | [1、NoSQL概述](docs/data-store/Redis/1.Nosql-Overview.md)<br/>[2、Redis概述](docs/data-store/Redis/2.readRedis.md)<br/>[3、Redis数据类型](docs/data-store/Redis/3.Redis-Datatype.md)<br/>[4、Redis配置](docs/data-store/Redis/4.Redis-Conf.md)<br/>[5、深入理解 Redis 的持久化](docs/data-store/Redis/5.Redis-Persistence.md)<br/> |
+| ![](https://icongr.am/devicon//mysql-original.svg?size=20) **MySQL** | 5.7.25  | [1、MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2、MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3、索引](docs/mysql/MySQL-Index.md)<br/>[4、事务](docs/mysql/MySQL-Transaction.md)<br/>5、表设计<br/>[6、性能优化](docs/mysql/MySQL-Optimization.md)<br/>7、锁机制<br/>8、分区分表分库<br/>9 、主从复制<br/> |
+| ![](https://icongr.am/devicon//redis-original.svg?size=20)   **Redis** |  5.0.6  | [1、NoSQL概述](docs/data-store/Redis/1.Nosql-Overview.md)<br/>[2、Redis概述](docs/data-store/Redis/2.readRedis.md)<br/>[3、Redis数据类型](docs/data-store/Redis/3.Redis-Datatype.md)<br/>[4、Redis配置](docs/data-store/Redis/4.Redis-Conf.md)<br/>[5、深入理解 Redis 的持久化](docs/data-store/Redis/5.Redis-Persistence.md)<br/> |
 |                      **Elasticsearch**                       |         |                                                              |
 |                        **Amazon S3**                         |         |                                                              |
 |                           MongoDB                            |         |                                                              |

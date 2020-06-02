@@ -1,10 +1,10 @@
 - **Java基础**
 - **数据存储和缓存**
-- [![MySQL](https://icongram.jgog.in/devicon/mysql-original.svg?&size=16)MySQL](mysql/readMySQL.md)
-- [![Redis](https://icongram.jgog.in/devicon/redis-original.svg?&size=16)Redis](redis/2.readRedis.md)
-- [![mongoDB](https://icongram.jgog.in/devicon/mongodb-original.svg?&size=16)mongoDB]( https://redis.io/ )
-- [![ **Elasticsearch** ](https://icongram.jgog.in/simple/elasticsearch.svg?&size=16) Elasticsearch]( https://redis.io/ )
-- [![S3](https://icongram.jgog.in/devicon/amazonwebservices-original.svg?&size=16)S3]( https://aws.amazon.com/cn/s3/ )
+- [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=16)MySQL](mysql/readMySQL.md)
+- [![Redis](https://icongr.am/devicon/redis-original.svg?&size=16)Redis](redis/2.readRedis.md)
+- [![mongoDB](https://icongr.am/devicon/mongodb-original.svg?&size=16)mongoDB]( https://redis.io/ )
+- [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=16) Elasticsearch]( https://redis.io/ )
+- [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=16)S3]( https://aws.amazon.com/cn/s3/ )
 - [FastDFS(OSS)]( https://github.com/happyfish100/fastdfs )
 - **单体架构**
 - [缕清各种Java Logging](logging/Java-Logging.md)
@@ -16,11 +16,11 @@
 - **RPC**
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
-- [![message](https://icongram.jgog.in/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](https://icongram.jgog.in/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
+- [![message](https://icongr.am/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
+- [![Nginx](https://icongr.am/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
 - **工程化与工具**
-- [![Maven](https://icongram.jgog.in/fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
-- [![Git](https://icongram.jgog.in/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
+- [![Maven](https://icongr.am/devicon//fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
+- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
 - [Sonar](https://www.sonarqube.org/)
 - **大数据**
 - [Hello 大数据](big-data/Hello-BigData.md)
@@ -29,10 +29,10 @@
 - web调优
 - DB调优
 - **其他**
-- [![Linux](https://icongram.jgog.in/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
+- [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - SHELL
 - TCP与HTTP
-- [![]( https://icongram.jgog.in/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
+- [![](https://icongr.am/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
-- [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
+- [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)

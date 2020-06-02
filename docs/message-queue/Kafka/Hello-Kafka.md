@@ -31,30 +31,30 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
   消息生产者生产消息发送到 Queue 中，然后消息消费者从 Queue 中取出并且消费消息。 消息被消费以后，queue 中不再有存储，所以消息消费者不可能消费到已经被消费的消息。 Queue 支持存在多个消费者，但是对一个消息而言，只会有一个消费者可以消费。
 
-  ![image-20200601143300835](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200601143300835.png)
+  ![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-202328@2x.png)
 
 - **发布/订阅模式**（一对多，数据生产后，推送给所有订阅者） 
 
   消息生产者（发布）将消息发布到 topic 中，同时有多个消息消费者（订阅）消费该消 息。和点对点方式不同，发布到 topic 的消息会被所有订阅者消费。
 
-  ![image-20200601143344370](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200601143344370.png)
+  ![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-203201@2x.png)
 
 
 
 ### 1.3 Kafka 基础架构图
 
-![image-20200601144034980](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200601144034980.png)
+![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-210522@2x.png)
 
 - Producer ：消息生产者，就是向 kafka broker 发消息的客户端；
 - Consumer ：消息消费者，向 kafka broker 取消息的客户端；
 - Consumer Group （CG）：消费者组，由多个 consumer 组成。**消费者组内每个消费者负责消费不同分区的数据，一个分区只能由一个组内消费者消费；消费者组之间互不影响**。所有的消费者都属于某个消费者组，即消费者组是逻辑上的一个订阅者。 
 - Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker 可以容纳多个 topic。 
-- Topic ：可以理解为一个队列，生产者和消费者面向的都是一个 topic； 
+- Topic ：可以理解为一个队列，Kafka 的消息通过 Topics(主题) 进行分类，生产者和消费者面向的都是一个 topic； 
 - Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上， 一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列； partition 中的每条消息 都会被分配一个有序的 id（ offset）。 kafka 只保证按一个 partition 中的顺序将消息发给 consumer，不保证一个 topic 的整体（多个 partition 间）的顺序； 
 - Replica：副本，为保证集群中的某个节点发生故障时，该节点上的 partition 数据不丢失，且 kafka 仍然能够继续工作，kafka 提供了副本机制，一个 topic 的每个分区都有若干个副本， 一个 leader 和若干个 follower。 
 - leader：每个分区多个副本的“主”，生产者发送数据的对象，以及消费者消费数据的对象都是 leader。 
 - follower：每个分区多个副本中的“从”，实时从 leader 中同步数据，保持和 leader 数据的同步。leader 发生故障时，某个 follower 会成为新的 follower。
-- Offset： kafka 的存储文件都是按照 offset.kafka 来命名，用 offset 做名字的好处是方便查找。例如你想找位于 2049 的位置，只要找到 2048.kafka 的文件即可。当然 the first offset 就 是 00000000000.kafka。
+- Offset： kafka 的存储文件都是按照 offset.kafka 来命名，用 offset 做名字的好处是方便查找。例如你想找位于 2049 的位置，只要找到 2048.kafka 的文件即可。当然 the first offset 就是 00000000000.kafka。
 
 ------
 
@@ -68,7 +68,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
 [中文版入门指南](<http://ifeve.com/kafka-1/> )
 
-### 2.2 概念(官方介绍翻译)
+### 2.2 基本概念(官方介绍翻译)
 
 Kafka是一个分布式的流处理平台。是支持分区的（partition）、多副本的（replica），基于 ZooKeeper 协调的分布式消息系统，它的最大的特性就是可以实时的处理大量数据以满足各种需求场景：比如基于 hadoop 的批处理系统、低延迟的实时系统、storm/Spark 流式处理引擎，web/nginx 日志、访问日志，消息服务等等 
 
@@ -223,17 +223,62 @@ Kafka 可以为分布式系统提供一种外部提交日志(commit-log)服务�
 
 ![img](../../_images/message-queue/Kafka/kafka-workflow.jpg)
 
+#### topic构成
+
 **Kafka 中消息是以 topic 进行分类的**，生产者生产消息，消费者消费消息，都是面向 topic 的。
 
-topic 是逻辑上的概念，而 patition 是物理上的概念，每个 patition 对应一个 log 文件，而 log 文件中存储的就是producer 生产的数据，patition 生产的数据会被不断的添加到 log 文件的末端，且每条数据都有自己的 offset。消费组中的每个消费者，都是实时记录自己消费到哪个offset，以便出错恢复，从上次的位置继续消费。
+**topic 是逻辑上的概念，而 patition 是物理上的概念**，每个 patition 对应一个 log 文件，而 log 文件中存储的就是producer 生产的数据，patition 生产的数据会被不断的添加到 log 文件的末端，且每条数据都有自己的 offset。消费组中的每个消费者，都是实时记录自己消费到哪个 offset，以便出错恢复，从上次的位置继续消费。
 
 ![img](../../_images/message-queue/Kafka/kafka-partition.jpg)
 
 
 
+#### 消息存储原理
+
 由于生产者生产的消息会不断追加到 log 文件末尾，为防止 log 文件过大导致数据定位效率低下，Kafka 采取了**分片**和**索引**机制，将每个 partition 分为多个 segment。每个segment对应两个文件——`.index文件`和 `.log文件`。这些文件位于一个文件夹下，该文件夹的命名规则为：topic名称+分区序号。例如，first 这个 topic 有三个分区，则其对应的文件夹为 first-0，first-1，first-2。
 
-```shell
+![QQ20200330-183839@2x](https://mrbird.cc/img/QQ20200330-183839@2x.png)
+
+这些文件的含义如下：
+
+| 类别                    | 作用                                                         |
+| :---------------------- | :----------------------------------------------------------- |
+| .index                  | 偏移量索引文件，存储数据对应的偏移量                         |
+| .timestamp              | 时间戳索引文件                                               |
+| .log                    | 日志文件，存储生产者生产的数据                               |
+| .snaphot                | 快照文件                                                     |
+|                         |                                                              |
+| Leader-epoch-checkpoint | 保存了每一任leader开始写入消息时的offset，会定时更新。 follower被选为leader时会根据这个确定哪些消息可用 |
+
+index 和 log 文件以当前 segment 的第一条消息的 offset 命名。偏移量offset是一个64位的长整形数，固定是20位数字，长度未达到，用0进行填补，索引文件和日志文件都由此作为文件名命名规则。所以从上图可以看出，我们的偏移量是从0开始的，`.index`和`.log`文件名称都为 `00000000000000000000`。下图为 index 文件和 log 文件的结构示意图。 
+
+![img](../../_images/message-queue/Kafka/kafka-segement.jpg)
+
+`.index文件` 存储大量的索引信息，`.log文件` 存储大量的数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址。
+
+
+
+上节中，我们通过生产者发送了hello和world两个数据，所以我们可以查看下.log文件下是否有这两条数据：
+
+![QQ20200331-151427@2x](https://mrbird.cc/img/QQ20200331-151427@2x.png)
+
+内容存在一些”乱码“，因为数据是经过序列化压缩的。
+
+那么数据文件.log大小有限制吗，能保存多久时间？这些我们都可以通过Kafka目录下conf/server.properties配置文件修改：
+
+```
+# log文件存储时间，单位为小时，这里设置为1周
+log.retention.hours=168
+
+# log文件大小的最大值，这里为1g，超过这个值，则会创建新的segment（也就是新的.index和.log文件）
+log.segment.bytes=1073741824
+```
+
+
+
+比如，当生产者生产数据量较多，一个segment存储不下触发分片时，在日志topic目录下你会看到类似如下所示的文件：
+
+```
 00000000000000000000.index
 00000000000000000000.log
 00000000000000170410.index
@@ -242,11 +287,13 @@ topic 是逻辑上的概念，而 patition 是物理上的概念，每个 patiti
 00000000000000239430.log
 ```
 
-index 和 log 文件以当前 segment 的第一条消息的 offset 命名。下图为 index 文件和 log 文件的结构示意图。 
 
-![img](../../_images/message-queue/Kafka/kafka-segement.jpg)
 
-`.index文件` 存储大量的索引信息，`.log文件` 存储大量的数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址。
+下图展示了Kafka查找数据的过程：
+
+![QQ20200331-155820@2x](https://mrbird.cc/img/QQ20200331-155820@2x.png)
+
+比如现在要查找偏移量offset为3的消息，根据.index文件命名我们可以知道，offset为3的索引应该从00000000000000000000.index里查找。根据上图所示，其对应的索引地址为756~911，所以Kafka将读取00000000000000000000.log 756~911区间的数据。
 
 ### 3.2 Kafka 生产过程    
 
@@ -282,7 +329,14 @@ producer 采用推（push） 模式将消息发布到 broker，每条消息都�
 
 我们需要将 producer 发送的数据封装成一个 ProducerRecord 对象。
 
-![image-20200601171854214](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200601171854214.png)
+```java
+public ProducerRecord (String topic, Integer partition, Long timestamp, K key, V value, Iterable<Header> headers)
+public ProducerRecord (String topic, Integer partition, Long timestamp, K key, V value)
+public ProducerRecord (String topic, Integer partition, K key, V value, Iterable<Header> headers)
+public ProducerRecord (String topic, Integer partition, K key, V value)
+public ProducerRecord (String topic, K key, V value)
+public ProducerRecord (String topic, V value)
+```
 
 1. 指明 partition 的情况下，直接将指明的值直接作为 partiton 值； 
 2. 没有指明 partition 值但有 key 的情况下，将 key 的 hash 值与 topic 的 partition 数进行取余得到 partition 值； 
@@ -329,32 +383,31 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
   0：producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟，broker 一接收到还没有写入磁盘就已经返回，当 broker 故障时有可能**丢失数据**；
 
-  1：producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟，broker 一接收到还没有写入磁盘就已经返回，当 broker 故障时有可能**丢失数据**（下图为acks=1数据丢失案例）；
+  1：producer 等待 broker 的 ack，partition 的 leader 落盘成功后返回 ack，如果在 follower 同步成功之前 leader 故障，那么将会**丢失数据**（下图为acks=1数据丢失案例）；
 
 ![img](../../_images/message-queue/Kafka/kafka-ack=1.png)
 
--1（all）：producer 等待 broker 的 ack，partition 的 leader 和 follower 全部落盘成功后才返回 ack。但是	如果在 follower 同步完成后，broker 发送 ack 之前，leader 发生故障，那么就会造成**数据重复**。（下图为acks=1数据重复案例）
+-1（all）：producer 等待 broker 的 ack，partition 的 leader 和 follower 全部落盘成功后才返回 ack。但是	如果在 follower 同步完成后，broker 发送 ack 之前，leader 发生故障，那么就会造成**数据重复**。（下图为acks=-1数据重复案例）
 
 ![img](../../_images/message-queue/Kafka/kafka-ack=-1.png)
 
 ##### d) 故障处理
 
-![img](../../_images/message-queue/Kafka/kafka-leo.png)
+由于我们并不能保证 Kafka 集群中每时每刻 follower 的长度都和 leader 一致（即数据同步是有时延的），那么当leader 挂掉选举某个 follower 为新的 leader 的时候（原先挂掉的 leader 恢复了成为了 follower），可能会出现leader 的数据比 follower 还少的情况。为了解决这种数据量不一致带来的混乱情况，Kafka 提出了以下概念：
 
+![QQ20200401-093957@2x](https://mrbird.cc/img/QQ20200401-093957@2x.png)
 
+- LEO（Log End Offset）：指的是每个副本最后一个offset；
+- HW（High Wather）：指的是消费者能见到的最大的 offset，ISR 队列中最小的 LEO。
 
-- **LEO: 指的是每个副本最大的offset;**
-- **HW：指的是消费者能见到的最大的offset，ISR队列中最小的LEO;**
+消费者和leader通信时，只能消费 HW 之前的数据，HW 之后的数据对消费者不可见。
 
-**followew故障**
+针对这个规则：
 
-follower 发生故障后会被临时踢出 ISR，待该 follower 恢复后，follower 会读取本地磁盘记录的上次的 HW，并将 log 文件高于 HW 的部分截取掉，从 HW 开始向 leader 进行同步。等该 followew 的 LEO 大于该 Partition 的HW，即 follower 追上 leader 之后，就可以重新加入 ISR 了。
+- **当follower发生故障时**：follower 发生故障后会被临时踢出 ISR，待该 follower 恢复后，follower 会读取本地磁盘记录的上次的 HW，并将 log 文件高于 HW 的部分截取掉，从 HW 开始向 leader 进行同步。等该 follower 的 LEO 大于等于该 Partition 的 HW，即 follower 追上 leader 之后，就可以重新加入 ISR 了。
+- **当leader发生故障时**：leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性，其余的 follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader 同步数据。
 
-**leader故障**
-
-leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性，其余的follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader 同步数据。
-
-注意：这**只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复**。
+所以数据一致性并不能保证数据不丢失或者不重复，这是由 ack 控制的。HW 规则只能保证副本之间的数据一致性！
 
 #### 3.2.6 Exactly Once语义
 
@@ -397,6 +450,10 @@ leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，�
 
 在这种情况下，消费者可以通过水平扩展的方式同时读取大量的消息。另外，如果一个消费者失败了，那么其他的 group 成员会自动负载均衡读取之前失败的消费者读取的分区。    
 
+消费者组最为重要的一个功能是实现广播与单播的功能。一个消费者组可以确保其所订阅的Topic的每个分区只能被从属于该消费者组中的唯一一个消费者所消费；如果不同的消费者组订阅了同一个Topic，那么这些消费者组之间是彼此独立的，不会受到相互的干扰。
+
+> 如果我们希望一条消思可以被多个消费者所消费，那么可以将这些消费者放到不同的消费者组中，这实际上就是广播的效果；如果希望一条消息只能被一个消费者所消费，那么可以将这些消费者放到同一个消费者组中，这实际上就是单播的效果。
+
 #### 3.4.2 消费方式
 
 **consumer 采用 pull（拉） 模式从 broker 中读取数据。** 
@@ -412,6 +469,40 @@ pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷�
 一个 consumer group 中有多个 consumer，一个 topic 有多个 partition，所以必然会涉及到 partition 的分配问题，即确定哪个 partition 由哪个 consumer 来消费。
 
 Kafka有两种分配策略，一是 RoundRobin，一是 Range。
+
+##### RoundRobin
+
+RoundRobin即轮询的意思，比如现在有一个三个消费者ConsumerA、ConsumerB和ConsumerC组成的消费者组，同时消费TopicA主题消息，TopicA分为7个分区，如果采用RoundRobin分配策略，过程如下所示：
+
+![QQ20200401-145222@2x](https://mrbird.cc/img/QQ20200401-145222@2x.png)
+
+这种轮询的方式应该很好理解。但如果消费者组消费多个主题的多个分区，会发生什么情况呢？比如现在有一个两个消费者ConsumerA和ConsumerB组成的消费者组，同时消费TopicA和TopicB主题消息，如果采用RoundRobin分配策略，过程如下所示：
+
+![QQ20200401-150317@2x](https://mrbird.cc/img/QQ20200401-150317@2x.png)
+
+> 注：TAP0表示TopicA Partition0分区数据，以此类推。
+
+这种情况下，采用RoundRobin算法分配，多个主题会被当做一个整体来看，这个整体包含了各自的Partition，比如在 Kafka-clients 依赖中，与之对应的对象为`TopicPartition`。接着将这些`TopicPartition`根据其哈希值进行排序，排序后采用轮询的方式分配给消费者。
+
+但这会带来一个问题：假如上图中的消费者组中，ConsumerA只订阅了TopicA主题，ConsumerB只订阅了TopicB主题，采用RoundRobin轮询算法后，可能会出现ConsumerA消费了TopicB主题分区里的消息，ConsumerB消费了TopicA主题分区里的消息。
+
+综上所述，RoundRobin算法只适用于消费者组中消费者订阅的主题相同的情况。同时会发现，采用RoundRobin算法，消费者组里的消费者之间消费的消息个数最多相差1个。
+
+##### Range
+
+Kafka默认采用Range分配策略，Range顾名思义就是按范围划分的意思。
+
+比如现在有一个三个消费者ConsumerA、ConsumerB和ConsumerC组成的消费者组，同时消费TopicA主题消息，TopicA分为7个分区，如果采用Range分配策略，过程如下所示：
+
+![QQ20200401-152904@2x](https://mrbird.cc/img/QQ20200401-152904@2x.png)
+
+假如现在有一个两个消费者ConsumerA和ConsumerB组成的消费者组，同时消费TopicA和TopicB主题消息，如果采用Range分配策略，过程如下所示：
+
+![QQ20200401-153300@2x](https://mrbird.cc/img/QQ20200401-153300@2x.png)
+
+Range算法并不会把多个主题分区当成一个整体。
+
+从上面的例子我们可以总结出Range算法的一个弊端：那就是同一个消费者组内的消费者消费的消息数量相差可能较大。
 
 #### 3.4.4 offset的维护
 
@@ -471,13 +562,11 @@ Kafka 的 producer 生产数据，要写入到 log 文件中，写的过程是�
 
 注意： producer 不在 zk 中注册， 消费者在 zk 中注册。
 
-- Zookeeper在Kafka中的作用
+Kafka集群中有一个broker会被选举为Controller，**负责管理集群broker的上线下，所有topic的分区副本分配和leader选举等工作**。
 
-  Kafka集群中有一个broker会被选举为Controller，**负责管理集群broker的上线下，所有topic的分区副本分配和leader选举等工作**。
+Controller的管理工作都是依赖于Zookeeper的。
 
-  Controller的管理工作都是依赖于Zookeeper的。
-
-  下图为partition的leader选举过程：
+下图为 partition 的 leader 选举过程：
 
 ![img](../../_images/message-queue/Kafka/controller-leader.png)
 
