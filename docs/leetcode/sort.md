@@ -215,7 +215,7 @@ public static void main(String[] args) {
 
 我们随意抽取一个数作为基准值，同时设定一个标记 mark 代表左边序列最右侧的下标位置，当然初始为 0 ，接下来遍历数组，如果元素大于基准值，无操作，继续遍历，如果元素小于基准值，则把 mark + 1 ，再将 mark 所在位置的元素和遍历到的元素交换位置，mark 这个位置存储的是比基准值小的数据，当遍历结束后，将基准值与 mark 所在元素交换位置即可。
 
-```
+```java
 public static void sort(int[] arr) {
     sort(arr， 0， arr.length - 1);
 }
@@ -256,7 +256,7 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 
 我们来看一下实现代码，不同之处只有 partition 方法：
 
-```
+```java
 public static void sort(int[] arr) {
     sort(arr， 0， arr.length - 1);
 }
@@ -368,6 +368,8 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 5. 将另一序列剩下的所有元素直接复制到合并序列尾。
 
 ### 3. 动图演示
+
+![img](https://miro.medium.com/max/300/1*fE7yGW2WPaltJWo6OnZ8LQ.gif)
 
 [![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/mergeSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/mergeSort.gif)
 
