@@ -97,12 +97,11 @@ ApplicationContext 的主要实现类：
 
 - ClassPathXmlApplicationContext：从 类路径下加载配置文件
 - FileSystemXmlApplicationContext: 从文件系统中加载配置文件
-
 - ConfigurableApplicationContext 扩展于 ApplicationContext，新增加两个主要方法：refresh() 和 close()， 让 ApplicationContext具有启动、刷新和关闭上下文的能力
 - WebApplicationContext 是专门为 WEB 应用而准备的，它允许从相对于 WEB 根目录的路径中完成初始化工作
 - ApplicationContext 在初始化上下文时就实例化所有单例的 Bean
 
-![](https://imgkr.cn-bj.ufileos.com/9f366f70-4b1e-48f5-8301-811398b8d25f.png)
+![javadoop.com](https://www.javadoop.com/blogimages/spring-context/1.png)
 
 **从 IOC 容器中获取 Bean**
 
@@ -158,7 +157,7 @@ class Factory {
 }
 class Client {
     public static void main(String[] a) {
-        Fruit f=Factory.getInstance("io.github.dunwu.spring.Apple");
+        Fruit f=Factory.getInstance("priv.starfish.spring.Apple");
         if(f!=null){
             f.eat();
         }
@@ -685,3 +684,9 @@ SpringMVC 处理请求过程：
 ## 参考与来源
 
 https://www.edureka.co/blog/interview-questions/spring-interview-questions/
+
+
+
+
+
+https://crossoverjie.top/2018/07/29/java-senior/ThreadPool/
