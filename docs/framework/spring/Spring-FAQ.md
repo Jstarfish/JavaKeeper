@@ -1,16 +1,14 @@
 
 
-> 基于Spring Framework 4.x，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
+> 基于Spring Framework 4.x 总结的常见面试题，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
 
 ## 一、一般问题
 
 ### 开发中主要使用 Spring 的什么技术 ?
 
-①. IOC 容器管理各层的组件
-
-②. 使用 AOP 配置声明式事务
-
-③. 整合其他框架.
+1. IOC 容器管理各层的组件
+2. 使用 AOP 配置声明式事务
+3. 整合其他框架
 
 
 
@@ -32,13 +30,13 @@
 
 ### 简述 AOP 和 IOC 概念
 
-AOP: Aspect Oriented Program, 面向(方面)切面的编程;Filter(过滤器)也是一种 AOP. AOP 是一种新的 方法论, 是对传统 OOP(Object-OrientedProgramming, 面向对象编程) 的补充. AOP 的主要编程对象是切面(aspect),而切面模块化横切关注点.可以举例通过事务说明.
+AOP：Aspect Oriented Program, 面向(方面)切面的编程;Filter(过滤器)也是一种 AOP. AOP 是一种新的 方法论, 是对传统 OOP(Object-OrientedProgramming, 面向对象编程) 的补充. AOP 的主要编程对象是切面(aspect),而切面模块化横切关注点.可以举例通过事务说明.
 
-IOC: Invert Of Control, 控制反转. 也称为 DI(依赖注入)其思想是反转资源获取的方向. 传统的资源查找方式要求组件向容器发起请求查找资源.作为回应, 容器适时的返回资源. 而应用了 IOC 之后, 则是容器主动地将资源推送给它所管理的组件,组件所要做的仅是选择一种合适的方式来接受资源. 这种行为也被称为查找的被动形式
+IOC：Invert Of Control, 控制反转. 也称为 DI(依赖注入)其思想是反转资源获取的方向. 传统的资源查找方式要求组件向容器发起请求查找资源.作为回应, 容器适时的返回资源. 而应用了 IOC 之后, 则是容器主动地将资源推送给它所管理的组件,组件所要做的仅是选择一种合适的方式来接受资源. 这种行为也被称为查找的被动形式
 
 
 
-## 二、依赖注入（IoC）
+## 二、依赖注入
 
 IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将原本在程序中手动创建对象的控制权，交由Spring框架来管理。** IoC 在其他语言中也有应用，并非 Spring 特有。 **IoC 容器是 Spring 用来实现 IoC 的载体， IoC 容器实际上就是个Map（key，value）,Map 中存放的是各种对象。**
 
@@ -54,7 +52,7 @@ Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配�
 
 ### 什么是依赖注入？
 
-**依赖注入是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。这就需要一种机制用来激活相应的组件以提供特定的功能，所以**依赖注入是控制反转的基础**。否则如果在组件不受框架控制的情况下，框架又怎么知道要创建哪个组件？
+**依赖注入（DI）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。这就需要一种机制用来激活相应的组件以提供特定的功能，所以**依赖注入是控制反转的基础**。否则如果在组件不受框架控制的情况下，框架又怎么知道要创建哪个组件？
 
 依赖注入有以下三种实现方式：
 
@@ -64,17 +62,17 @@ Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配�
 
 
 
-### spring 中有多少种 IOC 容器？
+### Spring 中有多少种 IOC 容器？
 
-在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前，必须对它进行实例化.。只有在容器实例化后， 才可以从 IOC 容器里获取 Bean 实例并使用
+在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前，必须对它进行实例化。只有在容器实例化后， 才可以从 IOC 容器里获取 Bean 实例并使用
 
-Spring 提供了两种类型的 IOC 容器实现.
+Spring 提供了两种类型的 IOC 容器实现
 
-- BeanFactory： IOC 容器的基本实现
+- BeanFactory：IOC 容器的基本实现
 
-- ApplicationContext: 提供了更多的高级特性，是 BeanFactory的子接口
+- ApplicationContext：提供了更多的高级特性，是 BeanFactory 的子接口
 
-BeanFactory是 Spring 框架的基础设施，面向 Spring 本身；ApplicationContext 面向使用 Spring 框架的开发者，几乎所有的应用场合都直接使用 ApplicationContext 而非底层的 BeanFactory；
+BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；ApplicationContext 面向使用 Spring 框架的开发者，几乎所有的应用场合都直接使用 ApplicationContext 而非底层的 BeanFactory；
 
 无论使用何种方式, 配置文件是相同的。
 
@@ -95,7 +93,7 @@ BeanFactory是 Spring 框架的基础设施，面向 Spring 本身；Application
 
 ApplicationContext 的主要实现类：
 
-- ClassPathXmlApplicationContext：从 类路径下加载配置文件
+- ClassPathXmlApplicationContext：从类路径下加载配置文件
 - FileSystemXmlApplicationContext: 从文件系统中加载配置文件
 - ConfigurableApplicationContext 扩展于 ApplicationContext，新增加两个主要方法：refresh() 和 close()， 让 ApplicationContext具有启动、刷新和关闭上下文的能力
 - WebApplicationContext 是专门为 WEB 应用而准备的，它允许从相对于 WEB 根目录的路径中完成初始化工作
@@ -180,7 +178,7 @@ class Client {
 
 
 
-### spring 提供了哪些配置方式？
+### Spring 提供了哪些配置方式？
 
 - 基于 xml 配置
 
@@ -226,9 +224,9 @@ class Client {
 
 ### Spring Bean的作用域？
 
-- 在 Spring 中, 可以在 <bean> 元素的 scope属性里设置 Bean 的作用域。
+- 在 Spring 中, 可以在 \<bean> 元素的 scope属性里设置 Bean 的作用域。
 
-- 默认情况下，Spring 只为每个在 IOC 容器里声明的 Bean 创建唯一一个实例, 整个 IOC 容器范围内都能共享该实例：所有后续的 getBean() 调用和 Bean 引用都将返回这个唯一的 Bean 实例。该作用域被称为 **singleton**，它是所有 Bean 的默认作用域。
+- 默认情况下，Spring 只为每个在 IOC 容器里声明的 Bean 创建唯一一个实例, 整个 IOC 容器范围内都能共享该实例：所有后续的 `getBean()` 调用和 Bean 引用都将返回这个唯一的 Bean 实例。该作用域被称为 **singleton**，它是所有 Bean 的默认作用域。
 
 Spring容器中的bean可以分为5个范围。所有范围的名称都是自说明的，但是为了避免混淆，还是让我们来解释一下：
 
@@ -260,6 +258,46 @@ Spring bean 容器的生命周期流程如下：
 10. 如果为 bean 指定了 destroy 方法（`<bean>` 的 destroy-method 属性），那么将调用它
 
 ![](https://imgkr.cn-bj.ufileos.com/6125ce48-cdfe-4779-9c25-c98088b4cf39.png)
+
+
+
+在 bean 初始化时会经历几个阶段，要与容器对 bean 生命周期的管理交互，可以实现  `InitializingBean` 和 `DisposableBean` 接口。容器对前者调用 `afterPropertiesSet()`，对后者调用 `destroy()`，以允许 bean 在初始化和销毁 bean 时执行某些操作。
+
+官方不建议使用这两个接口，而是建议使用 ``@PostConstruct` 和 `@PreDestroy`，或者 XML 配置中使用 `init-method`和`destroy-method` 属性
+
+```xml
+<bean id="exampleInitBean" class="examples.ExampleBean" init-method="init"/>
+```
+
+```java
+public class ExampleBean {
+
+    public void init() {
+        // do some initialization work
+    }
+}
+```
+
+等价于
+
+```java
+public class AnotherExampleBean implements InitializingBean {
+
+    public void afterPropertiesSet() {
+        // do some initialization work
+    }
+}
+```
+
+> Spring Bean生命周期回调——初始化回调和销毁回调方法
+
+实现 Bean 初始化回调和销毁回调各有三种方法，一是实现接口方法，二是在XML配置，三是使用注解
+
+- 使用注解 ``@PostConstruct` 和 `@PreDestroy`
+- 实现  `InitializingBean` 和 `DisposableBean` 接口
+- XML 中配置 ``init-method` 和 `destroy-method`
+
+在一个 bean 中，如果配置了多种生命周期回调机制，会按照上边从上到下的次序调用
 
 
 
@@ -346,7 +384,7 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 
 ### 什么是 AOP？
 
-AOP(Aspect-Oriented Programming，面向切面编程)：是一种新的方法论, 是对传统 OOP(Object-Oriented Programming，面向对象编程) 的补充。在 OOP 中, 我们以类(class)作为我们的基本单元，而 AOP 中的基本单元是 **Aspect(切面)**
+AOP(Aspect-Oriented Programming，面向切面编程)：是一种新的方法论，是对传统 OOP(Object-Oriented Programming，面向对象编程) 的补充。在 OOP 中, 我们以类(class)作为我们的基本单元，而 AOP 中的基本单元是 **Aspect(切面)**
 
 AOP 的主要编程对象是切面(aspect)
 
@@ -363,14 +401,19 @@ AOP 的好处:
 
 ### **AOP 术语**
 
-- 切面（Aspect）：横切关注点（跨越应用程序多个模块的功能）被模块化的特殊对象
-- 连接点（Joinpoint）：程序执行的某个特定位置，如类某个方法调用前、调用后、方法抛出异常后等。连接点由两个信息确定：方法表示的程序执行点；相对点表示的方位![img](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/JoinPoint-1.png)
-- 通知（Advice）： 切面必须要完成的工作。特定 JoinPoint 处的 Aspect 所采取的动作称为 Advice。Spring AOP 使用一个 Advice 作为拦截器，在 JoinPoint “周围”维护一系列的拦截器![advice - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/advice-2.png)
-- 目标（Target）：被通知的对象
+- 切面（Aspect）：横切关注点（跨越应用程序多个模块的功能），被模块化的特殊对象
+- 连接点（Joinpoint）：程序执行的某个特定位置，如类某个方法调用前、调用后、方法抛出异常后等。在这个位置我们可以插入一个 AOP 切面，它实际上是应用程序执行 Spring AOP 的位置![img](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/JoinPoint-1.png)
+- 通知（Advice）： 通知是个在方法执行前或执行后要做的动作，实际上是程序执行时要通过 SpringAOP 框架触发的代码段。Spring 切面可以应用五种类型的通知：
+  - before： 前置通知 ， 在一个方法执行前被调用
+  - after：在方法执行之后调用的通知，无论方式执行是否成功
+  - after-returning：仅当方法成功完成后执行的通知 
+  - after-throwing：在方法抛出异常退出时执行的通知 
+  - around：在方法执行之前和之后调用的通知![advice - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/advice-2.png)
+- 目标（Target）：被通知的对象，通常是一个代理对象，也指被通知（advice）对象
 - 代理（Proxy）：向目标对象应用通知之后创建的对象
-- 切点（pointcut）：每个类都拥有多个连接点，程序运行中的一些时间点，例如一个方法的执行，或者是一个异常的处理。AOP 通过切点定位到特定的连接点。类比：连接点相当于数据库中的记录，切点相当于查询条件。切点和连接点不是一对一的关系，一个切点匹配多个连接点，切点通过 `org.springframework.aop.Pointcut` 接口进行描述，它使用类和方法作为连接点的查询条件。
-- 引入（Introduction）：引入允许我们向现有的类添加新方法或属性。
-- 织入（Weaving）：织入是把切面应用到目标对象并创建新的代理对象的过程。
+- 切点（pointcut）：每个类都拥有多个连接点，程序运行中的一些时间点，例如一个方法的执行，或者是一个异常的处理。AOP 通过切点定位到特定的连接点。类比：连接点相当于数据库中的记录，切点相当于查询条件。切点和连接点不是一对一的关系，一个切点匹配多个连接点，切点通过 `org.springframework.aop.Pointcut` 接口进行描述，它使用类和方法作为连接点的查询条件
+- 引入（Introduction）：引入允许我们向现有的类添加新方法或属性
+- 织入（Weaving）：织入是把切面应用到目标对象并创建新的代理对象的过程
 
 
 
@@ -385,8 +428,6 @@ AOP 的好处:
 - 将 aop Schema 添加到 `<beans>` 根元素中.
 - 要在 Spring IOC 容器中启用 AspectJ 注解支持, 只要在 Bean 配置文件中定义一个空的 XML 元素 `<aop:aspectj-autoproxy>`
 - 当 Spring IOC 容器侦测到 Bean 配置文件中的` <aop:aspectj-autoproxy>` 元素时, 会自动为与 AspectJ切面匹配的 Bean 创建代理.
-
-
 
 
 
@@ -433,7 +474,7 @@ AOP 的好处:
 
 ## 五、数据访问
 
-### spring对JDBC的支持
+### Spring对JDBC的支持
 
 JdbcTemplate简介
 
@@ -585,7 +626,7 @@ Oracle 支持的 2 种事务隔离级别，Mysql支持 4 种事务隔离级别�
     </aop:config>
 ```
 
-- 
+
 
 ## 七、MVC
 
@@ -625,15 +666,83 @@ SpringMVC 处理请求过程：
 
 
 
-### 说出 Spring MVC 常用的 5 个注解:
 
-@RequestMapping 、 @PathVariable 、 @RequestParam 、 @RequestBoy 、@ResponseBody
+
+### Spring MVC 常用注解:
+
+##### @Controller
+
+在SpringMVC 中，控制器Controller 负责处理由DispatcherServlet 分发的请求，它把用户请求的数据经过业务处理层处理之后封装成一个Model ，然后再把该Model 返回给对应的View 进行展示。在SpringMVC 中只需使用@Controller 标记一个类是Controller ，然后使用@RequestMapping 和@RequestParam 等一些注解用以定义URL 请求和Controller 方法之间的映射，这样的Controller 就能被外界访问到。
+
+##### @RequestMapping
+
+RequestMapping是一个用来处理请求地址映射的注解，可用于类或方法上
+
+##### @RequestMapping 
+
+Spring Framework 4.3 之后引入的基于HTTP方法的变体
+
+- `@GetMapping`
+- `@PostMapping`
+- `@PutMapping`
+- `@DeleteMapping`
+- `@PatchMapping`
+
+##### @PathVariable
+
+用于将请求URL中的模板变量映射到功能处理方法的参数上，即取出uri模板中的变量作为参数
+
+##### @RequestParam
+
+使用@RequestParam绑定请求参数值，在处理方法入参处使用@RequestParam可以把请求参数传递给请求方法
+
+- value：参数名
+- required：是否必须。默认为true, 表示请求参数中必须包含对应的参数，若不存在，将抛出异常
+
+##### @RequestBody
+
+@RequestBody 表明方法参数应该绑定到HTTP请求体的值
+
+##### @ResponseBody
+
+@Responsebody 表示该方法的返回结果直接写入HTTP response body中
+
+一般在异步获取数据时使用，在使用@RequestMapping后，返回值通常解析为跳转路径，加上@Responsebody后返回结果不会被解析为跳转路径，而是直接写入HTTP response body中。比如异步获取 json 数据，加上@Responsebody后，会直接返回 json 数据。
+
+##### @Resource和@Autowired
+
+@Resource和@Autowired都是做bean的注入时使用，其实@Resource并不是Spring的注解，它的包是javax.annotation.Resource，需要导入，但是Spring支持该注解的注入。
+
+- 共同点：两者都可以写在字段和setter方法上。两者如果都写在字段上，那么就不需要再写setter方法。
+- 不同点
+  - @Autowired为Spring提供的注解，@Autowired注解是按照类型（byType）装配依赖对象，默认情况下它要求依赖对象必须存在，如果允许null值，可以设置它的required属性为false。如果我们想使用按照名称（byName）来装配，可以结合@Qualifier注解一起使用
+  - @Resource默认按照ByName自动注入，由J2EE提供，需要导入包 `javax.annotation.Resource`。@Resource有两个重要的属性：name和type，而Spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。所以，如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不制定name也不制定type属性，这时将通过反射机制使用byName自动注入策略。
+
+##### @ModelAttribute
+
+方法入参标注该注解后, 入参的对象就会放到数据模型中
+
+##### @SessionAttribute
+
+将模型中的某个属性暂存到**HttpSession**中，以便多个请求之间可以共享这个属性
+
+##### @CookieValue
+
+@CookieValue可让处理方法入参绑定某个Cookie 值
+
+##### @RequestHeader
+
+请求头包含了若干个属性，服务器可据此获知客户端的信息，通过@RequestHeader即可将请求头中的属性值绑定到处理方法的入参中
+
+##### @Valid
+
+
+
+
 
 ### @Responsebody
 
-@responsebody 表示该方法的返回结果直接写入HTTP response body中
 
-一般在异步获取数据时使用，在使用@RequestMapping后，返回值通常解析为跳转路径，加上@responsebody后返回结果不会被解析为跳转路径，而是直接写入HTTP response body中。比如异步获取json数据，加上@responsebody后，会直接返回json数据。
 
 
 
@@ -651,15 +760,7 @@ SpringMVC 处理请求过程：
 
 
 
-
-
 ## 八、其他问题
-
-各种注解：
-
-### @PostConstruct @PreDestroy
-
-
 
 ### Spring 框架中用到了哪些设计模式？
 
