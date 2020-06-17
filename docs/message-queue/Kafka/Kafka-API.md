@@ -146,7 +146,7 @@ kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API
 
   - 高级 API 写起来简单
   - 不需要自行去管理 offset，系统通过 zookeeper 自行管理。 
-  - 不需要管理分区，副本等情况， .系统自动管理。 消费者断线会自动根据上一次记录在 zookeeper 中的 offset 去接着获取数据（默认设置 1 分钟更新一下 zookeeper 中存的 offset） 可以使用 group 来区分对同一个 topic 的不同程序访问分离开来（不同的 group 记录不 同的 offset，这样不同程序读取同一个 topic 才不会因为 offset 互相影响） 
+  - 不需要管理分区，副本等情况， 系统自动管理。 消费者断线会自动根据上一次记录在 zookeeper 中的 offset 去接着获取数据（默认设置 1 分钟更新一下 zookeeper 中存的 offset） 可以使用 group 来区分对同一个 topic 的不同程序访问分离开来（不同的 group 记录不同的 offset，这样不同程序读取同一个 topic 才不会因为 offset 互相影响） 
 
 - 高级 API 缺点 
 
@@ -206,7 +206,7 @@ kafka 提供了两套 consumer API： 高级 Consumer API 和低级 Consumer API
 
 #### 4.3.2 低级 API(手动提交offset)
 
-虽然自动提交 offset 十分简介便利，但由于其是基于时间提交的，开发人员难以把握 offset 提交的时机。因此 Kafka 还提供了手动提交 offset 的 API。 手动提交 offset 的方法有两种：分别是 commitSync（同步提交）和 commitAsync（异步提交）。两者的相同点是，都会将本次 poll 的一批数据最高的偏移量提交；不同点是， commitSync 阻塞当前线程，一直到提交成功，并且会自动失败重试（由不可控因素导致， 也会出现提交失败）；而 commitAsync 则没有失败重试机制，故有可能提交失败。
+虽然自动提交 offset 十分简介便利，但由于其是基于时间提交的，开发人员难以把握 offset 提交的时机。因此 Kafka 还提供了手动提交 offset 的 API。 
 
 - 低级 API 优点    
 
@@ -269,7 +269,7 @@ public class CommitSyncCounsumer {
 
 ##### 2) 异步提交offset
 
-虽然同步提交 offset 更可靠一些，但是由于其会阻塞当前线程，直到提交成功。因此吞 吐量会收到很大的影响。因此更多的情况下，会选用异步提交 offset 的方式
+虽然同步提交 offset 更可靠一些，但是由于其会阻塞当前线程，直到提交成功。因此吞吐量会收到很大的影响。因此更多的情况下，会选用异步提交 offset 的方式
 
 ```java
 while (true) {
@@ -294,7 +294,7 @@ while (true) {
 
 ##### 3） 数据漏消费和重复消费分析
 
-无论是同步提交还是异步提交 offset，都有可能会造成数据的漏消费或者重复消费。先 提交 offset 后消费，有可能造成数据的漏消费；而先消费后提交 offset，有可能会造成数据 的重复消费。
+无论是同步提交还是异步提交 offset，都有可能会造成数据的漏消费或者重复消费。先提交 offset 后消费，有可能造成数据的漏消费；而先消费后提交 offset，有可能会造成数据的重复消费。
 
 ------
 

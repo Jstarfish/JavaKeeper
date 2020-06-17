@@ -382,6 +382,14 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 
 ## 四、AOP
 
+>👴：描述一下Spring AOP 呗？
+>
+>​		你有没有⽤过Spring的AOP? 是⽤来⼲嘛的? ⼤概会怎么使⽤？
+>
+>
+>
+>
+
 ### 什么是 AOP？
 
 AOP(Aspect-Oriented Programming，面向切面编程)：是一种新的方法论，是对传统 OOP(Object-Oriented Programming，面向对象编程) 的补充。在 OOP 中, 我们以类(class)作为我们的基本单元，而 AOP 中的基本单元是 **Aspect(切面)**
@@ -395,20 +403,26 @@ AOP 的好处:
 - 每个事物逻辑位于一个位置，代码不分散，便于维护和升级
 - 业务模块更简洁, 只包含核心业务代码
 
-![AOP - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/unnamed.png)
+![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/unnamed.png)
 
 
 
 ### **AOP 术语**
 
 - 切面（Aspect）：横切关注点（跨越应用程序多个模块的功能），被模块化的特殊对象
-- 连接点（Joinpoint）：程序执行的某个特定位置，如类某个方法调用前、调用后、方法抛出异常后等。在这个位置我们可以插入一个 AOP 切面，它实际上是应用程序执行 Spring AOP 的位置![img](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/JoinPoint-1.png)
+- 连接点（Joinpoint）：程序执行的某个特定位置，如类某个方法调用前、调用后、方法抛出异常后等。在这个位置我们可以插入一个 AOP 切面，它实际上是应用程序执行 Spring AOP 的位置
+
+![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/JoinPoint-1.png)
+
 - 通知（Advice）： 通知是个在方法执行前或执行后要做的动作，实际上是程序执行时要通过 SpringAOP 框架触发的代码段。Spring 切面可以应用五种类型的通知：
   - before： 前置通知 ， 在一个方法执行前被调用
   - after：在方法执行之后调用的通知，无论方式执行是否成功
   - after-returning：仅当方法成功完成后执行的通知 
   - after-throwing：在方法抛出异常退出时执行的通知 
-  - around：在方法执行之前和之后调用的通知![advice - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/advice-2.png)
+  - around：在方法执行之前和之后调用的通知
+
+![advice - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/advice-2.png)
+
 - 目标（Target）：被通知的对象，通常是一个代理对象，也指被通知（advice）对象
 - 代理（Proxy）：向目标对象应用通知之后创建的对象
 - 切点（pointcut）：每个类都拥有多个连接点，程序运行中的一些时间点，例如一个方法的执行，或者是一个异常的处理。AOP 通过切点定位到特定的连接点。类比：连接点相当于数据库中的记录，切点相当于查询条件。切点和连接点不是一对一的关系，一个切点匹配多个连接点，切点通过 `org.springframework.aop.Pointcut` 接口进行描述，它使用类和方法作为连接点的查询条件
@@ -419,8 +433,8 @@ AOP 的好处:
 
 **Spring  AOP**
 
-- **AspectJ：**Java 社区里最完整最流行的 AOP 框架.
-- 在 Spring2.0 以上版本中, 可以使用基于 AspectJ注解或基于 XML 配置的 AOP
+- **AspectJ：**Java 社区里最完整最流行的 AOP 框架
+- 在 Spring2.0 以上版本中, 可以使用基于 AspectJ 注解或基于 XML 配置的 AOP
 
 **在 Spring 中启用 AspectJ 注解支持**
 
