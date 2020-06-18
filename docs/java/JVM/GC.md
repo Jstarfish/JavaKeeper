@@ -12,13 +12,13 @@ Java 相比 C/C++ 最显著的特点便是引入了自动垃圾回收 ，它解�
 
 要搞懂垃圾回收的机制，我们首先要知道垃圾回收主要回收的是哪些数据，这些数据主要在哪一块区域，所以我们一起来看下 JVM 的内存区域
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYWExWalY2Q0VkRG1kaWNJZmRFY3pnSUZkMjlrTk5qaFJrR0dITFdvZ2FUV0VpYXpzUVZpYmdsOWtnLzY0MA?x-oss-process=image/format,png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx0a1jqj30ol0ck754.jpg)
 
 - 虚拟机栈：描述的是方法执行时的内存模型,是线程私有的，生命周期与线程相同,每个方法被执行的同时会创建**栈桢**，主要保存执行方法时的局部变量表、操作数栈、动态连接和方法返回地址等信息,方法执行时入栈，方法执行完出栈，出栈就相当于清空了数据，入栈出栈的时机很明确，所以这块区域**不需要进行 GC**。
 
 - 本地方法栈：与虚拟机栈功能非常类似，主要区别在于虚拟机栈为虚拟机执行 Java 方法时服务，而本地方法栈为虚拟机执行本地方法时服务的。这块区域也**不需要进行 GC**
 
-- 程序计数器：线程独有的， 可以把它看作是当前线程执行的字节码的行号指示器，比如如下字节码内容，在每个字节码`前面都有一个数字（行号），我们可以认为它就是程序计数器存储的内容![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYWnhwZkRpY3FoSmVmMjZLZ05HcUppYnI4STU4WVN5WVFLTjZYTDk5VmVIS2ZxTFdwVU44T013NFEvNjQw?x-oss-process=image/format,png)
+- 程序计数器：线程独有的， 可以把它看作是当前线程执行的字节码的行号指示器，比如如下字节码内容，在每个字节码`前面都有一个数字（行号），我们可以认为它就是程序计数器存储的内容![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx4g1s8j30iz07rgll.jpg)
 
   记录这些数字（指令地址）有啥用呢，我们知道 Java 虚拟机的多线程是通过线程轮流切换并分配处理器的时间来完成的，在任何一个时刻，一个处理器只会执行一个线程，如果这个线程被分配的时间片执行完了（线程被挂起），处理器会切换到另外一个线程执行，当下次轮到执行被挂起的线程（唤醒线程）时，怎么知道上次执行到哪了呢，通过记录在程序计数器中的行号指示器即可知道，所以程序计数器的主要作用是记录线程运行时的状态，方便线程被唤醒时能从上一次被挂起时的状态继续执行，需要注意的是，程序计数器是**唯一一个**在 Java 虚拟机规范中没有规定任何 OOM 情况的区域，所以这块区域也**不需要进行 GC**
 
@@ -213,7 +213,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 把堆等分成两块区域, A 和 B，区域 A 负责分配对象，区域 B 不分配, 对区域 A 使用以上所说的标记法把存活的对象标记出来，然后把区域 A 中存活的对象都复制到区域 B（存活对象都依次**紧邻排列**）最后把 A 区对象全部清理掉释放出空间，这样就解决了内存碎片的问题了。
 
-![](/Users/starfish/Downloads/复制算法.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfws4ow2i1j31gn0q075y.jpg)
 
 不过复制算法的缺点很明显，比如给堆分配了 500M 内存，结果只有 250M 可用，空间平白无故减少了一半！这肯定是不能接受的！另外每次回收也要把存活对象移动到另一半，效率低下（我们可以想想删除数组元素再把非删除的元素往一端移，效率显然堪忧）
 
