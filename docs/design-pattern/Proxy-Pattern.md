@@ -1,8 +1,6 @@
 # 代理模式
 
-![代理设计模式](https://refactoringguru.cn/images/patterns/content/proxy/proxy.png)
-
-
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b3ynhb0j31900u0b29.jpg)
 
 ##  基本介绍
 
@@ -22,7 +20,7 @@
 
 为什么要控制对于某个对象的访问呢？ 举个例子： 有这样一个消耗大量系统资源的巨型对象， 你只是偶尔需要使用它， 并非总是需要。
 
-![数据库查询有可能会非常缓慢](https://refactoringguru.cn/images/patterns/diagrams/proxy/problem-zh.png)
+![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b594jl2j30e604gdfw.jpg)
 
 
 
@@ -36,7 +34,7 @@
 
 代理模式建议新建一个与原服务对象接口相同的代理类， 然后更新应用以将代理对象传递给所有原始对象客户端。 代理类接收到客户端请求后会创建实际的服务对象， 并将所有工作委派给它。
 
-![代理模式的解决方案](https://refactoringguru.cn/images/patterns/diagrams/proxy/solution-zh.png)
+![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b5d5zc6j30e604gmx8.jpg)
 
 代理将自己伪装成数据库对象， 可在客户端或实际数据库对象不知情的情况下处理延迟初始化和缓存查询结果的工作。
 
@@ -46,7 +44,7 @@
 
 ##  代理模式结构
 
-![代理设计模式的结构](https://refactoringguru.cn/images/patterns/diagrams/proxy/structure.png)
+![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b5gg8kij30aa0aa3yf.jpg)
 
 1. **服务接口** （Service Interface） 声明了服务接口。 代理必须遵循该接口才能伪装成服务对象。
 2. **服务** （Service） 类提供了一些实用的业务逻辑。
@@ -326,7 +324,7 @@ public class ProxyFactory implements MethodInterceptor {
 
 
     public Object getProxyInstance(){
-        //工具类
+        //工具类，类似于JDK动态代理的Proxy类
         Enhancer enhancer = new Enhancer();
         //设置父类
         enhancer.setSuperclass(target.getClass());
