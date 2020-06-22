@@ -9,10 +9,10 @@
   - [MySQL 锁机制](data-store/MySQL/MySQL-Lock.md)
   - [MySQL 分表分库](data-store/MySQL/MySQL-Segmentation.md)
   - [MySQL 主从复制](data-store/MySQL/MySQL-Master-Slave.md)
-- [![Redis](https://icongr.am/devicon/redis-original.svg?&size=16)Redis](data-store/Redis/2.readRedis.md)](redis/2.readRedis.md)
-- [![mongoDB](../_media/mongodb-original.svg)mongoDB]( https://redis.io/ )
-- [![ **Elasticsearch** ](../_media/elasticsearch.svg) Elasticsearch]( https://redis.io/ )
-- [![S3](../_media/amazonwebservices-original.svg)S3]( https://aws.amazon.com/cn/s3/ )
+- [![img](../../_media/redis-original.svg?&size=16)Redis](data-store/Redis/2.readRedis.md)
+- [![mongoDB](../../_media/mongodb-original.svg)mongoDB]( https://redis.io/ )
+- [![Elasticsearch](../../_media/elasticsearch.svg) Elasticsearch]( https://redis.io/ )
+- [![S3](../../_media/amazonwebservices-original.svg)S3]( https://aws.amazon.com/cn/s3/ )
 - FastDFS(OSS)
 - **单体架构**
 - [缕清各种Java Logging](logging/Java-Logging.md)
@@ -21,11 +21,11 @@
 - Spring Boot
 - Spring Cloud
 - **面向服务架构**
-- [![message](../_media/message.svg) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](../_media/nginx-original.svg)Nginx](nginx/nginx.md)
+- [![message](../../_media/message.svg) 消息中间件](message-queue/readMQ.md)
+- [![Nginx](../../_media/nginx-original.svg)Nginx](nginx/nginx.md)
 - **工程化与工具**
-- [![Maven](https://icongram.jgog.in/fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
-- [![Git](../_media/git-original.svg?&size=16) Git](logging/logback简单使用.md)
+- [![Maven](https://icongr.am/fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
+- [![Git](../../_media/git-original.svg?&size=16) Git](logging/logback简单使用.md)
 - Sonar
 - **大数据**
 - HDFS
@@ -34,8 +34,8 @@
 - web调优
 - DB调优
 - **其他**
-- [![Linux](https://icongram.jgog.in/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
-- [![]( https://icongram.jgog.in/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
+- [![Linux](../../_media/linux-original.svg)Linux](linux/linux.md)
+- [![]( https://icongr.am/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
 - **Links**
-- [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
-- [![Blog](https://icongram.jgog.in/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
+- [![Github](../../_media/github-original.svg)Github](https://github.com/jhildenbiddle/docsify-tabs)
+- [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)

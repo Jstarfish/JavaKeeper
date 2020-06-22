@@ -1,11 +1,23 @@
 - **Java基础**
 - **数据存储和缓存**
-- [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=16)MySQL](data-store/MySQL/readMySQL.md)
-- [![Redis](https://icongr.am/devicon/redis-original.svg?&size=16)Redis](data-store/Redis/2.readRedis.md)
-- [![mongoDB](https://icongr.am/devicon/mongodb-original.svg?&size=16)mongoDB]( https://redis.io/ )
-- [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=16) Elasticsearch]( https://redis.io/ )
-- [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=16)S3]( https://aws.amazon.com/cn/s3/ )
-- [FastDFS(OSS)]( https://github.com/happyfish100/fastdfs )
+- [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
+- [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
+- [![mongoDB](https://icongr.am/devicon/mongodb-original.svg?&size=25)mongoDB]( https://redis.io/ )
+- [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
+- [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )
+- **直击面试**
+- [![](https://icongr.am/material/basket.svg?size=25)Java集合面试集](interview/Collections-FAQ.md)
+- [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试集](interview/MySQL-FAQ.md)
+- [![](https://icongr.am/jam/flower.svg?size=25)Spring面试集](interview/Spring-FAQ.md)
+- **设计模式**
+- [![](https://icongr.am/jam/alien.svg?size=25)设计模式前传](design-pattern/Design-Pattern-Overview.md)
+- [单例模式](design-pattern/Singleton-Pattern.md)
+- [工厂模式](design-pattern/Factory-Pattern.md)
+- [装饰模式](design-pattern/Decorator-Pattern.md)
+- [代理模式](design-pattern/Proxy-Pattern.md)
+- [观察者模式](design-pattern/Observer-Pattern.md)
+- [适配器模式](design-pattern/Adapter-Pattern.md)
+- [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
 - **单体架构**
 - [缕清各种Java Logging](logging/Java-Logging.md)
 - [hello logback](logging/logback简单使用.md)
@@ -32,7 +44,6 @@
 - [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - SHELL
 - TCP与HTTP
-- [![](https://icongr.am/entypo/key.svg?&size=16)设计模式](design-pattern/readme.md)
 - **直击面试**
 - [Java集合面试集](interview/Collections-FAQ.md)
 - [MySQL面试集](interview/MySQL-FAQ.md)
