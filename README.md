@@ -104,7 +104,7 @@
 
 |       Project        | Article                                                      |
 | :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——暗中观察](/docs/design-pattern/Observer-Pattern.md)<br />[装饰者模式——拒绝继承滥用](/docs/design-pattern/Decorator-Pattern.md)<br />[责任链模式——更灵活的 if else](/docs/design-pattern/Chain-of-Responsibility-Pattern)<br> |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——暗中观察](/docs/design-pattern/Observer-Pattern.md)<br />[装饰者模式——拒绝继承滥用](/docs/design-pattern/Decorator-Pattern.md)<br />[责任链模式——更灵活的 if else](/docs/design-pattern/Chain-of-Responsibility-Pattern)<br>[代理模式——面试官问我Spring AOP中两种代理的区别](https://mp.weixin.qq.com/s/U7eR5Mpu4VBbtPP1livLnA)<br/> |
 
 
 
@@ -167,7 +167,7 @@
 
 
 
-## 最后欣赏《毕加索 亚威农少女》，求个关注，不会让你失望的
+## 扫一扫《毕加索 亚威农少女》，寻找你要的“宝藏”
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gf8izv6q5jj30ft0ft4ir.jpg)
 
