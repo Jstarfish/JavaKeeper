@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![img](../_images/mysql/mysql.png)
+![img](../../_images/mysql/mysql.png)
 
 </div>
 
@@ -20,15 +20,7 @@ MySQL是个啥，就说一句话——**MySQL是一个关系型数据库管理�
 
 **Javer必会MySQL知识架构图**
 
-![image-20191129105227377](../_images/mysql/mysql-mind-map.png)
-
-
-
-
-
-
-
-
+![image-20191129105227377](../../_images/mysql/mysql-mind-map.png)
 
 
 
