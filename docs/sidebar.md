@@ -6,9 +6,10 @@
 - [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )
 - **直击面试**
-- [![](https://icongr.am/material/basket.svg?size=25)Java集合面试集](interview/Collections-FAQ.md)
-- [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试集](interview/MySQL-FAQ.md)
-- [![](https://icongr.am/jam/flower.svg?size=25)Spring面试集](interview/Spring-FAQ.md)
+- [![](https://icongr.am/material/basket.svg?size=25)Java集合面试](interview/Collections-FAQ.md)
+- [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试](interview/MySQL-FAQ.md)
+- [![](https://icongr.am/devicon/redis-original-wordmark.svg?size=25)Redis面试](interview/Redis-FAQ.md)
+- [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
 - **设计模式**
 - [![](https://icongr.am/jam/alien.svg?size=25)设计模式前传](design-pattern/Design-Pattern-Overview.md)
 - [单例模式](design-pattern/Singleton-Pattern.md)
@@ -19,8 +20,6 @@
 - [适配器模式](design-pattern/Adapter-Pattern.md)
 - [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
 - **单体架构**
-- [缕清各种Java Logging](logging/Java-Logging.md)
-- [hello logback](logging/logback简单使用.md)
 - **微服务架构**  
 - [🍃 Spring Boot](springboot/Hello-SpringBoot.md)
 - [🍃 定时任务@Scheduled](springboot/Spingboot定时任务@Scheduled.md)
@@ -42,11 +41,10 @@
 - DB调优
 - **其他**
 - [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
+- [缕清各种Java Logging](logging/Java-Logging.md)
+- [hello logback](logging/logback简单使用.md)
 - SHELL
 - TCP与HTTP
-- **直击面试**
-- [Java集合面试集](interview/Collections-FAQ.md)
-- [MySQL面试集](interview/MySQL-FAQ.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
