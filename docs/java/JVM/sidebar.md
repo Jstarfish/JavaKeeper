@@ -1,5 +1,9 @@
 - **Java基础**
 - [![img](https://icongr.am/devicon/java-original.svg?&size=25)JVM](java/JVM/readJVM.md)
+  - [JVM 与 Java 体系结构](java/JVM/JVM-Java.md)
+  - [类加载子系统](java/JVM/类加载子系统.md)
+  - [运行时数据区](java/JVM/运行时数据区.md)
+  - [垃圾收集器](java/JVM/GC.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
 - [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
@@ -12,7 +16,6 @@
 - [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试](interview/MySQL-FAQ.md)
 - [![](https://icongr.am/devicon/redis-original-wordmark.svg?size=25)Redis面试](interview/Redis-FAQ.md)
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
-- [![](https://icongr.am/simple/bower.svg?size=25)MyBatis面试](interview/MyBatis-FAQ.md)
 - [![img](https://icongr.am/entypo/network.svg?size=25&color=6495ED)计算机网络](interview/Network-FAQ.md)
 - **设计模式**
 - [![](https://icongr.am/jam/alien.svg?size=25)设计模式前传](design-pattern/Design-Pattern-Overview.md)
