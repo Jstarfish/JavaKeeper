@@ -1,71 +1,105 @@
 # 你说你做过 JVM 调优和参数配置，那你平时工作用过的配置参数有哪些？
 
+![](https://images.pexels.com/photos/207924/pexels-photo-207924.jpeg?cs=srgb&dl=pexels-207924.jpg&fm=jpg)
+
 ## JVM参数类型
 
-### 标准参数，即在 JVM 的各个版本中基本不变的，相对比较稳定的参数
+JVM 参数类型大致分为以下几类：
 
-- -version   (`java -version`) 
-- -help       (`java -help`)
-- `java -showversion`
+- **标准参数**（-），即在 JVM 的各个版本中基本不变的，相对比较稳定的参数，向后兼容
+- **非标准参数**（-X），变化比较小的参数，默认 JVM 实现这些参数的功能，但是并不保证所有 JVM 实现都满足，且不保证向后兼容；
+- **非Stable参数**（-XX），此类参数各个 JVM 实现会有所不同，将来可能会随时取消，需要慎重使用；
 
-### X 参数，非标准化参数，变化比较小的参数
 
-- -Xint：解释执行
 
-- -Xcomp：第一次使用就编译成本地代码
+### 标准参数
 
+![image-20200629114526799](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200629114526799.png)
+
+- `-version`：输出 java 的版本信息，比如 jdk 版本、vendor、model
+- `-help`：输出 java 标准参数列表及其描述
+- `-showversion`：输出 java 版本信息（与-version相同）之后，继续输出 java 的标准参数列表及其描述，相当于`java -verion` 和 `java -help`
+- `-client`：设置 jvm 使用 client 模式，特点是启动速度比较快，但运行时性能和内存管理效率不高，通常用于客户端应用程序或者PC应用开发和调试
+- `-server`：设置 jvm 使 server 模式，特点是启动速度比较慢，但运行时性能和内存管理效率很高，适用于生产环境。在具有64位能力的 jdk 环境下将默认启用该模式，而忽略 -client 参数
+- `-agentlib:libname[=options]`：用于装载本地 lib 包。其中 libname 为本地代理库文件名，默认搜索路径为环境变量 PATH 中的路径，options 为传给本地库启动时的参数，多个参数之间用逗号分隔
+- `-agentpath:pathname[=options]`：按全路径装载本地库，不再搜索PATH中的路径；其他功能和 agentlib相同
+- `-Dproperty=value`
+   设置系统属性名/值对，运行在此jvm之上的应用程序可用System.getProperty("property")得到value的值。
+   如果value中有空格，则需要用双引号将该值括起来，如-Dname="space string"。
+   该参数通常用于设置系统级全局变量值，如配置文件路径，以便该属性在程序中任何地方都可访问
+
+
+
+### X 参数
+
+非标准参数又称为扩展参数，其列表如下
+
+![image-20200629114436655](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200629114436655.png)
+
+- `-Xint`：设置 jvm 以解释模式运行，所有的字节码将被直接执行，而不会编译成本地码
+- `-Xbatch`：关闭后台代码编译，强制在前台编译，编译完成之后才能进行代码执行。 默认情况下，jvm 在后台进行编译，若没有编译完成，则前台运行代码时以解释模式运行
+- `-Xbootclasspath:bootclasspath`：让 jvm 从指定路径（可以是分号分隔的目录、jar、或者zip）中加载bootclass，用来替换 jdk 的 rt.jar；若非必要，一般不会用到
+- `-Xbootclasspath/a:path` ：将指定路径的所有文件追加到默认 bootstrap 路径中
+- `-Xfuture`：让jvm对类文件执行严格的格式检查（默认 jvm 不进行严格格式检查），以符合类文件格式规范，推荐开发人员使用该参数。
+- `-Xincgc`：开启增量 gc（默认为关闭），这有助于减少长时间GC时应用程序出现的停顿，但由于可能和应用程序并发执行，所以会降低CPU对应用的处理能力
+- **`-Xloggc:file`**： 与-verbose:gc功能类似，只是将每次GC事件的相关情况记录到一个文件中，文件的位置最好在本地，以避免网络的潜在问题。若与 verbose 命令同时出现在命令行中，则以 -Xloggc 为准
+- **`-Xms`**：指定 jvm 堆的初始大小，默认为物理内存的1/64，最小为1M，可以指定单位，比如k、m，若不指定，则默认为字节
+- **`-Xmx`**：指定 jvm 堆的最大值，默认为物理内存的 1/4或者1G，最小为2M；单位与`-Xms`一致
+- `-Xprof`：跟踪正运行的程序，并将跟踪数据在标准输出输出；适合于开发环境调试
+- **-Xss**： 设置单个线程栈的大小，一般默认为 512k
 - -Xmixed：混合模式，JVM自己来决定是否编译成本地代码，默认使用的就是混合模式 
 
-  ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdeb84yh71j30yq0j6akl.jpg)
 
-- xx参数
 
-  - Boolean 类型
 
-    - 公式： -xx:+ 或者 - 某个属性值（+表示开启，- 表示关闭）
+### xx参数
 
-    - Case
+- Boolean 类型
 
-      - 是否打印GC收集细节
+  - 公式： -xx:+ 或者 - 某个属性值（+表示开启，- 表示关闭）
 
-        - -XX:+PrintGCDetails 
-        - -XX:- PrintGCDetails 
+  - Case
 
-        ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdebpozfgwj315o0sgtcy.jpg)
+    - 是否打印GC收集细节
 
-        添加如下参数后，重新查看，发现是 + 号了
+      - -XX:+PrintGCDetails 
+      - -XX:- PrintGCDetails 
 
-        ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdebrx25moj31170u042c.jpg)
+      ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdebpozfgwj315o0sgtcy.jpg)
 
-      - 是否使用串行垃圾回收器
+      添加如下参数后，重新查看，发现是 + 号了
 
-        - -XX:-UseSerialGC
-        - -XX:+UseSerialGC
+      ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdebrx25moj31170u042c.jpg)
 
-  - KV 设值类型
+    - 是否使用串行垃圾回收器
 
-    - 公式 -XX:属性key=属性 value
+      - -XX:-UseSerialGC
+      - -XX:+UseSerialGC
 
-    - Case:
+- KV 设值类型
 
-      - -XX:MetaspaceSize=128m
+  - 公式 -XX:属性key=属性 value
 
-      - -xx:MaxTenuringThreshold=15
+  - Case:
 
-      - 我们常见的 -Xms和 -Xmx 也属于 KV 设值类型
+    - -XX:MetaspaceSize=128m
 
-        - -Xms 等价于 -XX:InitialHeapSize
-        - -Xmx 等价于 -XX:MaxHeapSize
+    - -xx:MaxTenuringThreshold=15
 
-        ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdecj9d7z3j310202qdgb.jpg)
+    - 我们常见的 -Xms和 -Xmx 也属于 KV 设值类型
 
-  - jinfo 举例，如何查看当前运行程序的配置
+      - -Xms 等价于 -XX:InitialHeapSize
+      - -Xmx 等价于 -XX:MaxHeapSize
 
-    - jps -l
-    - jinfo -flag [配置项] 进程编号
-    - jinfo **-flags** 1981(打印所有)
-    - jinfo -flag PrintGCDetails 1981
-    - jinfo -flag MetaspaceSize 2044
+      ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdecj9d7z3j310202qdgb.jpg)
+
+- jinfo 举例，如何查看当前运行程序的配置
+
+  - jps -l
+  - jinfo -flag [配置项] 进程编号
+  - jinfo **-flags** 1981(打印所有)
+  - jinfo -flag PrintGCDetails 1981
+  - jinfo -flag MetaspaceSize 2044
 
 这些都是命令级别的查看，我们如何在程序运行中查看
 
@@ -190,3 +224,17 @@ https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions
   - ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1e54soj31e006qjz6.jpg)
 
 ### 盘点家底查看JVM默认值
+
+
+
+参数不懂，推荐直接去看官网，
+
+https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
+
+
+
+https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BGBCIEFC
+
+https://docs.oracle.com/javase/8/
+
+Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html)
