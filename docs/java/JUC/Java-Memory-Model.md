@@ -227,8 +227,8 @@ Java 内存模型要求 lock，unlock，read，load，assign，use，store，wri
 - **管程锁定规则：** 一个unLock操作先行发生于后面对同一个锁的lock操作。
 - **volatile变量规则：** 对一个变量的写操作 happens-before 后面对这个变量的读操作。
 - **传递规则：** 如果操作A 先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A 先行发生于操作C。
-- **线程启动规则：** Thread对象的start()方法先行发生于此线程的每一个动作。
-- **线程中断规则：** 对线程interrupt()方法的调用先行发生于被中断线程的代码检测到中断事件的发生。
+- **线程启动规则：** Thread对象的 `start()` 方法先行发生于此线程的每一个动作。
+- **线程中断规则：** 对线程 `interrupt()` 方法的调用先行发生于被中断线程的代码检测到中断事件的发生。
 - **线程终结规则：** 线程中所有的操作都先行发生于线程的终止检测，我们可以通过`Thread.join()`方法结束、`Thread.isAlive()`的返回值手段检测到线程已经终止执行。
 - **对象终结规则：** 一个对象的初始化完成先行发生于它的 `finalize() `方法的开始
 
@@ -277,7 +277,3 @@ http://tutorials.jenkov.com/java-concurrency/java-memory-model.html
 https://juejin.im/post/5bf2977751882505d840321d#heading-5
 http://rsim.cs.uiuc.edu/Pubs/popl05.pdf 
 http://ifeve.com/wp-content/uploads/2014/03/JSR133中文版.pdf
-
-
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd06gol40cj30ku0aumy2.jpg)

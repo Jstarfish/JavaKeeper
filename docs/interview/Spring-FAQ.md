@@ -555,7 +555,7 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 - 声明了事务通知后，就需要将它与切入点关联起来。由于事务通知是在 <aop:config> 元素外部声明的, 所以它无法直接与切入点产生关联，所以必须在 <aop:config> 元素中声明一个增强器通知与切入点关联起来.
 - 由于 Spring AOP 是基于代理的方法，所以只能增强公共方法。因此, 只有公有方法才能通过 Spring AOP 进行事务管理。
 
-![img](https://imgkr.cn-bj.ufileos.com/8342e671-cd06-4ccc-b206-51a355780cea.png)
+![](https://imgkr.cn-bj.ufileos.com/8342e671-cd06-4ccc-b206-51a355780cea.png)
 
 
 
@@ -567,7 +567,7 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 - 在 Bean 配置文件中只需要启用 `<tx:annotation-driven>`元素, 并为之指定事务管理器就可以了
 -  如果事务处理器的名称是 transactionManager, 就可以在 `<tx:annotation-driven>` 元素中省略 `transaction-manager` 属性，这个元素会自动检测该名称的事务处理器
 
-![img](https://imgkr.cn-bj.ufileos.com/800f0b12-550d-49b9-b5a3-82fd645c51e9.png)
+![](https://imgkr.cn-bj.ufileos.com/800f0b12-550d-49b9-b5a3-82fd645c51e9.png)
 
 
 
@@ -582,7 +582,7 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 
 ### Spring 支持的事务隔离级别
 
-![img](https://imgkr.cn-bj.ufileos.com/a4fb6d55-d32b-41d8-9a98-e6873970196d.png)
+![](https://imgkr.cn-bj.ufileos.com/a4fb6d55-d32b-41d8-9a98-e6873970196d.png)
 
 事务的隔离级别要得到底层数据库引擎的支持，而不是应用程序或者框架的支持；
 
@@ -659,7 +659,7 @@ Spring Web MVC 框架提供 **模型-视图-控制器** 架构和随时可用的
 
 
 
-### Spring MVC 的运行流程 | **DispatcherServlet**描述
+### Spring MVC 的运行流程 | DispatcherServlet描述
 
 在整个 Spring MVC 框架中， DispatcherServlet 处于核心位置，负责协调和组织不同组件以完成请求处理并返回响应的工作
 
@@ -680,7 +680,71 @@ SpringMVC 处理请求过程：
 
 
 
+### Spring的Controller是单例的吗？多线程情况下Controller是线程安全吗？
 
+controller默认是单例的，不要使用非静态的成员变量，否则会发生数据逻辑混乱。正因为单例所以不是线程安全的
+
+```java
+@Controller
+//@Scope("prototype")
+public class ScopeTestController {
+
+    private int num = 0;
+
+    @RequestMapping("/testScope")
+    public void testScope() {
+        System.out.println(++num);
+    }
+
+    @RequestMapping("/testScope2")
+    public void testScope2() {
+        System.out.println(++num);
+    }
+
+}
+```
+
+我们首先访问 `http://localhost:8080/testScope`，得到的答案是`1`；
+然后我们再访问 `http://localhost:8080/testScope2`，得到的答案是 `2`。
+
+接下来我们再来给`controller`增加作用多例 `@Scope("prototype")`
+
+我们依旧首先访问 `http://localhost:8080/testScope`，得到的答案是`1`；
+然后我们再访问 `http://localhost:8080/testScope2`，得到的答案还是 `1`。
+
+**单例是不安全的，会导致属性重复使用**。
+
+#### 解决方案
+
+1. 不要在controller中定义成员变量
+2. 万一必须要定义一个非静态成员变量时候，则通过注解@Scope(“prototype”)，将其设置为多例模式。
+3. 在Controller中使用ThreadLocal变量
+
+
+
+## 八、注解
+
+### 什么是基于Java的Spring注解配置? 给一些注解的例子
+
+基于Java的配置，允许你在少量的Java注解的帮助下，进行你的大部分Spring配置而非通过XML文件。
+
+以@Configuration 注解为例，它用来标记类可以当做一个bean的定义，被Spring IOC容器使用。
+
+另一个例子是@Bean注解，它表示此方法将要返回一个对象，作为一个bean注册进Spring应用上下文。
+
+```java
+@Configuration
+public class StudentConfig {
+    @Bean
+    public StudentBean myStudent() {
+        return new StudentBean();
+    }
+}
+```
+
+### 怎样开启注解装配？
+
+注解装配在默认情况下是不开启的，为了使用注解装配，我们必须在Spring配置文件中配置 `<context:annotation-config/>` 元素。
 
 ### Spring MVC 常用注解:
 
@@ -748,19 +812,48 @@ Spring Framework 4.3 之后引入的基于HTTP方法的变体
 
 请求头包含了若干个属性，服务器可据此获知客户端的信息，通过@RequestHeader即可将请求头中的属性值绑定到处理方法的入参中
 
-##### @Valid
+### @Component, @Controller, @Repository, @Service 有何区别？
 
+- @Component：将 java 类标记为 bean。它是任何 Spring 管理组件的通用构造型。Spring 的组件扫描机制可以将其拾取并将其拉入应用程序环境中
+- @Controller：将一个类标记为 Spring Web MVC 控制器。标有它的 Bean 会自动导入到 IoC 容器中
+- @Service：此注解是组件注解的特化。它不会对 @Component 注解提供任何其他行为。你可以在服务层类中使用 @Service 而不是 @Component，因为它以更好的方式指定了意图
+- @Repository：这个注解是具有类似用途和功能的 @Component 注解的特化。它为 DAO 提供了额外的好处。它将 DAO 导入 IoC 容器，并使未经检查的异常有资格转换为 Spring DataAccessException。
 
+### @Required 注解有什么作用
 
+这个注解表明bean的属性必须在配置的时候设置，通过一个bean定义的显式的属性值或通过自动装配，若@Required注解的bean属性未被设置，容器将抛出 BeanInitializationException。示例：
 
+```java
+public class Employee {
+    private String name;
+    @Required
+    public void setName(String name){
+        this.name=name;
+    }
+    public string getName(){
+        return name;
+    }
+}
+```
 
-### @Responsebody
+### @Autowired 注解有什么作用
 
+@Autowired默认是按照类型装配注入的，默认情况下它要求依赖对象必须存在（可以设置它required属性为false）。@Autowired 注解提供了更细粒度的控制，包括在何处以及如何完成自动装配。它的用法和@Required一样，修饰setter方法、构造器、属性或者具有任意名称和/或多个参数的PN方法。
 
+```java
+public class Employee {
+    private String name;
+    @Autowired
+    public void setName(String name) {
+        this.name=name;
+    }
+    public string getName(){
+        return name;
+    }
+}
+```
 
-
-
-### @Autowired和@Resource的区别
+### @Autowired和@Resource之间的区别
 
 用途：做bean的注入时使用
 
@@ -772,9 +865,24 @@ Spring Framework 4.3 之后引入的基于HTTP方法的变体
 
 不同点：@Autowired  默认按类型装配。依赖对象必须存在，如果要允许null值，可以设置它的required属性为false  @Autowired(required=false)，也可以使用名称装配，配合@Qualifier注解
 
+@Resource默认是按照名称来装配注入的，只有当找不到与名称匹配的bean才会按照类型来装配注入
+
+### @Qualifier 注解有什么作用
+
+当创建多个相同类型的 bean 并希望仅使用属性装配其中一个 bean 时，可以使用 @Qualifier 注解和 @Autowired 通过指定应该装配哪个确切的 bean 来消除歧义。
+
+### @RequestMapping 注解有什么用？
+
+@RequestMapping 注解用于将特定 HTTP 请求方法映射到将处理相应请求的控制器中的特定类/方法。此注释可应用于两个级别：
+
+- 类级别：映射请求的 URL
+- 方法级别：映射 URL 以及 HTTP 请求方法
+
+------
 
 
-## 八、其他问题
+
+## 九、其他问题
 
 ### Spring 框架中用到了哪些设计模式？
 
