@@ -1,6 +1,15 @@
 - **Java基础**
 - [![](https://icongr.am/simple/oracle.svg?size=25&color=231c82&colored=false)JVM](java/JVM/readJVM.md)
 - [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
+  - [JMM](java/JUC/Java-Memory-Model.md)
+  - [阻塞队列](java/JUC/BlockingQueue.md)
+  - [volatile](java/JUC/volatile.md)
+  - [阻塞队列](java/JUC/BlockingQueue.md)
+  - [ThreadLocal](java/JUC/ThreadLocal.md)
+  - [线程池](java/JUC/Thread-Pool.md)
+  - [CAS](java/JUC/CAS.md)
+  - [synchronized](java/JUC/synchronized.md)
+  - [各种锁](java/JUC/各种锁.md)
 - [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)

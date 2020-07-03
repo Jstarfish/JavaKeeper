@@ -1,9 +1,11 @@
 - **Java基础**
-- [![img](https://icongr.am/devicon/java-original.svg?&size=25)JVM](java/JVM/readJVM.md)
+- [![](https://icongr.am/simple/oracle.svg?size=25&color=231c82&colored=false)JVM](java/JVM/readJVM.md)
   - [JVM 与 Java 体系结构](java/JVM/JVM-Java.md)
   - [类加载子系统](java/JVM/类加载子系统.md)
   - [运行时数据区](java/JVM/运行时数据区.md)
   - [垃圾收集器](java/JVM/GC.md)
+- [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
+- [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
 - [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
