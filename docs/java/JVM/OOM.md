@@ -2,6 +2,8 @@
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggcqh5gsdj324d0ol0y7.jpg)
 
+在《Java虚拟机规范》的规定里，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生 OutOfMemoryError 异常的可能。
+
 本篇主要包括如下 OOM 的介绍和示例：
 
 - java.lang.StackOverflowError
@@ -67,7 +69,7 @@ Exception in thread "main" java.lang.StackOverflowError
 
 ## 二. Java heap space
 
-堆内存也是有限的，当堆内存（Heap Space）没有足够空间存放新创建的对象时，就会抛出 `java.lang.OutOfMemoryError:Java heap space` 错误（根据实际生产经验，可以对程序日志中的 OutOfMemoryError 配置关键字告警，一经发现，立即处理）
+堆内存也是有限的，当堆内存（Heap Space）没有足够空间存放新创建的对象时，就会抛出 `java.lang.OutOfMemoryError:Java heap space` 错误，Java 堆内存的 OOM 异常是实际应用中最常见的内存溢出异常。
 
 ### 2.1 写个 bug
 
