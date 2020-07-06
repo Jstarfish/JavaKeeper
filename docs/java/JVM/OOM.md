@@ -17,13 +17,11 @@
 - java.lang.OutOfMemoryError: Out of swap space
 - java.lang.OutOfMemoryError：Kill process or sacrifice child
 
-我们常说的 OOM 异常，其实是 Error。
+> 我们常说的 OOM 异常，其实是 Error
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggbu55wwgj30sy0ku3z0.jpg)
 
 
-
-刚学 Java 的都知道 JVM 分栈内存和堆内存，所以我们先来看看栈异常和堆异常
 
 ## 一. StackOverflowError
 
@@ -42,7 +40,7 @@ public class StackOverflowErrorDemo {
 }
 ```
 
-上一篇详细的介绍过 JVM 运行时数据区，JVM 虚拟机栈是有深度的，在执行方法的时候会伴随着入栈和出栈，可上边的方法可以看到，main 方法执行后不停的递归，迟早把栈撑爆了
+上一篇详细的介绍过[JVM 运行时数据区](https://mp.weixin.qq.com/s/jPIHNsQwiYNCRUQt1qXR6Q)，JVM 虚拟机栈是有深度的，在执行方法的时候会伴随着入栈和出栈，上边的方法可以看到，main 方法执行后不停的递归，迟早把栈撑爆了
 
 ```
 Exception in thread "main" java.lang.StackOverflowError
@@ -62,14 +60,15 @@ Exception in thread "main" java.lang.StackOverflowError
 
 - 修复引发无限递归调用的异常代码， 通过程序抛出的异常堆栈，找出不断重复的代码行，按图索骥，修复无限递归 Bug
 - 排查是否存在类之间的循环依赖（当两个对象相互引用，在调用toString方法时也会产生这个异常）
-- <mark>排查是否存在在一个类中对当前类进行实例化，并作为该类的实例变量</mark>
 - 通过 JVM 启动参数 `-Xss` 增加线程栈内存空间， 某些正常使用场景需要执行大量方法或包含大量局部变量，这时可以适当地提高线程栈空间限制
 
 
 
 ## 二. Java heap space
 
-堆内存也是有限的，当堆内存（Heap Space）没有足够空间存放新创建的对象时，就会抛出 `java.lang.OutOfMemoryError:Java heap space` 错误，Java 堆内存的 OOM 异常是实际应用中最常见的内存溢出异常。
+Java 堆用于存储对象实例，我们只要不断的创建对象，并且保证 GC Roots 到对象之间有可达路径来避免 GC 清除这些对象，那随着对象数量的增加，总容量触及堆的最大容量限制后就会产生内存溢出异常。
+
+Java 堆内存的 OOM 异常是实际应用中最常见的内存溢出异常。
 
 ### 2.1 写个 bug
 
@@ -115,7 +114,7 @@ Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 
 > 面试官：说说内存泄露和内存溢出
 
-加送个知识点，看官也给个三连，加个鸡腿
+加送个知识点，三连的终将成为大神~~
 
 ## 内存泄露和内存溢出
 
@@ -194,19 +193,17 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 
 ## 四、Direct buffer memory
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gehn18eix6j31a00m2wup.jpg)
-
-我们使用 NIO 的时候经常需要使用 ByteBuffer 来读取或写入数据，这是一种基于Channel(通道) 和 Buffer(缓冲区)的 I/O 方式，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆里面的 DirectByteBuffer 对象作为这块内存的引用进行操作。这样在一些场景就避免了 Java 堆和 Native 中来回复制数据，所以性能会有提高。  
+我们使用 NIO 的时候经常需要使用 ByteBuffer 来读取或写入数据，这是一种基于 Channel(通道) 和 Buffer(缓冲区)的 I/O 方式，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆里面的 DirectByteBuffer 对象作为这块内存的引用进行操作。这样在一些场景就避免了 Java 堆和 Native 中来回复制数据，所以性能会有所提高。  
 
 > Java 允许应用程序通过 Direct ByteBuffer 直接访问堆外内存，许多高性能程序通过 Direct ByteBuffer 结合内存映射文件（Memory Mapped File）实现高速 IO。
 
 ### 4.1 写个 bug
 
-ByteBuffer.allocate(capability) 是分配 JVM 堆内存，属于 GC 管辖范围，需要内存拷贝所以速度相对较慢；
+- ByteBuffer.allocate(capability) 是分配 JVM 堆内存，属于 GC 管辖范围，需要内存拷贝所以速度相对较慢；
 
-ByteBuffer.allocateDirect(capability) 是分配 OS 本地内存，不属于 GC 管辖范围，由于不需要内存拷贝所以速度相对较快；
+- ByteBuffer.allocateDirect(capability) 是分配 OS 本地内存，不属于 GC 管辖范围，由于不需要内存拷贝所以速度相对较快；
 
-如果不断分配本地内存，堆内存很少使用，那么 JVM 就不需要执行 GC，DirectByteBuffer 对象就不会被回收，这时虽然堆内存充足，但本地内存可能已经不够用了，就会出现 OOM。
+如果不断分配本地内存，堆内存很少使用，那么 JVM 就不需要执行 GC，DirectByteBuffer 对象就不会被回收，这时虽然堆内存充足，但本地内存可能已经不够用了，就会出现 OOM，**本地直接内存溢出**。
 
 ```java
 /**
@@ -233,7 +230,7 @@ Exception in thread "main" java.lang.OutOfMemoryError: Direct buffer memory
 
 ### 4.2 解决方案
 
-1. Java 只能通过 ByteBuffer.allocateDirect 方法使用 Direct ByteBuffer，因此，可以通过 Arthas 等在线诊断工具拦截该方法进行排查
+1. Java 只能通过 `ByteBuffer.allocateDirect` 方法使用 Direct ByteBuffer，因此，可以通过 Arthas 等在线诊断工具拦截该方法进行排查
 2. 检查是否直接或间接使用了 NIO，如 netty，jetty 等
 3. 通过启动参数 `-XX:MaxDirectMemorySize` 调整 Direct ByteBuffer 的上限值
 4. 检查 JVM 参数是否有 `-XX:+DisableExplicitGC` 选项，如果有就去掉，因为该参数会使 `System.gc()` 失效
@@ -317,7 +314,7 @@ public class MetaspaceOOMDemo {
 }
 ```
 
-借助 Spring 的Enhancer 实现动态创建对象
+借助 Spring 的 GCLib 实现动态创建对象
 
 ```
 Exception in thread "main" org.springframework.cglib.core.CodeGenerationException: java.lang.OutOfMemoryError-->Metaspace
@@ -325,8 +322,13 @@ Exception in thread "main" org.springframework.cglib.core.CodeGenerationExceptio
 
 ### 6.2 解决方案
 
-- `-XX:MaxMetaspaceSize=1g` 增大元空间大小
-- dump 内存分析
+方法区溢出也是一种常见的内存溢出异常，在经常运行时生成大量动态类的应用场景中，就应该特别关注这些类的回收情况。这类场景除了上边的 GCLib 字节码增强和动态语言外，常见的还有，大量 JSP 或动态产生 JSP  文件的应用（远古时代的传统软件行业可能会有）、基于 OSGi 的应用（即使同一个类文件，被不同的加载器加载也会视为不同的类）等。
+
+方法区在 JDK8 中一般不太容易产生，HotSpot 提供了一些参数来设置元空间，可以起到预防作用
+
+- `-XX:MaxMetaspaceSize` 设置元空间最大值，默认是 -1，表示不限制（还是要受本地内存大小限制的）
+- `-XX:MetaspaceSize` 指定元空间的初始空间大小，以字节为单位，达到该值就会触发 GC 进行类型卸载，同时收集器会对该值进行调整
+- `-XX:MinMetaspaceFreeRatio` 在 GC 之后控制最小的元空间剩余容量的百分比，可减少因元空间不足导致的垃圾收集频率，类似的还有 `MaxMetaspaceFreeRatio`
 
 
 
@@ -396,6 +398,8 @@ JVM 在为数组分配内存前，会检查要分配的数据结构在系统中�
 ![涯海](https://tva1.sinaimg.cn/large/007S8ZIlly1gggc8i8yk4j31qo0te49o.jpg)
 
 ## 参考与感谢
+
+《深入理解 Java 虚拟机 第 3 版》
 
 https://plumbr.io/outofmemoryerror
 

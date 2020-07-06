@@ -3,8 +3,8 @@
 
 
 
-> `Keep On Growing`：**Java Reference Manual**
+> `Keep On Growing`：**Java Keeper**
 
 [GitHub](https://github.com/Jstarfish/Technical-Learning)
-[Get Started](#lazyegg)
+[Get Started](#JavaKeeper)
 

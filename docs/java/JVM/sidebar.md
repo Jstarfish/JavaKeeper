@@ -4,6 +4,7 @@
   - [类加载子系统](java/JVM/类加载子系统.md)
   - [运行时数据区](java/JVM/Runtime-Data-Areas.md)
   - [垃圾收集器](java/JVM/GC.md)
+  - [OOM 异常](java/JVM/OOM.md)
 - [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
 - [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - **数据存储和缓存**
