@@ -1,17 +1,16 @@
 - **Java基础**
 - [![](https://icongr.am/simple/oracle.svg?size=25&color=231c82&colored=false)JVM](java/JVM/readJVM.md)
 - [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
-  - [JMM](java/JUC/Java-Memory-Model.md)
-  - [阻塞队列](java/JUC/BlockingQueue.md)
-  - [volatile](java/JUC/volatile.md)
-  - [阻塞队列](java/JUC/BlockingQueue.md)
-  - [ThreadLocal](java/JUC/ThreadLocal.md)
-  - [线程池](java/JUC/Thread-Pool.md)
-  - [CAS](java/JUC/CAS.md)
-  - [synchronized](java/JUC/synchronized.md)
-  - [各种锁](java/JUC/各种锁.md)
 - [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - [![img](https://icongr.am/entypo/address.svg?size=25&color=074ca6)设计模式](design-pattern/readDisignPattern.md)
+  - [设计模式前传](design-pattern/Design-Pattern-Overview.md)
+  - [单例模式](design-pattern/Singleton-Pattern.md)
+  - [工厂模式](design-pattern/Factory-Pattern.md)
+  - [装饰模式](design-pattern/Decorator-Pattern.md)
+  - [代理模式](design-pattern/Proxy-Pattern.md)
+  - [观察者模式](design-pattern/Observer-Pattern.md)
+  - [适配器模式](design-pattern/Adapter-Pattern.md)
+  - [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
 - [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
@@ -26,35 +25,27 @@
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
 - [![](https://icongr.am/simple/bower.svg?size=25)MyBatis面试](interview/MyBatis-FAQ.md)
 - [![img](https://icongr.am/entypo/network.svg?size=25&color=6495ED)计算机网络](interview/Network-FAQ.md)
-- **设计模式**
-- [![](https://icongr.am/jam/alien.svg?size=25)设计模式前传](design-pattern/Design-Pattern-Overview.md)
-- [单例模式](design-pattern/Singleton-Pattern.md)
-- [工厂模式](design-pattern/Factory-Pattern.md)
-- [装饰模式](design-pattern/Decorator-Pattern.md)
-- [代理模式](design-pattern/Proxy-Pattern.md)
-- [观察者模式](design-pattern/Observer-Pattern.md)
-- [适配器模式](design-pattern/Adapter-Pattern.md)
-- [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
 - **单体架构**
-- **微服务架构**  
-- [🍃 Spring Boot](springboot/Hello-SpringBoot.md)
-- [🍃 定时任务@Scheduled](springboot/Spingboot定时任务@Scheduled.md)
-- [🍃 Spring Cloud](https://spring.io/projects/spring-cloud)
 - **RPC**
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
 - [![message](https://icongr.am/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
 - [![Nginx](https://icongr.am/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
-- **工程化与工具**
-- [![Maven](https://icongr.am/devicon//fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
-- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
-- [Sonar](https://www.sonarqube.org/)
+- **微服务架构**
+- [🍃 Spring Boot](springboot/Hello-SpringBoot.md)
+- [🍃 定时任务@Scheduled](springboot/Spingboot定时任务@Scheduled.md)
+- [🍃 Spring Cloud](https://spring.io/projects/spring-cloud)
 - **大数据**
 - [Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/simple/oracle.svg?size=25&color=231c82&colored=false)Kafka](message-queue/Kafka/readKafka.md)
 - **性能优化**
 - JVM优化
 - web调优
 - DB调优
+- **工程化与工具**
+- [![Maven](https://icongr.am/devicon//fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
+- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
+- [Sonar](https://www.sonarqube.org/)
 - **其他**
 - [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - [缕清各种Java Logging](logging/Java-Logging.md)

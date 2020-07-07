@@ -10,7 +10,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
 #### 1.2.1 传统消息队列的应用场景
 
-![image-20200601141825408](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200601141825408.png) 
+![image-20200601141825408](https://imgkr.cn-bj.ufileos.com/f6434adf-be2e-48d3-a2fa-95c6c229f846.png) 
 
 #### 1.2.2 为什么需要消息队列
 
