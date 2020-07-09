@@ -20,42 +20,36 @@
 - [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试](interview/MySQL-FAQ.md)
 - [![](https://icongr.am/devicon/redis-original-wordmark.svg?size=25)Redis面试](interview/Redis-FAQ.md)
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
+- [![](https://icongr.am/simple/bower.svg?size=25)MyBatis面试](interview/MyBatis-FAQ.md)
 - [![img](https://icongr.am/entypo/network.svg?size=25&color=6495ED)计算机网络](interview/Network-FAQ.md)
-- **设计模式**
-- [![](https://icongr.am/jam/alien.svg?size=25)设计模式前传](design-pattern/Design-Pattern-Overview.md)
-- [单例模式](design-pattern/Singleton-Pattern.md)
-- [工厂模式](design-pattern/Factory-Pattern.md)
-- [装饰模式](design-pattern/Decorator-Pattern.md)
-- [代理模式](design-pattern/Proxy-Pattern.md)
-- [观察者模式](design-pattern/Observer-Pattern.md)
-- [适配器模式](design-pattern/Adapter-Pattern.md)
-- [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
 - **单体架构**
-- **微服务架构**  
-- [🍃 Spring Boot](springboot/Hello-SpringBoot.md)
-- [🍃 定时任务@Scheduled](springboot/Spingboot定时任务@Scheduled.md)
-- [🍃 Spring Cloud](https://spring.io/projects/spring-cloud)
 - **RPC**
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
-- [![message](https://icongr.am/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](https://icongr.am/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
-- **工程化与工具**
-- [![Maven](https://icongr.am/devicon//fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
-- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
-- [Sonar](https://www.sonarqube.org/)
+- [![](https://icongr.am/fontawesome/group.svg?size=25&color=182d10)Zookeeper](soa/ZooKeeper/readZK.md)
+- [![message](https://icongr.am/clarity/email.svg?&size=25) 消息中间件](message-queue/readMQ.md)
+- [![](https://icongr.am/devicon/nginx-original.svg?size=25&color=182d10)Nginx](nginx/nginx.md)
+- **微服务架构**
+- [![](https://icongr.am/simple/leaflet.svg?size=25&color=11b041&colored=false)Spring Boot](framework/SpringBoot/Hello-SpringBoot.md)
+- [![](https://icongr.am/clarity/alarm-clock.svg?size=25&color=2d2b50)定时任务@Scheduled](framework/SpringBoot/@Scheduled.md)
 - **大数据**
 - [Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka](message-queue/Kafka/readKafka.md)
 - **性能优化**
-- JVM优化
-- web调优
-- DB调优
+- [![](https://icongr.am/octicons/cpu.svg?size=25&color=780ebe)CPU 飙升问题](optimization/CPU飙升.md)
+- \> JVM优化
+- \> web调优
+- \> DB调优
+- **数据结构与算法**
+- [![](https://icongr.am/entypo/tree.svg?size=25&color=44c016)树](data-structure/tree.md)
+- **工程化与工具**
+- [![Maven](https://icongr.am/simple/apachemaven.svg?size=25&color=c93ddb&colored=false)Maven](tools/Maven.md)
+- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](tools/Git-Specification.md)
+- [![](https://icongr.am/devicon/github-original.svg?size=25&color=currentColor)Git](tools/GitHub.md)
 - **其他**
 - [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - [缕清各种Java Logging](logging/Java-Logging.md)
 - [hello logback](logging/logback简单使用.md)
-- SHELL
-- TCP与HTTP
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
