@@ -10,8 +10,9 @@
 - [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )
 - **直击面试**
-- [![](https://icongr.am/material/basket.svg?size=25)Java集合面试](interview/Collections-FAQ.md)
+- [![](https://icongr.am/entypo/list.svg?size=25&color=96560d)Java集合面试](interview/Collections-FAQ.md)
 - [![](https://icongr.am/devicon/java-plain-wordmark.svg?size=25)JVM面试](interview/JVM-FAQ.md)
+- [![](https://icongr.am/entypo/line-graph.svg?size=25&color=0f170c)JUC面试](interview/JUC-FAQ.md)
 - [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试](interview/MySQL-FAQ.md)
 - [![](https://icongr.am/devicon/redis-original-wordmark.svg?size=25)Redis面试](interview/Redis-FAQ.md)
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
