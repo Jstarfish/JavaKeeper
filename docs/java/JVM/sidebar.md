@@ -7,6 +7,7 @@
   - [OOM 异常](java/JVM/OOM.md)
   - [JVM 参数配置](java/JVM/JVM参数配置.md)
   - [JVM 性能监控和故障处理工具](java/JVM/JVM性能监控和故障处理工具.md)
+  - [你了解自己的 ”Java对象“吗](java/JVM/Java-Object.md)
 - [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
 - [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - [![img](https://icongr.am/entypo/address.svg?size=25&color=074ca6)设计模式](design-pattern/readDisignPattern.md)
