@@ -12,8 +12,11 @@
 
 <h3 align="center">记录并分享每一次成长</h3>
 
-
 ------
+
+通过 gitbook 的形式整理了自己的工作和学习经验，www.lazyegg.net/javakeeper 直接访问即可，也推荐大家采用这种形式创建属于自己的“笔记本”，让成长看的见。
+
+> 也欢迎关注公众号 [JavaKeeper](#公众号) ，有 500 + 本电子书，大佬云集的微信群，等你来撩~
 
 
 
@@ -21,7 +24,7 @@
 
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
-|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>[运行时数据区](/docs/java/JVM/Runtime-Data-Areas.md)<br/> |
+|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>[运行时数据区](/docs/java/JVM/Runtime-Data-Areas.md)<br/>[你有认真了解过自己的Java“对象”吗](https://mp.weixin.qq.com/s/4NDnFf3sripUIp3uT8W3HQ)<br/> |
 |  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
 |   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
 |   NIO   |         |                                                              |
@@ -168,7 +171,9 @@
 
 
 
-## 扫一扫《毕加索 亚威农少女》，寻找你要的“宝藏”
+## 公众号
+
+扫一扫《亚威农少女》，寻找你要的“宝藏”
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gf8izv6q5jj30ft0ft4ir.jpg)
 

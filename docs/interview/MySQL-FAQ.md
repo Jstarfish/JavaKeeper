@@ -4,6 +4,8 @@
 >
 > 个人建议把面试题看作是费曼学习法中的回顾、简化的环节，准备面试的时候，跟着题目先自己讲给自己听，看看自己会满意吗，不满意就继续学习这个点，如此反复，好的offer离你不远的，奥利给
 
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱，笔记自取。
+
 ## 一、MySQL架构
 
 和其它数据库相比，MySQL有点与众不同，它的架构可以在多种不同场景中应用并发挥良好作用。主要体现在存储引擎的架构上，**插件式的存储引擎架构将查询处理和其它的系统任务以及数据的存储提取相分离**。这种架构可以根据业务的需求和实际需要选择合适的存储引擎。
@@ -1690,9 +1692,7 @@ https://juejin.im/post/5e3eb616f265da570d734dcb#heading-105
 
 https://blog.csdn.net/yin767833376/article/details/81511377
 
-
-
-
+![](https://imgkr.cn-bj.ufileos.com/6e7c80a9-48e6-4a2a-b920-682d8f0bab5c.png)
 
 
 
