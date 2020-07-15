@@ -1,11 +1,7 @@
-在 Java 5.0 提供了 java.util.concurrent（简称 JUC ）包，在此包中增加了在并发编程中很常用的实用工具类，用于定义类似于线程的自定义子系统，包括线程池、异步 IO 和轻量级任务框架。
-
-
-
 JUC 面试题总共围绕的就这么几部分
 
 - 多线程的一些概念（进程、线程、并行、并发啥的，谈谈你对高并发的认识）
-- 同步机制（locks、synchronzied）
+- 同步机制（locks、synchronzied、atomic）
 - 并发容器类
   - ConcurrentHashMap、CopyOnWriteArrayList、CopyOnWriteArraySet
   - 阻塞队列（顺着就会问到线程池）
@@ -41,6 +37,45 @@ JUC 面试题总共围绕的就这么几部分
 
 
 
+### 说说线程的生命周期和状态?
+
+Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种不同状态的其中一个状态（图源《Java 并发编程艺术》4.1.4 节）。
+
+![img](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png)
+
+线程在生命周期中并不是固定处于某一个状态而是随着代码的执行在不同状态之间切换。Java 线程状态变迁如下图所示（图源《Java 并发编程艺术》4.1.4 节）：
+
+![img](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java+%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%8F%98%E8%BF%81.png)
+
+由上图可以看出：线程创建之后它将处于 **NEW（新建）** 状态，调用 `start()` 方法后开始运行，线程这时候处于 **READY（可运行）** 状态。可运行状态的线程获得了 CPU 时间片（timeslice）后就处于 **RUNNING（运行）** 状态。
+
+
+
+### 说说 sleep() 方法和 wait() 方法区别和共同点?
+
+- 两者最主要的区别在于：**sleep 方法没有释放锁，而 wait 方法释放了锁** 。
+- 两者都可以暂停线程的执行。
+- Wait 通常被用于线程间交互/通信，sleep 通常被用于暂停执行。
+- wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 notify() 或者 notifyAll() 方法。sleep() 方法执行完成后，线程会自动苏醒。或者可以使用 wait(long timeout)超时后线程会自动苏醒。
+
+
+
+### 为什么我们调用 start() 方法时会执行 run() 方法，为什么我们不能直接调用 run() 方法？
+
+这是另一个非常经典的 java 多线程面试问题，而且在面试中会经常被问到。很简单，但是很多人都会答不上来！
+
+new 一个 Thread，线程进入了新建状态;调用 start() 方法，会启动一个线程并使线程进入了就绪状态，当分配到时间片后就可以开始运行了。 start() 会执行线程的相应准备工作，然后自动执行 run() 方法的内容，这是真正的多线程工作。 而直接执行 run() 方法，会把 run 方法当成一个 main 线程下的普通方法去执行，并不会在某个线程中执行它，所以这并不是多线程工作。
+
+**总结： 调用 start 方法方可启动线程并使线程进入就绪状态，而 run 方法只是 thread 的一个普通方法调用，还是在主线程里执行。**
+
+
+
+------
+
+
+
+## 二、同步机制篇
+
 ### Java同步机制有哪些
 
 1. synchronized关键字，这个相信大家很了解，最好能理解其中的原理
@@ -51,11 +86,11 @@ JUC 面试题总共围绕的就这么几部分
 
 那还有那些更高级的同步机制：
 
-3. 信号量（Semaphore）:是一种计数器，用来保护一个或者多个共享资源的访问，它是并发编程的一种基础工具，大多数编程语言都提供这个机制，这也是操作系统中经常提到的
-4. CountDownLatch:是Java语言提供的同步辅助类，在完成一组正在其他线程中执行的操作之前，他允许线程一直等待，这个类的使用已经在我的博客中了，大家可以去看看，自己去体验一下，平时编程不常用，但是实际中可能很有用，还是要多了解一下的；
-5. CyclicBarrier:也是java语言提供的同步辅助类，他允许多个线程在某一个集合点处进行相互等待；这个感觉慢有意思的，我的博客中已经有了，大家可以去看看
-6. Phaser:也是java语言提供的同步辅助类，他把并发任务分成多个阶段运行，在开始下一阶段之前，当前阶段中所有的线程都必须执行完成，JAVA7才有的特性。
-7. Exchanger:他提供了两个线程之间的数据交换点。
+3. 信号量（Semaphore）：是一种计数器，用来保护一个或者多个共享资源的访问，它是并发编程的一种基础工具，大多数编程语言都提供这个机制，这也是操作系统中经常提到的
+4. CountDownLatch：是Java语言提供的同步辅助类，在完成一组正在其他线程中执行的操作之前，他允许线程一直等待，这个类的使用已经在我的博客中了，大家可以去看看，自己去体验一下，平时编程不常用，但是实际中可能很有用，还是要多了解一下的；
+5. CyclicBarrier：也是java语言提供的同步辅助类，他允许多个线程在某一个集合点处进行相互等待；这个感觉慢有意思的，我的博客中已经有了，大家可以去看看
+6. Phaser：也是java语言提供的同步辅助类，他把并发任务分成多个阶段运行，在开始下一阶段之前，当前阶段中所有的线程都必须执行完成，JAVA7才有的特性。
+7. Exchanger：他提供了两个线程之间的数据交换点。
 
 
 
@@ -67,9 +102,15 @@ JUC 面试题总共围绕的就这么几部分
 >
 > synchronized说一下，有哪些实用形式？对类加锁时调用方法一定会加锁吗？
 
-synrhronized关键字简洁、清晰、语义明确，因此即使有了Lock接口，使用的还是非常广泛。其应用层的语义是可以把任何一个非null对象作为"锁"，当synchronized作用在方法上时，锁住的便是对象实例（this）；当作用在静态方法时锁住的便是对象对应的Class实例，因为 Class数据存在于永久带，因此静态方法锁相当于该类的一个全局锁；当synchronized作用于某一个对象实例时，锁住的便是对应的代码块。在 HotSpot JVM实现中，锁有个专门的名字：对象监视器。 
+synrhronized 关键字简洁、清晰、语义明确，因此即使有了 Lock 接口，使用的还是非常广泛。其应用层的语义是可以把任何一个非null对象作为"锁"，
 
-在JVM中，对象在内存中的布局分为三块区域：对象头、实例数据和对齐填充
+- 当 synchronized 作用在方法上时，锁住的便是对象实例（this）；
+- 当作用在静态方法时锁住的便是对象对应的Class实例，因为 Class数据存在于永久带，因此静态方法锁相当于该类的一个全局锁；
+- 当synchronized作用于某一个对象实例时，锁住的便是对应的代码块。
+
+在 HotSpot JVM实现中，锁有个专门的名字：对象监视器。 
+
+在JVM中，对象在内存中的布局分为三块区域：**对象头、实例数据和对齐填充**
 
 synchronized 用的锁是存在 Java 对象头里的。
 
@@ -124,203 +165,13 @@ synchronized 修饰的方法并没有 monitorenter 指令和 monitorexit 指令�
 
 
 
-### 说说 sleep() 方法和 wait() 方法区别和共同点?
 
-- 两者最主要的区别在于：**sleep 方法没有释放锁，而 wait 方法释放了锁** 。
-- 两者都可以暂停线程的执行。
-- Wait 通常被用于线程间交互/通信，sleep 通常被用于暂停执行。
-- wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 notify() 或者 notifyAll() 方法。sleep() 方法执行完成后，线程会自动苏醒。或者可以使用 wait(long timeout)超时后线程会自动苏醒。
 
+### Lock
 
+> 什么是线程死锁? 如何避免死锁?
 
-### 为什么我们调用 start() 方法时会执行 run() 方法，为什么我们不能直接调用 run() 方法？
-
-这是另一个非常经典的 java 多线程面试问题，而且在面试中会经常被问到。很简单，但是很多人都会答不上来！
-
-new 一个 Thread，线程进入了新建状态;调用 start() 方法，会启动一个线程并使线程进入了就绪状态，当分配到时间片后就可以开始运行了。 start() 会执行线程的相应准备工作，然后自动执行 run() 方法的内容，这是真正的多线程工作。 而直接执行 run() 方法，会把 run 方法当成一个 main 线程下的普通方法去执行，并不会在某个线程中执行它，所以这并不是多线程工作。
-
-**总结： 调用 start 方法方可启动线程并使线程进入就绪状态，而 run 方法只是 thread 的一个普通方法调用，还是在主线程里执行。**
-
-
-
-### 说说线程的生命周期和状态?
-
-Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种不同状态的其中一个状态（图源《Java 并发编程艺术》4.1.4 节）。
-
-![img](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png)
-
-线程在生命周期中并不是固定处于某一个状态而是随着代码的执行在不同状态之间切换。Java 线程状态变迁如下图所示（图源《Java 并发编程艺术》4.1.4 节）：
-
-![img](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java+%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%8F%98%E8%BF%81.png)
-
-由上图可以看出：线程创建之后它将处于 **NEW（新建）** 状态，调用 `start()` 方法后开始运行，线程这时候处于 **READY（可运行）** 状态。可运行状态的线程获得了 CPU 时间片（timeslice）后就处于 **RUNNING（运行）** 状态。
-
-
-
-### volatile关键字
-
-> 谈谈你对 volatile 的理解？
->
-> 你知道 volatile 底层的实现机制吗？
->
-> volatile 变量和 atomic 变量有什么不同？
->
-> volatile 的使用场景，你能举两个例子吗？
->
-> volatile 能使得一个非原子操作变成原子操作吗？
-
-**理解**：
-
-volatile 是 Java 虚拟机提供的轻量级的同步机制，保证了 Java 内存模型的两个特性，可见性、有序性（禁止指令重排）、不能保证原子性。
-
-
-
-**场景**：
-
-DCL 版本的单例模式就用到了volatile，因为 DCL 也不一定是线程安全的，`instance = new Singleton();`并不是一个原子操作，会分为 3 部分执行，
-
-1. 给 instance 分配内存
-2. 调用 instance 的构造函数来初始化对象
-3. 将 instance 对象指向分配的内存空间（执行完这步 instance 就为非 null 了）
-
-步骤 2 和 3 不存在数据依赖关系，如果虚拟机存在指令重排序优化，则步骤 2和 3 的顺序是无法确定的
-
-一句话：在需要保证原子性的场景，不要使用 volatile。
-
-
-
-**原理**：
-
-volatile 可以保证线程可见性且提供了一定的有序性，但是无法保证原子性。在 JVM 底层是基于内存屏障实现的。
-
-- 当对非 volatile 变量进行读写的时候，每个线程先从内存拷贝变量到 CPU 缓存中。如果计算机有多个CPU，每个线程可能在不同的 CPU 上被处理，这意味着每个线程可以拷贝到不同的 CPU cache 中
-- 而声明变量是 volatile 的，JVM 保证了每次读变量都从内存中读，跳过 CPU cache 这一步，所以就不会有可见性问题
-  - 对 volatile 变量进行写操作时，会在写操作后加一条 store 屏障指令，将工作内存中的共享变量刷新回主内存；
-  - 对 volatile 变量进行读操作时，会在写操作后加一条 load 屏障指令，从主内存中读取共享变量；
-
-
-
-**性能**：
-
-volatile 的读性能消耗与普通变量几乎相同，但是写操作稍慢，因为它需要在本地代码中插入许多内存屏障指令来保证处理器不发生乱序执行。
-
-------
-
-
-
-## JMM篇
-
-> 谈谈 Java 内存模型
->
-> 指令重排
->
-> 内存屏障
->
-> 单核CPU有可见性问题吗
-
-Java虚拟机规范中试图定义一种「 **Java 内存模型**」来**屏蔽掉各种硬件和操作系统的内存访问差异**，以实现**让 Java 程序在各种平台下都能达到一致的内存访问效果**
-
-**JMM组成**：
-
-- 主内存：Java 内存模型规定了所有变量都存储在主内存中（此处的主内存与物理硬件的主内存 RAM 名字一样，两者可以互相类比，但此处仅是虚拟机内存的一部分）。
-
-- 工作内存：每条线程都有自己的工作内存，线程的工作内存中保存了该线程使用到的主内存中的共享变量的副本拷贝。**线程对变量的所有操作都必须在工作内存进行，而不能直接读写主内存中的变量**。**工作内存是 JMM 的一个抽象概念，并不真实存在**。
-
-**特性**：
-
-JMM 就是用来解决如上问题的。 **JMM是围绕着并发过程中如何处理可见性、原子性和有序性这 3 个 特征建立起来的**
-
-- **可见性**：可见性是指当一个线程修改了共享变量的值，其他线程能够立即得知这个修改。Java 中的 volatile、synchronzied、final 都可以实现可见性
-
-- **原子性**：即一个操作或者多个操作，要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。即使在多个线程一起执行的时候，一个操作一旦开始，就不会被其他线程所干扰。
-
-- **有序性**：
-
-  计算机在执行程序时，为了提高性能，编译器和处理器常常会对指令做重排，一般分为以下 3 种
-
-  ![](https://tva1.sinaimg.cn/large/00831rSTly1gcrgrycnj0j31bs04k74y.jpg)
-
-  单线程环境里确保程序最终执行结果和代码顺序执行的结果一致；
-
-  处理器在进行重排序时必须要考虑指令之间的**数据依赖性**；
-
-  多线程环境中线程交替执行，由于编译器优化重排的存在，两个线程中使用的变量能否保证一致性是无法确定的，结果无法预测
-
-
-
-JMM是不区分JVM到底是运行在单核处理器、多核处理器的，Java内存模型是对CPU内存模型的抽象，这是一个High-Level的概念，与具体的CPU平台没啥关系
-
-
-
-happens-before 先行发生，是 Java 内存模型中定义的两项操作之间的偏序关系，**如果操作A 先行发生于操作B，那么A的结果对B可见**。
-
-
-
-内存屏障是被插入两个 CPU 指令之间的一种指令，用来禁止处理器指令发生重排序（像屏障一样），从而保障**有序性**的。
-
-------
-
-
-
-
-
-## Atomic~CAS
-
-> CAS 知道吗，如何实现？
-> 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
-> CAS 底层原理，谈谈你对 UnSafe 的理解？
-> AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
-> CAS 有什么缺点吗？ 如何规避 ABA 问题？
-
-Java 虚拟机又提供了一个轻量级的同步机制——volatile，但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，又增加了`java.util.concurrent.atomic`包， 这个包下提供了一系列原子类。
-
-
-
-**Atomic**：
-
-AtomicBoolean、AtomicInteger、tomicIntegerArray、AtomicReference、AtomicStampedReference
-
-常用方法：
-
-addAndGet(int)、getAndIncrement()、compareAndSet(int, int)
-
-**CAS**:
-
-- CAS：全称 `Compare and swap`，即**比较并交换**，它是一条 **CPU 同步原语**。 是一种硬件对并发的支持，针对多处理器操作而设计的一种特殊指令，用于管理对共享数据的并发访问。 
-- CAS 是一种无锁的非阻塞算法的实现。 
-- CAS 包含了 3 个操作数：
-  - 需要读写的内存值 V 
-  - 旧的预期值 A 
-  - 要修改的更新值 B 
-- 当且仅当 V 的值等于 A 时，CAS 通过原子方式用新值 B 来更新 V 的 值，否则不会执行任何操作（他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。）
-- 缺点
-  - 循环时间长，开销很大
-  - 只能保证一个共享变量的原子操作
-  - ABA 问题（用 AtomicReference 避免）
-
-
-
-**Unsafe**：
-
-CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方法。调用 Unsafe 类中的 CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。
-
-是 CAS 的核心类，由于 Java 方法无法直接访问底层系统，需要通过本地（native）方法来访问，UnSafe 相当于一个后门，UnSafe 类中的所有方法都是 native 修饰的，也就是说该类中的方法都是直接调用操作系统底层资源执行相应任务。 
-
-
-
-## 队列
-
-
-
-------
-
-
-
-
-
-### 什么是线程死锁?如何避免死锁?
-
-#### 8.1. 认识线程死锁
+#### 认识线程死锁
 
 线程死锁描述的是这样一种情况：多个线程同时被阻塞，它们中的一个或者全部都在等待某个资源被释放。由于线程被无限期地阻塞，因此程序不可能正常终止。
 
@@ -403,7 +254,7 @@ Thread[线程 2,5,main]waiting get resource1
 - 不剥夺条件:线程已获得的资源在末使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源
 - 循环等待条件:若干进程之间形成一种头尾相接的循环等待资源关系。
 
-#### 8.2. 如何避免线程死锁?
+#### 如何避免线程死锁?
 
 我上面说了产生死锁的四个必要条件，为了避免死锁，我们只要破坏产生死锁的四个条件中的其中一个就可以了。现在我们来挨个分析一下：
 
@@ -430,6 +281,7 @@ Thread[线程 2,5,main]waiting get resource1
         }
     }, "线程 2").start();
 ```
+
 Output
 
 ```
@@ -449,45 +301,50 @@ Process finished with exit code 0
 
 
 
-------
+### volatile关键字
+
+> 谈谈你对 volatile 的理解？
+>
+> 你知道 volatile 底层的实现机制吗？
+>
+> volatile 变量和 atomic 变量有什么不同？
+>
+> volatile 的使用场景，你能举两个例子吗？
+>
+> volatile 能使得一个非原子操作变成原子操作吗？
+
+**理解**：
+
+volatile 是 Java 虚拟机提供的轻量级的同步机制，保证了 Java 内存模型的两个特性，可见性、有序性（禁止指令重排）、不能保证原子性。
 
 
 
-## ThreadLocal
+**场景**：
 
-当使用 ThreadLocal 维护变量时，其为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立的改变自己的副本，而不会影响其他线程对应的副本。
+DCL 版本的单例模式就用到了volatile，因为 DCL 也不一定是线程安全的，`instance = new Singleton();`并不是一个原子操作，会分为 3 部分执行，
 
-ThreadLocal 内部实现机制：
+1. 给 instance 分配内存
+2. 调用 instance 的构造函数来初始化对象
+3. 将 instance 对象指向分配的内存空间（执行完这步 instance 就为非 null 了）
 
-- 每个线程内部都会维护一个类似 HashMap 的对象，称为 ThreadLocalMap，里边会包含若干了 Entry（K-V 键值对），相应的线程被称为这些 Entry 的属主线程；
-- Entry 的 Key 是一个 ThreadLocal 实例，Value 是一个线程特有对象。Entry 的作用即是：为其属主线程建立起一个 ThreadLocal 实例与一个线程特有对象之间的对应关系；
-- Entry 对 Key 的引用是弱引用；Entry 对 Value 的引用是强引用。
+步骤 2 和 3 不存在数据依赖关系，如果虚拟机存在指令重排序优化，则步骤 2和 3 的顺序是无法确定的
 
-
-
-### 谈谈 synchronized和ReentrantLock 的区别
-
-**① 两者都是可重入锁**
-
-两者都是可重入锁。“可重入锁”概念是：自己可以再次获取自己的内部锁。比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的，如果不可锁重入的话，就会造成死锁。同一个线程每次获取锁，锁的计数器都自增1，所以要等到锁的计数器下降为0时才能释放锁。
-
-**② synchronized 依赖于 JVM 而 ReentrantLock 依赖于 API**
-
-synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。
-
-**③ ReentrantLock 比 synchronized 增加了一些高级功能**
-
-相比synchronized，ReentrantLock增加了一些高级功能。主要来说主要有三点：**①等待可中断；②可实现公平锁；③可实现选择性通知（锁可以绑定多个条件）**
-
-- **ReentrantLock提供了一种能够中断等待锁的线程的机制**，通过lock.lockInterruptibly()来实现这个机制。也就是说正在等待的线程可以选择放弃等待，改为处理其他事情。
-- **ReentrantLock可以指定是公平锁还是非公平锁。而synchronized只能是非公平锁。所谓的公平锁就是先等待的线程先获得锁。** ReentrantLock默认情况是非公平的，可以通过 ReentrantLock类的`ReentrantLock(boolean fair)`构造方法来制定是否是公平的。
-- synchronized关键字与wait()和notify()/notifyAll()方法相结合可以实现等待/通知机制，ReentrantLock类当然也可以实现，但是需要借助于Condition接口与newCondition() 方法。Condition是JDK1.5之后才有的，它具有很好的灵活性，比如可以实现多路通知功能也就是在一个Lock对象中可以创建多个Condition实例（即对象监视器），**线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知”** ，这个功能非常重要，而且是Condition接口默认提供的。而synchronized关键字就相当于整个Lock对象中只有一个Condition实例，所有的线程都注册在它一个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程这样会造成很大的效率问题，而Condition实例的signalAll()方法 只会唤醒注册在该Condition实例中的所有等待线程。
-
-如果你想使用上述功能，那么选择ReentrantLock是一个不错的选择。
-
-**④ 性能已不是选择标准**
+一句话：在需要保证原子性的场景，不要使用 volatile。
 
 
+
+**原理**：
+
+volatile 可以保证线程可见性且提供了一定的有序性，但是无法保证原子性。在 JVM 底层是基于内存屏障实现的。
+
+- 当对非 volatile 变量进行读写的时候，每个线程先从内存拷贝变量到 CPU 缓存中。如果计算机有多个CPU，每个线程可能在不同的 CPU 上被处理，这意味着每个线程可以拷贝到不同的 CPU cache 中
+- 而声明变量是 volatile 的，JVM 保证了每次读变量都从内存中读，跳过 CPU cache 这一步，所以就不会有可见性问题
+  - 对 volatile 变量进行写操作时，会在写操作后加一条 store 屏障指令，将工作内存中的共享变量刷新回主内存；
+  - 对 volatile 变量进行读操作时，会在写操作后加一条 load 屏障指令，从主内存中读取共享变量；
+
+**性能**：
+
+volatile 的读性能消耗与普通变量几乎相同，但是写操作稍慢，因为它需要在本地代码中插入许多内存屏障指令来保证处理器不发生乱序执行。
 
 
 
@@ -528,14 +385,6 @@ RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤�
 
 
 
-
-
-
-
-
-
-
-
 ### 说说 synchronized 关键字和 volatile 关键字的区别
 
 `synchronized` 关键字和 `volatile` 关键字是两个互补的存在，而不是对立的存在：
@@ -547,175 +396,139 @@ RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤�
 
 
 
-## ThreadLocal
+### 谈谈 synchronized和ReentrantLock 的区别
 
-### 3.1. ThreadLocal简介
+**① 两者都是可重入锁**
 
-通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？** JDK中提供的`ThreadLocal`类正是为了解决这样的问题。 **ThreadLocal类主要解决的就是让每个线程绑定自己的值，可以将ThreadLocal类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据。**
+两者都是可重入锁。“可重入锁”概念是：自己可以再次获取自己的内部锁。比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的，如果不可锁重入的话，就会造成死锁。同一个线程每次获取锁，锁的计数器都自增1，所以要等到锁的计数器下降为0时才能释放锁。
 
-**如果你创建了一个ThreadLocal变量，那么访问这个变量的每个线程都会有这个变量的本地副本，这也是ThreadLocal变量名的由来。他们可以使用 get（） 和 set（） 方法来获取默认值或将其值更改为当前线程所存的副本的值，从而避免了线程安全问题。**
+**② synchronized 依赖于 JVM 而 ReentrantLock 依赖于 API**
 
-再举个简单的例子：
+synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。
 
-比如有两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么ThreadLocal就是用来避免这两个线程竞争的。
+**③ ReentrantLock 比 synchronized 增加了一些高级功能**
 
-### 3.2. ThreadLocal示例
+相比synchronized，ReentrantLock增加了一些高级功能。主要来说主要有三点：**①等待可中断；②可实现公平锁；③可实现选择性通知（锁可以绑定多个条件）**
 
-相信看了上面的解释，大家已经搞懂 ThreadLocal 类是个什么东西了。
+- **ReentrantLock提供了一种能够中断等待锁的线程的机制**，通过lock.lockInterruptibly()来实现这个机制。也就是说正在等待的线程可以选择放弃等待，改为处理其他事情。
+- **ReentrantLock可以指定是公平锁还是非公平锁。而synchronized只能是非公平锁。所谓的公平锁就是先等待的线程先获得锁。** ReentrantLock默认情况是非公平的，可以通过 ReentrantLock类的`ReentrantLock(boolean fair)`构造方法来制定是否是公平的。
+- synchronized关键字与wait()和notify()/notifyAll()方法相结合可以实现等待/通知机制，ReentrantLock类当然也可以实现，但是需要借助于Condition接口与newCondition() 方法。Condition是JDK1.5之后才有的，它具有很好的灵活性，比如可以实现多路通知功能也就是在一个Lock对象中可以创建多个Condition实例（即对象监视器），**线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知”** ，这个功能非常重要，而且是Condition接口默认提供的。而synchronized关键字就相当于整个Lock对象中只有一个Condition实例，所有的线程都注册在它一个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程这样会造成很大的效率问题，而Condition实例的signalAll()方法 只会唤醒注册在该Condition实例中的所有等待线程。
 
-```
-import java.text.SimpleDateFormat;
-import java.util.Random;
+如果你想使用上述功能，那么选择ReentrantLock是一个不错的选择。
 
-public class ThreadLocalExample implements Runnable{
+**④ 性能已不是选择标准**
 
-     // SimpleDateFormat 不是线程安全的，所以每个线程都要有自己独立的副本
-    private static final ThreadLocal<SimpleDateFormat> formatter = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd HHmm"));
 
-    public static void main(String[] args) throws InterruptedException {
-        ThreadLocalExample obj = new ThreadLocalExample();
-        for(int i=0 ; i<10; i++){
-            Thread t = new Thread(obj, ""+i);
-            Thread.sleep(new Random().nextInt(1000));
-            t.start();
-        }
-    }
 
-    @Override
-    public void run() {
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" default Formatter = "+formatter.get().toPattern());
-        try {
-            Thread.sleep(new Random().nextInt(1000));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //formatter pattern is changed here by thread, but it won't reflect to other threads
-        formatter.set(new SimpleDateFormat());
 
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" formatter = "+formatter.get().toPattern());
-    }
 
-}
-```
+------
 
-Output:
 
-```
-Thread Name= 0 default Formatter = yyyyMMdd HHmm
-Thread Name= 0 formatter = yy-M-d ah:mm
-Thread Name= 1 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 default Formatter = yyyyMMdd HHmm
-Thread Name= 1 formatter = yy-M-d ah:mm
-Thread Name= 3 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 formatter = yy-M-d ah:mm
-Thread Name= 4 default Formatter = yyyyMMdd HHmm
-Thread Name= 3 formatter = yy-M-d ah:mm
-Thread Name= 4 formatter = yy-M-d ah:mm
-Thread Name= 5 default Formatter = yyyyMMdd HHmm
-Thread Name= 5 formatter = yy-M-d ah:mm
-Thread Name= 6 default Formatter = yyyyMMdd HHmm
-Thread Name= 6 formatter = yy-M-d ah:mm
-Thread Name= 7 default Formatter = yyyyMMdd HHmm
-Thread Name= 7 formatter = yy-M-d ah:mm
-Thread Name= 8 default Formatter = yyyyMMdd HHmm
-Thread Name= 9 default Formatter = yyyyMMdd HHmm
-Thread Name= 8 formatter = yy-M-d ah:mm
-Thread Name= 9 formatter = yy-M-d ah:mm
-```
 
-从输出中可以看出，Thread-0已经改变了formatter的值，但仍然是thread-2默认格式化程序与初始化值相同，其他线程也一样。
+## 三、JMM篇
 
-上面有一段代码用到了创建 `ThreadLocal` 变量的那段代码用到了 Java8 的知识，它等于下面这段代码，如果你写了下面这段代码的话，IDEA会提示你转换为Java8的格式(IDEA真的不错！)。因为ThreadLocal类在Java 8中扩展，使用一个新的方法`withInitial()`，将Supplier功能接口作为参数。
-
-```
- private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>(){
-        @Override
-        protected SimpleDateFormat initialValue()
-        {
-            return new SimpleDateFormat("yyyyMMdd HHmm");
-        }
-    };
-```
-
-### 3.3. ThreadLocal原理
-
-从 `Thread`类源代码入手。
-
-```
-public class Thread implements Runnable {
- ......
-//与此线程有关的ThreadLocal值。由ThreadLocal类维护
-ThreadLocal.ThreadLocalMap threadLocals = null;
-
-//与此线程有关的InheritableThreadLocal值。由InheritableThreadLocal类维护
-ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
- ......
-}
-```
-
-从上面`Thread`类 源代码可以看出`Thread` 类中有一个 `threadLocals` 和 一个 `inheritableThreadLocals` 变量，它们都是 `ThreadLocalMap` 类型的变量,我们可以把 `ThreadLocalMap` 理解为`ThreadLocal` 类实现的定制化的 `HashMap`。默认情况下这两个变量都是null，只有当前线程调用 `ThreadLocal` 类的 `set`或`get`方法时才创建它们，实际上调用这两个方法的时候，我们调用的是`ThreadLocalMap`类对应的 `get()`、`set() `方法。
-
-`ThreadLocal`类的`set()`方法
-
-```
-    public void set(T value) {
-        Thread t = Thread.currentThread();
-        ThreadLocalMap map = getMap(t);
-        if (map != null)
-            map.set(this, value);
-        else
-            createMap(t, value);
-    }
-    ThreadLocalMap getMap(Thread t) {
-        return t.threadLocals;
-    }
-```
-
-通过上面这些内容，我们足以通过猜测得出结论：**最终的变量是放在了当前线程的 ThreadLocalMap 中，并不是存在 ThreadLocal 上，ThreadLocal 可以理解为只是ThreadLocalMap的封装，传递了变量值。** `ThrealLocal` 类中可以通过`Thread.currentThread()`获取到当前线程对象后，直接通过`getMap(Thread t)`可以访问到该线程的`ThreadLocalMap`对象。
-
-**每个Thread中都具备一个ThreadLocalMap，而ThreadLocalMap可以存储以ThreadLocal为key ，Object 对象为 value的键值对。**
-
-```
-ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
- ......
-}
-```
-
-比如我们在同一个线程中声明了两个 `ThreadLocal` 对象的话，会使用 `Thread`内部都是使用仅有那个`ThreadLocalMap` 存放数据的，`ThreadLocalMap`的 key 就是 `ThreadLocal`对象，value 就是 `ThreadLocal` 对象调用`set`方法设置的值。
-
-[![ThreadLocal数据结构](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)
-
-`ThreadLocalMap`是`ThreadLocal`的静态内部类。
-
-[![ThreadLocal内部类](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)
-
-### 3.4. ThreadLocal 内存泄露问题
-
-`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
-
-```
-      static class Entry extends WeakReference<ThreadLocal<?>> {
-            /** The value associated with this ThreadLocal. */
-            Object value;
-
-            Entry(ThreadLocal<?> k, Object v) {
-                super(k);
-                value = v;
-            }
-        }
-```
-
-**弱引用介绍：**
-
-> 如果一个对象只具有弱引用，那就类似于**可有可无的生活用品**。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。
+> 谈谈 Java 内存模型
 >
-> 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。
+> 指令重排
+>
+> 内存屏障
+>
+> 单核CPU有可见性问题吗
+
+Java虚拟机规范中试图定义一种「 **Java 内存模型**」来**屏蔽掉各种硬件和操作系统的内存访问差异**，以实现**让 Java 程序在各种平台下都能达到一致的内存访问效果**
+
+**JMM组成**：
+
+- 主内存：Java 内存模型规定了所有变量都存储在主内存中（此处的主内存与物理硬件的主内存 RAM 名字一样，两者可以互相类比，但此处仅是虚拟机内存的一部分）。
+
+- 工作内存：每条线程都有自己的工作内存，线程的工作内存中保存了该线程使用到的主内存中的共享变量的副本拷贝。**线程对变量的所有操作都必须在工作内存进行，而不能直接读写主内存中的变量**。**工作内存是 JMM 的一个抽象概念，并不真实存在**。
+
+**特性**：
+
+JMM 就是用来解决如上问题的。 **JMM是围绕着并发过程中如何处理可见性、原子性和有序性这 3 个 特征建立起来的**
+
+- **可见性**：可见性是指当一个线程修改了共享变量的值，其他线程能够立即得知这个修改。Java 中的 volatile、synchronzied、final 都可以实现可见性
+
+- **原子性**：即一个操作或者多个操作，要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。即使在多个线程一起执行的时候，一个操作一旦开始，就不会被其他线程所干扰。
+
+- **有序性**：
+
+  计算机在执行程序时，为了提高性能，编译器和处理器常常会对指令做重排，一般分为以下 3 种
+
+  ![](https://tva1.sinaimg.cn/large/00831rSTly1gcrgrycnj0j31bs04k74y.jpg)
+
+  单线程环境里确保程序最终执行结果和代码顺序执行的结果一致；
+
+  处理器在进行重排序时必须要考虑指令之间的**数据依赖性**；
+
+  多线程环境中线程交替执行，由于编译器优化重排的存在，两个线程中使用的变量能否保证一致性是无法确定的，结果无法预测
+
+
+
+JMM是不区分JVM到底是运行在单核处理器、多核处理器的，Java内存模型是对CPU内存模型的抽象，这是一个High-Level的概念，与具体的CPU平台没啥关系
+
+
+
+happens-before 先行发生，是 Java 内存模型中定义的两项操作之间的偏序关系，**如果操作A 先行发生于操作B，那么A的结果对B可见**。
+
+内存屏障是被插入两个 CPU 指令之间的一种指令，用来禁止处理器指令发生重排序（像屏障一样），从而保障**有序性**的。
 
 
 
 
 
-# 线程池篇
+------
+
+
+
+
+
+## 四、Atomic~CAS篇
+
+> CAS 知道吗，如何实现？
+> 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
+> CAS 底层原理，谈谈你对 UnSafe 的理解？
+> AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
+> CAS 有什么缺点吗？ 如何规避 ABA 问题？
+
+Java 虚拟机又提供了一个轻量级的同步机制——volatile，但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，又增加了`java.util.concurrent.atomic`包， 这个包下提供了一系列原子类。
+
+
+
+**Atomic**：
+
+AtomicBoolean、AtomicInteger、tomicIntegerArray、AtomicReference、AtomicStampedReference
+
+常用方法：
+
+addAndGet(int)、getAndIncrement()、compareAndSet(int, int)
+
+**CAS**:
+
+- CAS：全称 `Compare and swap`，即**比较并交换**，它是一条 **CPU 同步原语**。 是一种硬件对并发的支持，针对多处理器操作而设计的一种特殊指令，用于管理对共享数据的并发访问。 
+- CAS 是一种无锁的非阻塞算法的实现。 
+- CAS 包含了 3 个操作数：
+  - 需要读写的内存值 V 
+  - 旧的预期值 A 
+  - 要修改的更新值 B 
+- 当且仅当 V 的值等于 A 时，CAS 通过原子方式用新值 B 来更新 V 的 值，否则不会执行任何操作（他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。）
+- 缺点
+  - 循环时间长，开销很大
+  - 只能保证一个共享变量的原子操作
+  - ABA 问题（用 AtomicReference 避免）
+
+
+
+**Unsafe**：
+
+CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方法。调用 Unsafe 类中的 CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。
+
+是 CAS 的核心类，由于 Java 方法无法直接访问底层系统，需要通过本地（native）方法来访问，UnSafe 相当于一个后门，UnSafe 类中的所有方法都是 native 修饰的，也就是说该类中的方法都是直接调用操作系统底层资源执行相应任务。 
+
+
+
+## 五、线程池篇
 
 > 线程池原理，拒绝策略，核心线程数
 >
@@ -907,7 +720,7 @@ public interface Callable<V> {
 }
 ```
 
-### 4.3. 执行execute()方法和submit()方法的区别是什么呢？
+### 执行execute()方法和submit()方法的区别是什么呢？
 
 1. **execute()方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功与否；**
 2. **submit()方法用于提交需要返回值的任务。线程池会返回一个 Future 类型的对象，通过这个 Future 对象可以判断任务是否执行成功**，并且可以通过 `Future` 的 `get()`方法来获取返回值，`get()`方法会阻塞当前线程直到任务完成，而使用 `get（long timeout，TimeUnit unit）`方法则会阻塞当前线程一段时间后立即返回，这时候有可能任务没有执行完。
@@ -939,7 +752,7 @@ public interface Callable<V> {
     }
 ```
 
-### 4.4. 如何创建线程池
+### 如何创建线程池
 
 《阿里巴巴Java开发手册》中强制线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险
 
@@ -956,7 +769,7 @@ public interface Callable<V> {
 
 对应Executors工具类中的方法如图所示： [![Executor框架的工具类](https://camo.githubusercontent.com/6cfe663a5033e0f4adcfa148e6c54cdbb97c00bb/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f4578656375746f722545362541312538362545362539452542362545372539412538342545352542372541352545352538352542372545372542312542422e706e67)](https://camo.githubusercontent.com/6cfe663a5033e0f4adcfa148e6c54cdbb97c00bb/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f4578656375746f722545362541312538362545362539452542362545372539412538342545352542372541352545352538352542372545372542312542422e706e67)
 
-### 4.5 ThreadPoolExecutor 类分析
+### ThreadPoolExecutor 类分析
 
 `ThreadPoolExecutor` 类中提供的四个构造方法。我们来看最长的那个，其余三个都是在这个构造方法的基础上产生（其他几个构造方法说白点都是给定某些默认参数的构造方法比如默认制定拒绝策略是什么），这里就不贴代码讲了，比较简单。
 
@@ -989,7 +802,7 @@ public interface Callable<V> {
 
 **下面这些对创建 非常重要，在后面使用线程池的过程中你一定会用到！所以，务必拿着小本本记清楚。**
 
-#### 4.5.1 `ThreadPoolExecutor`构造函数重要参数分析
+####  `ThreadPoolExecutor`构造函数重要参数分析
 
 **ThreadPoolExecutor 3 个最重要的参数：**
 
@@ -1004,7 +817,7 @@ public interface Callable<V> {
 3. **threadFactory** :executor 创建新线程的时候会用到。
 4. **handler** :饱和策略。关于饱和策略下面单独介绍一下。
 
-#### 4.5.2 `ThreadPoolExecutor` 饱和策略
+#### `ThreadPoolExecutor` 饱和策略
 
 **ThreadPoolExecutor 饱和策略定义:**
 
@@ -1017,7 +830,7 @@ public interface Callable<V> {
 
 举个例子： Spring 通过 `ThreadPoolTaskExecutor` 或者我们直接通过 `ThreadPoolExecutor` 的构造函数创建线程池的时候，当我们不指定 `RejectedExecutionHandler` 饱和策略的话来配置线程池的时候默认使用的是 `ThreadPoolExecutor.AbortPolicy`。在默认情况下，`ThreadPoolExecutor` 将抛出 `RejectedExecutionException` 来拒绝新来的任务 ，这代表你将丢失对这个任务的处理。 对于可伸缩的应用程序，建议使用 `ThreadPoolExecutor.CallerRunsPolicy`。当最大池被填满时，此策略为我们提供可伸缩队列。（这个直接查看 `ThreadPoolExecutor` 的构造函数源码就可以看出，比较简单的原因，这里就不贴代码了）
 
-### 4.6 一个简单的线程池Demo:`Runnable`+`ThreadPoolExecutor`
+### 一个简单的线程池Demo:`Runnable`+`ThreadPoolExecutor`
 
 为了让大家更清楚上面的面试题中的一些概念，我写了一个简单的线程池 Demo。
 
@@ -1136,7 +949,7 @@ pool-1-thread-5 End. Time = Tue Nov 12 20:59:54 CST 2019
 pool-1-thread-1 End. Time = Tue Nov 12 20:59:54 CST 2019
 ```
 
-### 4.7 线程池原理分析
+### 线程池原理分析
 
 承接 4.6 节，我们通过代码输出结果可以看出：**线程池每次会同时执行 5 个任务，这 5 个任务执行完之后，剩余的 5 个任务才会被执行。** 大家可以先通过上面讲解的内容，分析一下到底是咋回事？（自己独立思考一会）
 
@@ -1229,9 +1042,7 @@ sleep方法和yield方法的区别
 
 
 
-## AQS
-
-## AQS
+## 六、AQS篇
 
 ### 6.1. AQS 介绍
 
@@ -1339,7 +1150,7 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 
 
 
-## countDownLatch/CycliBarries/Semaphore使用过吗
+### countDownLatch/CycliBarries/Semaphore使用过吗
 
 
 
@@ -1426,6 +1237,188 @@ public class SemaphoreDemo {
 
 
 
+
+## 七、并发容器篇
+
+Queue
+
+ConcurrentHashMap
+
+
+
+## 八、其他问题
+
+### ThreadLocal
+
+当使用 ThreadLocal 维护变量时，其为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立的改变自己的副本，而不会影响其他线程对应的副本。
+
+ThreadLocal 内部实现机制：
+
+- 每个线程内部都会维护一个类似 HashMap 的对象，称为 ThreadLocalMap，里边会包含若干了 Entry（K-V 键值对），相应的线程被称为这些 Entry 的属主线程；
+- Entry 的 Key 是一个 ThreadLocal 实例，Value 是一个线程特有对象。Entry 的作用即是：为其属主线程建立起一个 ThreadLocal 实例与一个线程特有对象之间的对应关系；
+- Entry 对 Key 的引用是弱引用；Entry 对 Value 的引用是强引用。
+
+### 3.1. ThreadLocal简介
+
+通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？** JDK中提供的`ThreadLocal`类正是为了解决这样的问题。 **ThreadLocal类主要解决的就是让每个线程绑定自己的值，可以将ThreadLocal类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据。**
+
+**如果你创建了一个ThreadLocal变量，那么访问这个变量的每个线程都会有这个变量的本地副本，这也是ThreadLocal变量名的由来。他们可以使用 get（） 和 set（） 方法来获取默认值或将其值更改为当前线程所存的副本的值，从而避免了线程安全问题。**
+
+再举个简单的例子：
+
+比如有两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么ThreadLocal就是用来避免这两个线程竞争的。
+
+### 3.2. ThreadLocal示例
+
+相信看了上面的解释，大家已经搞懂 ThreadLocal 类是个什么东西了。
+
+```
+import java.text.SimpleDateFormat;
+import java.util.Random;
+
+public class ThreadLocalExample implements Runnable{
+
+     // SimpleDateFormat 不是线程安全的，所以每个线程都要有自己独立的副本
+    private static final ThreadLocal<SimpleDateFormat> formatter = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd HHmm"));
+
+    public static void main(String[] args) throws InterruptedException {
+        ThreadLocalExample obj = new ThreadLocalExample();
+        for(int i=0 ; i<10; i++){
+            Thread t = new Thread(obj, ""+i);
+            Thread.sleep(new Random().nextInt(1000));
+            t.start();
+        }
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Thread Name= "+Thread.currentThread().getName()+" default Formatter = "+formatter.get().toPattern());
+        try {
+            Thread.sleep(new Random().nextInt(1000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //formatter pattern is changed here by thread, but it won't reflect to other threads
+        formatter.set(new SimpleDateFormat());
+
+        System.out.println("Thread Name= "+Thread.currentThread().getName()+" formatter = "+formatter.get().toPattern());
+    }
+
+}
+```
+
+Output:
+
+```
+Thread Name= 0 default Formatter = yyyyMMdd HHmm
+Thread Name= 0 formatter = yy-M-d ah:mm
+Thread Name= 1 default Formatter = yyyyMMdd HHmm
+Thread Name= 2 default Formatter = yyyyMMdd HHmm
+Thread Name= 1 formatter = yy-M-d ah:mm
+Thread Name= 3 default Formatter = yyyyMMdd HHmm
+Thread Name= 2 formatter = yy-M-d ah:mm
+Thread Name= 4 default Formatter = yyyyMMdd HHmm
+Thread Name= 3 formatter = yy-M-d ah:mm
+Thread Name= 4 formatter = yy-M-d ah:mm
+Thread Name= 5 default Formatter = yyyyMMdd HHmm
+Thread Name= 5 formatter = yy-M-d ah:mm
+Thread Name= 6 default Formatter = yyyyMMdd HHmm
+Thread Name= 6 formatter = yy-M-d ah:mm
+Thread Name= 7 default Formatter = yyyyMMdd HHmm
+Thread Name= 7 formatter = yy-M-d ah:mm
+Thread Name= 8 default Formatter = yyyyMMdd HHmm
+Thread Name= 9 default Formatter = yyyyMMdd HHmm
+Thread Name= 8 formatter = yy-M-d ah:mm
+Thread Name= 9 formatter = yy-M-d ah:mm
+```
+
+从输出中可以看出，Thread-0已经改变了formatter的值，但仍然是thread-2默认格式化程序与初始化值相同，其他线程也一样。
+
+上面有一段代码用到了创建 `ThreadLocal` 变量的那段代码用到了 Java8 的知识，它等于下面这段代码，如果你写了下面这段代码的话，IDEA会提示你转换为Java8的格式(IDEA真的不错！)。因为ThreadLocal类在Java 8中扩展，使用一个新的方法`withInitial()`，将Supplier功能接口作为参数。
+
+```
+ private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("yyyyMMdd HHmm");
+        }
+    };
+```
+
+### 3.3. ThreadLocal原理
+
+从 `Thread`类源代码入手。
+
+```
+public class Thread implements Runnable {
+ ......
+//与此线程有关的ThreadLocal值。由ThreadLocal类维护
+ThreadLocal.ThreadLocalMap threadLocals = null;
+
+//与此线程有关的InheritableThreadLocal值。由InheritableThreadLocal类维护
+ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+ ......
+}
+```
+
+从上面`Thread`类 源代码可以看出`Thread` 类中有一个 `threadLocals` 和 一个 `inheritableThreadLocals` 变量，它们都是 `ThreadLocalMap` 类型的变量,我们可以把 `ThreadLocalMap` 理解为`ThreadLocal` 类实现的定制化的 `HashMap`。默认情况下这两个变量都是null，只有当前线程调用 `ThreadLocal` 类的 `set`或`get`方法时才创建它们，实际上调用这两个方法的时候，我们调用的是`ThreadLocalMap`类对应的 `get()`、`set() `方法。
+
+`ThreadLocal`类的`set()`方法
+
+```
+    public void set(T value) {
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null)
+            map.set(this, value);
+        else
+            createMap(t, value);
+    }
+    ThreadLocalMap getMap(Thread t) {
+        return t.threadLocals;
+    }
+```
+
+通过上面这些内容，我们足以通过猜测得出结论：**最终的变量是放在了当前线程的 ThreadLocalMap 中，并不是存在 ThreadLocal 上，ThreadLocal 可以理解为只是ThreadLocalMap的封装，传递了变量值。** `ThrealLocal` 类中可以通过`Thread.currentThread()`获取到当前线程对象后，直接通过`getMap(Thread t)`可以访问到该线程的`ThreadLocalMap`对象。
+
+**每个Thread中都具备一个ThreadLocalMap，而ThreadLocalMap可以存储以ThreadLocal为key ，Object 对象为 value的键值对。**
+
+```
+ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+ ......
+}
+```
+
+比如我们在同一个线程中声明了两个 `ThreadLocal` 对象的话，会使用 `Thread`内部都是使用仅有那个`ThreadLocalMap` 存放数据的，`ThreadLocalMap`的 key 就是 `ThreadLocal`对象，value 就是 `ThreadLocal` 对象调用`set`方法设置的值。
+
+[![ThreadLocal数据结构](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)
+
+`ThreadLocalMap`是`ThreadLocal`的静态内部类。
+
+[![ThreadLocal内部类](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)
+
+### 3.4. ThreadLocal 内存泄露问题
+
+`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
+
+```
+      static class Entry extends WeakReference<ThreadLocal<?>> {
+            /** The value associated with this ThreadLocal. */
+            Object value;
+
+            Entry(ThreadLocal<?> k, Object v) {
+                super(k);
+                value = v;
+            }
+        }
+```
+
+**弱引用介绍：**
+
+> 如果一个对象只具有弱引用，那就类似于**可有可无的生活用品**。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。
+>
+> 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。
 
 
 
