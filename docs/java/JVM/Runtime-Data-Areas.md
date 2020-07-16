@@ -1,10 +1,10 @@
-2万字长文包教包会 JVM 内存结构   保姆级学习笔记
+# 2万字长文包教包会 JVM 内存结构   保姆级学习笔记
 
 > JVM  ≠ Japanese Video's Man
 >
-> 写这篇的主要原因呢，就是为了能在简历上写个“熟悉JVM底层结构”，另一个原因就是能让读我文章的大家也写上这句话，真是个助人为乐的帅小伙。。。。嗯，不单单只是面向面试学习哈，更重要的是构建自己的JVM 知识体系，Javaer 们技术栈要有广度，但是 JVM 的掌握必须有深度
+> 写这篇的主要原因呢，就是为了能在简历上写个“熟悉JVM底层结构”，另一个原因就是能让读我文章的大家也写上这句话，真是个助人为乐的帅小伙。。。。嗯，不单单只是面向面试学习哈，更重要的是构建自己的 JVM 知识体系，Javaer 们技术栈要有广度，但是 JVM 的掌握必须有深度
 >
-> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱，笔记自取
 
 
 
@@ -57,7 +57,7 @@ PC 寄存器用来存储指向下一条指令的地址，即将要执行的指�
 
 ![jvm-pc-counter](https://tva1.sinaimg.cn/large/0082zybply1gc5kmznm1sj31m50u0wph.jpg)
 
-（分析：进入class文件所在目录，执行`javap -v xx.class`反解析（或者通过IDEA插件`Jclasslib`直接查看，上图），可以看到当前类对应的Code区（汇编指令）、本地变量表、异常表和代码行偏移量映射表、常量池等信息。）
+（分析：进入class文件所在目录，执行 `javap -v xx.class` 反解析（或者通过 IDEA 插件 `Jclasslib` 直接查看，上图），可以看到当前类对应的Code区（汇编指令）、本地变量表、异常表和代码行偏移量映射表、常量池等信息。）
 
 
 
