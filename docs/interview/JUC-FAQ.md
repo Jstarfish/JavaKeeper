@@ -218,24 +218,6 @@ public class DeadLockDemo {
         }, "线程 2").start();
     }
 }
-Thread[线程 1,5,main]get resource1
-Thread[线程 2,5,main]get resource2
-Thread[线程 1,5,main]waiting get resource2
-Thread[线程 2,5,main]waiting get resource1
-        new Thread(() -> {
-            synchronized (resource1) {
-                System.out.println(Thread.currentThread() + "get resource1");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(Thread.currentThread() + "waiting get resource2");
-                synchronized (resource2) {
-                    System.out.println(Thread.currentThread() + "get resource2");
-                }
-            }
-        }, "线程 2").start();
 ```
 
 Output
@@ -298,6 +280,32 @@ Process finished with exit code 0
 我们分析一下上面的代码为什么避免了死锁的发生?
 
 线程 1 首先获得到 resource1 的监视器锁,这时候线程 2 就获取不到了。然后线程 1 再去获取 resource2 的监视器锁，可以获取到。然后线程 1 释放了对 resource1、resource2 的监视器锁的占用，线程 2 获取到就可以执行了。这样就破坏了破坏循环等待条件，因此避免了死锁。
+
+
+
+### ReentrantLock (可重入锁) 
+
+> 何为可重入
+
+可重入的意思是某一个线程是否可多次获得一个锁，**在继承的情况下，如果不是可重入的，那就形成死锁了,比如递归调用自己的时候;**，如果不能可重入，每次都获取锁不合适，比如synchronized就是可重入的，ReentrantLock也是可重入的
+
+当某个线程A已经持有了一个锁,当线程B尝试进入被这个锁保护的代码段的时候.就会被阻塞.而锁的操作粒度是”线程”,而不是调用.同一个线程再次进入同步代码的时候.可以使用自己已经获取到的锁,这就是可重入锁
+
+> 为什么要可重入
+
+如果线程A继续再次获得这个锁呢?比如一个方法是synchronized,递归调用自己,那么第一次已经获得了锁,第二次调用的时候还能进入吗? 直观上当然需要能进入.这就要求必须是可重入的.可重入锁又叫做递归锁,不然就死锁了。 
+
+ 它实现方式是：
+
+为每个锁关联一个获取计数器和一个所有者线程,当计数值为0的时候,这个所就没有被任何线程只有.当线程请求一个未被持有的锁时,JVM将记下锁的持有者,并且将获取计数值置为1,如果同一个线程再次获取这个锁,技术值将递增,退出一次同步代码块,计算值递减,当计数值为0时,这个锁就被释放.ReentrantLock里面有实现
+
+
+
+**`ReentrantLock` 类是唯一实现了`Lock的类`** ，它拥有与`synchronized` 相同的并发性和内存语义，但是添加了类似**锁投票**、**定时锁等候**和**可中断锁等候**的一些特性。此外，它还提供了在激烈争用情况下**更佳的性能**。（换句话说，当许多线程都想访问共享资源时，JVM 可以花更少的时候来调度线程，把更多时间用在执行线程上。）  
+
+用sychronized修饰的方法或者语句块在代码执行完之后锁自动释放，而是用Lock需要我们**手动释放锁**，所以为了保证锁最终被释放(发生异常情况)，要把互斥区放在try内，释放锁放在finally内！！  
+
+
 
 
 
@@ -627,7 +635,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 工作原理：
 
-线程池在内部实际上构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程。线程池的运行主要分成两部分：**任务管理、线程管理**。任务管理部分充当生产者的角色，当任务提交后，线程池会判断该任务后续的流转：
+**线程池在内部实际上构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程**。线程池的运行主要分成两部分：**任务管理、线程管理**。任务管理部分充当生产者的角色，当任务提交后，线程池会判断该任务后续的流转：
 
 - 直接申请线程执行该任务；
 - 缓冲到队列中等待线程执行；

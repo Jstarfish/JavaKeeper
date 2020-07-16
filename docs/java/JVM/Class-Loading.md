@@ -10,8 +10,6 @@
 4. 多线程的情况下，类的加载为什么不会出现重复加载的情况？
 5. 什么是双亲委派机制？它有啥优势？可以打破这种机制吗？
 
-![](https://tva1.sinaimg.cn/large/0082zybply1gc0vxdcutjj30dw10hju9.jpg)
-
 ------
 ## 类加载子系统
 
@@ -100,17 +98,17 @@
 
 - 将常量池内的符号引用转换为直接引用的过程
 - 事实上，解析操作往往会伴随着 JVM 在执行完初始化之后再执行
-- 符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《Java虚拟机规范》的Class文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄
+- 符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《Java虚拟机规范》的 Class文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄
 - 解析动作主要针对类或接口、字段、类方法、接口方法、方法类型等。对应常量池中的`CONSTANT_Class_info`、`CONSTANT_Fieldref_info`、`CONSTANT_Methodref_info`等
 
 ### 3. 初始化（Initialization）
 
-- 初始化阶段就是执行**类构造器方法**\<clinit>()的过程
+- 初始化阶段就是执行**类构造器方法** `<clinit>()` 的过程
 - 此方法不需要定义，是 javac 编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来
 - 构造器方法中指令按语句在源文件中出现的顺序执行
-- \<clinit>()不同于类的构造器（构造器是虚拟机视角下的\<init>()）
-- 若该类具有父类，JVM会保证子类的\<clinit>()执行前，父类的\<clinit>()已经执行完毕
-- 虚拟机必须保证一个类的\<clinit>()方法在多线程下被同步加锁
+- `<clinit>()` 不同于类的构造器（构造器是虚拟机视角下的 `<init>()`）
+- 若该类具有父类，JVM 会保证子类的 `<clinit>()` 执行前，父类的 `<clinit>()` 已经执行完毕
+- 虚拟机必须保证一个类的 `<clinit>()` 方法在多线程下被同步加锁
 
 ```java
 public class ClassInitTest{
@@ -138,7 +136,7 @@ Java 程序对类的使用方式分为：主动使用和被动使用。虚拟机
 - 反射
 - 初始化一个类的子类
 - Java 虚拟机启动时被标明为启动类的类
-- JDK7 开始提供的动态语言支持：`java.lang.invoke.MethodHandle`实例的解析结果，`REF_getStatic`、`REF_putStatic`、`REF_invokeStatic`句柄对应的类没有初始化，则初始化
+- JDK7 开始提供的动态语言支持：`java.lang.invoke.MethodHandle` 实例的解析结果，`REF_getStatic`、`REF_putStatic`、`REF_invokeStatic` 句柄对应的类没有初始化，则初始化
 
 除以上五种情况，其他使用 Java 类的方式被看作是对**类的被动使用**，都不**会导致类的初始化**。
 
@@ -185,7 +183,7 @@ class SubClass extends SuperClass {
 - 它用来加载 Java 的核心库（`JAVA_HOME/jre/lib/rt.jar`、`resource.jar`或`sun.boot.class.path`路径下的内容），用于提供 JVM 自身需要的类
 - 并不继承自 `java.lang.ClassLoader`，没有父加载器
 - 加载扩展类和应用程序类加载器，并指定为他们的父类加载器
-- 出于安全考虑，Bootstrap 启动类加载器只加载名为java、Javax、sun等开头的类
+- 出于安全考虑，Bootstrap 启动类加载器只加载名为 java、Javax、sun 等开头的类
 
 #### 扩展类加载器（Extension ClassLoader）
 
