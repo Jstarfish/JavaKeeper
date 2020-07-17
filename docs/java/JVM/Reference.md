@@ -10,14 +10,14 @@
 
 >基本类型：编程语言中内置的最小粒度的数据类型。它包括四大类八种类型：
 >
->- 4种整数类型：byte、short、int、long
->- 2种浮点数类型：float、double
->- 1种字符类型：char
->- 1种布尔类型：boolean
+>- 4 种整数类型：byte、short、int、long
+>- 2 种浮点数类型：float、double
+>- 1 种字符类型：char
+>- 1 种布尔类型：boolean
 >
 >引用类型：引用类型指向一个对象，不是原始值，指向对象的变量是引用变量。在 Java 里，除了基本类型，其他类型都属于引用类型，它主要包括：类、接口、数组、枚举、注解
 
-有了数据类型，JVM对程序数据的管理就规范化了，不同的数据类型，它的存储形式和位置是不一样的
+有了数据类型，JVM 对程序数据的管理就规范化了，不同的数据类型，它的存储形式和位置是不一样的
 
 怎么跑偏了，回归正题，通过引用，可以对堆中的对象进行操作。引用《Java编程思想》中的一段话，
 
@@ -25,11 +25,11 @@
 
 比如：
 
-```
+```java
 Person person = new Person("张三");
 ```
 
-这里的 person 就是指向Person 实例“张三”的引用，我们一般都是通过 person 来操作“张三”实例。
+这里的 person 就是指向 Person 实例“张三”的引用，我们一般都是通过 person 来操作“张三”实例。
 
 
 
@@ -86,13 +86,13 @@ public class StrongRefenenceDemo {
 }
 ```
 
-demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，所以不会被GC回收
+demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，所以不会被 GC 回收。
 
 
 
 ### 软引用
 
-软引用是一种相对强引用弱化了一些的引用，需要用`java.lang.ref.SoftReference` 类来实现，可以让对象豁免一些垃圾收集。
+软引用是一种相对强引用弱化了一些的引用，需要用 `java.lang.ref.SoftReference` 类来实现，可以让对象豁免一些垃圾收集。
 
 软引用用来描述一些还有用，但并非必需的对象。对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中并进行第二次回收。如果这次回收还是没有足够的内存，才会抛出内存溢出异常。
 
@@ -289,7 +289,7 @@ static class ThreadLocalMap {
 
 虚引用，顾名思义，就是形同虚设，与其他几种引用都不太一样，一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。
 
-虚引用需要`java.lang.ref.PhantomReference` 来实现。
+虚引用需要 `java.lang.ref.PhantomReference` 来实现。
 
 如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收器回收，它不能单独使用也不能通过它访问对象，虚引用必须和引用队列（RefenenceQueue）联合使用。
 
@@ -688,7 +688,3 @@ https://blog.csdn.net/Jesministrator/article/details/78786162
 http://throwable.club/2019/02/16/java-reference/
 
 《深入理解java虚拟机》
-
-
-
-![](H:\Technical-Learning\images\end.png)

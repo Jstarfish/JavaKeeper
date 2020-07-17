@@ -206,3 +206,128 @@ VisualVM 是一款免费的，集成了多个 JDK 命令行工具的可视化工
 
 
 恰当的使用虚拟机故障处理、分析工具可以提升我们分析数据、定位并解决问题的效率，但我们也要知道工具永远都是知识技能的一层包装，没有什么工具是"秘密武器"。
+
+
+
+
+
+## OOM 问题排查的一些常用工具
+
+接下来我们来看下如何排查造成 OOM 的原因，内存泄漏是最常见的造成 OOM 的一种原因，所以接下来我们以来看看怎么使用工具来排查这种问题,使用到的工具主要有两大类
+
+**1、使用 mat（Eclipse Memory Analyzer） 来分析 dump（堆转储快照） 文件**
+
+主要步骤如下
+
+- 运行 Java 时添加 「-XX:+HeapDumpOnOutOfMemoryError」 参数来导出内存溢出时的堆信息，生成 hrof 文件, 添加 「-XX:HeapDumpPath」可以指定 hrof 文件的生成路径,如果不指定则 hrof 文件生成在与字节码文件相同的目录下
+- 使用 MAT（Eclipse Memory Analyzer）来分析 hrof 文件，查出内存泄漏的原因
+
+接下来我们就来看看如何用以上的工具查看如下内存泄漏案例
+
+```
+/**
+* VM Args:-Xmx10m
+ */
+import java.util.ArrayList;
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+        while (true) {
+            list.add("OutOfMemoryError soon");
+        }
+    }
+}
+```
+
+为了让以上程序快速产生 OOM, 我把堆大小设置成了 10M, 这样执行 「java -Xmx10m -XX:+HeapDumpOnOutOfMemoryError Main」后很快就发生了 OOM，此时我们就拿到了 hrof 文件，下载 MAT 工具，打开 hrof,进行分析，打开之后选择 「Leak Suspects Report」进行分析，可以看到发生 OOM 的线程的堆栈信息，明确定位到是哪一行造成的
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk44QWer8TLAhny1tOZcS0gYVI8CElnkwoHxQxqxdVMic4hQBYompTKO6ag/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+
+
+*如图示，可以看到 Main.java 文件的第 12 行导致了这次的 OOM*
+
+**2、使用 jvisualvm 来分析**
+
+用第一种方式必须等 OOM 后才能 dump 出 hprof 文件，但如果我们想在运行中观察堆的使用情况以便查出可能的内存泄漏代码就无能为力了，这时我们可以借助 **jvisualvm** 这款工具, jvisualvm 的功能强大，除了可以实时监控堆内存的使用情况，还可以跟踪垃圾回收，运行中 dump 中堆内存使用情况、cpu分析，线程分析等，是查找分析问题的利器，更骚的是它不光能分析本地的 Java 程序，还可以分析线上的 Java 程序运行情况, 本身这款工具也是随 JDK 发布的，是官方力推的一款运行监视，故障处理的神器。我们来看看如何用 jvisualvm 来分析上文所述的存在内存泄漏的如下代码
+
+```
+import java.util.Map;
+import java.util.HashMap;
+
+public class KeylessEntry {
+    static class Key {
+        Integer id; 
+        Key(Integer id) {
+            this.id = id;
+        }  
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+    }
+
+    public static void main(String[] args) {
+        Map<Key,String> m = new HashMap<Key,String>();
+        while(true) {
+            for(int i=0;i<10000;i++) {
+                if(!m.containsKey(new Key(i))) {
+                    m.put(new Key(i), "Number:" + i);
+                }
+            }
+        }
+    }
+}
+```
+
+打开 jvisualvm （终端输入 jvisualvm 执行即可），打开后，将堆大小设置为 500M，执行命令 **java Xms500m -Xmx500m KeylessEntry**，此时可以观察到左边出现了对应的应用 KeylessEntry,双击点击 open
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk445FOl7e3SFFMlmBibKvluGrMlzjIicIoLtfX2p5iaqPYpBbBjYOLzBAmZw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+打开之后可以看到展示了 CPU，堆内存使用，加载类及线程的情况
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk4489ratobztWxsIIjyJbWFoWIg8ic6ZUERibC81pc35wuqW55kgar3uUfw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+注意看堆（Heap）的使用情况，一直在上涨
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk44hIU8l1X70hqXbhfHUPNKF2ERsjSwT54icia1vSIAqAWBibIQG3dCBX9Wg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+此时我们再点击 「Heap Dump」
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk44BVxVwoN99jHhhK97AAQnicXt7tlOERWH7V6RJqCDjWZXJ2TlfcklH2A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+过一会儿即可看到内存中对象的使用情况
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk448z3z6bu76NkrDehR3PxKd2tPNRCfhZ2ObMFRX7jDJa7AylGc0Z2LWg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+可以看到相关的 TreeNode 有 291w 个，远超正常情况下的 10000 个！说明 HashMap 一直在增长，自此我们可以定位出问题代码所在！
+
+**3、使用 jps + jmap 来获取 dump 文件**
+
+jps 可以列出正在运行的虚拟机进程，并显示执行虚拟机主类及这些进程的本地虚拟机唯一 ID，如图示
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk449ic7ZBCWWca88nzQrkvWTfUw7kuhDXtKLjnllSDXHrTFPgAFUEKQMug/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+拿到进程的 pid 后，我们就可以用 jmap 来 dump 出堆转储文件了，执行命令如下
+
+```
+jmap -dump:format=b,file=heapdump.phrof pid
+```
+
+拿到 dump 文件后我们就可以用 MAT 工具来分析了。
+但这个命令在生产上一定要慎用！因为JVM 会将整个 heap 的信息 dump 写入到一个文件，heap 比较大的话会导致这个过程比较耗时，并且执行过程中为了保证 dump 的信息是可靠的，会暂停应用！
+
+
+
+## jstat 与可视化 APM 工具构建
+
+jstat 是用于监视虚拟机各种运行状态信息的命令行工具，可以显示本地或者远程虚拟机进程中的类加载，内存，垃圾收集，JIT 编译等运行数据，jstat 支持定时查询相应的指标，如下
+
+```
+jstat -gc 2764 250 22
+```
+
+定时针对 2764 进程输出堆的垃圾收集情况的统计，可以显示 gc 的信息，查看gc的次数及时间,利用这些指标，把它们可视化，对分析问题会有很大的帮助,如图示，下图就是我司根据 jstat 做的一部分 gc 的可视化报表，能快速定位发生问题的问题点，如果大家需要做 APM 可视化工具，建议配合使用 jstat 来完成。
+
+![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk44O4ltjSGfibEsaGv4OSDNv9sgcqicSwJydSHIHKVetyZk8JoPRzfoO98g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)

@@ -4,6 +4,7 @@
   - [类加载子系统](java/JVM/Class-Loading.md)
   - [运行时数据区](java/JVM/Runtime-Data-Areas.md)
   - [垃圾收集器](java/JVM/GC.md)
+  - [强引用、软引用、弱引用、虚引用](java/JVM/Reference.md)
   - [OOM 异常](java/JVM/OOM.md)
   - [JVM 参数配置](java/JVM/JVM参数配置.md)
   - [JVM 性能监控和故障处理工具](java/JVM/JVM性能监控和故障处理工具.md)

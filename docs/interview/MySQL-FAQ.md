@@ -193,7 +193,7 @@ char是适合存储很短的、一般固定长度的字符串。例如，char非
 
 > 列的字符串类型可以是什么？
 
-字符串类型是：SET、BLOB、ENUM、CHAR、CHAR、TEXT、VARCHAR
+字符串类型是：SET、BLOB、ENUM、CHAR、TEXT、VARCHAR
 
 
 

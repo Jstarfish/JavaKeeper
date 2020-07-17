@@ -179,13 +179,13 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 
 从输出结果可以看到，我们的限制 1000 条数据没有起作用，map 容量远超过了 1000，而且最后也出现了我们想要的错误，这是因为类 Key 只重写了 `hashCode()` 方法，却没有重写 `equals()` 方法，我们在使用 `containsKey()` 方法其实就出现了问题，于是就会一直往 HashMap 中添加 Key，直至 GC 都清理不掉。
 
-> 🧑🏻‍💻 面试官又来了：说一下HashMap原理以及为什么需要同时实现equals和hashcode
+> 🧑🏻‍💻 面试官又来了：说一下 HashMap 原理以及为什么需要同时实现 equals 和 hashcode
 
 > 执行这个程序的最终错误，和 JVM 配置也会有关系，如果设置的堆内存特别小，会直接报 `Java heap space`。算是被这个错误截胡了，所以有时，在资源受限的情况下，无法准确预测程序会死于哪种具体的原因。
 
 ### 3.2 解决方案
 
-- 添加 JVM 参数`-XX:-UseGCOverheadLimit` 不推荐这么干，没有真正解决问题，只是将异常推迟
+- 添加 JVM 参数 `-XX:-UseGCOverheadLimit` 不推荐这么干，没有真正解决问题，只是将异常推迟
 - 检查项目中是否有大量的死循环或有使用大内存的代码，优化代码
 - dump内存分析，检查是否存在内存泄露，如果没有，加大内存
 
@@ -199,9 +199,9 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 
 ### 4.1 写个 bug
 
-- ByteBuffer.allocate(capability) 是分配 JVM 堆内存，属于 GC 管辖范围，需要内存拷贝所以速度相对较慢；
+- `ByteBuffer.allocate(capability)` 是分配 JVM 堆内存，属于 GC 管辖范围，需要内存拷贝所以速度相对较慢；
 
-- ByteBuffer.allocateDirect(capability) 是分配 OS 本地内存，不属于 GC 管辖范围，由于不需要内存拷贝所以速度相对较快；
+- `ByteBuffer.allocateDirect(capability)`是分配 OS 本地内存，不属于 GC 管辖范围，由于不需要内存拷贝所以速度相对较快；
 
 如果不断分配本地内存，堆内存很少使用，那么 JVM 就不需要执行 GC，DirectByteBuffer 对象就不会被回收，这时虽然堆内存充足，但本地内存可能已经不够用了，就会出现 OOM，**本地直接内存溢出**。
 
