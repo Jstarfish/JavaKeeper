@@ -648,6 +648,8 @@ B-树的搜索，从根结点开始，对结点内的关键字（有序）序列
 
 
 
+B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhangliangzi/article/details/51367639
+
 # 平衡多路查找树（B-Tree）
 
 B-Tree是为磁盘等外存储设备设计的一种平衡查找树。因此在讲B-Tree之前先了解下磁盘的相关知识。

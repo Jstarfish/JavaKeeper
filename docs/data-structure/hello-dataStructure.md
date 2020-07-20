@@ -1,6 +1,6 @@
-B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhangliangzi/article/details/51367639
+# 数据结构开篇
 
-# 数据结构
+![](https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?cs=srgb&dl=pexels-163064.jpg&fm=jpg)
 
 ## 概念
 
@@ -8,7 +8,7 @@ B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhanglia
 
 
 
-**数据元素（data element）**是数据的基本单位，是数据集合的个体，在计算机程序中通 常作为一个整体来进行处理。例如一条描述一位学生的完整信息的数据记录就是一个数据元 素；空间中一点的三维坐标也可以是一个数据元素。数据元素通常由若干个数据项组成，例 如描述学生相关信息的姓名、性别、学号等都是数据项；三维坐标中的每一维坐标值也是数 据项。数据项具有原子性，是不可分割的最小单位。
+**数据元素（data element）**是数据的基本单位，是数据集合的个体，在计算机程序中通 常作为一个整体来进行处理。例如一条描述一位学生的完整信息的数据记录就是一个数据元素；空间中一点的三维坐标也可以是一个数据元素。数据元素通常由若干个数据项组成，例如描述学生相关信息的姓名、性别、学号等都是数据项；三维坐标中的每一维坐标值也是数据项。数据项具有原子性，是不可分割的最小单位。
 
 
 
@@ -16,7 +16,7 @@ B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhanglia
 
 
 
-**数据结构（data structure）**是指相互之间存在一种或多种特定关系的数据元素的集合。  是组织并存储数据以便能够有效使用的一种专门格式，它用来反映一个数据的内部构成，即 一个数据由哪些成分数据构成，以什么方式构成，呈什么结构。      
+**数据结构（data structure）**是指相互之间存在一种或多种特定关系的数据元素的集合。是组织并存储数据以便能够有效使用的一种专门格式，它用来反映一个数据的内部构成，即一个数据由哪些成分数据构成，以什么方式构成，呈什么结构。      
 
 由于信息可以存在于逻辑思维领域，也可以存在于计算机世界，因此作为信息载体的数据同样存在于两个世界中。表示一组数据元素及其相互关系的数据结构同样也有两种不同的表现形式，一种是数据结构的逻辑层面，即数据的逻辑结构；一种是存在于计算机世界的物理层面，即数据的存储结构
 
@@ -32,19 +32,19 @@ B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhanglia
 
 - 集合结构：集合结构中的数据元素除了同属于一个集合外，他们之间没有其他关系
 
-   ![img](https://img-blog.csdn.net/20171015213224082?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/集合结构.png) 
 
 - 线性结构：数据之间是一对一关系
 
-   ![img](https://img-blog.csdn.net/20171015213254478?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/线形结构.png) 
 
 - 树形结构：数据之间存在一对多的层次关系
 
-   ![img](https://img-blog.csdn.net/20171015213325699?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/树形结构.png) 
 
 - 图形结构：数据之间多对多的关系
 
-   ![img](https://img-blog.csdn.net/20171015213350420?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/图形结构.png) 
 
 ### 物理结构
 
@@ -56,11 +56,11 @@ B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhanglia
 
 - 顺序存储：把数据元素存放在地址连续的存储单元里，其数据间的逻辑关系和物理关系一致
 
-   ![img](https://img-blog.csdn.net/20171015213409499?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/顺序结构.png) 
 
 - 链式存储：把数据元素存放在任意的存储单元里，这组存储单元可以是连续的，也可以是不连续的。
 
-   ![img](https://img-blog.csdn.net/20171015213436248?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvWWFuZ1RvbmdB/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+   ![](../_images/data-structure/链式结构.png) 
 
 
 
@@ -74,7 +74,7 @@ B-Tree、B+Tree、红黑树、B*Tree数据结构  https://blog.csdn.net/zhanglia
 
 **抽象数据类型（abstract data type, 简称 ADT）**由一种数据模型和在该数据模型上的一组操作组成。  
 
-抽象数据类型一方面使得使用它的人可以只关心它的逻辑特征，不需要了解它的实现方  式。另一方面可以使我们更容易描述现实世界，使得我们可以在更高的层面上来考虑问题。  例如可以使用树来描述行政区划，使用图来描述通信网络。  
+抽象数据类型一方面使得使用它的人可以只关心它的逻辑特征，不需要了解它的实现方式。另一方面可以使我们更容易描述现实世界，使得我们可以在更高的层面上来考虑问题。 例如可以使用树来描述行政区划，使用图来描述通信网络。  
 
  
 

@@ -823,10 +823,14 @@ Java 虚拟机被允许堆满足上述三个条件的无用类进行回收，这
 
 《深入理解 Java 虚拟机 第三版》
 
-宋红康 JVM 教程
+宋红康老师的 JVM 教程
 
 https://docs.oracle.com/javase/specs/index.html
 
 https://www.cnblogs.com/wicfhwffg/p/9382677.html
 
 https://www.cnblogs.com/hollischuang/p/12501950.html
+
+
+
+![](https://imgkr.cn-bj.ufileos.com/6e7c80a9-48e6-4a2a-b920-682d8f0bab5c.png)
