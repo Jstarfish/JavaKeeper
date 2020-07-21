@@ -1,5 +1,7 @@
 # 谈谈你对 OOM 的认识
 
+> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱，笔记自取
+
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggcqh5gsdj324d0ol0y7.jpg)
 
 在《Java虚拟机规范》的规定里，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生 OutOfMemoryError 异常的可能。
@@ -406,3 +408,7 @@ https://plumbr.io/outofmemoryerror
 https://yq.aliyun.com/articles/711191
 
 https://github.com/StabilityMan/StabilityGuide/blob/master/docs/diagnosis/jvm/exception
+
+
+
+![](https://imgkr.cn-bj.ufileos.com/6e7c80a9-48e6-4a2a-b920-682d8f0bab5c.png)
