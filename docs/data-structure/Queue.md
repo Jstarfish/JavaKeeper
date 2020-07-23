@@ -270,12 +270,10 @@ public class MyArrayQueue implements MyQueue {
 
 **队头指针( front )**指向链队列的头结点，而**队尾指针( rear )**指向终端结点。非空链队列如下所示。
 
-![非空链队列](https://img-blog.csdn.net/20170802214836654?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMjczNjY4NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-
-
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh1bmzvkjnj31860bngmm.jpg)
 
 当**队列为空**时，front和rear都指向头结点。
-![空链队列](https://img-blog.csdn.net/20170802215015859?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMjczNjY4NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gh1bpyg5ebj30e20bp0t0.jpg" alt="空链队列" style="zoom: 50%;" />
 
 ```java
 public class MyLinkedQueue implements MyQueue {
