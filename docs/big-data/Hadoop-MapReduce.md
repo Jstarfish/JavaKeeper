@@ -217,4 +217,28 @@ Java 的序列化是一个重量级序列化框架（Serializable），一个对
    }
    ```
 
-   
+
+
+#### 2.3 序列化案例实操
+
+1、需求：统计每一个手机号耗费的总上行流量、下行流量、总流量
+
+1. 输入数据 phone_data .txt 
+
+2. 输入数据格式：
+
+   ![image-20200723183657595](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200723183657595.png)
+
+3. 期望输出数据格式
+
+    ![image-20200723183719979](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200723183719979.png)
+
+
+
+2、需求分析
+
+![image-20200723183758867](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200723183758867.png)
+
+3、编写 MapReduce 程序
+
+编写流量统计的 Bean 对象
