@@ -30,7 +30,10 @@
 - [![](https://icongr.am/feather/cloud.svg?size=25&color=36b305)Spring Cloud](framework/SpringCloud/readSpringCloud.md)
 - [![](https://icongr.am/clarity/alarm-clock.svg?size=25&color=2d2b50)定时任务@Scheduled](framework/SpringBoot/@Scheduled.md)
 - **大数据**
-- [Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/fontawesome/ellipsis-h.svg?size=25&color=currentColor)Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/devicon/apache-original.svg?size=25&color=currentColor)HDFS](big-data/HDFS.md)
+- [![](https://icongr.am/devicon/apache-original.svg?size=25&color=currentColor)Map-Reduce](big-data/Hadoop-MapReduce.md)
+- [![](https://icongr.am/simple/hive.svg?size=25&color=currentColor&colored=false)Hive](big-data/Hive.md)
 - [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka](message-queue/Kafka/readKafka.md)
 - **性能优化**
 - [![](https://icongr.am/octicons/cpu.svg?size=25&color=780ebe)CPU 飙升问题](optimization/CPU飙升.md)
