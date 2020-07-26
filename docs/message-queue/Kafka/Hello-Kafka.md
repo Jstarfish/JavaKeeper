@@ -12,7 +12,7 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
 #### 1.2.1 传统消息队列的应用场景
 
-<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gh18hlatixj316k0s478y.jpg" style="zoom: 50%;" /> 
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3hnbbzj1j316k0s4dkj.jpg) 
 
 #### 1.2.2 为什么需要消息队列
 
@@ -50,12 +50,12 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 - Producer ：消息生产者，就是向 kafka broker 发消息的客户端；
 - Consumer ：消息消费者，向 kafka broker 取消息的客户端；
 - Consumer Group （CG）：消费者组，由多个 consumer 组成。**消费者组内每个消费者负责消费不同分区的数据，一个分区只能由一个组内消费者消费；消费者组之间互不影响**。所有的消费者都属于某个消费者组，即消费者组是逻辑上的一个订阅者。 
-- Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker 可以容纳多个 topic。 
+- Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker 可以容纳多个 topic； 
 - Topic ：可以理解为一个队列，Kafka 的消息通过 Topics(主题) 进行分类，生产者和消费者面向的都是一个 topic； 
-- Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上， 一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列； partition 中的每条消息 都会被分配一个有序的 id（ offset）。 kafka 只保证按一个 partition 中的顺序将消息发给 consumer，不保证一个 topic 的整体（多个 partition 间）的顺序； 
-- Replica：副本，为保证集群中的某个节点发生故障时，该节点上的 partition 数据不丢失，且 kafka 仍然能够继续工作，kafka 提供了副本机制，一个 topic 的每个分区都有若干个副本， 一个 leader 和若干个 follower。 
-- leader：每个分区多个副本的“主”，生产者发送数据的对象，以及消费者消费数据的对象都是 leader。 
-- follower：每个分区多个副本中的“从”，实时从 leader 中同步数据，保持和 leader 数据的同步。leader 发生故障时，某个 follower 会成为新的 follower。
+- Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上， 一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列； partition 中的每条消息都会被分配一个有序的 id（ offset）。 kafka 只保证按一个 partition 中的顺序将消息发给 consumer，不保证一个 topic 的整体（多个 partition 间）的顺序； 
+- Replica：副本，为保证集群中的某个节点发生故障时，该节点上的 partition 数据不丢失，且 kafka 仍然能够继续工作，kafka 提供了副本机制，一个 topic 的每个分区都有若干个副本， 一个 leader 和若干个 follower； 
+- leader：每个分区多个副本的“主”，生产者发送数据的对象，以及消费者消费数据的对象都是 leader；
+- follower：每个分区多个副本中的“从”，实时从 leader 中同步数据，保持和 leader 数据的同步。leader 发生故障时，某个 follower 会成为新的 follower；
 - Offset： kafka 的存储文件都是按照 offset.kafka 来命名，用 offset 做名字的好处是方便查找。例如你想找位于 2049 的位置，只要找到 2048.kafka 的文件即可。当然 the first offset 就是 00000000000.kafka。
 
 ------
@@ -93,17 +93,17 @@ Kafka 是一个分布式的流处理平台。是支持分区的（partition）�
 
 #### Kafka有五个核心API：
 
-- **Producer API** 允许应用程序发布记录流至一个或多个Kafka的话题(Topics)
+- **Producer API** 允许应用程序发布记录流至一个或多个 Kafka 的话题(Topics)
 
 - **Consumer API** 允许应用程序订阅一个或多个主题，并处理这些主题接收到的记录流
 
 - **Streams API** 允许应用程序充当流处理器（stream processor），从一个或多个主题获取输入流，并生产一个输出流至一个或多个的主题，能够有效地变换输入流为输出流
 
-- **Connector API** 允许构建和运行可重用的生产者或消费者，能够把 Kafka主题连接到现有的应用程序或数据系统。例如，一个连接到关系数据库的连接器(connector)可能会获取每个表的变化
+- **Connector API** 允许构建和运行可重用的生产者或消费者，能够把 Kafka 主题连接到现有的应用程序或数据系统。例如，一个连接到关系数据库的连接器(connector)可能会获取每个表的变化
 
 - **Admin API** 允许管理和检查主题、brokes 和其他 Kafka 对象。（这个是新版本才有的）
 
-  ![img](../../_images/message-queue/Kafka/kafka-apis.png)
+  ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3hpxk1e8j30tp0ozjtg.jpg)
 
 Kafka 的客户端和服务器之间的通信是靠一个简单的，高性能的，与语言无关的 TCP 协议完成的。这个协议有不同的版本，并保持向后兼容旧版本。Kafka 不光提供了一个 Java 客户端，还有许多语言版本的客户端。
 
@@ -111,13 +111,13 @@ Kafka 的客户端和服务器之间的通信是靠一个简单的，高性能�
 
 主题是同一类别的消息记录（record）的集合。Kafka 的主题支持多用户订阅，也就是说，一个主题可以有零个，一个或多个消费者订阅写入的数据。对于每个主题，Kafka 集群都会维护一个分区日志，如下所示：
 
-![图片来源：官方文档](../../_images/message-queue/Kafka/log_anatomy.png)
+![图片来源：官方文档](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3hqggk2wj30bk07f3yr.jpg)
 
 **每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到 partition 的末尾。在每个 partition 中，每条消息都会被分配一个顺序的唯一标识，这个标识被称为 **offset**，即偏移量。**kafka 不能保证全局有序，只能保证分区内有序** 。
 
 Kafka 集群保留所有发布的记录，不管这个记录有没有被消费过，**Kafka 提供可配置的保留策略去删除旧数据**(还有一种策略根据分区大小删除数据)。例如，如果将保留策略设置为两天，在数据发布后两天，它可用于消费，之后它将被丢弃以腾出空间。Kafka 的性能跟存储的数据量的大小无关（会持久化到硬盘）， 所以将数据存储很长一段时间是没有问题的。
 
-![图片来源：官方文档](../../_images/message-queue/Kafka/log_consumer.png)
+![图片来源：官方文档](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3hqzopuqj31d90u0djc.jpg)
 
 事实上，在单个消费者层面上，每个消费者保存的唯一的元数据就是它所消费的数据日志文件的偏移量。偏移量是由消费者来控制的，通常情况下，消费者会在读取记录时线性的提高其偏移量。不过由于偏移量是由消费者控制，所以消费者可以将偏移量设置到任何位置，比如设置到以前的位置对数据进行重复消费，或者设置到最新位置来跳过一些数据。
 
@@ -141,7 +141,7 @@ Kafka 集群保留所有发布的记录，不管这个记录有没有被消费�
 
 这是 kafka 用来实现一个 topic 消息的广播（发给所有的consumer） 和单播（发给任意一个 consumer）的手段。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需 要多次发送消息到不同的 topic； 
 
-![img](../../_images/message-queue/Kafka/sumer-groups.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3htbkk8uj30d607074q.jpg)
 
 **举个栗子：**
 
@@ -149,7 +149,7 @@ Kafka 集群保留所有发布的记录，不管这个记录有没有被消费�
 
 从图中我们可以看到，在同一个消费者组中，每个消费者实例可以消费多个分区，但是每个分区最多只能被消费者组中的一个实例消费。也就是说，如果有一个4个分区的主题，那么消费者组中最多只能有4个消费者实例去消费，多出来的都不会被分配到分区。其实这也很好理解，如果允许两个消费者实例同时消费同一个分区，那么就无法记录这个分区被这个消费者组消费的 offset 了。如果在消费者组中动态的上线或下线消费者，那么 Kafka 集群会自动调整分区与消费者实例间的对应关系。
 
-**Kafka消费群的实现方式是通过分割日志的分区，分给每个 Consumer 实例，使每个实例在任何时间点的都可以“公平分享”独占的分区**。维持消费群中的成员关系的这个过程是通过Kafka动态协议处理。如果新的实例加入该组，他将接管该组的其他成员的一些分区; 如果一个实例死亡，其分区将被分配到剩余的实例。
+**Kafka消费群的实现方式是通过分割日志的分区，分给每个 Consumer 实例，使每个实例在任何时间点的都可以“公平分享”独占的分区**。维持消费群中的成员关系的这个过程是通过 Kafka 动态协议处理。如果新的实例加入该组，他将接管该组的其他成员的一些分区; 如果一个实例死亡，其分区将被分配到剩余的实例。
 
 Kafka 只保证一个分区内的消息有序，不能保证一个主题的不同分区之间的消息有序。分区的消息有序与依靠主键进行数据分区的能力相结合足以满足大多数应用的要求。但是，如果你想要保证所有的消息都绝对有序可以只为一个主题分配一个分区，虽然这将意味着每个消费群同时只能有一个消费进程在消费。
 

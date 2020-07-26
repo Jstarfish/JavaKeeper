@@ -31,10 +31,7 @@
 - [Hello 大数据](big-data/Hello-BigData.md)
 - [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka](message-queue/Kafka/readKafka.md)
   - [Kafka 入门](message-queue/Kafka/Hello-Kafka.md)
-  - \> Kakfa 存储机制
-  - \> Kafka 生产者
-  - \> Kafka 消费者
-  - \> Kafka API
+  - [Kafka 工作流程和存储机制分析](message-queue/Kafka/Kafka-Workflow.md)
 - **性能优化**
 - JVM优化
 - web调优

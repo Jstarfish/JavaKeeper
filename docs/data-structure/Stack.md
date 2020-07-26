@@ -2,26 +2,30 @@
 
 ## 一、概述
 
+### 定义
+
 注意：本文所说的栈是数据结构中的栈，而不是内存模型中栈
 
-栈（stack）是限定仅在表尾一端进行插入或删除操作的特殊线性表。又称为堆栈。
+栈（stack）是限定仅在表尾一端进行插入或删除操作的**特殊线性表**。又称为堆栈。
 
 对于栈来说, 允许进行插入或删除操作的一端称为栈顶（top）,而另一端称为栈底（bottom）。不含元素栈称为空栈，向栈中插入一个新元素称为入栈或压栈， 从栈中删除一个元素称为出栈或退栈。
 
-假设有一个栈Ｓ＝（a1, a2, …, an), a1先进栈, an最后进栈。称a1为栈底元素, an为栈顶元素, 如图3.1所示。出栈时只允许在栈顶进行, 所以an先出栈, a1最后出栈。因此又称栈为后进先出（Last In First Out，LIFO）的线性表。
+假设有一个栈Ｓ＝（a1, a2, …, an)，a1先进栈， an最后进栈。称 a1 为栈底元素，an 为栈顶元素。出栈时只允许在栈顶进行，所以 an 先出栈，a1最后出栈。因此又称栈为后进先出（Last In First Out，LIFO）的线性表。
 
 栈（stack），是一种线性存储结构，它有以下几个特点：
 
 - 栈中数据是按照"后进先出（LIFO, Last In First Out）"方式进出栈的。
 - 向栈中添加/删除数据时，只能从栈顶进行操作。
 
-![image-20200720182808907](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200720182808907.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4mmnezg5j31cg0d6ab9.jpg)
 
-在上图中，当ABCD均已入栈后，出栈时得到的序列为DCBA，这就是后进先出。
+在上图中，当 ABCD 均已入栈后，出栈时得到的序列为 DCBA，这就是后进先出。
 
 
 
-栈的基本操作除了进栈`push()`，出栈`pop()`之外，还有判空`isEmpty()`、取栈顶元素`peek()`等操作。
+### 基本操作
+
+栈的基本操作除了进栈 `push()`，出栈 `pop()` 之外，还有判空 `isEmpty()`、取栈顶元素 `peek()` 等操作。
 
 抽象成接口如下：
 
@@ -61,9 +65,9 @@ public interface MyStack {
 
 和线性表类似，栈也有两种存储结构：顺序存储和链式存储。
 
-顺序栈是使用顺序存储结构实现的栈，即利用一组地址连续的存储单元依次存放栈中的数据元素。由于栈是一种特殊的线性表，因此在线性表的顺序存储结构的基础上，选择线性表的一端作为栈顶即可。那么根据数组操作的特性，选择数组下标大的一端，即线性表顺序存储的表尾来作为栈顶，此时入栈、出栈操作可以O(1)时间完成。
+顺序栈是使用顺序存储结构实现的栈，即利用一组地址连续的存储单元依次存放栈中的数据元素。由于栈是一种特殊的线性表，因此在线性表的顺序存储结构的基础上，选择线性表的一端作为栈顶即可。那么根据数组操作的特性，选择数组下标大的一端，即线性表顺序存储的表尾来作为栈顶，此时入栈、出栈操作可以 $O(1)$ 时间完成。
 
-由于栈的操作都是在栈顶完成，因此在顺序栈的实现中需要附设一个指针top来动态地指示栈顶元素在数组中的位置。通常top可以用栈顶元素所在的数组下标来表示，top=-1时表示空栈。
+由于栈的操作都是在栈顶完成，因此在顺序栈的实现中需要附设一个指针 top 来动态地指示栈顶元素在数组中的位置。通常 top 可以用栈顶元素所在的数组下标来表示，top=-1时表示空栈。
 
 栈在使用过程中所需的最大空间难以估计，所以，一般构造栈的时候不应设定最大容量。一种合理的做法和线性表类似，先为栈分配一个基本容量，然后在实际的使用过程中，当栈的空间不够用时再倍增存储空间。
 
@@ -124,7 +128,7 @@ public class MyArrayStack implements MyStack {
 
 
 
-## 栈的链式存储与实现
+## 三、栈的链式存储与实现
 
 栈的链式存储即采用链表实现栈。当采用单链表存储线性表后，根据单链表的操作特性选择单链表的头部作为栈顶，此时，入栈和出栈等操作可以在O(1)时间内完成。
 
@@ -132,9 +136,9 @@ public class MyArrayStack implements MyStack {
 
 下面以不带头结点的单链表为例实现栈，如下示意图所示：
 
-![不带头结点单链表栈示意图](https://img-blog.csdn.net/20170507171556109?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZ2F2aW5fam9obg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![不带头结点单链表栈示意图](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4n6ws71lj3106050aa4.jpg)
 
-在上图中，top为栈顶结点的引用，始终指向当前栈顶元素所在的结点。若top为null，则表示空栈。入栈操作是在top所指结点之前插入新的结点，使新结点的next域指向top，top前移即可；出栈则直接让top后移即可。
+在上图中，top 为栈顶结点的引用，始终指向当前栈顶元素所在的结点。若 top 为null，则表示空栈。入栈操作是在 top 所指结点之前插入新的结点，使新结点的 next 域指向 top，top 前移即可；出栈则直接让 top 后移即可。
 
 ```java
 public class MyLinkedStack implements MyStack {
@@ -210,34 +214,62 @@ public class MyLinkedStack implements MyStack {
 }
 ```
 
-上述`MyLinkedStack`类中有两个成员变量，其中`top`表示首结点，也就是栈顶元素所在的结点；`size`指示栈的大小，即栈中数据元素的个数。不难理解，所有的操作均可以在O(1)时间内完成。
+上述 `MyLinkedStack` 类中有两个成员变量，其中 `top` 表示首结点，也就是栈顶元素所在的结点；`size` 指示栈的大小，即栈中数据元素的个数。不难理解，所有的操作均可以在 $O(1)$ 时间内完成。
 
-## Stack详细介绍
 
-学完Vector了之后，接下来我们开始学习Stack。Stack很简单，它继承于Vector。学习方式还是和之前一样，先对Stack有个整体认识，然后再学习它的源码；最后再通过实例来学会使用它。内容包括：
 
-- 第1部分 Stack介绍
-- 第2部分 Stack源码解析(基于JDK1.6.0_45)
-- 第3部分 Vector示例
+## 四、JDK  中的栈实现 Stack
 
-### Stack介绍
-
-Stack是栈。它的特性是：先进后出(FILO, First In Last Out)。
-
-java工具包中的Stack是继承于Vector(矢量队列)的，由于Vector是通过数组实现的，这就意味着，Stack也是通过数组实现的，而非链表。当然，我们也可以将LinkedList当作栈来使用！在“Java 集合系列06之 Vector详细介绍(源码解析)和使用示例”中，已经详细介绍过Vector的数据结构，这里就不再对Stack的数据结构进行说明了。
+Java 工具包中的 Stack 是继承于 Vector(矢量队列)的，由于 Vector 是通过数组实现的，这就意味着，Stack 也是通过数组实现的，而非链表。当然，我们也可以将 LinkedList 当作栈来使用。
 
 ### Stack的继承关系
 
-```
+```java
 java.lang.Object
-↳     java.util.AbstractCollection<E>
-   ↳     java.util.AbstractList<E>
-       ↳     java.util.Vector<E>
-           ↳     java.util.Stack<E>
+     java.util.AbstractCollection<E>
+        java.util.AbstractList<E>
+            java.util.Vector<E>
+                 java.util.Stack<E>
 
 public class Stack<E> extends Vector<E> {}
 ```
 
-Stack和Collection的关系如下图
 
-![栈](https://alleniverson.gitbooks.io/data-structure-and-algorithms/3.%E6%A0%88/images/1.4.jpg)
+
+## 五、LeetCode
+
+### 有效的括号
+
+>给定一个只包括 `'('`，`')'`，`'{'`，`'}'`，`'['`，`']'` 的字符串，判断字符串是否有效。
+>
+>有效字符串需满足：
+>
+>1. 左括号必须用相同类型的右括号闭合。
+>2. 左括号必须以正确的顺序闭合。
+>
+>注意空字符串可被认为是有效字符串。
+>
+>```
+>输入: "{[]}"
+>输出: true
+>输入: "([)]"
+>输出: false
+>```
+
+
+
+
+
+
+
+>请根据每日 `气温` 列表，重新生成一个列表。对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。
+>
+>例如，给定一个列表 `temperatures = [73, 74, 75, 71, 69, 72, 76, 73]`，你的输出应该是 `[1, 1, 4, 2, 1, 1, 0, 0]`。
+>
+>**提示：**`气温` 列表长度的范围是 `[1, 30000]`。每个气温的值的均为华氏度，都是在 `[30, 100]` 范围内的整数。
+
+
+
+
+
+> 逆波兰表达式求值
