@@ -1,6 +1,6 @@
 # Kafka 为什么能那么快 | Kafka高效读写数据的原因
 
-无论 kafka作为 MQ 也好，作为存储层也罢，无非就是两个功能（好简单的样子），一是 Producer 生产的数据存到 broker，二是 Consumer 从 broker 读取数据。那 Kafka 的快也就体现在读写两个方面了，下面我们就聊聊 Kafka 快的原因。
+无论 kafka 作为 MQ 也好，作为存储层也罢，无非就是两个功能（好简单的样子），一是 Producer 生产的数据存到 broker，二是 Consumer 从 broker 读取数据。那 Kafka 的快也就体现在读写两个方面了，下面我们就聊聊 Kafka 快的原因。
 
 ![](https://img01.sogoucdn.com/app/a/100520093/e18d20c94006dfe0-20cbe3c7627c7e45-20667d70eb09be3df128e4c687167789.jpg)
 
@@ -26,11 +26,11 @@ Topic 只是一个逻辑的概念。每个 Topic 都包含一个或多个 Partit
 >
 >硬盘内部主要部件为磁盘盘片、传动手臂、读写磁头和主轴马达。实际数据都是写在盘片上，读写主要是通过传动手臂上的读写磁头来完成。实际运行时，主轴让磁盘盘片转动，然后传动手臂可伸展让读取头在盘片上进行读写操作。磁盘物理结构如下图所示：
 >
->![](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2017/343bddc0.jpg)
+>![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71vfmov9j308c08c74b.jpg)
 >
 >由于单一盘片容量有限，一般硬盘都有两张以上的盘片，每个盘片有两面，都可记录信息，所以一张盘片对应着两个磁头。盘片被分为许多扇形的区域，每个区域叫一个扇区。盘片表面上以盘片中心为圆心，不同半径的同心圆称为磁道，不同盘片相同半径的磁道所组成的圆柱称为柱面。磁道与柱面都是表示不同半径的圆，在许多场合，磁道和柱面可以互换使用。磁盘盘片垂直视角如下图所示：
 >
->![图片来源：commons.wikimedia.org](https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/DiskStructure.svg/480px-DiskStructure.svg.png)
+>![图片来源：commons.wikimedia.org](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71uhvvykj30dc0dcgnx.jpg)
 >
 >影响磁盘的关键因素是磁盘服务时间，即磁盘完成一个I/O请求所花费的时间，它由寻道时间、旋转延迟和数据传输时间三部分构成。
 >
@@ -46,7 +46,7 @@ Topic 只是一个逻辑的概念。每个 Topic 都包含一个或多个 Partit
 
 ### 2. 顺序写磁盘
 
-![图片来源：kafka.apache.org](https://kafka.apache.org/25/images/log_anatomy.png)
+![图片来源：kafka.apache.org](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71vl4e5kj30bk07f3yr.jpg)
 
 **Kafka 中每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到 partition 的末尾，这个就是顺序写。
 
