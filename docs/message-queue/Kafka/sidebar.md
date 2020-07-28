@@ -32,6 +32,7 @@
 - [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka](message-queue/Kafka/readKafka.md)
   - [Kafka 入门](message-queue/Kafka/Hello-Kafka.md)
   - [Kafka 工作流程和存储机制分析](message-queue/Kafka/Kafka-Workflow.md)
+  - [Kafka 为什么快](message-queue/Kafka/Kafka高效读写数据的原因.md)
 - **性能优化**
 - JVM优化
 - web调优
