@@ -42,6 +42,8 @@
 - \> DB调优
 - **数据结构与算法**
 - [![](https://icongr.am/octicons/home.svg?size=25&color=currentColor)数据结构](data-structure/hello-dataStructure.md)
+- [![](https://icongr.am/entypo/dots-two-vertical.svg?size=25&color=e24040)数组](data-structure/Array.md)
+- [![](https://icongr.am/clarity/ellipsis-horizontal.svg?size=25&color=47579a)链表](data-structure/Linked-List.md)
 - [![](https://icongr.am/octicons/arrow-left.svg?size=25&color=currentColor)栈](data-structure/Stack.md)
 - [![](https://icongr.am/octicons/arrow-right.svg?size=25&color=currentColor)队列](data-structure/Queue.md)
 - [![](https://icongr.am/entypo/tree.svg?size=25&color=44c016)树](data-structure/Tree.md)
