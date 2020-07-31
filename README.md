@@ -80,7 +80,7 @@
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
 |   MQ    |         | [Hello MQ](/docs/message-queue/浅谈消息队列及常见的消息中间件.md)<br> |
-|  Kafka  |  2.12   | [Hello Kafka](/docs/message-queue/Kafka/Hello-Kafka.md)<br>  |
+|  Kafka  |  2.12   | [Hello Kafka](/docs/message-queue/Kafka/Hello-Kafka.md)<br>[Kafka为什么能那么快的 6 个原因]([Hello Kafka](/docs/message-queue/Kafka/Hello-Kafka.md)<br/>)<br/> |
 
 
 
