@@ -6,6 +6,7 @@
   - [设计模式前传](design-pattern/Design-Pattern-Overview.md)
   - [单例模式](design-pattern/Singleton-Pattern.md)
   - [工厂模式](design-pattern/Factory-Pattern.md)
+  - [原型模式](design-pattern/Prototype-Pattern.md)
   - [装饰模式](design-pattern/Decorator-Pattern.md)
   - [代理模式](design-pattern/Proxy-Pattern.md)
   - [观察者模式](design-pattern/Observer-Pattern.md)

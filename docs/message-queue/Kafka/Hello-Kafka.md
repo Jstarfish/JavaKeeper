@@ -54,9 +54,9 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 - Topic ：可以理解为一个队列，Kafka 的消息通过 Topics(主题) 进行分类，生产者和消费者面向的都是一个 topic； 
 - Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上， 一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列； partition 中的每条消息都会被分配一个有序的 id（ offset）。 kafka 只保证按一个 partition 中的顺序将消息发给 consumer，不保证一个 topic 的整体（多个 partition 间）的顺序； 
 - Replica：副本，为保证集群中的某个节点发生故障时，该节点上的 partition 数据不丢失，且 kafka 仍然能够继续工作，kafka 提供了副本机制，一个 topic 的每个分区都有若干个副本， 一个 leader 和若干个 follower； 
-- leader：每个分区多个副本的“主”，生产者发送数据的对象，以及消费者消费数据的对象都是 leader；
+- leader：每个分区多个副本的“主”，**生产者发送数据的对象，以及消费者消费数据的对象都是 leader**；
 - follower：每个分区多个副本中的“从”，实时从 leader 中同步数据，保持和 leader 数据的同步。leader 发生故障时，某个 follower 会成为新的 follower；
-- Offset： kafka 的存储文件都是按照 offset.kafka 来命名，用 offset 做名字的好处是方便查找。例如你想找位于 2049 的位置，只要找到 2048.kafka 的文件即可。当然 the first offset 就是 00000000000.kafka。
+- Offset： kafka 的存储文件都是按照 `offset.kafka` 来命名，用 offset 做名字的好处是方便查找。例如你想找位于 2049 的位置，只要找到 2048.kafka 的文件即可。当然 the first offset 就是 00000000000.kafka。
 
 ------
 
@@ -77,8 +77,8 @@ Kafka 是一个分布式的流处理平台。是支持分区的（partition）�
 #### 有三个关键能力
 
 - 它可以让你发布和订阅记录流。在这方面，它类似于一个消息队列或企业消息系统
-- 它可以让你持久化收到的记录流，从而具有容错能力。
-- 它可以让你处理收到的记录流。
+- 它可以让你持久化收到的记录流，从而具有容错能力
+- 它可以让你处理收到的记录流
 
 #### 应用于两大类应用
 
@@ -139,7 +139,7 @@ Kafka 集群保留所有发布的记录，不管这个记录有没有被消费�
 
 如果所有的消费者实例有不同的消费群，那么每个消息将被广播到所有的消费者进程。
 
-这是 kafka 用来实现一个 topic 消息的广播（发给所有的consumer） 和单播（发给任意一个 consumer）的手段。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需 要多次发送消息到不同的 topic； 
+**这是 kafka 用来实现一个 topic 消息的广播（发给所有的 consumer） 和单播（发给任意一个 consumer）的手段**。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需 要多次发送消息到不同的 topic； 
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3htbkk8uj30d607074q.jpg)
 
