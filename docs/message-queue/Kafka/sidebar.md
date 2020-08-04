@@ -1,7 +1,7 @@
 - **Java基础**
 - [![](https://icongr.am/simple/oracle.svg?size=25&color=231c82&colored=false)JVM](java/JVM/readJVM.md)
 - [![img](https://icongr.am/fontawesome/expeditedssl.svg?size=25&color=f23131)JUC](java/JUC/readJUC.md)
-- [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
+- [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java-8.md)
 - [![img](https://icongr.am/entypo/address.svg?size=25&color=074ca6)设计模式](design-pattern/readDisignPattern.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
@@ -10,43 +10,56 @@
 - [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )
 - **直击面试**
-- [![](https://icongr.am/material/basket.svg?size=25)Java集合面试](interview/Collections-FAQ.md)
+- [![](https://icongr.am/entypo/list.svg?size=25&color=96560d)Java集合面试](interview/Collections-FAQ.md)
 - [![](https://icongr.am/devicon/java-plain-wordmark.svg?size=25)JVM面试](interview/JVM-FAQ.md)
+- [![](https://icongr.am/entypo/line-graph.svg?size=25&color=0f170c)JUC面试](interview/JUC-FAQ.md)
 - [![](https://icongr.am/devicon/mysql-original-wordmark.svg?size=25)MySQL面试](interview/MySQL-FAQ.md)
 - [![](https://icongr.am/devicon/redis-original-wordmark.svg?size=25)Redis面试](interview/Redis-FAQ.md)
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
 - [![](https://icongr.am/simple/bower.svg?size=25)MyBatis面试](interview/MyBatis-FAQ.md)
 - [![img](https://icongr.am/entypo/network.svg?size=25&color=6495ED)计算机网络](interview/Network-FAQ.md)
+- [![img](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka 面试](interview/Kafka-FAQ.md)
 - **单体架构**
 - **RPC**
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
-- [![message](https://icongr.am/clarity/email.svg?&size=16) 消息中间件](message-queue/readMQ.md)
-- [![Nginx](https://icongr.am/devicon/nginx-original.svg?&size=16)Nginx](nginx/nginx.md)
+- [![](https://icongr.am/fontawesome/group.svg?size=25&color=182d10)Zookeeper](soa/ZooKeeper/readZK.md)
+- [![message](https://icongr.am/clarity/email.svg?&size=25) 消息中间件](message-queue/readMQ.md)
+- [![](https://icongr.am/devicon/nginx-original.svg?size=25&color=182d10)Nginx](nginx/nginx.md)
 - **微服务架构**
-- [🍃 Spring Boot](springboot/Hello-SpringBoot.md)
-- [🍃 定时任务@Scheduled](springboot/Spingboot定时任务@Scheduled.md)
-- [🍃 Spring Cloud](https://spring.io/projects/spring-cloud)
+- [![](https://icongr.am/simple/leaflet.svg?size=25&color=11b041&colored=false)Spring Boot](framework/SpringBoot/Hello-SpringBoot.md)
+- [![](https://icongr.am/feather/cloud.svg?size=25&color=36b305)Spring Cloud](framework/SpringCloud/readSpringCloud.md)
+- [![](https://icongr.am/clarity/alarm-clock.svg?size=25&color=2d2b50)定时任务@Scheduled](framework/SpringBoot/@Scheduled.md)
 - **大数据**
-- [Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/fontawesome/ellipsis-h.svg?size=25&color=currentColor)Hello 大数据](big-data/Hello-BigData.md)
+- [![](https://icongr.am/devicon/apache-original.svg?size=25&color=currentColor)HDFS](big-data/HDFS.md)
+- [![](https://icongr.am/devicon/apache-original.svg?size=25&color=currentColor)Map-Reduce](big-data/Hadoop-MapReduce.md)
+- [![](https://icongr.am/simple/hive.svg?size=25&color=currentColor&colored=false)Hive](big-data/Hive.md)
 - [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka](message-queue/Kafka/readKafka.md)
   - [Kafka 入门](message-queue/Kafka/Hello-Kafka.md)
   - [Kafka 工作流程和存储机制分析](message-queue/Kafka/Kafka-Workflow.md)
+  - [Kafka 生产者详解](message-queue/Kafka/Kafka-Producer.md)
   - [Kafka 为什么快](message-queue/Kafka/Kafka高效读写数据的原因.md)
 - **性能优化**
-- JVM优化
-- web调优
-- DB调优
+- [![](https://icongr.am/octicons/cpu.svg?size=25&color=780ebe)CPU 飙升问题](optimization/CPU飙升.md)
+- \> JVM优化
+- \> web调优
+- \> DB调优
+- **数据结构与算法**
+- [![](https://icongr.am/octicons/home.svg?size=25&color=currentColor)数据结构](data-structure/hello-dataStructure.md)
+- [![](https://icongr.am/entypo/dots-two-vertical.svg?size=25&color=e24040)数组](data-structure/Array.md)
+- [![](https://icongr.am/clarity/ellipsis-horizontal.svg?size=25&color=47579a)链表](data-structure/Linked-List.md)
+- [![](https://icongr.am/octicons/arrow-left.svg?size=25&color=currentColor)栈](data-structure/Stack.md)
+- [![](https://icongr.am/octicons/arrow-right.svg?size=25&color=currentColor)队列](data-structure/Queue.md)
+- [![](https://icongr.am/entypo/tree.svg?size=25&color=44c016)树](data-structure/Tree.md)
 - **工程化与工具**
-- [![Maven](https://icongr.am/devicon//fontawesome/maxcdn.svg?&size=16)Maven](logging/logback简单使用.md)
-- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](logging/logback简单使用.md)
-- [Sonar](https://www.sonarqube.org/)
+- [![Maven](https://icongr.am/simple/apachemaven.svg?size=25&color=c93ddb&colored=false)Maven](tools/Maven.md)
+- [![Git](https://icongr.am/devicon/git-original.svg?&size=16)Git](tools/Git-Specification.md)
+- [![](https://icongr.am/devicon/github-original.svg?size=25&color=currentColor)Git](tools/GitHub.md)
 - **其他**
 - [![Linux](https://icongr.am/devicon/linux-original.svg?&size=16)Linux](linux/linux.md)
 - [缕清各种Java Logging](logging/Java-Logging.md)
 - [hello logback](logging/logback简单使用.md)
-- SHELL
-- TCP与HTTP
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
 - [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
