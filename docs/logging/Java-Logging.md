@@ -4,17 +4,22 @@
 
 
 
-## Java常用框架
+## Java常用日志框架
 
-- **Jul** (Java Util Logging) : 自Java1.4以来，Java在Java.util中提供的一个内置框架，也常称为JDKLog、jdk-logging。
-- **Log4j** : Apache Log4j是一个基于Java的日志记录工具。它是由Ceki Gülcü首创的，现在则是Apache软件基金会的一个项目。
-- **Log4j 2** : Apache Log4j 2是apache开发的一款Log4j的升级产品，Log4j 2与Log4j 1发生了很大的变化，Log4j 2不兼容Log4j 1。
-- **Logback**  : 一套日志组件的实现(Slf4j阵营)。
-- **tinylog** : 一个轻量级的日志框架
-- **Apache Commons Logging** : Apache基金会所属的项目，是一套Java日志接口，之前叫 Jakarta Commons Logging，后更名为Commons Logging。
-- **Slf4j** : Simple Logging Facade for Java，类似于Commons Logging，是一套简易Java日志门面，本身并无日志的实现。（Simple Logging Facade for Java，缩写Slf4j）。
+- **[Jul](https://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html "JUL")** (Java Util Logging) ：自 Java1.4 以来，Java在 `Java.util.logging` 中提供的一个内置框架，也常称为 JDKLog、jdk-logging
+- **[Log4j](https://logging.apache.org/log4j/2.x/ "log4j")**：Apache Log4j 是一个基于 Java 的日志记录工具。最初是 Log4j 1，我们现在用的大都是 Log4j 2，Apache Log4j 2 是 Apache 开发的一款 Log4j 的升级产品，Log4j 2 与 Log4j 1 发生了很大的变化，Log4j 2 不兼容Log4j 1
+- **[Slf4j](http://www.slf4j.org/ "SLF4J")**：`Simple Logging Facade for Java`，类似于 Commons Logging，是一套简易 Java 日志门面，本身并无日志的实现
+- **Logback**：一套日志组件的实现
+- **tinylog**： 一个轻量级的日志框架
+- **Apache Commons Logging**：Apache 基金会所属的项目，是一套 Java 日志接口，之前叫 Jakarta Commons Logging，后更名为 Commons Logging
+- 
 
 
+
+> ```java
+> private static Logger logger = Logger.getLogger("JavaKeeper");
+> 
+> ```
 
 JUL、LOG4J1、LOG4J2、LOGBACK是**日志实现框架**，而Commons Logging和SLF4J是**日志实现门面**，可以理解为一个适配器，**可以将你的应用程序从日志框架中解耦**。
 
