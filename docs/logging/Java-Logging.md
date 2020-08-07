@@ -1,123 +1,104 @@
-## Java日志
-
 日志就是记录程序的运行轨迹，方便查找关键信息，也方便快速定位解决问题。 
+
+> 谁不知道日志呀，下面我们看看世界上最好的语言 Java 的常用日志实现
+>
+> ```java
+> private static final Logger logger = Logger.getLogger("jul");
+> private static final Logger trace = LogManager.getLogger("log4j");
+> private static final Logger logger = LoggerFactory.getLogger("SLF4J");
+> private static final Log log = LogFactory.getLog("Apache Commons Logging");
+> ```
+>
+> 我**，这么多，怎么记得住，我要用哪个？
+>
+> ![](https://www.52doutu.cn/static/temp/pic/21532a340b7cb6f8f654ef3e6e00622c.gif)
+>
+> 项目中有一堆日志相关的 Jar 包，到底应该引入哪个排除哪个？
+>
+> 这两个 Jar 包冲突了?  这个包需要依赖这个包?
+>
+> 这类问题有时候容易让人崩溃，所以就来缕一缕 Java 日志框架的那点事~~
+
+
 
 
 
 ## Java常用日志框架
 
-- **[Jul](https://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html "JUL")** (Java Util Logging) ：自 Java1.4 以来，Java在 `Java.util.logging` 中提供的一个内置框架，也常称为 JDKLog、jdk-logging
+- **[JUL](https://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html "JUL")** (Java Util Logging) ：自 Java1.4 以来，Java 在 `Java.util.logging` 中提供的一个内置框架，也常称为 JDKLog、jdk-logging
 - **[Log4j](https://logging.apache.org/log4j/2.x/ "log4j")**：Apache Log4j 是一个基于 Java 的日志记录工具。最初是 Log4j 1，我们现在用的大都是 Log4j 2，Apache Log4j 2 是 Apache 开发的一款 Log4j 的升级产品，Log4j 2 与 Log4j 1 发生了很大的变化，Log4j 2 不兼容Log4j 1
-- **[Slf4j](http://www.slf4j.org/ "SLF4J")**：`Simple Logging Facade for Java`，类似于 Commons Logging，是一套简易 Java 日志门面，本身并无日志的实现
-- **Logback**：一套日志组件的实现
-- **tinylog**： 一个轻量级的日志框架
-- **Apache Commons Logging**：Apache 基金会所属的项目，是一套 Java 日志接口，之前叫 Jakarta Commons Logging，后更名为 Commons Logging
-- 
+- **[SLF4J](http://www.slf4j.org/ "SLF4J")**：`Simple Logging Facade for Java`，类似于 Commons Logging，是一套简易 Java 日志门面，本身并无日志的实现
+- **[Logback](http://logback.qos.ch/ "Logback")**：Logback 是 `Slf4j` 的原生实现框架，同样也是出自 `Log4j` 一个人之手，但拥有比 `log4j` 更多的优点、特性和更做强的性能，现在基本都用来代替 `log4j` 成为主流
+- **[tinylog](https://tinylog.org/v2/ "tinylog")**： 一个轻量级的开源日志框架
+- **[Apache Commons Logging](http://commons.apache.org/proper/commons-logging/ "Apache Commons Logging")**：Apache 基金会所属的项目，是一套 Java 日志接口，之前叫 `Jakarta Commons Logging`，后更名为 Commons Logging
 
 
 
+JUL、log4j 、Logback 是**日志实现框架**，而 Apache Commons Logging 和 SLF4J 是**日志实现门面**，可以理解为一个适配器，**可以将你的应用程序从日志框架中解耦**。
+
+> 日志门面，是门面模式的一个典型的应用。
+>
+> 门面模式（Facade Pattern），也称之为外观模式，其核心为：外部与一个子系统的通信必须通过一个统一的外观对象进行，使得子系统更易于使用。
+>
+> ![](https://static01.imgkr.com/temp/34d51bca34e54c05a32d148439244496.png)
+
+
+
+> 阿里巴巴 Java 开发手册嵩山版_日志规约：
+>
+> 【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架（SLF4J、JCL--Jakarta Commons Logging）中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。
+>
+> 说明：日志框架（SLF4J、JCL--Jakarta Commons Logging）的使用方式（推荐使用 SLF4J）
+>
+> 使用 SLF4J：
+>
 > ```java
-> private static Logger logger = Logger.getLogger("JavaKeeper");
-> 
+> import org.slf4j.Logger;
+> import org.slf4j.LoggerFactory;
+> private static final Logger logger = LoggerFactory.getLogger(Test.class);
+> ```
+>
+> 使用 JCL：
+>
+> ```java
+> import org.apache.commons.logging.Log;
+> import org.apache.commons.logging.LogFactory;
+> private static final Log log = LogFactory.getLog(Test.class);
 > ```
 
-JUL、LOG4J1、LOG4J2、LOGBACK是**日志实现框架**，而Commons Logging和SLF4J是**日志实现门面**，可以理解为一个适配器，**可以将你的应用程序从日志框架中解耦**。
-
-【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架 SLF4J 中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。 import org.slf4j.Logger; import org.slf4j.LoggerFactory; private static final Logger logger = LoggerFactory.getLogger(Abc.class);  
 
 
-
-## Java常用日志框架历史
-
-- 1996年早期，欧洲安全电子市场项目组决定编写它自己的程序跟踪API(Tracing API)。经过不断的完善，这个API终于成为一个十分受欢迎的Java日志软件包，即Log4j。后来Log4j成为Apache基金会项目中的一员。
-
-- 期间Log4j近乎成了Java社区的日志标准。据说Apache基金会还曾经建议Sun引入Log4j到java的标准库中，但Sun拒绝了。
-
-- 2002年Java1.4发布，Sun推出了自己的日志库JUL(Java Util Logging),其实现基本模仿了Log4j的实现。在JUL出来以前，Log4j就已经成为一项成熟的技术，使得Log4j在选择上占据了一定的优势。
-
-- 接着，Apache推出了Jakarta Commons Logging，JCL只是定义了一套日志接口(其内部也提供一个Simple Log的简单实现)，支持运行时动态加载日志组件的实现，也就是说，在你应用代码里，只需调用Commons Logging的接口，底层实现可以是Log4j，也可以是Java Util Logging。
-
-- 后来(2006年)，Ceki Gülcü不适应Apache的工作方式，离开了Apache。然后先后创建了Slf4j(日志门面接口，类似于Commons Logging)和Logback(Slf4j的实现)两个项目，并回瑞典创建了QOS公司，QOS官网上是这样描述Logback的：The Generic，Reliable Fast&Flexible Logging Framework(一个通用，可靠，快速且灵活的日志框架)。
-
-- 现今，Java日志领域被划分为两大阵营：Commons Logging阵营和Slf4j阵营。
-  Commons Logging在Apache大树的笼罩下，有很大的用户基数。但有证据表明，形式正在发生变化。2013年底有人分析了GitHub上30000个项目，统计出了最流行的100个Libraries，可以看出Slf4j的发展趋势更好：
-
-- Apache眼看有被Logback反超的势头，于2012-07重写了Log4j 1.x，成立了新的项目Log4j 2, Log4j 2具有Logback的所有特性。
-  
-
-  
-
-![](http://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/java_populor_jar.png)
-
-## java常用日志框架关系
-
-- Log4j 2与Log4j 1发生了很大的变化，Log4j 2不兼容Log4j 1。
-- Commons Logging和Slf4j是日志门面(门面模式是软件工程中常用的一种软件设计模式，也被称为正面模式、外观模式。它为子系统中的一组接口提供一个统一的高层接口，使得子系统更容易使用)。Log4j和Logback则是具体的日志实现方案。可以简单的理解为接口与接口的实现，调用者只需要关注接口而无需关注具体的实现，做到解耦。
-- 比较常用的组合使用方式是Slf4j与Logback组合使用，Commons Logging与Log4j组合使用。
-- Logback必须配合Slf4j使用。由于Logback和Slf4j是同一个作者，其兼容性不言而喻。
+到这里我好像就明白了，有 2 个日志接口标准和其他的几个具体实现，但还是要扯一扯，要不没人点赞~~
 
 
 
-## Commons Logging与Slf4j实现机制对比
+## [Java常用日志框架历史](https://www.cnblogs.com/chenhongliang/p/5312517.html "Java常用日志框架历史")
 
-#### Commons Logging实现机制
+- 1996 年早期，欧洲安全电子市场项目组决定编写它自己的程序跟踪 API(Tracing API)。经过不断的完善，这个API 终于成为一个十分受欢迎的 Java 日志软件包，即 Log4j。后来 Log4j 成为 Apache 基金会项目中的一员。
 
-> Commons Logging是通过动态查找机制，在程序运行时，使用自己的ClassLoader寻找和载入本地具体的实现。详细策略可以查看commons-logging-*.jar包中的org.apache.commons.logging.impl.LogFactoryImpl.java文件。由于Osgi不同的插件使用独立的ClassLoader，Osgi的这种机制保证了插件互相独立, 其机制限制了Commons Logging在Osgi中的正常使用。
+- 2002 年 Java1.4 发布，Sun 推出了自己的日志库 JUL(Java Util Logging)，其实现基本模仿了 Log4j 的实现。在 JUL 出来以前，Log4j 就已经成为一项成熟的技术，使得 Log4j 在选择上占据了一定的优势。
 
-#### Slf4j实现机制
+  > 谁能想到 Java1.4 之前，JDK 竟然没有内置的日志功能呢
 
-> Slf4j在编译期间，静态绑定本地的Log库，因此可以在Osgi中正常使用。它是通过查找类路径下org.slf4j.impl.StaticLoggerBinder，然后在StaticLoggerBinder中进行绑定。
+- 因为有了两种选择，所以导致了日志使用的混乱。所以 Apache 又推出了 `Jakarta Commons Logging`，JCL 只是定义了一套日志接口，支持运行时动态加载日志组件的实现，也就是说，应用层编写代码时，只需调用 JCL 提供的统一接口来记录日志，底层实现可以是 `Log4j`，也可以是 `Java Util Logging`。
 
+- 2006年，Log4j 的作者 Ceki Gülcü 从 Apache 离职，然后又搞出来一套类似 JCL 的接口类——Slf4j 和它的默认实现 Logback。
 
+- 从此，Java 日志领域被划分为两大阵营：Commons Logging 阵营和 Slf4j 阵营。
 
-## 项目中选择日志框架选择
-
-如果是在一个新的项目中建议使用Slf4j与Logback组合，这样有如下的几个优点。
-
-- Slf4j实现机制决定Slf4j限制较少，使用范围更广。由于Slf4j在编译期间，静态绑定本地的LOG库使得通用性要比Commons Logging要好。
-- Logback拥有更好的性能。Logback声称：某些关键操作，比如判定是否记录一条日志语句的操作，其性能得到了显著的提高。这个操作在Logback中需要3纳秒，而在Log4J中则需要30纳秒。LogBack创建记录器（logger）的速度也更快：13毫秒，而在Log4J中需要23毫秒。更重要的是，它获取已存在的记录器只需94纳秒，而Log4J需要2234纳秒，时间减少到了1/23。跟JUL相比的性能提高也是显著的。
-- Commons Logging开销更高
-
-```
-# 在使Commons Logging时为了减少构建日志信息的开销，通常的做法是
-if(log.isDebugEnabled()){
-  log.debug("User name： " +
-    user.getName() + " buy goods id ：" + good.getId());
-}
-
-# 在Slf4j阵营，你只需这么做：
-log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
-
-# 也就是说，Slf4j把构建日志的开销放在了它确认需要显示这条日志之后，减少内存和Cup的开销，使用占位符号，代码也更为简洁
-```
-
-- Logback文档免费。Logback的所有文档是全面免费提供的，不象Log4J那样只提供部分免费文档而需要用户去购买付费文档。
+- 2012 年，Apache 眼看有被 Logback 反超的势头，于是重写了 Log4j 1.x，成立了新的项目 Log4j 2，Log4j 2 具有 Logback 的所有特性。
 
 
 
-## Java日志组件
-
-[**Loggers**](http://www.loggly.com/ultimate-guide/logging/java-logging-basics/#loggers)**：**记录器，Logger 负责捕捉事件并将其发送给合适的 Appender。
-
-[**Loggers**](http://www.loggly.com/ultimate-guide/logging/java-logging-basics/#loggers)**：**记录器，Logger 负责捕捉事件并将其发送给合适的 Appender。
-
-[**Appenders**](http://www.loggly.com/ultimate-guide/logging/java-logging-basics/#appenders)**：**也被称为 Handlers，处理器，负责将日志事件记录到目标位置。在将日志事件输出之前， Appenders 使用Layouts来对事件进行格式化处理。
-
-[**Layouts**](http://www.loggly.com/ultimate-guide/logging/java-logging-basics/#layouts)**：**也被称为 Formatters，格式化器，它负责对日志事件中的数据进行转换和格式化。Layouts 决定了数据在一条日志记录中的最终形式。
-
-当 Logger 记录一个事件时，它将事件转发给适当的 Appender。然后 Appender 使用 Layout 来对日志记录进行格式化，并将其发送给控制台、文件或者其它目标位置。另外，Filters 可以让你进一步指定一个 Appender 是否可以应用在一条特定的日志记录上。在日志配置中，Filters 并不是必需的，但可以让你更灵活地控制日志消息的流动。
-
-![]( https://logglyultimate.wpengine.com/wp-content/uploads/2015/09/Picture1-2.png )
-
-
-
-## Java日志级别
+## Java 日志级别
 
 不同的日志框架，级别也会有些差异
 
-**log4j**  —— **OFF、FATAL、ERROR、WARN、INFO、DEBUG、TRACE、 ALL** 
+- ￼j.u.l：OFF、SEVERE、WARNING、INFO、CONFIG、FINE、FINER、FINEST、ALL
 
-**logback**  —— **OFF、ERROR、WARN、INFO、DEBUG、TRACE、 ALL** 
+- log4j：OFF、FATAL、ERROR、WARN、INFO、DEBUG、TRACE、 ALL
+
+- logback：OFF、ERROR、WARN、INFO、DEBUG、TRACE、 ALL
 
 | 日志级别 | 描述                                               |
 | -------- | -------------------------------------------------- |
@@ -132,24 +113,60 @@ log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
 
 
 
-## SLF4J绑定日志框架
+## Commons Logging 与 Slf4j 实现机制对比
+
+#### Commons Logging 实现机制
+
+Commons Logging 是通过动态查找机制，在程序运行时，使用自己的 ClassLoader 寻找和载入本地具体的实现。详细策略可以查看 `commons-logging-*.jar` 包中的`org.apache.commons.logging.impl.LogFactoryImpl.java` 文件。由于 Osgi 不同的插件使用独立的ClassLoader，Osgi 的这种机制保证了插件互相独立，其机制限制了 Commons Logging 在 Osgi 中的正常使用。
+
+#### Slf4j 实现机制
+
+Slf4j 在编译期间，静态绑定本地的 Log 库，因此可以在 Osgi 中正常使用。它是通过查找类路径下`org.slf4j.impl.StaticLoggerBinder`，然后在 StaticLoggerBinder 中进行绑定。
+
+
+
+## 项目中选择日志框架选择
+
+如果是在一个新的项目中建议使用 Slf4j 与 Logback 组合，这样有如下的几个优点
+
+- Slf4j 实现机制决定 Slf4j 限制较少，使用范围更广。由于 Slf4j 在编译期间，静态绑定本地的 LOG 库使得通用性要比 Commons Logging 要好。
+
+- Logback 拥有更好的性能。Logback 声称：某些关键操作，比如判定是否记录一条日志语句的操作，其性能得到了显著的提高。这个操作在 Logback 中需要 3 纳秒，而在 Log4J 中则需要 30 纳秒。LogBack 创建记录器（logger）的速度也更快：13 毫秒，而在 Log4J 中需要 23 毫秒。更重要的是，它获取已存在的记录器只需94 纳秒，而 Log4J 需要 2234 纳秒，时间减少到了 1/23。跟 JUL 相比的性能提高也是显著的。
+
+- Commons Logging 开销更高
+
+  在使Commons Logging时为了减少构建日志信息的开销，通常的做法是
+
+  ```java
+  if(log.isDebugEnabled()){
+    log.debug("User name： " +
+      user.getName() + " buy goods id ：" + good.getId());
+  }
+  ```
+
+  在 Slf4j 阵营，你只需这么做：
+
+  ```java
+  log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
+  ```
+
+  也就是说，Slf4j 把构建日志的开销放在了它确认需要显示这条日志之后，减少内存和 cup 的开销，使用占位符号，代码也更为简洁
+
+- Logback 文档免费。Logback 的所有文档是全面免费提供的，不像 Log4J 那样只提供部分免费文档而需要用户去购买付费文档。
+
+
+
+## SLF4J 绑定日志框架
 
 ![](http://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
 
-![](http://www.slf4j.org/images/concrete-bindings.png)
+![来源：slf4j.org](http://www.slf4j.org/images/concrete-bindings.png)
+
+
 
 
 
 ## 阿里Java开发手册——日志规约 
-
-1. 【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架 SLF4J 中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。 
-
-   ```java
-   import org.slf4j.Logger; 
-   import org.slf4j.LoggerFactory;
-   
-   private static final Logger logger = LoggerFactory.getLogger(Abc.class);  
-   ```
 
 2. 【强制】日志文件至少保存 15 天，因为有些异常具备以“周”为频次发生的特点。 
 
@@ -193,7 +210,9 @@ log.debug("User name：{} ,buy goods id ：{}", user.getName(),good.getId());
 
 
 
+http://www.slf4j.org/manual.html
 
+[https://www.cnblogs.com/chenhongliang/p/5312517.html#java%E6%97%A5%E5%BF%97%E6%A6%82%E8%BF%B0](https://www.cnblogs.com/chenhongliang/p/5312517.html#java日志概述)
 
 
 
