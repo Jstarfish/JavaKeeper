@@ -11,7 +11,7 @@
 >
 > 我**，这么多，怎么记得住，我要用哪个？
 >
-> ![](https://www.52doutu.cn/static/temp/pic/21532a340b7cb6f8f654ef3e6e00622c.gif)
+> ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1ghjejmjjlhj3073073weh.jpg)
 >
 > 项目中有一堆日志相关的 Jar 包，到底应该引入哪个排除哪个？
 >
@@ -158,7 +158,7 @@ Slf4j 在编译期间，静态绑定本地的 Log 库，因此可以在 Osgi 中
 
 ## SLF4J 绑定日志框架
 
-![](http://cnblogpic.oss-cn-qingdao.aliyuncs.com/blogpic/java_log/slf4j-bind.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghjfdb8016j31cy0riwhw.jpg)
 
 ![来源：slf4j.org](http://www.slf4j.org/images/concrete-bindings.png)
 
