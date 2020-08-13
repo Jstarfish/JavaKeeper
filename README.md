@@ -36,7 +36,7 @@
 
 |                           Project                            | Version | Article                                                      |
 | :----------------------------------------------------------: | :-----: | :----------------------------------------------------------- |
-| ![](https://icongr.am/devicon//mysql-original.svg?size=20) **MySQL** | 5.7.25  | [1、MySQL架构概述](docs/mysql/MySQL-Framework.md)<br/>[2、MySQL存储引擎](docs/mysql/MySQL-Storage-Engines.md)<br/>[3、索引](docs/mysql/MySQL-Index.md)<br/>[4、事务](docs/mysql/MySQL-Transaction.md)<br/>5、表设计<br/>[6、性能优化](docs/mysql/MySQL-Optimization.md)<br/>7、锁机制<br/>8、分区分表分库<br/>9 、主从复制<br/> |
+| ![](https://icongr.am/devicon//mysql-original.svg?size=20) **MySQL** | 5.7.25  | [1、MySQL架构概述](docs/data-store/MySQL/MySQL-Framework.md)<br/>[2、MySQL存储引擎](docs/data-store/MySQL/MySQL-Storage-Engines.md)<br/>[3、索引](docs/data-store/MySQL/MySQL-Index.md)<br/>[4、事务](docs/data-store/MySQL/MySQL-Transaction.md)<br/>5、表设计<br/>[6、性能优化](docs/data-store/MySQL/MySQL-Optimization.md)<br/>7、锁机制<br/>8、分区分表分库<br/>9 、主从复制<br/> |
 | ![](https://icongr.am/devicon//redis-original.svg?size=20)   **Redis** |  5.0.6  | [1、NoSQL概述](docs/data-store/Redis/1.Nosql-Overview.md)<br/>[2、Redis概述](docs/data-store/Redis/2.readRedis.md)<br/>[3、Redis数据类型](docs/data-store/Redis/3.Redis-Datatype.md)<br/>[4、Redis配置](docs/data-store/Redis/4.Redis-Conf.md)<br/>[5、深入理解 Redis 的持久化](docs/data-store/Redis/5.Redis-Persistence.md)<br/> |
 |                      **Elasticsearch**                       |         |                                                              |
 |                        **Amazon S3**                         |         |                                                              |
@@ -108,7 +108,7 @@
 
 |       Project        | Article                                                      |
 | :------------------: | :----------------------------------------------------------- |
-| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——暗中观察](/docs/design-pattern/Observer-Pattern.md)<br />[装饰者模式——拒绝继承滥用](/docs/design-pattern/Decorator-Pattern.md)<br />[责任链模式——更灵活的 if else](/docs/design-pattern/Chain-of-Responsibility-Pattern)<br>[代理模式——面试官问我Spring AOP中两种代理的区别](https://mp.weixin.qq.com/s/U7eR5Mpu4VBbtPP1livLnA)<br/> |
+| GoF 的 23 种设计模式 | [设计模式前传——要学设计模式你要先知道这些](/docs/design-pattern/Design-Pattern-Overview.md) <br/>[单例模式——我只有一个对象](/docs/design-pattern/Singleton-Pattern.md)<br/>[工厂模式——我有好多对象](/docs/design-pattern/Factory-Pattern.md)<br/>[观察者模式——暗中观察](/docs/design-pattern/Observer-Pattern.md)<br />[装饰者模式——拒绝继承滥用](/docs/design-pattern/Decorator-Pattern.md)<br />[责任链模式——更灵活的 if else](/docs/design-pattern/Chain-of-Responsibility-Pattern)<br>[代理模式——面试官问我Spring AOP中两种代理的区别](https://mp.weixin.qq.com/s/U7eR5Mpu4VBbtPP1livLnA)<br/>[原型模式——浅拷贝和深拷贝](http://mp.weixin.qq.com/s?__biz=MzIyNDI3MjY0NQ==&mid=2247485400&idx=1&sn=b83ef5d8d81e54bc46207bf540fc9cf9&chksm=e810cfb2df6746a41e10904fe43611e1385d406a95f680472e72620b91973f8724af9a4d8c37&token=1569764147&lang=zh_CN#rd)<br/> |
 
 
 
