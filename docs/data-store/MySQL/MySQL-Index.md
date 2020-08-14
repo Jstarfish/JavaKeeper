@@ -1,4 +1,4 @@
-# MySQL索引篇——妈妈再也不担心我不会索引了
+# MySQL索引篇——妈妈再也不用担心我不会索引了
 
 >索引问题，在面试中是肯定会出现的，记一道知乎服务端面试题
 >
@@ -12,7 +12,11 @@
 
 - 可以简单的理解为“排好序的快速查找数据结构”，数据本身之外，<font color=#FF0000>**数据库还维护者一个满足特定查找算法的数据结构**</font>，这些数据结构以某种方式引用（指向）数据，这样就可以在这些数据结构上实现高级查找算法。这种数据结构，就是索引。下图是一种可能的索引方式示例。
 
+<<<<<<< HEAD
   ![](https://static01.imgkr.com/temp/5dda88d8f792449eb6ba7206265aab40.png)
+=======
+  ![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghphshtu04j30gt08xmxn.jpg)
+>>>>>>> d603e5d78c0acfdf025b57e1fd861df9ad4d2ff7
 
   左边的数据表，一共有两列七条记录，最左边的是数据记录的物理地址
   
@@ -294,7 +298,7 @@ MyISAM 引擎的索引文件和数据文件是分离的。**MyISAM 引擎索引�
 
 我们知道 InnoDB 索引是聚集索引，它的索引和数据是存入同一个 `.idb` 文件中的，因此它的索引结构是在同一个树节点中同时存放索引和数据，如下图中最底层的叶子节点有三行数据，对应于数据表中的 id、stu_id、name数据项。
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gewoy2lhr5j320d0u016k.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gewoy2lhr5j320d0u016k.jpg)
 
 在 Innodb 中，索引分叶子节点和非叶子节点，非叶子节点就像新华字典的目录，单独存放在索引段中，叶子节点则是顺序排列的，在数据段中。InnoDB 的数据文件可以按照表来切分（只需要开启`innodb_file_per_table)`，切分后存放在`xxx.ibd`中，默认不切分，存放在 `xxx.ibdata`中。
 
@@ -309,7 +313,7 @@ MyISAM 引擎的索引文件和数据文件是分离的。**MyISAM 引擎索引�
 
 这也就是所谓的“**回表查询**”
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gewsc7l623j320r0u0gwt.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gewsc7l623j320r0u0gwt.jpg)
 
 **InnoDB 索引结构需要注意的点**
 
