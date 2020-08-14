@@ -115,7 +115,7 @@ file.flush()
 
 同时，还伴随着四次上下文切换，如下图所示
 
-![](https://imgkr.cn-bj.ufileos.com/def7b55a-9601-48a1-a3fa-9a105369f766.png)
+![](https://static01.imgkr.com/temp/8fc510468c6e40ecbeca875aac22b536.png)
 
 数据落盘通常都是非实时的，kafka 生产者数据持久化也是如此。Kafka 的数据**并不是实时的写入硬盘**，它充分利用了现代操作系统分页存储来利用内存提高 I/O 效率，就是上一节提到的 Page Cache。
 
@@ -129,7 +129,7 @@ file.flush()
 
 mmap 也有一个很明显的缺陷——不可靠，写到 mmap 中的数据并没有被真正的写到硬盘，操作系统会在程序主动调用 flush 的时候才把数据真正的写到硬盘。Kafka 提供了一个参数——`producer.type` 来控制是不是主动flush；如果 Kafka 写入到 mmap 之后就立即 flush 然后再返回 Producer 叫同步(sync)；写入 mmap 之后立即返回 Producer 不调用 flush 就叫异步(async)，默认是 sync。
 
-![](https://imgkr.cn-bj.ufileos.com/c3c7ca2f-f84b-4802-8d43-772416dea198.png)
+![](https://static01.imgkr.com/temp/68b8af0326f94444b3bb9a41c8918ab2.png)
 
 > 零拷贝（Zero-copy）技术指在计算机执行操作时，CPU 不需要先将数据从一个内存区域复制到另一个内存区域，从而可以减少上下文切换以及 CPU 的拷贝时间。
 >
@@ -165,7 +165,7 @@ Socket.send(buffer)
 
 Linux 2.4+ 内核通过 sendfile 系统调用，提供了零拷贝。数据通过 DMA 拷贝到内核态 Buffer 后，直接通过 DMA 拷贝到 NIC Buffer，无需 CPU 拷贝。这也是零拷贝这一说法的来源。除了减少数据拷贝外，因为整个读文件 - 网络发送由一个 sendfile 调用完成，整个过程只有两次上下文切换，因此大大提高了性能。
 
-![](https://imgkr.cn-bj.ufileos.com/b38b8bc6-46b1-4782-9f04-833791b990be.png)
+![](https://static01.imgkr.com/temp/6753e5f7f2f7435687b6c3fb7c6d1eff.png)
 
 Kafka 在这里采用的方案是通过 NIO 的 `transferTo/transferFrom` 调用操作系统的 sendfile 实现零拷贝。总共发生 2 次内核数据拷贝、2 次上下文切换和一次系统调用，消除了 CPU 数据拷贝
 

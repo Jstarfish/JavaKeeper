@@ -335,7 +335,7 @@ doSend() 方法主要分为10步完成：
 
 10. 如果 batch 已经满了,唤醒 sender 线程发送数据
 
-
+![](https://img2018.cnblogs.com/blog/1465200/201909/1465200-20190910145036444-1215527333.png)
 
 ### 具体的发送过程
 
@@ -486,11 +486,228 @@ this.ensureValidRecordSize(serializedSize);
 
 #### 向 accumulator 写数据
 
+```java
+public RecordAccumulator.RecordAppendResult append(TopicPartition tp, long timestamp, byte[] key, byte[] value, Header[] headers, Callback callback, long maxTimeToBlock) throws InterruptedException {
+    this.appendsInProgress.incrementAndGet();
+    ByteBuffer buffer = null;
+    if (headers == null) {
+        headers = Record.EMPTY_HEADERS;
+    }
+
+    RecordAccumulator.RecordAppendResult var16;
+    try {
+        // 当前tp有对应queue时直接返回，否则新建一个返回
+        Deque<ProducerBatch> dq = this.getOrCreateDeque(tp);
+        // 在对一个 queue 进行操作时,会保证线程安全
+        synchronized(dq) {
+            if (this.closed) {
+                throw new KafkaException("Producer closed while send in progress");
+            }
+
+            RecordAccumulator.RecordAppendResult appendResult = this.tryAppend(timestamp, key, value, headers, callback, dq);
+            if (appendResult != null) {
+                RecordAccumulator.RecordAppendResult var14 = appendResult;
+                return var14;
+            }
+        }
+		// 为 topic-partition 创建一个新的 RecordBatch
+        byte maxUsableMagic = this.apiVersions.maxUsableProduceMagic();
+        int size = Math.max(this.batchSize, AbstractRecords.estimateSizeInBytesUpperBound(maxUsableMagic, this.compression, key, value, headers));
+        this.log.trace("Allocating a new {} byte message buffer for topic {} partition {}", new Object[]{size, tp.topic(), tp.partition()});
+        // 给这个 RecordBatch 初始化一个 buffer
+        buffer = this.free.allocate(size, maxTimeToBlock);
+        synchronized(dq) {
+            if (this.closed) {
+                throw new KafkaException("Producer closed while send in progress");
+            }
+
+            RecordAccumulator.RecordAppendResult appendResult = this.tryAppend(timestamp, key, value, headers, callback, dq);
+            if (appendResult == null) {
+                // 给 topic-partition 创建一个 RecordBatch
+                MemoryRecordsBuilder recordsBuilder = this.recordsBuilder(buffer, maxUsableMagic);
+                ProducerBatch batch = new ProducerBatch(tp, recordsBuilder, this.time.milliseconds());
+                // 向新的 RecordBatch 中追加数据
+                FutureRecordMetadata future = (FutureRecordMetadata)Utils.notNull(batch.tryAppend(timestamp, key, value, headers, callback, this.time.milliseconds()));
+                // 将 RecordBatch 添加到对应的 queue 中
+                dq.addLast(batch);
+                // 向未 ack 的 batch 集合添加这个 batch
+                this.incomplete.add(batch);
+                buffer = null;
+                // 如果 dp.size()>1 就证明这个 queue 有一个 batch 是可以发送了
+                RecordAccumulator.RecordAppendResult var19 = new RecordAccumulator.RecordAppendResult(future, dq.size() > 1 || batch.isFull(), true);
+                return var19;
+            }
+
+            var16 = appendResult;
+        }
+    } finally {
+        if (buffer != null) {
+            this.free.deallocate(buffer);
+        }
+
+        this.appendsInProgress.decrementAndGet();
+    }
+
+    return var16;
+}
+```
 
 
 
+#### 使用sender线程批量发送
 
+```java
+public void run() {
+    this.log.debug("Starting Kafka producer I/O thread.");
 
+    while(this.running) {
+        try {
+            this.run(this.time.milliseconds());
+        } catch (Exception var4) {
+            this.log.error("Uncaught error in kafka producer I/O thread: ", var4);
+        }
+    }
+
+    this.log.debug("Beginning shutdown of Kafka producer I/O thread, sending remaining records.");
+	// 累加器中可能仍然有请求，或者等待确认,等待他们完成就停止接受请求
+    while(!this.forceClose && (this.accumulator.hasUndrained() || this.client.inFlightRequestCount() > 0)) {
+        //......
+    }
+
+    if (this.forceClose) {
+        //......
+    }
+
+    try {
+        this.client.close();
+    } catch (Exception var2) {
+        this.log.error("Failed to close network client", var2);
+    }
+
+    this.log.debug("Shutdown of Kafka producer I/O thread has completed.");
+}
+
+void run(long now) {
+    //首先还是判断是否使用事务发送
+    if (this.transactionManager != null) {
+        try {
+            if (this.transactionManager.shouldResetProducerStateAfterResolvingSequences()) {
+                this.transactionManager.resetProducerId();
+            }
+
+            if (!this.transactionManager.isTransactional()) {
+                this.maybeWaitForProducerId();
+            } else if (this.transactionManager.hasUnresolvedSequences() && !this.transactionManager.hasFatalError()) {
+                this.transactionManager.transitionToFatalError(new KafkaException("The client hasn't received acknowledgment for some previously sent messages and can no longer retry them. It isn't safe to continue."));
+            } else if (this.transactionManager.hasInFlightTransactionalRequest() || this.maybeSendTransactionalRequest(now)) {
+                this.client.poll(this.retryBackoffMs, now);
+                return;
+            }
+			//如果事务管理器转态错误 或者producer没有id 将停止进行发送
+            if (this.transactionManager.hasFatalError() || !this.transactionManager.hasProducerId()) {
+                RuntimeException lastError = this.transactionManager.lastError();
+                if (lastError != null) {
+                    this.maybeAbortBatches(lastError);
+                }
+
+                this.client.poll(this.retryBackoffMs, now);
+                return;
+            }
+
+            if (this.transactionManager.hasAbortableError()) {
+                this.accumulator.abortUndrainedBatches(this.transactionManager.lastError());
+            }
+        } catch (AuthenticationException var5) {
+            this.log.trace("Authentication exception while processing transactional request: {}", var5);
+            this.transactionManager.authenticationFailed(var5);
+        }
+    }
+	//发送Producer数据
+    long pollTimeout = this.sendProducerData(now);
+    this.client.poll(pollTimeout, now);
+}
+
+private long sendProducerData(long now) {
+    Cluster cluster = this.metadata.fetch();
+    // 获取准备发送数据的分区列表
+    ReadyCheckResult result = this.accumulator.ready(cluster, now);
+    Iterator iter;
+    //如果有分区leader信息是未知的,那么就强制更新metadata
+    if (!result.unknownLeaderTopics.isEmpty()) {
+        iter = result.unknownLeaderTopics.iterator();
+
+        while(iter.hasNext()) {
+            String topic = (String)iter.next();
+            this.metadata.add(topic);
+        }
+
+        this.log.debug("Requesting metadata update due to unknown leader topics from the batched records: {}", result.unknownLeaderTopics);
+        this.metadata.requestUpdate();
+    }
+
+    iter = result.readyNodes.iterator();
+    long notReadyTimeout = 9223372036854775807L;
+
+    // 移除没有准备好发送的Node
+    while(iter.hasNext()) {
+        Node node = (Node)iter.next();
+        if (!this.client.ready(node, now)) {
+            iter.remove();
+            notReadyTimeout = Math.min(notReadyTimeout, this.client.pollDelayMs(node, now));
+        }
+    }
+	//创建Producer请求内容
+    Map<Integer, List<ProducerBatch>> batches = this.accumulator.drain(cluster, result.readyNodes, this.maxRequestSize, now);
+    this.addToInflightBatches(batches);
+    List expiredBatches;
+    Iterator var11;
+    ProducerBatch expiredBatch;
+    if (this.guaranteeMessageOrder) {
+        Iterator var9 = batches.values().iterator();
+
+        while(var9.hasNext()) {
+            expiredBatches = (List)var9.next();
+            var11 = expiredBatches.iterator();
+
+            while(var11.hasNext()) {
+                expiredBatch = (ProducerBatch)var11.next();
+                this.accumulator.mutePartition(expiredBatch.topicPartition);
+            }
+        }
+    }
+
+    this.accumulator.resetNextBatchExpiryTime();
+    List<ProducerBatch> expiredInflightBatches = this.getExpiredInflightBatches(now);
+    expiredBatches = this.accumulator.expiredBatches(now);
+    expiredBatches.addAll(expiredInflightBatches);
+    if (!expiredBatches.isEmpty()) {
+        this.log.trace("Expired {} batches in accumulator", expiredBatches.size());
+    }
+
+    var11 = expiredBatches.iterator();
+
+    while(var11.hasNext()) {
+        expiredBatch = (ProducerBatch)var11.next();
+        String errorMessage = "Expiring " + expiredBatch.recordCount + " record(s) for " + expiredBatch.topicPartition + ":" + (now - expiredBatch.createdMs) + " ms has passed since batch creation";
+        this.failBatch(expiredBatch, -1L, -1L, new TimeoutException(errorMessage), false);
+        if (this.transactionManager != null && expiredBatch.inRetry()) {
+            this.transactionManager.markSequenceUnresolved(expiredBatch.topicPartition);
+        }
+    }
+
+    this.sensors.updateProduceRequestMetrics(batches);
+    long pollTimeout = Math.min(result.nextReadyCheckDelayMs, notReadyTimeout);
+    pollTimeout = Math.min(pollTimeout, this.accumulator.nextExpiryTimeMs() - now);
+    pollTimeout = Math.max(pollTimeout, 0L);
+    if (!result.readyNodes.isEmpty()) {
+        this.log.trace("Nodes with data ready to send: {}", result.readyNodes);
+        pollTimeout = 0L;
+    }
+
+    this.sendProduceRequests(batches, now);
+    return pollTimeout;
+}
+```
 
 
 

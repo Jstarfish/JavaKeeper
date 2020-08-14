@@ -40,9 +40,9 @@
 
 | 类别                    | 作用                                                         |
 | :---------------------- | :----------------------------------------------------------- |
-| .index                  | 偏移量索引文件，存储数据对应的偏移量                         |
+| .index                  | 基于偏移量的索引文件，存放着消息的offset和其对应的物理位置，是**<mark>稀松索引</mark>** |
 | .timestamp              | 时间戳索引文件                                               |
-| .log                    | 日志文件，存储生产者生产的数据                               |
+| .log                    | 它是segment文件的数据文件，用于存储实际的消息。该文件是二进制格式的。log文件是存储在 ConcurrentSkipListMap 里的，是一个map结构，key是文件名（offset），value是内容，这样在查找指定偏移量的消息时，用二分查找法就能快速定位到消息所在的数据文件和索引文件 |
 | .snaphot                | 快照文件                                                     |
 | leader-epoch-checkpoint | 保存了每一任leader开始写入消息时的offset，会定时更新。 follower被选为leader时会根据这个确定哪些消息可用 |
 
@@ -88,6 +88,14 @@ log.segment.bytes=1073741824
 00000000000000239430.index
 00000000000000239430.log
 ```
+
+- 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
+
+- 偏移量：分区中的每一条消息都会被分配的一个连续的id值，该值用于唯一标识分区中的每一条消息
+- 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项`log.retention.hours=168` 就表示 7 天后删除老的消息文件
+- [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数log.index.interval.bytes限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是4KB，写4kb的数据然后在索引里写一条索引。
+
+
 
 
 
