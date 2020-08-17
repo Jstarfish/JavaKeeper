@@ -10,13 +10,34 @@
 
 **Kafka 中消息是以 topic 进行分类的**，生产者生产消息，消费者消费消息，都是面向 topic 的。
 
-在 Kafka 中，一个 topic 可以分为多个 partition，一个 partition 分为多个 segment，每个 segment 对应两个文件：.index 和 .log 文件
+在 Kafka 中，一个 topic 可以分为多个 partition，一个 partition 分为多个 **segment**，每个 segment 对应两个文件：.index 和 .log 文件
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3ntjmvt8j31600mzac4.jpg)
 
 **topic 是逻辑上的概念，而 patition 是物理上的概念**，每个 patition 对应一个 log 文件，而 log 文件中存储的就是 producer 生产的数据，patition 生产的数据会被不断的添加到 log 文件的末端，且每条数据都有自己的 offset。
 
 消费组中的每个消费者，都是实时记录自己消费到哪个 offset，以便出错恢复，从上次的位置继续消费。
+
+
+
+> 问：Kafka 为什么要将 Topic 进行分区
+>
+> 答：负载均衡+水平扩展
+>
+> Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition 则是物理概念。可以想象，如果 Topic 不进行分区，而将 Topic 内的消息存储于一个 broker，那么关于该 Topic 的所有读写请求都将由这一个 broker 处理，吞吐量很容易陷入瓶颈，这显然是不符合高吞吐量应用场景的。有了 Partition 概念以后，假设一个 Topic 被分为 10 个 Partitions，Kafka 会根据一定的算法将 10 个 Partition 尽可能均匀的分布到不同的 broker（服务器）上，当 producer 发布消息时，producer 客户端可以采用 `random`、`key-hash` 及 `轮询` 等算法选定目标 partition，若不指定，Kafka 也将根据一定算法将其置于某一分区上。Partiton 机制可以极大的提高吞吐量，并且使得系统具备良好的水平扩展能力。
+>
+> 在创建 topic 时可以在 `$KAFKA_HOME/config/server.properties` 中指定这个 partition 的数量（如下所示），当然可以在 topic 创建之后去修改 partition 的数量。
+>
+> ```properties
+> # The default number of log partitions per topic. More partitions allow greater
+> # parallelism for consumption, but this will also result in more files across
+> # the brokers.
+> num.partitions=3
+> ```
+>
+> 在发送一条消息时，可以指定这个消息的 key，producer 根据这个 key 和 partition 机制来判断这个消息发送到哪个partition。partition 机制可以通过指定 producer 的 partition.class 这一参数来指定（即支持自定义），该 class 必须实现 kafka.producer.Partitioner 接口。
+>
+> 
 
 
 
@@ -90,12 +111,23 @@ log.segment.bytes=1073741824
 ```
 
 - 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
-
 - 偏移量：分区中的每一条消息都会被分配的一个连续的id值，该值用于唯一标识分区中的每一条消息
 - 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项`log.retention.hours=168` 就表示 7 天后删除老的消息文件
 - [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数log.index.interval.bytes限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是4KB，写4kb的数据然后在索引里写一条索引。
 
+举个栗子：00000000000000170410 的 “.index” 文件和 “.log” 文件的对应的关系，如下图
 
+![](https://images.gitbook.cn/60eafc10-cc9b-11e8-b452-15eec1b99303)
+
+> 问：为什么不能以 partition 作为存储单位？还要加个 segment？
+>
+> 答：如果就以 partition 为最小存储单位，可以想象，当 Kafka producer 不断发送消息，必然会引起 partition 文件的无限扩张，将对消息文件的维护以及已消费的消息的清理带来严重的影响，因此，需以 segment 为单位将 partition 进一步细分。每个 partition（目录）相当于一个巨型文件被平均分配到多个大小相等的 segment（段）数据文件中（每个 segment 文件中消息数量不一定相等）这种特性也方便 old segment 的删除，即方便已被消费的消息的清理，提高磁盘的利用率。每个 partition 只需要支持顺序读写就行，segment 的文件生命周期由服务端配置参数（log.segment.bytes，log.roll.{ms,hours} 等若干参数）决定。
+>
+> 
+>
+> 问：segment 的工作原理是怎样的？
+>
+> 答：segment 文件由两部分组成，分别为 “.index” 文件和 “.log” 文件，分别表示为 segment 索引文件和数据文件。这两个文件的命令规则为：partition 全局的第一个 segment 从 0 开始，后续每个 segment 文件名为上一个 segment 文件最后一条消息的 offset 值，数值大小为 64 位，20 位数字字符长度，没有数字用 0 填充
 
 
 
@@ -161,9 +193,19 @@ public ProducerRecord (String topic, V value)
 
 #### 2.3 副本（Replication）
 
-同一个 partition 可能会有多个 replication（ 对应 server.properties 配置中的 default.replication.factor=N）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据。
+同一个 partition 可能会有多个 replication（ 对应 server.properties 配置中的 `default.replication.factor=N`）。没有 replication 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。引入 replication 之后，同一个 partition 可能会有多个 replication，而这时需要在这些 replication 之间选出一 个 leader， producer 和 consumer 只与这个 leader 交互，其它 replication 作为 follower 从 leader 中复制数据。
+
+为了提高消息的可靠性，Kafka 每个 topic 的 partition 有 N 个副本（replicas），其中 N（大于等于 1）是 topic 的复制因子（replica fator）的个数。Kafka 通过多副本机制实现故障自动转移，当 Kafka 集群中出现 broker 失效时，副本机制可保证服务可用。对于任何一个 partition，它的 N 个 replicas 中，其中一个 replica 为 leader，其他都为 follower，leader 负责处理 partition 的所有读写请求，follower 则负责被动地去复制 leader 上的数据。如下图所示，Kafka 集群中有 4 个 broker，某 topic 有 3 个 partition，且复制因子即副本个数也为 3：
+
+![](https://images.gitbook.cn/616acd70-cf9b-11e8-8388-bd48f25029c6)
+
+如果 leader 所在的 broker 发生故障或宕机，对应 partition 将因无 leader 而不能处理客户端请求，这时副本的作用就体现出来了：一个新 leader 将从 follower 中被选举出来并继续处理客户端的请求。
+
+
 
 #### 2.4 数据可靠性保证
+
+一个 partition 有多个副本（replicas），为了提高可靠性，这些副本分散在不同的 broker 上，由于带宽、读写性能、网络延迟等因素，同一时刻，这些副本的状态通常是不一致的：即 followers 与 leader 的状态不一致。
 
 为保证 producer 发送的数据，能可靠的发送到指定的 topic，topic 的每个 partition 收到 producer 数据后，都需要向 producer 发送 ack（acknowledgement确认收到），如果 producer 收到 ack，就会进行下一轮的发送，否则重新发送数据。
 
@@ -215,6 +257,21 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 所以数据一致性并不能保证数据不丢失或者不重复，这是由 ack 控制的。HW 规则只能保证副本之间的数据一致性！
 
+
+
+Kafka 的 ISR 的管理最终都会反馈到 ZooKeeper 节点上，具体位置为：
+
+```
+/brokers/topics/[topic]/partitions/[partition]/state
+```
+
+目前，有两个地方会对这个 ZooKeeper 的节点进行维护。
+
+1. Controller 来维护：Kafka 集群中的其中一个 Broker 会被选举为 Controller，主要负责 Partition 管理和副本状态管理，也会执行类似于重分配 partition 之类的管理任务。在符合某些特定条件下，Controller 下的 LeaderSelector 会选举新的 leader，ISR 和新的 `leader_epoch` 及 `controller_epoch` 写入 ZooKeeper 的相关节点中。同时发起 LeaderAndIsrRequest 通知所有的 replicas。
+2. leader 来维护：leader 有单独的线程定期检测 ISR 中 follower 是否脱离 ISR，如果发现 ISR 变化，则会将新的 ISR 的信息返回到 ZooKeeper 的相关节点中。
+
+
+
 #### 2.5 Exactly Once语义
 
 将服务器的 ACK 级别设置为 -1，可以保证 Producer 到 Server 之间不会丢失数据，即 At Least Once 语义。相对的，将服务器 ACK 级别设置为 0，可以保证生产者每条消息只会被发送一次，即 At Most Once语义。
@@ -240,9 +297,9 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 无论消息是否被消费， kafka 都会保留所有消息。有两种策略可以删除旧数据： 
 
-1. 基于时间： log.retention.hours=168 
+1. 基于时间： `log.retention.hours=168` 
 
-2. 基于大小： log.retention.bytes=1073741824 需要注意的是，因为 Kafka 读取特定消息的时间复杂度为 O(1)，即与文件大小无关， 所以这里删除过期文件与提高 Kafka 性能无关。   
+2. 基于大小： `log.retention.bytes=1073741824` 需要注意的是，因为 Kafka 读取特定消息的时间复杂度为 $O(1)$，即与文件大小无关， 所以这里删除过期文件与提高 Kafka 性能无关。   
 
 
 
@@ -260,7 +317,7 @@ pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷�
 
 在这种情况下，消费者可以通过水平扩展的方式同时读取大量的消息。另外，如果一个消费者失败了，那么其他的 group 成员会自动负载均衡读取之前失败的消费者读取的分区。    
 
-消费者组最为重要的一个功能是实现广播与单播的功能。一个消费者组可以确保其所订阅的 Topic 的每个分区只能被从属于该消费者组中的唯一一个消费者所消费；如果不同的消费者组订阅了同一个 Topic，那么这些消费者组之间是彼此独立的，不会受到相互的干扰。
+**消费者组最为重要的一个功能是实现广播与单播的功能**。一个消费者组可以确保其所订阅的 Topic 的每个分区只能被从属于该消费者组中的唯一一个消费者所消费；如果不同的消费者组订阅了同一个 Topic，那么这些消费者组之间是彼此独立的，不会受到相互的干扰。
 
 > 如果我们希望一条消息可以被多个消费者所消费，那么可以将这些消费者放到不同的消费者组中，这实际上就是广播的效果；如果希望一条消息只能被一个消费者所消费，那么可以将这些消费者放到同一个消费者组中，这实际上就是单播的效果。 
 
@@ -317,7 +374,11 @@ one
 
 消费 topic 后，查看 kafka-logs 目录，会发现多出 50 个分区。
 
-默认情况下__consumer_offsets 有 50 个分区，如果你的系统中 consumer group 也很多的话，那么这个命令的输出结果会很多
+默认情况下__consumer_offsets 有 50 个分区，如果你的系统中 consumer group 也很多的话，那么这个命令的输出结果会很多，具体放置在哪个分区，根据 groupID 做如下计算得到：
+
+```
+Math.abs(groupID.hashCode()) % numPartitions
+```
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh485ouy5aj31aq0u04qp.jpg)
 

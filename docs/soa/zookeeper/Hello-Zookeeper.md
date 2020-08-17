@@ -2,7 +2,7 @@
 
 > 本来想系统回顾下 ZooKeeper的，可是网上没找到一篇合自己胃口的文章，写的差不多的，感觉大部分都是基于《从Paxos到ZooKeeper 分布式一致性原理与实践》写的，所以自己读了一遍，加上项目中的使用，做个整理。加油，奥利给！
 
-![](https://imgkr.cn-bj.ufileos.com/5143daad-8428-4edd-82e5-18d1778c8e2e.gif)
+![img](https://zookeeper.apache.org/images/zookeeper_small.gif)
 
 ## 前言
 
@@ -40,7 +40,7 @@ ZooKeeper 的目标是将这些不同服务的精华提炼为一个非常简单�
 
 ZooKeeper 从设计模式角度来理解：就是一个基于**观察者模式**设计的分布式服务管理框架，它负责存储和管理大家都关心的数据，然后接受观察者的注册，一旦这些数据的状态发生变化，ZK 就将负责通知已经在 ZK 上注册的那些观察者做出相应的反应，从而实现集群中类似 Master/Slave 管理模式。
 
-![](https://imgkr.cn-bj.ufileos.com/2fea0e81-7cc9-4d9d-b70e-cc34c4932124.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817163736.png)
 
 ### 1.4 特性
 
@@ -124,7 +124,7 @@ Zookeeper 数据模型的结构与 Unix 文件系统的结构相似，整体上�
    - 监听这个 Znode 可获取它的实时状态变化
    - 典型应用：HBase 中 Master 状态监控和选举。（TODO:图应该是注册和Register and watch）
 
-![](https://imgkr.cn-bj.ufileos.com/2bca4022-b9ab-4134-b343-919f10e912a8.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817163829.jpg)
 
 ##### Master选举
 

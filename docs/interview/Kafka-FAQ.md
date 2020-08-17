@@ -18,11 +18,11 @@
 
 简单架构如下
 
-![](https://www.iteblog.com/pic/producer_consumer.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817095326.png)
 
 详细如下
 
-![32 道常见的 Kafka 面试题你都会吗？附答案](https://www.iteblog.com/pic/kafka/kafka_arch-iteblog.png)
+![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-210522@2x.png)
 
 
 Kafka 架构分为以下几个部分
@@ -49,7 +49,7 @@ kafka 中的每个 partition 中的消息在写入时都是有序的，而且单
 
 一致性就是说不论是老的 Leader 还是新选举的 Leader，Consumer 都能读到一样的数据。
 
-![](https://www.iteblog.com/pic/kafka/kafka_high_water_make-iteblog.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817095840.png)
 
 假设分区的副本为3，其中副本0是 Leader，副本1和副本2是 follower，并且在 ISR 列表里面。虽然副本0已经写入了 Message4，但是 Consumer 只能读取到 Message2。因为所有的 ISR 都同步了 Message2，只有 High Water Mark 以上的消息才支持 Consumer 读取，而 High Water Mark 取决于 ISR 列表里面偏移量最小的分区，对应于上图的副本2，这个很类似于木桶原理。
 
@@ -86,12 +86,10 @@ ISR是由leader维护，follower从leader同步数据有一些延迟（具体可
 
 每个消费者从属于消费组。具体关系如下：
 
-[![32 道常见的 Kafka 面试题你都会吗？附答案](https://www.iteblog.com/pic/kafka/consumer-groups.png)](https://www.iteblog.com/pic/kafka/consumer-groups.png)
-如果想及时了解Spark、Hadoop或者HBase相关的文章，欢迎关注微信公众号：**iteblog_hadoop**
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3htbkk8uj30d607074q.jpg)
+
 
 ## 13、Kafka 的每个分区只能被一个消费者线程，如何做到多个线程同时消费一个分区？
-
-参见我这篇文章：[Airbnb 是如何通过 balanced Kafka reader 来扩展 Spark streaming 实时流处理能力的](https://www.iteblog.com/archives/2551.html)
 
 ## 14、数据传输的事务有几种？
 
@@ -113,13 +111,7 @@ Kafka最初考虑的问题是，customer应该从brokes拉取消息还是brokers
 Pull模式的另外一个好处是consumer可以自主决定是否批量的从broker拉取数据。Push模式必须在不知道下游consumer消费能力和消费策略的情况下决定是立即推送每条消息还是缓存之后批量推送。如果为了避免consumer崩溃而采用较低的推送速率，将可能导致一次只推送较少的消息而造成浪费。Pull模式下，consumer就可以根据自己的消费能力去决定这些策略。
 Pull有个缺点是，如果broker没有可供消费的消息，将导致consumer不断在循环中轮询，直到新消息到t达。为了避免这点，Kafka有个参数可以让consumer阻塞知道新消息到达(当然也可以阻塞知道消息的数量达到某个特定的量这样就可以批量发
 
-## 17、Kafka 消息格式的演变清楚吗？
 
-Kafka 的消息格式经过了四次大变化，具体可以参见我这篇文章：[Apache Kafka消息格式的演变(0.7.x~0.10.x)](https://www.iteblog.com/archives/2232.html)。
-
-## 18、Kafka 偏移量的演变清楚吗？
-
-参见我这篇文章：[图解Apache Kafka消息偏移量的演变(0.7.x~0.10.x)](https://www.iteblog.com/archives/2235.html)
 
 ## 19、Kafka 高效文件存储设计特点
 
@@ -135,7 +127,7 @@ Kafka 的消息格式经过了四次大变化，具体可以参见我这篇文�
 - 其他分区的第一个副本放置位置相对于第0个分区依次往后移。也就是如果我们有5个 Broker，5个分区，假设第一个分区放在第四个 Broker 上，那么第二个分区将会放在第五个 Broker 上；第三个分区将会放在第一个 Broker 上；第四个分区将会放在第二个 Broker 上，依次类推；
 - 剩余的副本相对于第一个副本放置位置其实是由 `nextReplicaShift` 决定的，而这个数也是随机产生的；
 
-具体可以参见[Kafka创建Topic时如何将分区放置到不同的Broker中](https://www.iteblog.com/archives/2219.html)。
+
 
 ## 21、Kafka新建的分区会在哪个目录下创建
 
@@ -145,47 +137,13 @@ Kafka 的消息格式经过了四次大变化，具体可以参见我这篇文�
 
 但是如果 `log.dirs` 参数配置了多个目录，那么 Kafka 会在哪个文件夹中创建分区目录呢？答案是：Kafka 会在含有分区目录最少的文件夹中创建新的分区目录，分区目录名为 Topic名+分区ID。注意，是分区文件夹总数最少的目录，而不是磁盘使用量最少的目录！也就是说，如果你给 `log.dirs` 参数新增了一个新的磁盘，新的分区目录肯定是先在这个新的磁盘上创建直到这个新的磁盘目录拥有的分区目录不是最少为止。
 
-具体可以参见我博客：[Kafka新建的分区会在哪个目录下创建](https://www.iteblog.com/archives/2231.html)
+
 
 ## 22、谈一谈 Kafka 的再均衡
 
 在Kafka中，当有新消费者加入或者订阅的topic数发生变化时，会触发Rebalance(再均衡：在同一个消费者组当中，分区的所有权从一个消费者转移到另外一个消费者)机制，Rebalance顾名思义就是重新均衡消费者消费。Rebalance的过程如下：
 
 第一步：所有成员都向coordinator发送请求，请求入组。一旦所有成员都发送了请求，coordinator会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
-第二步：leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内的所有成员就都知道自己应该消费哪些分区了。
-所以对于Rebalance来说，Coordinator起着至关重要的作用
+第二步：leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内
 
-## 23、谈谈 Kafka 分区分配策略
 
-参见我这篇文章 [Kafka分区分配策略(Partition Assignment Strategy)](https://www.iteblog.com/archives/2209.html)
-
-## 24、Kafka Producer 是如何动态感知主题分区数变化的？
-
-参见我这篇文章：[Kafka Producer是如何动态感知Topic分区数变化](https://www.iteblog.com/archives/1618.html)
-
-## 25、 Kafka 是如何实现高吞吐率的？
-
-Kafka是分布式消息系统，需要处理海量的消息，Kafka的设计是把所有的消息都写入速度低容量大的硬盘，以此来换取更强的存储能力，但实际上，使用硬盘并没有带来过多的性能损失。kafka主要使用了以下几个方式实现了超高的吞吐率：
-
-- 顺序读写；
-- 零拷贝
-- 文件分段
-- 批量发送
-- 数据压缩。
-
-具体参见：[Kafka是如何实现高吞吐率的](https://www.iteblog.com/redirect.php?url=aHR0cHM6Ly9tcC53ZWl4aW4ucXEuY29tL3MvYi1URU9ibmZqLWw4cTRpZDFzZXBjdw==&article=true)
-
-## 26、Kafka 监控都有哪些？
-
-参见我另外几篇文章：[Apache Kafka监控之KafkaOffsetMonitor](https://www.iteblog.com/archives/1083.html)
-[雅虎开源的Kafka集群管理器(Kafka Manager)](https://www.iteblog.com/archives/1264.html)
-[Apache Kafka监控之Kafka Web Console](https://www.iteblog.com/archives/1084.html)
-还有 JMX
-
-## 27、如何为Kafka集群选择合适的Topics/Partitions数量
-
-参见我另外几篇文章：[如何为Kafka集群选择合适的Topics/Partitions数量](https://www.iteblog.com/archives/1805.html)
-
-## 28、谈谈你对 Kafka 事务的了解？
-
-参见这篇文章：http://www.jasongj.com/kafka/transaction/
