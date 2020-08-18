@@ -5,7 +5,7 @@
 - [![img](https://icongr.am/entypo/address.svg?size=25&color=074ca6)设计模式](design-pattern/readDisignPattern.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
-- [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
+- [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/readRedis.md)
 - [![mongoDB](https://icongr.am/devicon/mongodb-original.svg?&size=25)mongoDB]( https://redis.io/ )
 - [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )

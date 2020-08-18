@@ -325,7 +325,7 @@ pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷�
 
 一个 consumer group 中有多个 consumer，一个 topic 有多个 partition，所以必然会涉及到 partition 的分配问题，即确定哪个 partition 由哪个 consumer 来消费。
 
-Kafka 有两种分配策略，一是 RoundRobin，一是 Range。
+Kafka 有两种分配策略，一是 RoundRobin，一是 Range（新版本还有Sticky）。
 
 ##### RoundRobin
 
@@ -383,6 +383,22 @@ Math.abs(groupID.hashCode()) % numPartitions
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh485ouy5aj31aq0u04qp.jpg)
 
 
+
+#### 4.4 再均衡 Rebalance 
+
+所谓的再平衡，指的是在 kafka consumer 所订阅的 topic 发生变化时发生的一种分区重分配机制。一般有三种情况会触发再平衡：
+
+- consumer group 中的新增或删除某个 consumer，导致其所消费的分区需要分配到组内其他的 consumer上；
+- consumer 订阅的 topic 发生变化，比如订阅的 topic 采用的是正则表达式的形式，如 `test-*` 此时如果有一个新建了一个topic `test-user`，那么这个 topic 的所有分区也是会自动分配给当前的 consumer 的，此时就会发生再平衡；
+- consumer 所订阅的 topic 发生了新增分区的行为，那么新增的分区就会分配给当前的 consumer，此时就会触发再平衡。
+
+Kafka提供的再平衡策略主要有三种：`Round Robin`，`Range`和`Sticky`，默认使用的是`Range`。这三种分配策略的主要区别在于：
+
+- `Round Robin`：会采用轮询的方式将当前所有的分区依次分配给所有的consumer；
+- `Range`：首先会计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer；
+- `Sticky`：这种分区策略是最新版本中新增的一种策略，其主要实现了两个目的：
+  - 将现有的分区尽可能均衡的分配给各个consumer，存在此目的的原因在于`Round Robin`和`Range`分配策略实际上都会导致某几个consumer承载过多的分区，从而导致消费压力不均衡；
+  - 如果发生再平衡，那么重新分配之后在前一点的基础上会尽力保证当前未宕机的consumer所消费的分区不会被分配给其他的consumer上；
 
 ### 五、Kafka事务
 

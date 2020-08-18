@@ -1,3 +1,5 @@
+![Kafka Interview Questions](https://d2h0cx97tjks2p.cloudfront.net/blogs/wp-content/uploads/sites/2/2018/05/Kafka-Interview-Questions-3.jpg)
+
 ## 1、Kafka 都有哪些特点？
 
 - 高吞吐量、低延迟：kafka每秒可以处理几十万条消息，它的延迟最低只有几毫秒，每个topic可以分多个partition, consumer group 对partition进行consume操作。
@@ -16,12 +18,6 @@
 
 ## 3、 Kafka 的设计架构你知道吗？
 
-简单架构如下
-
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817095326.png)
-
-详细如下
-
 ![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-210522@2x.png)
 
 
@@ -39,19 +35,43 @@ Kafka 架构分为以下几个部分
 
 分区对于 Kafka 集群的好处是：实现负载均衡。分区对于消费者来说，可以提高并发度，提高效率。
 
+简而言之：**<mark>负载均衡+水平扩展</mark>**
+
+Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition 则是物理概念。可以想象，如果 Topic 不进行分区，而将 Topic 内的消息存储于一个 broker，那么关于该 Topic 的所有读写请求都将由这一个 broker 处理，吞吐量很容易陷入瓶颈，这显然是不符合高吞吐量应用场景的。有了 Partition 概念以后，假设一个 Topic 被分为 10 个 Partitions，Kafka 会根据一定的算法将 10 个 Partition 尽可能均匀的分布到不同的 broker（服务器）上，当 producer 发布消息时，producer 客户端可以采用 `random`、`key-hash` 及 `轮询` 等算法选定目标 partition，若不指定，Kafka 也将根据一定算法将其置于某一分区上。Partiton 机制可以极大的提高吞吐量，并且使得系统具备良好的水平扩展能力。
+
+
+
+## 5、Kafka 高可靠性实现
+
+谈及可靠性，最常规、最有效的策略就是 “副本（replication）机制” ，Kafka 实现高可靠性同样采用了该策略。
+
+通过调节副本相关参数，可使 Kafka 在性能和可靠性之间取得平衡。
+
+1. 文件存储方面：Kafka 中消息是以 topic 进行分类的，生产者通过 topic 向 Kafka broker 发送消息，消费者通过 topic 读取数据。然而 topic 在物理层面又能以 partition 为分组，一个 topic 可以分成若干个 partition。事实上，partition 并不是最终的存储粒度，partition 还可以细分为 segment，一个 partition 物理上由多个 segment 组成
+
+2. 复制原理和同步方式：![enter image description here](https://images.gitbook.cn/f7aa23c0-cfab-11e8-9378-c501de8503c2)
+
+![enter image description here](https://images.gitbook.cn/616acd70-cf9b-11e8-8388-bd48f25029c6)
+
+
+
 ## 5、你知道 Kafka 是如何做到消息的有序性？
 
 kafka 中的每个 partition 中的消息在写入时都是有序的，而且单独一个 partition 只能由一个消费者去消费，可以在里面保证消息的顺序性。但是分区之间的消息是不保证有序的。
+
+发送消息的时候，可以指定 partition 发送。
 
 
 
 ## 7、请谈一谈 Kafka 数据一致性原理
 
+
+
 一致性就是说不论是老的 Leader 还是新选举的 Leader，Consumer 都能读到一样的数据。
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817095840.png)
 
-假设分区的副本为3，其中副本0是 Leader，副本1和副本2是 follower，并且在 ISR 列表里面。虽然副本0已经写入了 Message4，但是 Consumer 只能读取到 Message2。因为所有的 ISR 都同步了 Message2，只有 High Water Mark 以上的消息才支持 Consumer 读取，而 High Water Mark 取决于 ISR 列表里面偏移量最小的分区，对应于上图的副本2，这个很类似于木桶原理。
+假设分区的副本为3，其中副本0是 Leader，副本1和副本2是 follower，并且在 ISR 列表里面。虽然副本0已经写入了 Message4，但是 Consumer 只能读取到 Message2。因为所有的 ISR 都同步了 Message2，只有 High Water Mark 以上的消息才支持 Consumer 读取，而 High Water Mark 取决于 ISR 列表里面偏移量最小的分区，对应于上图的副本2，这个很类似于**木桶原理**。
 
 这样做的原因是还没有被足够多副本复制的消息被认为是“不安全”的，如果 Leader 发生崩溃，另一个副本成为新 Leader，那么这些消息很可能丢失了。如果我们允许消费者读取这些消息，可能就会破坏一致性。试想，一个消费者从当前 Leader（副本0） 读取并处理了 Message4，这个时候 Leader 挂掉了，选举了副本1为新的 Leader，这时候另一个消费者再去从新的 Leader 读取消息，发现这个消息其实并不存在，这就导致了数据不一致性问题。
 
@@ -76,11 +96,13 @@ ISR是由leader维护，follower从leader同步数据有一些延迟（具体可
 
 ## 10、Kafka 在什么情况下会出现消息丢失？
 
-可以参见我这篇文章：[Kafka 是如何保证数据可靠性和一致性](https://www.iteblog.com/archives/2560.html)
+Producer 往 Broker 发送消息的 acks 机制
 
 ## 11、怎么尽可能保证 Kafka 的可靠性
 
-可以参见我这篇文章：[Kafka 是如何保证数据可靠性和一致性](https://www.iteblog.com/archives/2560.html)
+为保证 producer 发送的数据，能可靠地发送到指定的 topic，topic 的每个 partition 收到 producer 发送的数据后，都需要向 producer 发送 ack（acknowledge 确认收到），如果 producer 收到 ack，就会进行下一轮的发送，否则重新发送数据。
+
+涉及到副本 ISR、故障处理中的 LEO、HW
 
 ## 12、消费者和消费者组有什么关系？
 
@@ -88,8 +110,9 @@ ISR是由leader维护，follower从leader同步数据有一些延迟（具体可
 
 ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3htbkk8uj30d607074q.jpg)
 
-
 ## 13、Kafka 的每个分区只能被一个消费者线程，如何做到多个线程同时消费一个分区？
+
+
 
 ## 14、数据传输的事务有几种？
 
@@ -105,11 +128,7 @@ Kafa consumer消费消息时，向broker发出fetch请求去消费特定分区�
 
 ## 16、Kafka消息是采用Pull模式，还是Push模式？
 
-Kafka最初考虑的问题是，customer应该从brokes拉取消息还是brokers将消息推送到consumer，也就是pull还push。在这方面，Kafka遵循了一种大部分消息系统共同的传统的设计：producer将消息推送到broker，consumer从broker拉取消息。
-
-一些消息系统比如Scribe和Apache Flume采用了push模式，将消息推送到下游的consumer。这样做有好处也有坏处：由broker决定消息推送的速率，对于不同消费速率的consumer就不太好处理了。消息系统都致力于让consumer以最大的速率最快速的消费消息，但不幸的是，push模式下，当broker推送的速率远大于consumer消费的速率时，consumer恐怕就要崩溃了。最终Kafka还是选取了传统的pull模式。
-Pull模式的另外一个好处是consumer可以自主决定是否批量的从broker拉取数据。Push模式必须在不知道下游consumer消费能力和消费策略的情况下决定是立即推送每条消息还是缓存之后批量推送。如果为了避免consumer崩溃而采用较低的推送速率，将可能导致一次只推送较少的消息而造成浪费。Pull模式下，consumer就可以根据自己的消费能力去决定这些策略。
-Pull有个缺点是，如果broker没有可供消费的消息，将导致consumer不断在循环中轮询，直到新消息到t达。为了避免这点，Kafka有个参数可以让consumer阻塞知道新消息到达(当然也可以阻塞知道消息的数量达到某个特定的量这样就可以批量发
+producer将消息推送到broker，consumer从broker拉取消息。
 
 
 
@@ -143,7 +162,51 @@ Pull有个缺点是，如果broker没有可供消费的消息，将导致consume
 
 在Kafka中，当有新消费者加入或者订阅的topic数发生变化时，会触发Rebalance(再均衡：在同一个消费者组当中，分区的所有权从一个消费者转移到另外一个消费者)机制，Rebalance顾名思义就是重新均衡消费者消费。Rebalance的过程如下：
 
-第一步：所有成员都向coordinator发送请求，请求入组。一旦所有成员都发送了请求，coordinator会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
+第一步：所有成员都向 coordinator 发送请求，请求入组。一旦所有成员都发送了请求，coordinator 会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
 第二步：leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内
 
 
+
+## 22、Kafka 为什么能那么快 | Kafka高效读写数据的原因据的原因 | 吞吐量大的原因？
+
+- partition 并行处理
+- 顺序写磁盘，充分利用磁盘特性
+- 利用了现代操作系统分页存储 Page Cache 来利用内存提高 I/O 效率
+- 采用了零拷贝技术
+  - Producer 生产的数据持久化到 broker，采用 mmap 文件映射，实现顺序的快速写入
+  - Customer 从 broker 读取数据，采用 sendfile，将磁盘文件读到 OS 内核缓冲区后，转到 NIO buffer进行网络发送，减少 CPU 消耗
+
+
+
+## 23、如何保证消息不被重复消费？
+
+生产者在向Kafka写数据时，每条消息会有一个offset，表示消息写入顺序的序号。当消费者消费后，**每隔一段时间会把自己已消费消息的offset通过Zookeeper提交给Kafka**，告知Kafka自己offset的位置。这样一来，如果消费者重启，则会从Kafka记录的offset之后的数据开始消费，从而避免重复消费。
+
+但是，可能出现一种意外情况。由于消费者提交offset是定期的，**当消费者处理了某些消息，但还未来及提交offset时，此时如果重启消费者，则会出现消息的重复消费**。
+
+
+
+例：数据 1/2/3 依次进入 Kafka，Kafka 会给这三条数据每条分配一个 offset，代表这条数据的序号，假设分配的 offset 依次是 152/153/154。消费者从 Kafka 消费时，也是按照这个顺序去消费。假如**当消费者消费了 offset=153 的这条数据，刚准备去提交 offset 到 Zookeeper，此时消费者进程被重启了**。那么此时消费过的数据1和数据2的 offset 并没有提交，Kafka 也就不知道你已经消费了 `offset=153` 这条数据。此时当消费者重启后，消费者会找 Kafka 说，嘿，哥儿们，你给我接着把上次我消费到的那个地方后面的数据继续给我传递过来。由于之前的 offset 没有提交成功，那么数据1和数据2会再次传过来，如果此时消费者没有去重的话，那么就会导致重复消费。
+
+![图片](http://prchen.com/2019/06/24/%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/1.png)
+
+如上图，可能出现数据1和数据2插入数据库两遍的问题。
+
+其实重复消费消息并不可怕，重要的是在发生重复消费后，如何**保证消息消费时的幂等性**。如果消费者可以在消费消息时先判断一下，自己是否已经消费了该消息，如果是就不消费，那么就可以保证系统的幂等性。
+
+一条数据被消费者重复消费两次，但数据库中只有一条数据，这就保证了系统幂等性。
+
+简单来说，**保证系统幂等性就是确保消息重复发送后数据库中数据的正确性**。
+
+那么，如何保证消息队列的幂等性？
+
+1. 向数据库insert数据时，先**根据主键查询，若数据存在则不insert，改为update**
+2. 向Redis中写数据可以用**set去重，天然保证幂等性**
+3. 生产者发送每条消息时，增加一个全局唯一id（类似订单id），消费者消费到时，先**根据这个id去Redis中查询是否消费过该消息**。如果没有消费过，就处理，将id写入Redis；如果消费过了，那么就不处理，保证不重复处理相同消息。
+4. 基于数据库的**唯一键约束**来保证不会插入重复的数据，当消费者企图插入重复数据到数据库时，会报错。
+
+![图片](http://prchen.com/2019/06/24/%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/2.png)
+
+- Kafka采取类似**断点续传**的策略保证消息不被重复消费。具体是通过**每隔一段时间把已消费消息的offset通过Zookeeper提交给Kafka**实现的。
+- 但是当消费者**处理完成但尚未提交offset**的时间段宕机或重启等意外情况发生时，还是可能出现消息被重复消费。
+- 保证消息不被重复消费（保证消息消费时的幂等性）其实是保证数据库中数据的正确性。几种保证系统幂等性的思路：通过主键查询，若存在则update；Redis天然set去重；根据全局id查询，若已消费则不处理；唯一键约束保证不插入重复数据等。

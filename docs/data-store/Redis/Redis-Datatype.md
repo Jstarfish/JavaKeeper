@@ -85,7 +85,7 @@ C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis �
 
 Redis 的列表结构常用来做异步队列使用。将需要延后处理的任务结构体序列化成字符串塞进 Redis 的列表，另一个线程从这个列表中轮询数据进行处理
 
-**右边进左边出：队列** 
+##### 右边进左边出：队列 
 
 ```shell
 > rpush books python java golang 
@@ -102,7 +102,7 @@ Redis 的列表结构常用来做异步队列使用。将需要延后处理的�
 (nil)
 ```
 
-**右边进右边出：栈** 
+#####  右边进右边出：栈 
 
 ```shell
 > rpush books python java golang
@@ -116,38 +116,6 @@ Redis 的列表结构常用来做异步队列使用。将需要延后处理的�
  \> rpop books
  (nil)
 ```
-
-
-
-我们可以从源码的 `adlist.h/listNode` 来看到对其的定义：
-
-```c
-COPY/* Node, List, and Iterator are the only data structures used currently. */
-
-typedef struct listNode {
-    struct listNode *prev;
-    struct listNode *next;
-    void *value;
-} listNode;
-
-typedef struct listIter {
-    listNode *next;
-    int direction;
-} listIter;
-
-typedef struct list {
-    listNode *head;
-    listNode *tail;
-    void *(*dup)(void *ptr);
-    void (*free)(void *ptr);
-    int (*match)(void *ptr, void *key);
-    unsigned long len;
-} list;
-```
-
-
-
-
 
 
 
