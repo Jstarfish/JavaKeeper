@@ -11,6 +11,7 @@
   - [redis.conf](data-store/Redis/Redis-Conf.md)
   - [Redis 持久化](data-store/Redis/Redis-Persistence.md)
   - [Redis 事务](data-store/Redis/Redis-Transaction.md)
+  - [Redis 集群](data-store/Redis/Redis-Cluster.md)
 - [![mongoDB](https://icongr.am/devicon/mongodb-original.svg?&size=25)mongoDB]( https://redis.io/ )
 - [![ **Elasticsearch** ](https://icongr.am/simple/elasticsearch.svg?&size=20) Elasticsearch]( https://redis.io/ )
 - [![S3](https://icongr.am/devicon/amazonwebservices-original.svg?&size=25)S3]( https://aws.amazon.com/cn/s3/ )
