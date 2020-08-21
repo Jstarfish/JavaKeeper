@@ -63,7 +63,7 @@
 
 - Case3：全体连坐（某一条操作记录报错的话，exec后所有操作都不会成功）
 
-![redis-transaction-case3.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1g9yqy1ebddj20eh04z3yi.jpg)
+  ![image-20200821180050813](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200821180100.png)
 
 - Case4：冤头债主（示例中 k1被设置为String类型，decr k1可以放入操作队列中，因为只有在执行的时候才可以判断出语句错误，其他正确的会被正常执行）
 
