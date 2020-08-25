@@ -113,7 +113,7 @@ Redis 针对如上两种错误采用了不同的处理策略，对于发生在 `
 >
 > 鉴于没有任何机制能避免程序员自己造成的错误， 并且这类错误通常不会在生产环境中出现， 所以 Redis 选择了更简单、更快速的无回滚方式来处理事务。
 
-![img](https://i04piccdn.sogoucdn.com/d2ab1c04cc178f61)
+![](https://i04piccdn.sogoucdn.com/d2ab1c04cc178f61)
 
 
 
@@ -130,7 +130,7 @@ redis> WATCH key1 key2 key3
 OK 
 ```
 
-**当** `EXEC` **被调用时， 不管事务是否成功执行， 对所有键的监视都会被取消。**另外， 当客户端断开连接时， 该客户端对键的监视也会被取消。
+**当 `EXEC` 被调用时， 不管事务是否成功执行， 对所有键的监视都会被取消**。另外， 当客户端断开连接时， 该客户端对键的监视也会被取消。
 
 我们看个简单的例子，用 watch 监控我的账号余额（一周100零花钱的我），正常消费
 
@@ -162,11 +162,11 @@ OK
 
 通过 watch 命令在事务执行之前监控了多个 keys，倘若在 watch 之后有任何 key 的值发生变化，exec 命令执行的事务都将被放弃，同时返回 Null 应答以通知调用者事务执行失败。
 
-> ##### 悲观锁
+> **悲观锁**
 >
 > 悲观锁(Pessimistic Lock)，顾名思义，就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会 block 直到它拿到锁。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁
 >
-> ##### 乐观锁
+> **乐观锁**
 >
 > 乐观锁(Optimistic Lock)，顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号等机制。乐观锁适用于多读的应用类型，这样可以提高吞吐量。乐观锁策略：提交版本必须大于记录当前版本才能执行更新
 
@@ -174,7 +174,9 @@ OK
 
 ### WATCH 命令的实现原理
 
-在代表数据库的 `server.h/redisDb` 结构类型中， 都保存了一个 `watched_keys` 字典， 字典的键是这个数据库被监视的键， 而字典的值则是一个链表， 链表中保存了所有监视这个键的客户端。
+在代表数据库的 `server.h/redisDb` 结构类型中， 都保存了一个 `watched_keys` 字典， 字典的键是这个数据库被监视的键， 而字典的值是一个链表， 链表中保存了所有监视这个键的客户端，如下图。
+
+![Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825112354.png)
 
 ```c
 typedef struct redisDb {
@@ -192,40 +194,45 @@ typedef struct redisDb {
 list *watched_keys;     /* Keys WATCHED for MULTI/EXEC CAS */
 ```
 
-比如说，以下字典就展示了一个 `watched_keys` 字典的例子：
+`WATCH` 命令的作用， 就是将当前客户端和要监视的键在 `watched_keys` 中进行关联。
 
-![图：Redis设计与实现](https://redisbook.readthedocs.io/en/latest/_images/graphviz-9aea81f33da1373550c590eb0b7ca0c2b3d38366.svg)
+举个例子， 如果当前客户端为 `client99` ， 那么当客户端执行 `WATCH key2 key3` 时， 前面展示的 `watched_keys` 将被修改成这个样子：
 
-其中， 键 `key1` 正在被 `client2` 、 `client5` 和 `client1` 三个客户端监视， 其他一些键也分别被其他别的客户端监视着。
-
-WATCH 命令的作用， 就是将当前客户端和要监视的键在 `watched_keys` 中进行关联。
-
-举个例子， 如果当前客户端为 `client10086` ， 那么当客户端执行 `WATCH key1 key2` 时， 前面展示的 `watched_keys` 将被修改成这个样子：
-
-![图：Redis设计与实现](https://redisbook.readthedocs.io/en/latest/_images/graphviz-fe5e31054c282a3cdd86656994fe1678a3d4f201.svg)
+![图：Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825112441.png)
 
 通过 `watched_keys` 字典， 如果程序想检查某个键是否被监视， 那么它只要检查字典中是否存在这个键即可； 如果程序要获取监视某个键的所有客户端， 那么只要取出键的值（一个链表）， 然后对链表进行遍历即可。
 
 
 
-在任何对数据库键空间（key space）进行修改的命令成功执行之后 （比如 FLUSHDB、SET 、DEL、LPUSH、 SADD，诸如此类）， `multi.c/touchWatchedKey` 函数都会被调用 —— 它检查数据库的 `watched_keys` 字典， 看是否有客户端在监视已经被命令修改的键， 如果有的话， 程序将所有监视这个/这些被修改键的客户端的 `REDIS_DIRTY_CAS` 选项打开：
+在任何对数据库键空间（key space）进行修改的命令成功执行之后 （比如 FLUSHDB、SET 、DEL、LPUSH、 SADD，诸如此类）， `multi.c/touchWatchedKey` 函数都会被调用 —— 它会去 `watched_keys` 字典， 看是否有客户端在监视已经被命令修改的键， 如果有的话， 程序将所有监视这个/这些被修改键的客户端的 `REDIS_DIRTY_CAS` 选项打开：
 
-![图：Redis设计与实现](https://redisbook.readthedocs.io/en/latest/_images/graphviz-e5c66122242aa10939b696dfeeb905343c5202bd.svg)
+![图：Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825123241.png)
 
 ```c
+void multiCommand(client *c) {
+    // 不能在事务中嵌套事务
+    if (c->flags & CLIENT_MULTI) {
+        addReplyError(c,"MULTI calls can not be nested");
+        return;
+    }
+    // 打开事务 FLAG
+    c->flags |= CLIENT_MULTI;
+    addReply(c,shared.ok);
+}
+
 /* "Touch" a key, so that if this key is being WATCHed by some client the
  * next EXEC will fail. */
 void touchWatchedKey(redisDb *db, robj *key) {
     list *clients;
     listIter li;
     listNode *ln;
-
+	// 字典为空，没有任何键被监视
     if (dictSize(db->watched_keys) == 0) return;
+    // 获取所有监视这个键的客户端
     clients = dictFetchValue(db->watched_keys, key);
     if (!clients) return;
 
-    /* Mark all the clients watching this key as CLIENT_DIRTY_CAS */
-    /* Check if we are already watching for this key */
+    // 遍历所有客户端，打开他们的 CLIENT_DIRTY_CAS 标识
     listRewind(clients,&li);
     while((ln = listNext(&li))) {
         client *c = listNodeValue(ln);
@@ -237,8 +244,8 @@ void touchWatchedKey(redisDb *db, robj *key) {
 
 当客户端发送 EXEC 命令、触发事务执行时， 服务器会对客户端的状态进行检查：
 
-- 如果客户端的 `REDIS_DIRTY_CAS` 选项已经被打开，那么说明被客户端监视的键至少有一个已经被修改了，事务的安全性已经被破坏。服务器会放弃执行这个事务，直接向客户端返回空回复，表示事务执行失败。
-- 如果 `REDIS_DIRTY_CAS` 选项没有被打开，那么说明所有监视键都安全，服务器正式执行事务。
+- 如果客户端的 `CLIENT_DIRTY_CAS` 选项已经被打开，那么说明被客户端监视的键至少有一个已经被修改了，事务的安全性已经被破坏。服务器会放弃执行这个事务，直接向客户端返回空回复，表示事务执行失败。
+- 如果 `CLIENT_DIRTY_CAS` 选项没有被打开，那么说明所有监视键都安全，服务器正式执行事务。
 
 
 
@@ -247,9 +254,7 @@ void touchWatchedKey(redisDb *db, robj *key) {
 #### 3 阶段
 
 - 开启：以 MULTI 开始一个事务
-
 - 入队：将多个命令入队到事务中，接到这些命令并不会立即执行，而是放到等待执行的事务队列里面
-
 - 执行：由 EXEC 命令触发事务
 
 #### 3 特性
