@@ -160,6 +160,7 @@
     line-height: 26px;
     text-align: left;
     font-weight: 500;
+  	color: #666;
 }
 
 #nice table tr th {
@@ -188,6 +189,12 @@
 
 #nice .footnote-num {
   font-family: inherit;
+  display: inline;
+  width: 5%;
+  background: none;
+  font-size: 80%;
+  opacity: 0.6;
+  line-height: 26px;
 }
 
 #nice .footnote-item p {

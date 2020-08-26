@@ -46,13 +46,13 @@ IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将
 
 Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。Spring 容器使用依赖注入来管理组成应用程序的组件。容器通过读取提供的配置元数据来接收对象进行实例化，配置和组装的指令。该元数据可以通过 XML，Java 注解或 Java 代码提供。
 
-![image.png](https://upload-images.jianshu.io/upload_images/3101171-33099411d16ca051.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![container magic](https://docs.spring.io/spring/docs/5.0.18.RELEASE/spring-framework-reference/images/container-magic.png)
 
 
 
 ### 什么是依赖注入？
 
-**依赖注入（DI）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。这就需要一种机制用来激活相应的组件以提供特定的功能，所以**依赖注入是控制反转的基础**。否则如果在组件不受框架控制的情况下，框架又怎么知道要创建哪个组件？
+**依赖注入（DI,Dependency Injection）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。这就需要一种机制用来激活相应的组件以提供特定的功能，所以**依赖注入是控制反转的基础**。否则如果在组件不受框架控制的情况下，框架又怎么知道要创建哪个组件？
 
 依赖注入有以下三种实现方式：
 
@@ -104,8 +104,6 @@ ApplicationContext 的主要实现类：
 **从 IOC 容器中获取 Bean**
 
 -  调用 ApplicationContext 的 getBean() 方法
-
-![](https://imgkr.cn-bj.ufileos.com/3aa6c769-3b9a-4882-b2e1-622c127437a3.png)
 
 ```java
 ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
@@ -205,11 +203,12 @@ class Client {
 
   Spring 的 Java 配置是通过使用 @Bean 和 @Configuration 来实现。
 
-  	1. @Bean 注解扮演与 `<bean/> ` 元素相同的角色。
-   	2. @Configuration 类允许通过简单地调用同一个类中的其他 @Bean 方法来定义 bean 间依赖关系。
-
-  例如：
-
+  1. @Bean 注解扮演与 `<bean/>` 元素相同的角色。
+  
+ 	2. @Configuration 类允许通过简单地调用同一个类中的其他 @Bean 方法来定义 bean 间依赖关系。
+  
+例如：
+  
   ```java
   @Configuration
   public class StudentConfig {
@@ -218,17 +217,17 @@ class Client {
           return new StudentBean();
       }
   }
-  ```
-
+```
+  
   
 
 ### Spring Bean的作用域？
 
-- 在 Spring 中, 可以在 \<bean> 元素的 scope属性里设置 Bean 的作用域。
+- 在 Spring 中, 可以在 \<bean> 元素的 scope 属性里设置 Bean 的作用域。
 
-- 默认情况下，Spring 只为每个在 IOC 容器里声明的 Bean 创建唯一一个实例, 整个 IOC 容器范围内都能共享该实例：所有后续的 `getBean()` 调用和 Bean 引用都将返回这个唯一的 Bean 实例。该作用域被称为 **singleton**，它是所有 Bean 的默认作用域。
+- 默认情况下，Spring 只为每个在 IOC 容器里声明的 Bean 创建唯一一个实例，整个 IOC 容器范围内都能共享该实例：所有后续的 `getBean()` 调用和 Bean 引用都将返回这个唯一的 Bean 实例。该作用域被称为 **singleton**，它是所有 Bean 的默认作用域。
 
-Spring容器中的bean可以分为5个范围。所有范围的名称都是自说明的，但是为了避免混淆，还是让我们来解释一下：
+Spring 容器中的 bean 可以分为 5 个范围。所有范围的名称都是自说明的，但是为了避免混淆，还是让我们来解释一下：
 
 1. **singleton**：这种bean范围是默认的，这种范围确保不管接受到多少个请求，每个容器中只有一个bean的实例，单例的模式由bean factory自身来维护。
 2. **prototype**：原型范围与单例范围相反，为每一个bean请求提供一个实例。
@@ -242,7 +241,7 @@ Spring容器中的bean可以分为5个范围。所有范围的名称都是自说
 
 ### Spring bean 容器的生命周期是什么样的？
 
-Spring IOC 容器可以管理 Bean 的生命周期, Spring 允许在 Bean 生命周期的特定点执行定制的任务.
+Spring IOC 容器可以管理 Bean 的生命周期, Spring 允许在 Bean 生命周期的特定点执行定制的任务。
 
 Spring bean 容器的生命周期流程如下：
 
@@ -257,7 +256,7 @@ Spring bean 容器的生命周期流程如下：
 9. 如果 bean 实现 DisposableBean 接口，当 spring 容器关闭时，会调用 destory()；
 10. 如果为 bean 指定了 destroy 方法（`<bean>` 的 destroy-method 属性），那么将调用它
 
-![](https://imgkr.cn-bj.ufileos.com/6125ce48-cdfe-4779-9c25-c98088b4cf39.png)
+![](https://bbsmax.ikafan.com/static/L3Byb3h5L2h0dHBzL2ltZzIwMTguY25ibG9ncy5jb20vYmxvZy8xMzUxOTk5LzIwMTkwNi8xMzUxOTk5LTIwMTkwNjA0MTczNTQ0MzIwLTE0MjI5MDYwNjgucG5n.jpg)
 
 
 
@@ -295,7 +294,7 @@ public class AnotherExampleBean implements InitializingBean {
 
 - 使用注解 ``@PostConstruct` 和 `@PreDestroy`
 - 实现  `InitializingBean` 和 `DisposableBean` 接口
-- XML 中配置 ``init-method` 和 `destroy-method`
+- XML 中配置 `init-method` 和 `destroy-method`
 
 在一个 bean 中，如果配置了多种生命周期回调机制，会按照上边从上到下的次序调用
 
@@ -452,7 +451,7 @@ AOP 的好处:
 - 通知是标注有某种注解的简单的 Java 方法.
 - AspectJ支持 5 种类型的通知注解:
 
-- - @Before: 前置通知, 在方法执行之前执行
+  - @Before: 前置通知, 在方法执行之前执行
   - @After: 后置通知, 在方法执行之后执行
   - @AfterRunning: 返回通知, 在方法返回结果之后执行
   - @AfterThrowing: 异常通知, 在方法抛出异常之后
@@ -555,8 +554,6 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 - 声明了事务通知后，就需要将它与切入点关联起来。由于事务通知是在 <aop:config> 元素外部声明的, 所以它无法直接与切入点产生关联，所以必须在 <aop:config> 元素中声明一个增强器通知与切入点关联起来.
 - 由于 Spring AOP 是基于代理的方法，所以只能增强公共方法。因此, 只有公有方法才能通过 Spring AOP 进行事务管理。
 
-![](https://imgkr.cn-bj.ufileos.com/8342e671-cd06-4ccc-b206-51a355780cea.png)
-
 
 
 ### 用 @Transactional 注解声明式地管理事务
@@ -567,8 +564,6 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 - 在 Bean 配置文件中只需要启用 `<tx:annotation-driven>`元素, 并为之指定事务管理器就可以了
 -  如果事务处理器的名称是 transactionManager, 就可以在 `<tx:annotation-driven>` 元素中省略 `transaction-manager` 属性，这个元素会自动检测该名称的事务处理器
 
-![](https://imgkr.cn-bj.ufileos.com/800f0b12-550d-49b9-b5a3-82fd645c51e9.png)
-
 
 
 ### 事务传播属性
@@ -576,13 +571,27 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 - 当事务方法被另一个事务方法调用时， 必须指定事务应该如何传播。例如：方法可能继续在现有事务中运行，也可能开启一个新事务，并在自己的事务中运行
 - 事务的传播行为可以由传播属性指定，Spring 定义了 7  种类传播行为：
 
-![](https://imgkr.cn-bj.ufileos.com/910901d5-de7e-4d06-8825-39e8ae051060.png)
+| 传播行为                  | 意义                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| PROPAGATION_MANDATORY     | 表示该方法必须运行在一个事务中。如果当前没有事务正在发生，将抛出一个异常 |
+| PROPAGATION_NESTED        | 表示如果当前正有一个事务在进行中，则该方法应当运行在一个嵌套式事务中。被嵌套的事务可以独立于封装事务进行提交或回滚。如果封装事务不存在，行为就像PROPAGATION_REQUIRES一样。 |
+| PROPAGATION_NEVER         | 表示当前的方法不应该在一个事务中运行。如果一个事务正在进行，则会抛出一个异常。 |
+| PROPAGATION_NOT_SUPPORTED | 表示该方法不应该在一个事务中运行。如果一个现有事务正在进行中，它将在该方法的运行期间被挂起。 |
+| PROPAGATION_SUPPORTS      | 表示当前方法不需要事务性上下文，但是如果有一个事务已经在运行的话，它也可以在这个事务里运行。 |
+| PROPAGATION_REQUIRES_NEW  | 表示当前方法必须在它自己的事务里运行。一个新的事务将被启动，而且如果有一个现有事务在运行的话，则将在这个方法运行期间被挂起。 |
+| PROPAGATION_REQUIRES      | 表示当前方法必须在一个事务中运行。如果一个现有事务正在进行中，该方法将在那个事务中运行，否则就要开始一个新事务。 |
 
 
 
 ### Spring 支持的事务隔离级别
 
-![](https://imgkr.cn-bj.ufileos.com/a4fb6d55-d32b-41d8-9a98-e6873970196d.png)
+| 隔离级别                   | 含义                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| ISOLATION_DEFAULT          | 使用后端数据库默认的隔离级别。                               |
+| ISOLATION_READ_UNCOMMITTED | 允许读取尚未提交的更改。可能导致脏读、幻影读或不可重复读。   |
+| ISOLATION_READ_COMMITTED   | 允许从已经提交的并发事务读取。可防止脏读，但幻影读和不可重复读仍可能会发生。 |
+| ISOLATION_REPEATABLE_READ  | 对相同字段的多次读取的结果是一致的，除非数据被当前事务本身改变。可防止脏读和不可重复读，但幻影读仍可能发生。 |
+| ISOLATION_SERIALIZABLE     | 完全服从ACID的隔离级别，确保不发生脏读、不可重复读和幻影读。这在所有隔离级别中也是最慢的，因为它通常是通过完全锁定当前事务所涉及的数据表来完成的。 |
 
 事务的隔离级别要得到底层数据库引擎的支持，而不是应用程序或者框架的支持；
 
@@ -601,7 +610,7 @@ Oracle 支持的 2 种事务隔离级别，Mysql支持 4 种事务隔离级别�
 - 默认情况下只有未检查异常(RuntimeException和Error类型的异常)会导致事务回滚，而受检查异常不会。
 - 事务的回滚规则可以通过 @Transactional 注解的 rollbackFor和 noRollbackFor属性来定义，这两个属性被声明为 Class[] 类型的，因此可以为这两个属性指定多个异常类。
 
-- - rollbackFor：遇到时必须进行回滚
+  - rollbackFor：遇到时必须进行回滚
   - noRollbackFor： 一组异常类，遇到时必须不回滚
 
 ###  超时和只读属性
@@ -907,9 +916,5 @@ public class Employee {
 ## 参考与来源
 
 https://www.edureka.co/blog/interview-questions/spring-interview-questions/
-
-
-
-
 
 https://crossoverjie.top/2018/07/29/java-senior/ThreadPool/
