@@ -2,14 +2,15 @@
 >
 > 说说几种常见的线程池及使用场景?
 >
-> 线程池的构造类的方法的 5 个参数的具体意义是什么
+> 线程池的构造类的方法的 5 个参数的具体意义是什么？
 >
-> 按线程池内部机制，当提交新任务时，有哪些异常要考虑
+> 按线程池内部机制，当提交新任务时，有哪些异常要考虑？
 >
 > 单机上一个线程池正在处理服务，如果忽然断电怎么办（正在处理和阻塞队列里的请求怎么处理）？
 >
 > 生产上如何合理设置参数？
 >
+> 说说线程池的拒绝策略？
 
 
 
@@ -65,19 +66,76 @@ ThreadPoolExecutor 实现的顶层接口是 Executor，顶层接口 Executor 提
 1. 扩充执行任务的能力，补充可以为一个或一批异步任务生成 Future 的方法；
 2. 提供了管控线程池的方法，比如停止线程池的运行。
 
-AbstractExecutorService 则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类 ThreadPoolExecutor 实现最复杂的运行部分，ThreadPoolExecutor 将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。
+`AbstractExecutorService` 则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。最下层的实现类 `ThreadPoolExecutor` 实现最复杂的运行部分，`ThreadPoolExecutor` 将会一方面维护自身的生命周期，另一方面同时管理线程和任务，使两者良好的结合从而执行并行任务。
+
+我们来了解下 **ThreadPoolExecutor** 的构造函数。
+
+### 线程池的几个重要参数
+
+从使用中我们可以看到，常用的构造线程池方法其实最后都是通过 **ThreadPoolExecutor** 实例来创建的，且该构造器有 7 大参数。
+
+```java
+public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue<Runnable> workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler) {
+        if (corePoolSize < 0 ||
+            maximumPoolSize <= 0 ||
+            maximumPoolSize < corePoolSize ||
+            keepAliveTime < 0)
+            throw new IllegalArgumentException();
+        if (workQueue == null || threadFactory == null || handler == null)
+            throw new NullPointerException();
+        this.acc = System.getSecurityManager() == null ?
+                null :
+                AccessController.getContext();
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.workQueue = workQueue;
+        this.keepAliveTime = unit.toNanos(keepAliveTime);
+        this.threadFactory = threadFactory;
+        this.handler = handler;
+    }
+```
+
+- **corePoolSize：** 线程池中的常驻核心线程数
+
+  - 创建线程池后，当有请求任务进来之后，就会安排池中的线程去执行请求任务，近似理解为近日当值线程
+  - 当线程池中的线程数目达到corePoolSize后，就会把到达的任务放到缓存队列中
+
+- **maximumPoolSize：** 线程池最大线程数大小，该值必须大于等于 1
+
+- **keepAliveTime：** 线程池中非核心线程空闲的存活时间
+
+- 当前线程池数量超过 corePoolSize 时，当空闲时间达到 keepAliveTime 值时，非核心线程会被销毁直到只剩下 corePoolSize 个线程为止
+
+- **unit：** keepAliveTime 的时间单位
+
+- **workQueue：** 存放任务的阻塞队列，被提交但尚未被执行的任务
+
+- **threadFactory：** 用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题
+
+- **handler：** 拒绝策略，表示当队列满了且工作线程大于等于线程池的最大线程数（maximumPoolSize）时如何来拒绝请求执行的线程的策略，主要有四种类型。
+
+  等待队列也已经满了，再也塞不下新任务。同时，线程池中的 max 线程也达到了，无法继续为新任务服务，这时候我们就需要拒绝策略合理的处理这个问题了。
+
+  - AbortPolicy   直接抛出RegectedExcutionException 异常阻止系统正常进行，**默认策略**
+  - DiscardPolicy  直接丢弃任务，不予任何处理也不抛出异常，如果允许任务丢失，这是最好的一种方案
+  - DiscardOldestPolicy  抛弃队列中等待最久的任务，然后把当前任务加入队列中尝试再次提交当前任务
+  - CallerRunsPolicy  交给线程池调用所在的线程进行处理，“调用者运行”的一种调节机制，该策略既不会抛弃任务，也不会抛出异常，而是将某些任务回退到调用者，从而降低新任务的流量
+
+  以上内置拒绝策略均实现了 RejectExcutionHandler 接口
 
 
 
-### Hello ThreadPool
-
-常见的线程池的使用方式
-
- `Executors`，提供了一系列静态工厂方法用于创建各种线程池，工具类，类似于我们常用的 `Arrays`、`Collections`
+常见的线程池的使用方式 `Executors`，它提供了一系列静态工厂方法用于创建各种线程池，工具类，类似于我们常用的 `Arrays`、`Collections`
 
 #### newFixedThreadPool
 
-```
+```java
 public static ExecutorService newFixedThreadPool(int nThreads) {
     return new ThreadPoolExecutor(nThreads, nThreads,
                                   0L, TimeUnit.MILLISECONDS,
@@ -86,7 +144,7 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 ```
 
 - 创建一个指定工作线程数量的线程池。每当提交一个任务就创建一个工作线程，如果工作线程数量达到线程池初始的最大数，则将提交的任务存入到池队列中，可控制线程的最大并发数。
-- newFixedThreadPool 创建的线程池 corePoolSize 和 MaximumPoolSize 值是相等的，它使用的 **LinkedBolckingQueue**
+- `newFixedThreadPool` 创建的线程池 corePoolSize 和 MaximumPoolSize 值是相等的，它使用的 **LinkedBolckingQueue**
 - 这种方式即使线程池中没有可运行任务时，它也不会释放工作线程，还会占用一定的系统资源。
 
 
@@ -151,66 +209,6 @@ public static ExecutorService newWorkStealingPool() {
 
 - Java8 新特性，使用目前机器上可用的处理器作为它的并行级别
 - 可以通过参数 parallelism 指定并行数量
-
-
-
-## 四、线程池的几个重要参数
-
-从使用中我们可以看到，常用的构造线程池方法其实最后都是通过 **ThreadPoolExecutor** 实例来创建的，且该构造器有 7 大参数。
-
-```java
-public ThreadPoolExecutor(int corePoolSize,
-                              int maximumPoolSize,
-                              long keepAliveTime,
-                              TimeUnit unit,
-                              BlockingQueue<Runnable> workQueue,
-                              ThreadFactory threadFactory,
-                              RejectedExecutionHandler handler) {
-        if (corePoolSize < 0 ||
-            maximumPoolSize <= 0 ||
-            maximumPoolSize < corePoolSize ||
-            keepAliveTime < 0)
-            throw new IllegalArgumentException();
-        if (workQueue == null || threadFactory == null || handler == null)
-            throw new NullPointerException();
-        this.acc = System.getSecurityManager() == null ?
-                null :
-                AccessController.getContext();
-        this.corePoolSize = corePoolSize;
-        this.maximumPoolSize = maximumPoolSize;
-        this.workQueue = workQueue;
-        this.keepAliveTime = unit.toNanos(keepAliveTime);
-        this.threadFactory = threadFactory;
-        this.handler = handler;
-    }
-```
-
-- **corePoolSize：** 线程池中的常驻核心线程数
-  - 创建线程池后，当有请求任务进来之后，就会安排池中的线程去执行请求任务，近似理解为近日当值线程
-  - 当线程池中的线程数目达到corePoolSize后，就会把到达的任务放到缓存队列中
-
-- **maximumPoolSize：** 线程池最大线程数大小，该值必须大于等于 1
-
-- **keepAliveTime：** 线程池中非核心线程空闲的存活时间
-  
-- 当前线程池数量超过 corePoolSize 时，当空闲时间达到 keepAliveTime 值时，非核心线程会被销毁直到只剩下 corePoolSize 个线程为止
-  
-- **unit：** keepAliveTime 的时间单位
-
-- **workQueue：** 存放任务的阻塞队列，被提交但尚未被执行的任务
-
-- **threadFactory：** 用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题
-
-- **handler：** 拒绝策略，表示当队列满了且工作线程大于等于线程池的最大线程数（maximumPoolSize）时如何来拒绝请求执行的线程的策略，主要有四种类型。
-
-  等待队列也已经满了，再也塞不下新任务。同时，线程池中的 max 线程也达到了，无法继续为新任务服务，这时候我们就需要拒绝策略合理的处理这个问题了。
-
-  - AbortPolicy   直接抛出RegectedExcutionException 异常阻止系统正常进行，**默认策略**
-  - DiscardPolicy  直接丢弃任务，不予任何处理也不抛出异常，如果允许任务丢失，这是最好的一种方案
-  - DiscardOldestPolicy  抛弃队列中等待最久的任务，然后把当前任务加入队列中尝试再次提交当前任务
-  - CallerRunsPolicy  交给线程池调用所在的线程进行处理，“调用者运行”的一种调节机制，该策略既不会抛弃任务，也不会抛出异常，而是将某些任务回退到调用者，从而降低新任务的流量
-
-  以上内置拒绝策略均实现了 RejectExcutionHandler 接口
 
 
 

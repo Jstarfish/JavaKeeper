@@ -14,19 +14,19 @@
 
 ### Spring有哪些优点？
 
-- **轻量级：**Spring在大小和透明性方面绝对属于轻量级的，基础版本的Spring框架大约只有2MB。
-- **控制反转(IOC)：**Spring使用控制反转技术实现了松耦合。依赖被注入到对象，而不是创建或寻找依赖对象。
-- **面向切面编程(AOP)：** Spring支持面向切面编程，同时把应用的业务逻辑与系统的服务分离开来。
-- **容器：**Spring包含并管理应用程序对象的配置及生命周期。
-- **MVC框架：**Spring的web框架是一个设计优良的web MVC框架，很好的取代了一些web框架。
-- **事务管理：**Spring对下至本地业务上至全局业务(JAT)提供了统一的事务管理接口。
-- **异常处理：**Spring提供一个方便的API将特定技术的异常(由JDBC, Hibernate, 或JDO抛出)转化为一致的、Unchecked异常。
+- **轻量级**：Spring在大小和透明性方面绝对属于轻量级的，基础版本的Spring框架大约只有2MB。
+- **控制反转(IOC)**：Spring使用控制反转技术实现了松耦合。依赖被注入到对象，而不是创建或寻找依赖对象。
+- **面向切面编程(AOP)**：Spring支持面向切面编程，同时把应用的业务逻辑与系统的服务分离开来。
+- **容器**：Spring包含并管理应用程序对象的配置及生命周期。
+- **MVC框架**：Spring的web框架是一个设计优良的web MVC框架，很好的取代了一些web框架。
+- **事务管理**：Spring对下至本地业务上至全局业务(JAT)提供了统一的事务管理接口。
+- **异常处理**：Spring提供一个方便的API将特定技术的异常(由JDBC, Hibernate, 或JDO抛出)转化为一致的、Unchecked异常。
 
 
 
 ### Spring模块
 
-![spring overview](https://docs.spring.io/spring/docs/4.3.27.RELEASE/spring-framework-reference/htmlsingle/images/spring-overview.png)
+![spring overview](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8npk820uj30k00f0q3x.jpg)
 
 ### 简述 AOP 和 IOC 概念
 
@@ -46,7 +46,7 @@ IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将
 
 Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。Spring 容器使用依赖注入来管理组成应用程序的组件。容器通过读取提供的配置元数据来接收对象进行实例化，配置和组装的指令。该元数据可以通过 XML，Java 注解或 Java 代码提供。
 
-![container magic](https://docs.spring.io/spring/docs/5.0.18.RELEASE/spring-framework-reference/images/container-magic.png)
+![container magic](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8npp9px7j30du088743.jpg)
 
 
 
@@ -99,7 +99,7 @@ ApplicationContext 的主要实现类：
 - WebApplicationContext 是专门为 WEB 应用而准备的，它允许从相对于 WEB 根目录的路径中完成初始化工作
 - ApplicationContext 在初始化上下文时就实例化所有单例的 Bean
 
-![javadoop.com](https://www.javadoop.com/blogimages/spring-context/1.png)
+![javadoop.com](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8npy9i8cj31300pwn0i.jpg)
 
 **从 IOC 容器中获取 Bean**
 
@@ -172,7 +172,7 @@ class Client {
 - 它们由 Spring IoC 容器实例化，配置，装配和管理
 - Bean 是基于用户提供给容器的配置元数据创建
 
-![Bean generation - Spring Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/bean.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nq56qklj30l602jjre.jpg)
 
 
 
@@ -206,9 +206,9 @@ class Client {
   1. @Bean 注解扮演与 `<bean/>` 元素相同的角色。
   
  	2. @Configuration 类允许通过简单地调用同一个类中的其他 @Bean 方法来定义 bean 间依赖关系。
-  
+
 例如：
-  
+
   ```java
   @Configuration
   public class StudentConfig {
@@ -217,8 +217,8 @@ class Client {
           return new StudentBean();
       }
   }
-```
-  
+  ```
+
   
 
 ### Spring Bean的作用域？
@@ -256,13 +256,13 @@ Spring bean 容器的生命周期流程如下：
 9. 如果 bean 实现 DisposableBean 接口，当 spring 容器关闭时，会调用 destory()；
 10. 如果为 bean 指定了 destroy 方法（`<bean>` 的 destroy-method 属性），那么将调用它
 
-![](https://bbsmax.ikafan.com/static/L3Byb3h5L2h0dHBzL2ltZzIwMTguY25ibG9ncy5jb20vYmxvZy8xMzUxOTk5LzIwMTkwNi8xMzUxOTk5LTIwMTkwNjA0MTczNTQ0MzIwLTE0MjI5MDYwNjgucG5n.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nqbdmr2j30zp0u0n2x.jpg)
 
 
 
 在 bean 初始化时会经历几个阶段，要与容器对 bean 生命周期的管理交互，可以实现  `InitializingBean` 和 `DisposableBean` 接口。容器对前者调用 `afterPropertiesSet()`，对后者调用 `destroy()`，以允许 bean 在初始化和销毁 bean 时执行某些操作。
 
-官方不建议使用这两个接口，而是建议使用 ``@PostConstruct` 和 `@PreDestroy`，或者 XML 配置中使用 `init-method`和`destroy-method` 属性
+官方不建议使用这两个接口，而是建议使用 `@PostConstruct` 和 `@PreDestroy`，或者 XML 配置中使用 `init-method`和`destroy-method` 属性
 
 ```xml
 <bean id="exampleInitBean" class="examples.ExampleBean" init-method="init"/>
@@ -292,7 +292,7 @@ public class AnotherExampleBean implements InitializingBean {
 
 实现 Bean 初始化回调和销毁回调各有三种方法，一是实现接口方法，二是在XML配置，三是使用注解
 
-- 使用注解 ``@PostConstruct` 和 `@PreDestroy`
+- 使用注解 `@PostConstruct` 和 `@PreDestroy`
 - 实现  `InitializingBean` 和 `DisposableBean` 接口
 - XML 中配置 `init-method` 和 `destroy-method`
 
@@ -322,15 +322,15 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 
 在Spring框架中共有5种自动装配，让我们逐一分析
 
-1. **no：**这是Spring框架的默认设置，在该设置下自动装配是关闭的，开发者需要自行在beanautowire属性里指定自动装配的模式
+1. **no**：这是Spring框架的默认设置，在该设置下自动装配是关闭的，开发者需要自行在beanautowire属性里指定自动装配的模式
 
-2. **byName：**该选项可以根据bean名称设置依赖关系。当向一个bean中自动装配一个属性时，容器将根据bean的名称自动在在配置文件中查询一个匹配的bean。如果找到的话，就装配这个属性，如果没找到的话就报错。
+2. **byName**：该选项可以根据bean名称设置依赖关系。当向一个bean中自动装配一个属性时，容器将根据bean的名称自动在在配置文件中查询一个匹配的bean。如果找到的话，就装配这个属性，如果没找到的话就报错。
 
-3. **byType：**该选项可以根据bean类型设置依赖关系。当向一个bean中自动装配一个属性时，容器将根据bean的类型自动在在配置文件中查询一个匹配的bean。如果找到的话，就装配这个属性，如果没找到的话就报错。
+3. **byType**：该选项可以根据bean类型设置依赖关系。当向一个bean中自动装配一个属性时，容器将根据bean的类型自动在在配置文件中查询一个匹配的bean。如果找到的话，就装配这个属性，如果没找到的话就报错。
 
-4. **constructor：**构造器的自动装配和byType模式类似，但是仅仅适用于与有构造器相同参数的bean，如果在容器中没有找到与构造器参数类型一致的bean，那么将会抛出异常。
+4. **constructor**：构造器的自动装配和byType模式类似，但是仅仅适用于与有构造器相同参数的bean，如果在容器中没有找到与构造器参数类型一致的bean，那么将会抛出异常。
 
-5. **autodetect：**Spring首先尝试通过 *constructor* 使用自动装配来连接，如果它不执行，Spring 尝试通过 *byType* 来自动装配
+5. **autodetect**：Spring首先尝试通过 *constructor* 使用自动装配来连接，如果它不执行，Spring 尝试通过 *byType* 来自动装配
 
    
 
@@ -352,7 +352,7 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 - **@Service**：标识服务层(业务层)组件
 - **@Controller**： 标识表现层组件
 
-![annotations - Spring Framework Tutorial - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/annotations.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nqhucw4j31qq0j2aak.jpg)
 
 对于扫描到的组件,，Spring 有默认的命名策略：使用非限定类名,，第一个字母小写。也可以在注解中通过 value 属性值标识组件的名称。
 
@@ -385,9 +385,6 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 >
 >​		你有没有⽤过Spring的AOP? 是⽤来⼲嘛的? ⼤概会怎么使⽤？
 >
->
->
->
 
 ### 什么是 AOP？
 
@@ -402,7 +399,7 @@ AOP 的好处:
 - 每个事物逻辑位于一个位置，代码不分散，便于维护和升级
 - 业务模块更简洁, 只包含核心业务代码
 
-![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/unnamed.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nqrqcgvj30ov0hqq38.jpg)
 
 
 
@@ -411,7 +408,7 @@ AOP 的好处:
 - 切面（Aspect）：横切关注点（跨越应用程序多个模块的功能），被模块化的特殊对象
 - 连接点（Joinpoint）：程序执行的某个特定位置，如类某个方法调用前、调用后、方法抛出异常后等。在这个位置我们可以插入一个 AOP 切面，它实际上是应用程序执行 Spring AOP 的位置
 
-![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/JoinPoint-1.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nqwua8mj31da0fqmxb.jpg)
 
 - 通知（Advice）： 通知是个在方法执行前或执行后要做的动作，实际上是程序执行时要通过 SpringAOP 框架触发的代码段。Spring 切面可以应用五种类型的通知：
   - before： 前置通知 ， 在一个方法执行前被调用
@@ -420,7 +417,7 @@ AOP 的好处:
   - after-throwing：在方法抛出异常退出时执行的通知 
   - around：在方法执行之前和之后调用的通知
 
-![advice - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/advice-2.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nr1x47wj30z20qi3yr.jpg)
 
 - 目标（Target）：被通知的对象，通常是一个代理对象，也指被通知（advice）对象
 - 代理（Proxy）：向目标对象应用通知之后创建的对象
@@ -474,7 +471,7 @@ AOP 的好处:
 
 ### 有哪些不同的AOP实现
 
-![AOP Implementations - Spring Framework Interview Questions - Edureka!](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/AOP-Implementations.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nr8kv0fj31kw0onwg3.jpg)
 
 
 
@@ -681,11 +678,7 @@ SpringMVC 处理请求过程：
 5. DispatcherServlet 借助 ViewResoler 完成逻辑视图名到真实视图对象的解析
 6. 得到真实视图对象 View 后, DispatcherServlet 使用这个 View 对ModelAndView 中的模型数据进行视图渲染
 
-![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/05/dispatcherservlet.png)
-
-
-
-![](https://imgkr.cn-bj.ufileos.com/986949cb-e4dc-42cf-acb9-8cd07bbb4d05.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nrg3furj316o0rs3zx.jpg)
 
 
 
@@ -902,14 +895,6 @@ public class Employee {
 - **包装器设计模式** : 我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。这种模式让我们可以根据客户的需求能够动态切换不同的数据源。
 - **观察者模式:** Spring 事件驱动模型就是观察者模式很经典的一个应用。
 - **适配器模式** :Spring AOP 的增强或通知(Advice)使用到了适配器模式、spring MVC 中也是用到了适配器模式适配`Controller`。
-
-
-
-
-
-
-
-
 
 
 
