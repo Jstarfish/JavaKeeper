@@ -22,6 +22,7 @@
 - **开发架构**
 - [![](https://icongr.am/simple/leaflet.svg?size=25&color=11b041&colored=false)Spring](framework/Spring/readSpring.md)
   - [Spring-IOC](framework/Spring/Spring-IOC-Source.md)
+  - [Spring循环依赖](framework/Spring/Spring-Cycle-Dependency.md)
 - **RPC**
 - [Hello Protocol Buffers](rpc/Hello-Protocol-Buffers.md)
 - **面向服务架构**
