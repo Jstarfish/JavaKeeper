@@ -6,17 +6,14 @@
 
 队列是只允许在一端进行插入操作，而在另一端进行删除操作的线性表。简称FIFO。允许插入的一端称为队尾，允许删除的一端称为队头。
 
-![这里写图片描述](https://img-blog.csdn.net/20160509165022899)
+![](https://img-blog.csdn.net/20160509165022899)
 
 1. 队列是一个有序列表，可以用数组或是链表来实现。
 
 2. 遵循先入先出的原则。即:先存入队列的数据，要先取出。后存入的要后取出 
 
-3. 示意图:(使用数组模拟队列示意图)
 
-   ![image-20200720104833994](C:\Users\jiahaixin\AppData\Roaming\Typora\typora-user-images\image-20200720104833994.png)
-
-![img](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/08/14/screen-shot-2018-05-03-at-151021.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gibh72i8saj30ve0cmt9d.jpg)
 
 在 FIFO 数据结构中，将`首先处理添加到队列中的第一个元素`。
 
