@@ -50,7 +50,7 @@ public class CountDownLatchDemo {
 
 CyclicBarrier 的字面意思是可循环（Cyclic）使用的屏障（Barrier），它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活，线程进入屏障通过 CyclicBarrier 的 await() 方法。
 
-![dayarch.top](https://rgyb.sunluomeng.top/20200627150846.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gicop7b8boj31hu0s0doe.jpg)
 
 可以理解为：**集齐七颗龙珠，才能召唤神龙**（主力开发都到齐了，才能需求评审，也有点报数的感觉）
 
