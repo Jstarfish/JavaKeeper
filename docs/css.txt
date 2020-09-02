@@ -5,6 +5,7 @@
 #nice {
   font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   word-break: break-all;
+  padding: 0 8px;
 }
 
 /* 标题 */
@@ -67,15 +68,7 @@
 }
 
 #nice h5 {
-  font-weight: normal;
-  font-size: 1.3em;
-  text-align: center;
-  background: hsl(216, 100%, 68%);
-  border: 3px double #fff;
-  width: 80%;
-  padding: 10px;
-  margin: 30px auto;
-  color: #fff;
+  color: #666;
 }
 
 #nice h6 {
