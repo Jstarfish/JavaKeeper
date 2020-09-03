@@ -2,9 +2,41 @@ Java中的大部分同步类（Lock、Semaphore、ReentrantLock等）都是基�
 
 
 
-> 文章来源 https://dayarch.top/p/java-aqs-and-reentrantlock.html
 
 
+## 队列同步器 AQS
+
+队列同步器 （AbstractQueuedSynchronizer），简称同步器或 AQS
+
+- `ReentrantLock`
+- `ReentrantReadWriteLock`
+- `Semaphore(信号量)`
+- `CountDownLatch`
+- `公平锁`
+- `非公平锁`
+- `ThreadPoolExecutor` 
+
+都和 AQS 有直接关系，所以了解 AQS 的抽象实现，在此基础上再稍稍查看上述各类的实现细节，很快就可以全部搞定，不至于查看源码时一头雾水，丢失主线
+
+
+
+AQS 是 `AbstractQueuedSynchronizer` 的简称，翻译成中文就是 `抽象队列同步器` ，这三个单词分开来看：
+
+- Abstract （抽象）：也就是说， AQS 是一个抽象类，只实现一些主要的逻辑，有些方法推迟到子类实现
+- Queued （队列）：队列有啥特征呢？先进先出（ FIFO ）对吧？也就是说， AQS 是用先进先出队列来存储数据的
+- Synchronizer （同步器）：即 AQS 实现同步功能
+
+以上概括一下， AQS 是一个用来构建锁和同步器的框架，使用 AQS 能简单而又高效地构造出同步器。
+
+
+
+首先，我们通过下面的架构图来整体了解一下 AQS 框架
+
+![美团技术团队](https://p1.meituan.net/travelcube/82077ccf14127a87b77cefd1ccf562d3253591.png)
+
+- 上图中有颜色的为 Method，无颜色的为 Attribution。
+- 总的来说，AQS 框架共分为五层，自上而下由浅入深，从 AQS 对外暴露的 API 到底层基础数据。
+- 当有自定义同步器接入时，只需重写第一层所需要的部分方法即可，不需要关注底层具体的实现流程。当自定义同步器进行加锁或者解锁操作时，先经过第一层的 API 进入 AQS 内部方法，然后经过第二层进行锁的获取，接着对于获取锁失败的流程，进入第三层和第四层的等待队列处理，而这些处理方式均依赖于第五层的基础数据提供层。
 
 
 
@@ -16,7 +48,7 @@ Java中的大部分同步类（Lock、Semaphore、ReentrantLock等）都是基�
 >
 > **答：**看下图
 
-[![img](https://rgyb.sunluomeng.top/20200517201817.png)](https://rgyb.sunluomeng.top/20200517201817.png)
+![img](https://rgyb.sunluomeng.top/20200517201817.png)
 
 相信看到这个截图你就明白一二了，你听过的，面试常被问起的，工作中常用的
 
@@ -30,298 +62,13 @@ Java中的大部分同步类（Lock、Semaphore、ReentrantLock等）都是基�
 
 都和 AQS 有直接关系，所以了解 AQS 的抽象实现，在此基础上再稍稍查看上述各类的实现细节，很快就可以全部搞定，不至于查看源码时一头雾水，丢失主线
 
-
-
-AQS 是 `AbstractQueuedSynchronizer` 的简称，翻译成中文就是 `抽象队列同步器` ，这三个单词分开来看：
-
-- Abstract （抽象）：也就是说， AQS 是一个抽象类，只实现一些主要的逻辑，有些方法推迟到子类实现
-- Queued （队列）：队列有啥特征呢？先进先出（ FIFO ）对吧？也就是说， AQS 是用先进先出队列来存储数据的
-- Synchronizer （同步）：即 AQS 实现同步功能
-
-以上概括一下， AQS 是一个用来构建锁和同步器的框架，使用 AQS 能简单而又高效地构造出同步器。
-
-
-
-AQS 队列在内部维护了一个 FIFO 的双向链表，如果对数据结构比较熟的话，应该很容易就能想到，在双向链表中，每个节点都有两个指针，分别指向直接前驱节点和直接后继节点。使用双向链表的优点之一，就是从任意一个节点开始都很容易访问它的前驱节点和后继节点。
-
-在 AQS 中，每个 Node 其实就是一个线程封装，当线程在竞争锁失败之后，会封装成 Node 加入到 AQS 队列中；获取锁的线程释放锁之后，会从队列中唤醒一个阻塞的 Node （也就是线程）
-
-AQS 使用 volatile 的变量 state 来作为资源的标识:
-
-```
-private volatile int state;
-```
-
-关于 state 状态的读取与修改，子类可以通过覆盖 getState() 和 setState() 方法来实现自己的逻辑，其中比较重要的是:
-
-```
-// 传入期望值 expect ,想要修改的值 update ,然后通过 Unsafe 的 compareAndSwapInt() 即 CAS 操作来实现
-protected final boolean compareAndSetState(int expect, int update) {
-    // See below for intrinsics setup to support this
-    return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
-}
-```
-
-下面是 AQS 中两个重要的成员变量:
-
-```
-private transient volatile Node head;   // 头结点
-private transient volatile Node tail;   // 尾节点
-```
-
-关于 AQS 维护的双向链表，在源码中是这样解释的:
-
-```
-The wait queue is a variant of a "CLH" (Craig, Landin, and Hagersten) lock queue. 
-CLH locks are normally used for spinlocks.  We instead use them for blocking synchronizers, 
-but use the same basic tactic of holding some of the control information 
-about a thread in the predecessor of its node.  
-```
-
-也就是 AQS 的等待队列是 “CLH” 锁定队列的变体
-
-直接来一张图会更形象一些：
-
-![img](https://mmbiz.qpic.cn/mmbiz_jpg/laEmibHFxFw5V4PsAed1hMNib2ich2E5tvJNaR0VJnMgq0Nq54lbAG0a3W5ctu8I0eWfgwtq0VHQmqt2qsdyv4Evg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-Node 节点维护的是线程，控制线程的一些操作，具体来看看是 Node 是怎么做的：
-
-```
-static final class Node {
-    /** Marker to indicate a node is waiting in shared mode */
-    // 标记一个节点,在 共享模式 下等待
-    static final Node SHARED = new Node();
- 
-    /** Marker to indicate a node is waiting in exclusive mode */
-    // 标记一个节点,在 独占模式 下等待
-    static final Node EXCLUSIVE = null;
-
-    /** waitStatus value to indicate thread has cancelled */
-    // waitStatus 的值,表示该节点从队列中取消
-    static final int CANCELLED =  1;
- 
-    /** waitStatus value to indicate successor's thread needs unparking */
-    // waitStatus 的值,表示后继节点在等待唤醒
-    // 只有处于 signal 状态的节点,才能被唤醒
-    static final int SIGNAL    = -1;
- 
-    /** waitStatus value to indicate thread is waiting on condition */
-    // waitStatus 的值,表示该节点在等待一些条件
-    static final int CONDITION = -2;
- 
- /**
-     * waitStatus value to indicate the next acquireShared should
-     * unconditionally propagate
-    */
-    // waitStatus 的值,表示有资源可以使用,新 head 节点需要唤醒后继节点
-    // 如果是在共享模式下,同步状态应该无条件传播下去
-    static final int PROPAGATE = -3;
-
- // 节点状态,取值为 -3,-2,-1,0,1
-    volatile int waitStatus;
-
- // 前驱节点
-    volatile Node prev;
-
- // 后继节点
-    volatile Node next;
-
- // 节点所对应的线程
-    volatile Thread thread;
-
- // condition 队列中的后继节点
-    Node nextWaiter;
-
- // 判断是否是共享模式
-    final boolean isShared() {
-        return nextWaiter == SHARED;
-    }
-
- /**
- * 返回前驱节点
- */
-    final Node predecessor() throws NullPointerException {
-        Node p = prev;
-        if (p == null)
-            throw new NullPointerException();
-        else
-            return p;
-    }
-
-    Node() {    // Used to establish initial head or SHARED marker
-    }
-
- /**
- * 将线程构造成一个 Node 节点,然后添加到 condition 队列中
- */
-    Node(Thread thread, Node mode) {     // Used by addWaiter
-        this.nextWaiter = mode;
-        this.thread = thread;
-    }
-
- /**
- * 等待队列用到的方法
- */
-    Node(Thread thread, int waitStatus) { // Used by Condition
-        this.waitStatus = waitStatus;
-        this.thread = thread;
-    }
-}
-```
-
-## AQS 如何获取资源
-
-在 AQS 中，获取资源的入口是 acquire(int arg) 方法，其中 arg 是获取资源的个数，来看下代码：
-
-```
-public final void acquire(int arg) {
-    if (!tryAcquire(arg) &&
-        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-        selfInterrupt();
-}
-```
-
-在获取资源时，会首先调用 tryAcquire 方法，这个方法是在子类中具体实现的
-
-如果通过 tryAcquire 获取资源失败，接下来会通过 addWaiter(Node.EXCLUSIVE) 方法，将这个线程插入到等待队列中，具体代码:
-
-```
-private Node addWaiter(Node mode) {
- // 生成该线程所对应的 Node 节点
-    Node node = new Node(Thread.currentThread(), mode);
-    // 将 Node 插入到队列中
-    Node pred = tail;
-    if (pred != null) {
-        node.prev = pred;
-        // 使用 CAS 操作,如果成功就返回
-        if (compareAndSetTail(pred, node)) {
-            pred.next = node;
-            return node;
-        }
-    }
-    // 如果 pred == null 或者 CAS 操作失败,则调用 enq 方法再次自旋插入
-    enq(node);
-    return node;
-}
- 
-// 自旋 CAS 插入等待队列
-private Node enq(final Node node) {
-    for (;;) {
-        Node t = tail;
-        if (t == null) { // Must initialize
-            if (compareAndSetHead(new Node()))
-                tail = head;
-        } else {
-            node.prev = t;
-            if (compareAndSetTail(t, node)) {
-                t.next = node;
-                return t;
-            }
-        }
-    }
-}
-```
-
-在上面能够看到使用的是 CAS 自旋插入，这是因为在 AQS 中会存在多个线程同时竞争资源的情况，进而一定会出现多个线程同时插入节点的操作，这里使用 CAS 自旋插入是为了保证操作的线程安全性
-
-现在呢，申请 acquire(int arg) 方法，然后通过调用 addWaiter 方法，将一个 Node 插入到了队列尾部。处于等待队列节点是从头结点开始一个一个的去获取资源，获取资源方式如下：
-
-```
-final boolean acquireQueued(final Node node, int arg) {
-    boolean failed = true;
-    try {
-        boolean interrupted = false;
-        for (;;) {
-            final Node p = node.predecessor();
-            // 如果 Node 的前驱节点 p 是 head,说明 Node 是第二个节点,那么它就可以尝试获取资源
-            if (p == head && tryAcquire(arg)) {
-             // 如果资源获取成功,则将 head 指向自己
-                setHead(node);
-                p.next = null; // help GC
-                failed = false;
-                return interrupted;
-            }
-            // 节点进入等待队列后,调用 shouldParkAfterFailedAcquire 或者 parkAndCheckInterrupt 方法
-            // 进入阻塞状态,即只有头结点的线程处于活跃状态
-            if (shouldParkAfterFailedAcquire(p, node) &&
-                parkAndCheckInterrupt())
-                interrupted = true;
-        }
-    } finally {
-        if (failed)
-            cancelAcquire(node);
-    }
-}
-```
-
-在获取资源时，除了 acquire 之外，还有三个方法：
-
-- acquireInterruptibly ：申请可中断的资源（独占模式）
-- acquireShared ：申请共享模式的资源
-- acquireSharedInterruptibly ：申请可中断的资源（共享模式）
-
-到这里，关于 AQS 如何获取资源就说的差不多了，接下来看看 AQS 是如何释放资源的
-
-## AQS 如何释放资源
-
-释放资源相对于获取资源来说，简单了很多。源码如下：
-
-```
-public final boolean release(int arg) {
- // 如果释放锁成功
-    if (tryRelease(arg)) { 
-     // 获取 AQS 队列中的头结点
-        Node h = head;
-        // 如果头结点不为空,且状态 != 0
-        if (h != null && h.waitStatus != 0)
-         // 调用 unparkSuccessor(h) 方法,唤醒后续节点
-            unparkSuccessor(h);
-        return true;
-    }
-    return false;
-}
-
-private void unparkSuccessor(Node node) {
-    int ws = node.waitStatus;
-    // 如果状态是负数,尝试将它改为 0
-    if (ws < 0)
-        compareAndSetWaitStatus(node, ws, 0);
- // 得到头结点的后继节点
-    Node s = node.next;
-    // 如果 waitStatus 大于 0 ,说明这个节点被取消
-    if (s == null || s.waitStatus > 0) {
-        s = null;
-        // 那就从尾节点开始,找到距离 head 最近的一个 waitStatus<=0 的节点进行唤醒
-        for (Node t = tail; t != null && t != node; t = t.prev)
-            if (t.waitStatus <= 0)
-                s = t;
-    }
-    // 如果后继节点不为空,则将其从阻塞状态变为非阻塞状态
-    if (s != null)
-        LockSupport.unpark(s.thread);
-}
-```
-
-## AQS 两种资源共享模式
-
-资源有两种共享模式:
-
-- 独占模式( Exclusive )：资源是独占的，也就是一次只能被一个线程占有，比如 ReentrantLock
-- 共享模式( Share )：同时可以被多个线程获取，具体的资源个数可以通过参数来确定，比如 Semaphore/CountDownLatch
-
-
-
-
-
 上面提到，在锁的实现类中会聚合同步器，然后利同步器实现锁的语义，那么问题来了：
 
 > 为什么要用聚合模式，怎么进一步理解锁和同步器的关系呢？
 
-[![img](https://rgyb.sunluomeng.top/20200530125122.png)](https://rgyb.sunluomeng.top/20200530125122.png)
+![img](https://rgyb.sunluomeng.top/20200530125122.png)
 
 我们绝大多数都是在使用锁，实现锁之后，其核心就是要使用方便
-
-[![img](https://rgyb.sunluomeng.top/20200530130025.png)](https://rgyb.sunluomeng.top/20200530130025.png)
 
 从 AQS 的类名称和修饰上来看，这是一个抽象类，所以从设计模式的角度来看同步器一定是基于【模版模式】来设计的，使用者需要继承同步器，实现自定义同步器，并重写指定方法，随后将同步器组合在自定义的同步组件中，并调用同步器的模版方法，而这些模版方法又回调用使用者重写的方法
 
@@ -330,15 +77,11 @@ private void unparkSuccessor(Node node) {
 1. 哪些是自定义同步器可重写的方法？
 2. 哪些是抽象同步器提供的模版方法？
 
-
-
 ### 同步器可重写的方法
 
 同步器提供的可重写方法只有5个，这大大方便了锁的使用者：
 
-![img](https://rgyb.sunluomeng.top/20200523160830.png)
-
-![image-20200710100815089](https://imgkr.cn-bj.ufileos.com/a1afaf46-5661-465b-a7b3-ab28e704c3d4.png)
+![](https://rgyb.sunluomeng.top/20200523160830.png)
 
 按理说，需要重写的方法也应该有 abstract 来修饰的，为什么这里没有？原因其实很简单，上面的方法我已经用颜色区分成了两类：
 
@@ -357,11 +100,15 @@ protected boolean tryAcquire(int arg) {
 
 表格方法描述中所说的`同步状态`就是上文提到的有 volatile 修饰的 state，所以我们在`重写`上面几个方法时，还要通过同步器提供的下面三个方法（AQS 提供的）来获取或修改同步状态：
 
-[![img](https://rgyb.sunluomeng.top/20200523160906.png)](https://rgyb.sunluomeng.top/20200523160906.png)
+![](https://rgyb.sunluomeng.top/20200523160906.png)
 
-而独占式和共享式操作 state 变量的区别也就很简单了
+而独占式和共享式操作 state 变量的区别也就很简单了，我们可以通过修改 State 字段表示的同步状态来实现多线程的独占模式和共享模式（加锁过程）
 
-[![img](https://rgyb.sunluomeng.top/20200523160705.png)](https://rgyb.sunluomeng.top/20200523160705.png)
+![](https://rgyb.sunluomeng.top/20200523160705.png)
+
+![](https://p0.meituan.net/travelcube/27605d483e8935da683a93be015713f331378.png)
+
+![](https://p0.meituan.net/travelcube/3f1e1a44f5b7d77000ba4f9476189b2e32806.png)
 
 所以你看到的 `ReentrantLock` `ReentrantReadWriteLock` `Semaphore(信号量)` `CountDownLatch` 这几个类其实仅仅是在实现以上几个方法上略有差别，其他的实现都是通过同步器的模版方法来实现的，到这里是不是心情放松了许多呢？我们来看一看模版方法：
 
@@ -369,7 +116,7 @@ protected boolean tryAcquire(int arg) {
 
 上面我们将同步器的实现方法分为独占式和共享式两类，模版方法其实除了提供以上两类模版方法之外，只是多了`响应中断`和`超时限制` 的模版方法供 Lock 使用，来看一下
 
-[![img](https://rgyb.sunluomeng.top/20200523195957.png)](https://rgyb.sunluomeng.top/20200523195957.png)
+![](https://rgyb.sunluomeng.top/20200523195957.png)
 
 先不用记上述方法的功能，目前你只需要了解个大概功能就好。另外，相信你也注意到了：
 
@@ -377,7 +124,7 @@ protected boolean tryAcquire(int arg) {
 
 看到这你也许有点乱了，我们稍微归纳一下：
 
-[![img](https://rgyb.sunluomeng.top/20200523213113.png)](https://rgyb.sunluomeng.top/20200523213113.png)
+![](https://rgyb.sunluomeng.top/20200523213113.png)
 
 程序员还是看代码心里踏实一点，我们再来用代码说明一下上面的关系（注意代码中的注释，以下的代码并不是很严谨，只是为了简单说明上图的代码实现）：
 
@@ -389,9 +136,6 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * 自定义互斥锁
- *
- * @author tanrgyb
- * @date 2020/5/23 9:33 PM
  */
 public class MyMutex implements Lock {
 
@@ -501,17 +245,45 @@ AQS 内部维护了一个同步队列，用于管理同步状态。
 
 为了将上述步骤弄清楚，我们需要来看一看 Node 结构 （如果你能打开 IDE 一起看那是极好的）
 
-[![img](https://rgyb.sunluomeng.top/20200524183916.png)](https://rgyb.sunluomeng.top/20200524183916.png)
+![img](https://rgyb.sunluomeng.top/20200524183916.png)
 
 乍一看有点杂乱，我们还是将其归类说明一下：
 
-[![img](https://rgyb.sunluomeng.top/20200524184014.png)](https://rgyb.sunluomeng.top/20200524184014.png)
+![](https://rgyb.sunluomeng.top/20200524184014.png)
 
 上面这几个状态说明有个印象就好，有了Node 的结构说明铺垫，你也就能想象同步队列的基本结构了：
 
-![img](https://rgyb.sunluomeng.top/20200525072245.png)
+![](https://rgyb.sunluomeng.top/20200525072245.png)
 
 前置知识基本铺垫完毕，我们来看一看独占式获取同步状态的整个过程
+
+解释一下几个方法和属性值的含义：
+
+| 方法和属性值 | 含义                                                         |
+| :----------- | :----------------------------------------------------------- |
+| waitStatus   | 当前节点在队列中的状态                                       |
+| thread       | 表示处于该节点的线程                                         |
+| prev         | 前驱指针                                                     |
+| predecessor  | 返回前驱节点，没有的话抛出npe                                |
+| nextWaiter   | 指向下一个处于CONDITION状态的节点（由于本篇文章不讲述Condition Queue队列，这个指针不多介绍） |
+| next         | 后继指针                                                     |
+
+线程两种锁的模式：
+
+| 模式      | 含义                           |
+| :-------- | :----------------------------- |
+| SHARED    | 表示线程以共享的模式等待锁     |
+| EXCLUSIVE | 表示线程正在以独占的方式等待锁 |
+
+waitStatus有下面几个枚举值：
+
+| 枚举      | 含义                                           |
+| :-------- | :--------------------------------------------- |
+| 0         | 当一个Node被初始化的时候的默认值               |
+| CANCELLED | 为1，表示线程获取锁的请求已经取消了            |
+| CONDITION | 为-2，表示节点在等待队列中，节点线程等待唤醒   |
+| PROPAGATE | 为-3，当前线程处在SHARED情况下，该字段才会使用 |
+| SIGNAL    | 为-1，表示线程已经准备好了，就等资源释放了     |
 
 ### 独占式获取同步状态
 
@@ -1376,6 +1148,11 @@ else if (current == getExclusiveOwnerThread())
 1. Java 并发实战
 2. Java 并发编程的艺术
 3. https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html
+4. https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/Multithread/AQS.md
+5. https://www.javadoop.com/post/AbstractQueuedSynchronizer-2
+6. https://www.cnblogs.com/waterystone/p/4920797.html
+7. https://www.cnblogs.com/chengxiao/archive/2017/07/24/7141160.html
+8. https://dayarch.top/p/java-aqs-and-reentrantlock.html
 
 
 
@@ -1383,20 +1160,3 @@ else if (current == getExclusiveOwnerThread())
 
 
 
-
-
-
-
-参考与感谢
-
-Java极客技术
-
-https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html
-
-https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/Multithread/AQS.md
-
-https://www.javadoop.com/post/AbstractQueuedSynchronizer-2
-
-https://www.cnblogs.com/waterystone/p/4920797.html
-
-https://www.cnblogs.com/chengxiao/archive/2017/07/24/7141160.html

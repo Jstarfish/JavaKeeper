@@ -1,6 +1,8 @@
+> Java并发编程：CountDownLatch、CyclicBarrier 和 Semaphore
+
 ## CountDownLatch
 
-在多线程协作完成业务功能时，有时候需要等待其他多个线程完成任务之后，主线程才能继续往下执行业务功能，在这种的业务场景下，通常可以使用 Thread 类的 `join()` 方法，让主线程等待被 join 的线程执行完之后，主线程才能继续往下执行。当然，使用线程间消息通信机制也可以完成。其实，Java 并发工具类中为我们提供了类似“倒计时”这样的工具类，可以十分方便的完成所说的这种业务场景。
+在多线程协作完成业务功能时，有时候需要等待其他多个线程完成任务之后，主线程才能继续往下执行业务功能，在这种的业务场景下，通常可以使用 Thread 类的 `join()` 方法，让主线程等待被 join 的线程执行完之后，主线程才能继续往下执行。当然，使用线程间消息通信机制也可以完成。其实，Java 并发工具类中为我们提供了类似“**倒计时**”这样的工具类，可以十分方便的完成所说的这种业务场景。
 
 简单概括他的作用就是：让一些线程阻塞直到另一些线程完成一系列操作后才被唤醒。
 
@@ -35,7 +37,7 @@ public class CountDownLatchDemo {
 
 上边的代码，如果有人通宵上自习，死心眼的班长会一直等，一直等~
 
-为了不让班长随机应变，CountDownLatch 还提供了等待限制时间的方法，常用方法一览：
+为了让班长随机应变，CountDownLatch 还提供了等待限制时间的方法，常用方法一览：
 
 - `await()`：调用该方法的线程等到构造方法传入的 N 减到 0 的时候，才能继续往下执行；
 - `await(long timeout, TimeUnit unit)`：与上面的 await 方法功能一致，只不过这里有了时间限制，调用该方法的线程等到指定的 timeout 时间后，不管 N 是否减至为 0，都会继续往下执行；
@@ -48,7 +50,7 @@ public class CountDownLatchDemo {
 
 ## CyclicBarrier
 
-CyclicBarrier 的字面意思是可循环（Cyclic）使用的屏障（Barrier），它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活，线程进入屏障通过 CyclicBarrier 的 await() 方法。
+CyclicBarrier 的字面意思是可循环（Cyclic）使用的屏障（Barrier），它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活，线程进入屏障通过 CyclicBarrier 的 `await()` 方法。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gicop7b8boj31hu0s0doe.jpg)
 
@@ -84,11 +86,11 @@ public class CyclieBarrierDemo {
 }
 ```
 
-> countDownLatch 相当于做减法，CyclicBarrier 相当于做加法
+> 可以这么理解：**countDownLatch 相当于做减法，CyclicBarrier 相当于做加法**
 
 ## Semaphore 
 
-Semaphore 翻译过来是信号量的意思，其实我们叫它令牌或者许可更好理解一些。
+Semaphore 翻译过来是**信号量**的意思，其实我们叫它令牌或者许可更好理解一些。
 
 官方是这样解释的：
 
@@ -96,9 +98,9 @@ Semaphore 翻译过来是信号量的意思，其实我们叫它令牌或者许�
 
 这个解释太官方，我们用例子来理解：
 
-如果我 `Semaphore s = new Semaphore(1)` 写的是1，我取一下，acquire 一下他就变成0，当变成0之后别人是acquire 不到的，然后继续执行，线程结束之后注意要 `s.release()`,，执行完该执行的就把他 release 掉，release 又把0变回去1， 还原化。
+如果我 `Semaphore s = new Semaphore(1)` 写的是1，我取一下（acquire），他就变成 0，当变成 0 之后别人是 acquire 不到的，然后继续执行，线程结束之后注意要 `s.release()`，执行完该执行的就把他 release 掉，release 又把0变回去1， 还原化。
 
-Semaphore的含义就是限流，比如说你在买票，Semaphore 写5就是只能有5个人可以同时买票。acquire的意思叫获得这把锁，线程如果想继续往下执行，必须得从 Semaphore 里面获得一 个许可， 他一共有5个许可，用到0了剩下的就得等着。
+Semaphore 的含义就是限流，比如说你在买票，Semaphore 写 5 就是只能有5个人可以同时买票。acquire 的意思叫获得这把锁，线程如果想继续往下执行，必须得从 Semaphore 里面获得一 个许可， 他一共有 5 个许可，用到 0 了剩下的就得等着。
 
 > 我们去海底捞吃火锅，假设海底捞有10 张桌子，同一时间最多有10 桌客人进餐，第 11 以后来的客人必须在候餐区等着，有客人出来后，你就可以进去了
 
@@ -110,7 +112,7 @@ public class SemaphoreDemo {
         //模拟 5 张桌子, 这里用公平锁，前5波先进去吃
         Semaphore semaphore = new Semaphore(5,true);
 
-        //15 波吃饭的客人
+        //7 波吃饭的客人
         for (int i = 1; i <= 7 ; i++) {
             new Thread(()->{
                 try {
@@ -147,7 +149,7 @@ public class SemaphoreDemo {
 6	 吃完离开
 ```
 
-Semaphore 信号量主要用于两个目的，一个是用于多个共享资源的互斥使用，另一个用于并发线程数的控制。
+**Semaphore 信号量主要用于两个目的，一个是用于多个共享资源的互斥使用，另一个用于并发线程数的控制**。
 
 
 
@@ -193,3 +195,10 @@ Semaphore 信号量主要用于两个目的，一个是用于多个共享资源�
 
 > 他们底层逻辑是基于 AbstractQueuedSynchronizer 实现的。
 
+
+
+## 小总结
+
+1. CountDownLatch 可以实现计数等待，主要用于某个线程等待其他几个线程
+2. CyclicBarrier 实现循环栅栏，主要用于多个线程同时等待其他线程
+3. Semaphore 信号量，主要强调只有某些个数量的线程能拿到资源执行
