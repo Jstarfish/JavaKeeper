@@ -12,6 +12,7 @@
   - [观察者模式](design-pattern/Observer-Pattern.md)
   - [适配器模式](design-pattern/Adapter-Pattern.md)
   - [责任链模式](design-pattern/Chain-of-Responsibility-Pattern.md)
+  - [模板模式](design-pattern/Template-Pattern.md)
 - **数据存储和缓存**
 - [![MySQL](https://icongr.am/devicon/mysql-original.svg?&size=25)MySQL](data-store/MySQL/readMySQL.md)
 - [![Redis](https://icongr.am/devicon/redis-original.svg?size=25)Redis](data-store/Redis/2.readRedis.md)
