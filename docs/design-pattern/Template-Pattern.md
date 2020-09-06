@@ -1,42 +1,277 @@
+> 模板方法模式
+>
 > 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
-## 模板模式——独一无二的对象
+## 前言
 
 模板，顾名思义，它是一个固定化、标准化的东西。
 
+**模板方法模式**是一种行为设计模式， 它在超类中定义了一个算法的框架， 允许子类在不修改结构的情况下重写算法的特定步骤。
+
+## 场景问题
+
+程序员不愿多扯，上来先干两行代码
+
+网上模板方法的场景示例特别多，个人感觉还是《Head First 设计模式》中的例子比较好。
+
+假设我们是一家饮品店的师傅，起码需要以下两个手艺
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gigzsl1cnpj32gj0sk4ck.jpg)
+
+真简单哈，这么看，步骤大同小异，我的第一反应就是写个业务接口，不同的饮品实现其中的方法就行，像这样
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih087fykdj31pk0u0nbj.jpg)
 
 
-## 概述
+
+画完类图，猛地发现，第一步和第三步没什么差别，而且做饮品是个流程式的工作，我希望使用时，直接调用一个方法，就去执行对应的制作步骤。
+
+灵机一动，不用接口了，用一个**抽象父类**，把步骤方法放在一个大的流程方法 `makingDrinks()` 方法中，且第一步和第三步，完全一样，没必要在子类实现，改进如下
+
+![](/Users/starfish/Pictures/templateMethod_3.jpg)
+
+再看下我们的设计，感觉还不错，现在用同一个 `makingDrinks()` 方法来处理咖啡和茶的制作，而且我们不希望子类覆盖这个方法，所以可以申明为 final，不同的制作步骤，我们希望子类来提供，必须在父类申明为抽象方法，而第一步和第三步我们不希望子类重写，所以我们声明为非抽象方法
+
+```java
+public abstract class Drinks {
+
+    void boilWater() {
+        System.out.println("将水煮沸");
+    }
+
+    abstract void brew();
+
+    void pourInCup() {
+        System.out.println("倒入杯子");
+    }
+
+    abstract void addCondiments();
+    
+    public final void makingDrinks() {
+        //热水
+        boilWater();
+        //冲泡
+        brew();
+        //倒进杯子
+        pourInCup();
+        //加料
+        addCondiments();
+    }
+}
+```
+
+接着，我们分别处理咖啡和茶，这两个类只需要**继承**父类，重写其中的抽象方法即可（实现各自的冲泡和添加调料）
+
+```java
+public class Tea extends Drinks {
+    @Override
+    void brew() {
+        System.out.println("冲茶叶");
+    }
+    @Override
+    void addCondiments() {
+        System.out.println("加柠檬片");
+    }
+}
+```
+
+```java
+public class Coffee extends Drinks {
+    @Override
+    void brew() {
+        System.out.println("冲咖啡粉");
+    }
+
+    @Override
+    void addCondiments() {
+        System.out.println("加奶加糖");
+    }
+}
+```
+
+现在可以上岗了，试着制作下咖啡和茶吧
+
+```java
+public static void main(String[] args) {
+    Drinks coffee = new Coffee();
+    coffee.makingDrinks();
+    System.out.println();
+    Drinks tea = new Tea();
+    tea.makingDrinks();
+}
+```
+
+好嘞，又学会一个设计模式，这就是**模板方法模式**，我们的 `makingDrinks()` 就是模板方法。我们可以看到相同的步骤 `boilWater()` 和 `pourInCup()` 只在父类中进行即可，不同的步骤放在子类实现。
+
+## 认识模板方法
 
 在阎宏博士的《JAVA与模式》一书中开头是这样描述模板方法（Template Method）模式的：
 
 > 模板方法模式是类的行为模式。准备一个抽象类，将部分逻辑以具体方法以及具体构造函数的形式实现，然后声明一些抽象方法来迫使子类实现剩余的逻辑。不同的子类可以以不同的方式实现这些抽象方法，从而对剩余的逻辑有不同的实现。这就是模板方法模式的用意。
 
-模板方法模式是所有模式中最为常见的几个模式之一，是**基于继承**的代码复用的基本技术
+写代码的一个很重要的思考点就是“**变与不变**”，程序中哪些功能是可变的，哪些功能是不变的，我们可以把不变的部分抽象出来，进行公共的实现，把变化的部分分离出来，用接口来封装隔离，或用抽象类约束子类行为。模板方法就很好的体现了这一点。
+
+模板方法定义了一个算法的步骤，并允许子类为一个或多个步骤提供实现。
+
+模板方法模式是所有模式中最为常见的几个模式之一，是**基于继承**的代码复用的基本技术，我们再看下类图
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih2dmwutxj31ug0u0h0i.jpg)
+
+模板方法模式就是用来创建一个算法的模板，这个模板就是方法，该方法将算法定义成一组步骤，其中的任意步骤都可能是抽象的，由子类负责实现。这样可以**确保算法的结构保持不变，同时由子类提供部分实现**。
 
 
 
-![模板方法方案](https://sourcemaking.com/files/v2/content/patterns/Template_Method.png)
+再回顾下我们制作咖啡和茶的例子，有些顾客要不希望咖啡加糖或者不希望茶里加柠檬，我们要改造下模板方法，在加相应的调料之前，问下顾客
+
+```java
+public abstract class Drinks {
+
+    void boilWater() {
+        System.out.println("将水煮沸");
+    }
+
+    abstract void brew();
+
+    void pourInCup() {
+        System.out.println("倒入杯子");
+    }
+
+    abstract void addCondiments();
+
+    public final void makingDrinks() {
+        boilWater();
+        brew();
+        pourInCup();
+
+        //如果顾客需要，才加料
+        if (customerLike()) {
+            addCondiments();
+        }
+    }
+
+    //定义一个空的缺省方法，只返回 true
+    boolean customerLike() {
+        return true;
+    }
+}
+```
+
+如上，我们加了一个逻辑判断，逻辑判断的方法时一个只返回 true 的方法，这个方法我们叫做 **钩子方法**。
+
+> 钩子：在模板方法的父类中，我们可以定义一个方法，它默认不做任何事，子类可以视情况要不要覆盖它，该方法称为“钩子”。
+
+钩子方法一般是空的或者有默认实现。钩子的存在，可以让子类有能力对算法的不同点进行挂钩。而要不要挂钩，又由子类去决定。
+
+是不是很有用呢，我们再看下咖啡的制作
+
+```java
+public class Coffee extends Drinks {
+    @Override
+    void brew() {
+        System.out.println("冲咖啡粉");
+    }
+
+    @Override
+    void addCondiments() {
+        System.out.println("加奶加糖");
+    }
+		//覆盖了钩子，提供了自己的询问功能，让用户输入是否需要加料
+    boolean customerLike() {
+        String answer = getUserInput();
+        if (answer.toLowerCase().startsWith("y")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //处理用户的输入
+    private String getUserInput() {
+        String answer = null;
+        System.out.println("您想要加奶加糖吗？输入 YES 或 NO");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            answer = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (answer == null) {
+            return "no";
+        }
+        return answer;
+    }
+}
+```
+
+接着再去测试下代码，看看结果吧。
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih3og312yj315y07uta9.jpg)
 
 
 
-- FrameworkClass 包含 templateMethod() 方法，模板方法应该是 final 修饰的，不允许子类重写，
-- **AbstractClass** contains the templateMethod() which should be made final so that it cannot be overridden. This template method makes use of other operations available in order to run the algorithm but is decoupled for the actual implementation of these methods. All operations used by this template method are made abstract, so their implementation is deferred to subclasses.
-- **ConcreteClass** implements all the operations required by the templateMethod that were defined as abstract in the parent class. There can be many different ConcreteClasses.
+我想你应该知道钩子的好处了吧，它可以作为条件控制，影响抽象类中的算法流程，当然也可以什么都不做。
 
 
 
-![模板方法示例](https://sourcemaking.com/files/v2/content/patterns/Template_method_example.png)
+模板方法有很多种实现，有时看起来可能不是我们所谓的“中规中矩”的设计。接下来我们看下 JDK 和 Spring 中是怎么使用模板方法的。
 
-我们以千篇一律的程序员日常为例，起床，挤地铁，工作（写代码，测试，），加班（Java程序员留下加班），睡觉
+### JDK 中的模板方法
+
+我们写代码经常会用到 **comparable** 比较器来对数组对象进行排序，我们都会实现它的 `compareTo()` 方法，之后就可以通过 `Collections.sort()` 或者 `Arrays.sort()` 方法进行排序了。
+
+具体的实现类就不写了(可以去 github：starfish-learning 上看我的代码)，看下使用
+
+```java
+@Override
+public int compareTo(Object o) {
+    Coffee coffee = (Coffee) o;
+    if(this.price < (coffee.price)){
+        return -1;
+    }else if(this.price == coffee.price){
+        return 0;
+    }else{
+        return 1;
+    }
+}
+```
+
+```java
+public static void main(String[] args) {
+  Coffee[] coffees = {new Coffee("星冰乐",38),
+                      new Coffee("拿铁",32),
+                      new Coffee("摩卡",35)};
+ 
+  Arrays.sort(coffees);
+
+  for (Coffee coffee1 : coffees) {
+    System.out.println(coffee1);
+  }
+
+}
+```
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1giha6rya5nj319006adhb.jpg)
+
+你可能会说，这个看着不像我们常规的模板方法，是的。我们看下比较器实现的步骤
+
+1. 构建对象数组
+2. 通过 Arrays.sort 方法对数组排序，传参为 `Comparable` 接口的实例
+3. 比较时候会调用我们的实现类的 `compareTo()` 方法
+4. 将排好序的数组设置进原数组中，排序完成
+
+一脸懵逼，这个实现竟然也是模板方法。
+
+这个模式的重点在于提供了一个固定算法框架，并让子类实现某些步骤，虽然使用继承是标准的实现方式，但通过回调来实现，也不能说这就不是模板方法。
+
+### Spring 中的模板方法
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gihaulhakyj30yc0qokcz.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gihav1jqqjj30vc0eotgf.jpg)
 
 
 
-
-
-
-
-
+## 小总结
 
 **优点：** 1、封装不变部分，扩展可变部分。 2、提取公共代码，便于维护。 3、行为由父类控制，子类实现。
 
@@ -48,8 +283,8 @@
 
 
 
+参考：
 
+《Head First 设计模式》、《研磨设计模式》
 
-
-
-参考：https://sourcemaking.com/design_patterns/template_method
+https://sourcemaking.com/design_patterns/template_method
