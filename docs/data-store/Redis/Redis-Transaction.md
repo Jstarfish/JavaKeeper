@@ -1,3 +1,5 @@
+> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200824161651.jpg)
 
 > 假设现在有这样一个业务，用户获取的某些数据来自第三方接口信息，为避免频繁请求第三方接口，我们往往会加一层缓存，缓存肯定要有时效性，假设我们要存储的结构是 hash（没有String的'**SET anotherkey "will expire in a minute" EX 60**'这种原子操作），我们既要批量去放入缓存，又要保证每个 key 都加上过期时间（以防 key 永不过期），这时候事务操作是个比较好的选择
@@ -280,3 +282,9 @@ void touchWatchedKey(redisDb *db, robj *key) {
 **最后**
 
 Redis 事务在发送每个指令到事务缓存队列时都要经过一次网络读写，当一个事务内部的指令较多时，需要的网络 IO 时间也会线性增长。所以通常 Redis 的客户端在执行事务时都会结合 pipeline 一起使用，这样可以将多次 IO 操作压缩为单次 IO 操作。
+
+
+
+### 参考资料
+
+[1] Redis设计与实现: *https://redisbook.readthedocs.io/en/latest/feature/transaction.html#id3*

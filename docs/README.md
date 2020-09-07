@@ -19,7 +19,7 @@
 >
 > 不忘初心是对的，但要切记要出发
 
-
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200907141047.png)
 
 ### ToDoList
 
@@ -28,4 +28,5 @@
 
 > 作为一个深耕在互联网公司的 Java 码农，在准备换坑的时候，才发现这么些年都没有一个对所学知识的整理，所以就整理下之前的笔记和一些正在学习的内容。
 
-![](https://imgkr.cn-bj.ufileos.com/6e7c80a9-48e6-4a2a-b920-682d8f0bab5c.png)
+> 文章持续更新，可以微信搜「 **JavaKeeper** 」第一时间阅读，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 已经收录，Javaer 开发、面试必备技能兵器谱，有你想要的。
+

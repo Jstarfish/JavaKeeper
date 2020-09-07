@@ -1,4 +1,4 @@
-> 模板方法模式
+> 模板方法模式——看看 JDK 和 Spring 是如何优雅复用代码的
 >
 > 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
@@ -263,9 +263,69 @@ public static void main(String[] args) {
 
 这个模式的重点在于提供了一个固定算法框架，并让子类实现某些步骤，虽然使用继承是标准的实现方式，但通过回调来实现，也不能说这就不是模板方法。
 
+其实并发编程中最常见，也是面试必问的 AQS 就是一个典型的模板方法。
+
+
+
 ### Spring 中的模板方法
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gihaulhakyj30yc0qokcz.jpg)
+Spring 中的设计模式太多了，而且大部分扩展功能都可以看到模板方式模式的影子。
+
+我们看下 IOC 容器初始化时中的模板方法，不管是 XML 还是注解的方式，对于核心容器启动流程都是一致的。
+
+`AbstractApplicationContext` 的 `refresh` 方法实现了 IOC 容器启动的主要逻辑。
+
+一个 `refresh()` 方法包含了好多其他步骤方法，像不像我们说的 **模板方法**，`getBeanFactory()` 、`refreshBeanFactory()` 是子类必须实现的抽象方法，`postProcessBeanFactory()` 是钩子方法。
+
+```java
+public abstract class AbstractApplicationContext extends DefaultResourceLoader
+      implements ConfigurableApplicationContext {
+	@Override
+	public void refresh() throws BeansException, IllegalStateException {
+		synchronized (this.startupShutdownMonitor) {
+			prepareRefresh();
+			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+			prepareBeanFactory(beanFactory);
+            postProcessBeanFactory(beanFactory);
+            invokeBeanFactoryPostProcessors(beanFactory);
+            registerBeanPostProcessors(beanFactory);
+            initMessageSource();
+            initApplicationEventMulticaster();
+            onRefresh();
+            registerListeners();
+            finishBeanFactoryInitialization(beanFactory);
+            finishRefresh();
+		}
+	}
+    // 两个抽象方法
+    @Override
+	public abstract ConfigurableListableBeanFactory getBeanFactory() throws 		IllegalStateException;	
+    
+    protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
+    
+    //钩子方法
+    protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+	}
+ }
+```
+
+打开你的 IDEA，我们会发现常用的 `ClassPathXmlApplicationContext` 和 `AnnotationConfigApplicationContext` 启动入口，都是它的实现类（子类的子类的子类的...）。
+
+`AbstractApplicationContext`的一个子类 `AbstractRefreshableWebApplicationContext` 中有钩子方法 `onRefresh() `的实现：
+
+```java
+public abstract class AbstractRefreshableWebApplicationContext extends …… {
+    /**
+	 * Initialize the theme capability.
+	 */
+	@Override
+	protected void onRefresh() {
+		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
+	}
+}
+```
+
+看下大概的类图：
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gihav1jqqjj30vc0eotgf.jpg)
 
@@ -283,8 +343,10 @@ public static void main(String[] args) {
 
 
 
-参考：
+## 参考：
 
 《Head First 设计模式》、《研磨设计模式》
 
 https://sourcemaking.com/design_patterns/template_method
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200907141047.png)
