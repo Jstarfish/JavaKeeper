@@ -4,7 +4,6 @@
   - [JMM](java/JUC/Java-Memory-Model.md)
   - [阻塞队列](java/JUC/BlockingQueue.md)
   - [volatile](java/JUC/volatile.md)
-  - [阻塞队列](java/JUC/BlockingQueue.md)
   - [ThreadLocal](java/JUC/ThreadLocal.md)
   - [线程池](java/JUC/Thread-Pool.md)
   - [CAS](java/JUC/CAS.md)
@@ -12,6 +11,7 @@
   - [各种锁](java/JUC/各种锁.md)
   - [CountDownLatch、CyclicBarrier、Semaphore](java/JUC/CountDownLatch、CyclicBarrier、Semaphore.md)
   - [AQS](java/JUC/AQS.md)
+  - [并发容器大集合](java/JUC/Concurrent-Container.md)
 - [![](https://icongr.am/devicon/java-original.svg?size=25&color=f23131)Java 8](java/Java8.md)
 - [![img](https://icongr.am/entypo/address.svg?size=25&color=074ca6)设计模式](design-pattern/readDisignPattern.md)
 - **数据存储和缓存**
