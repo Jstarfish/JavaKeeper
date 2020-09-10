@@ -561,7 +561,7 @@ void createEntry(int hash, K key, V value, int bucketIndex) {
 }
 ```
 
-最后的 `createEntry()` 方法就说明了当 hash 冲突时，采用的拉链法来解决 hash 冲突的，并且是把新元素是插入到单边表的表头。
+最后的 `createEntry()` 方法就说明了当 hash 冲突时，采用的拉链法来解决 hash 冲突的，并且是把新元素插入到单链表的表头。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx45xr0x5j31hl0u0ncd.jpg)
 
@@ -1177,7 +1177,7 @@ Hashtable 容器在竞争激烈的并发环境下表现出效率低下的原因�
 
 在 JDK1.7 版本中，ConcurrentHashMap 的数据结构是由一个 Segment 数组和多个 HashEntry 组成。Segment 数组的意义就是将一个大的 table 分割成多个小的 table 来进行加锁。每一个 Segment 元素存储的是 HashEntry数组+链表，这个和 HashMap 的数据存储结构一样。
 
-![](https://yfzhou.oss-cn-beijing.aliyuncs.com/blog/img/JDK1.7%20ConcurrentHashMap.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200910104046.jpg)
 
 ConcurrentHashMap 类中包含两个静态内部类 HashEntry 和 Segment。
 HashEntry 用来封装映射表的键值对，Segment 用来充当锁的角色，每个 Segment 对象守护整个散列映射表的若干个桶。每个桶是由若干个 HashEntry 对象链接起来的链表。一个 ConcurrentHashMap 实例中包含由若干个 Segment 对象组成的数组。每个 Segment 守护着一个 HashEntry 数组里的元素，当对 HashEntry 数组的数据进行修改时，必须首先获得它对应的 Segment 锁。
@@ -1317,7 +1317,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
 
 #### put() 方法
 
-1. **定位segment并确保定位的Segment已初始化 **
+1. **定位segment并确保定位的Segment已初始化**
 2. **调用 Segment的 put 方法。**
 
 ```java
@@ -1363,9 +1363,9 @@ public V get(Object key) {
 
 ### JDK1.8  实现
 
-![img](https://yfzhou.oss-cn-beijing.aliyuncs.com/blog/img/JDK1.8%20ConcurrentHashMap.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200910104629.jpg)
 
-ConcurrentHashMap 在 JDK8 中进行了巨大改动，光是代码量就从1000多行增加到6000行！1.8摒弃了`Segment`(锁段)的概念，采用了 `CAS + synchronized` 来保证并发的安全性。
+ConcurrentHashMap 在 JDK8 中进行了巨大改动，光是代码量就从1000多行增加到6000行！1.8 摒弃了`Segment`(锁段)的概念，采用了 `CAS + synchronized` 来保证并发的安全性。
 
 可以看到，和 HashMap 1.8 的数据结构很像。底层数据结构改变为采用**数组+链表+红黑树**的数据形式。
 
@@ -1572,9 +1572,9 @@ public V get(Object key) {
 
 ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方式上不同。
 
-- **底层数据结构：** JDK1.7的 ConcurrentHashMap 底层采用 **分段的数组+链表** 实现，JDK1.8 采用的数据结构和 HashMap1.8 的结构类似，**数组+链表/红黑二叉树**。Hashtable 和 JDK1.8 之前的 HashMap 的底层数据结构类似都是采用 **数组+链表** 的形式，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的；
-- **实现线程安全的方式（重要）：** 
-  - **在JDK1.7的时候，ConcurrentHashMap（分段锁）** 对整个桶数组进行了分割分段(Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。（默认分配16个Segment，比Hashtable效率提高16倍。） **到了 JDK1.8 的时候已经摒弃了Segment的概念，而是直接用 Node 数组+链表/红黑树的数据结构来实现，并发控制使用 synchronized 和 CAS 来操作。（JDK1.6以后 对 synchronized锁做了很多优化）** 整个看起来就像是优化过且线程安全的 HashMap，虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本；
+- **底层数据结构：** JDK1.7 的 ConcurrentHashMap 底层采用 **分段的数组+链表** 实现，JDK1.8 采用的数据结构和 HashMap1.8 的结构类似，**数组+链表/红黑二叉树**。Hashtable 和 JDK1.8 之前的 HashMap 的底层数据结构类似都是采用 **数组+链表** 的形式，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的；
+- **实现线程安全的方式（重要）** ：
+  - **在 JDK1.7 的时候，ConcurrentHashMap（分段锁）** 对整个桶数组进行了分割分段(Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。（默认分配16个Segment，比Hashtable效率提高16倍。） **到了 JDK1.8 的时候已经摒弃了Segment的概念，而是直接用 Node 数组+链表/红黑树的数据结构来实现，并发控制使用 synchronized 和 CAS 来操作。（JDK1.6以后 对 synchronized锁做了很多优化）** 整个看起来就像是优化过且线程安全的 HashMap，虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本；
   - Hashtable(同一把锁) ：使用 synchronized 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争越激烈效率越低。
 
 
@@ -1601,7 +1601,7 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 场景：`java.util.concurrent` 包下的容器都是安全失败，可以在多线程下并发使用，并发修改。
 
-快速失败和安全失败是对迭代器而言的。 
+**快速失败和安全失败是对迭代器而言的**。 
 
 快速失败：当在迭代一个集合的时候，如果有另外一个线程在修改这个集合，就会抛出`ConcurrentModification`异常，`java.util` 下都是快速失败。 
 
@@ -1689,7 +1689,7 @@ Java中对集合对象或者数组对象排序，有两种实现方式：
     }
     ```
 
-**comparable相当于内部比较器。comparator相当于外部比较器**
+**comparable 相当于内部比较器。comparator 相当于外部比较器**
 
 区别：
 
