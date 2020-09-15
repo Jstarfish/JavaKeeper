@@ -14,7 +14,7 @@
 
 单链表中的每个结点不仅包含值，还包含链接到下一个结点的`引用字段`。通过这种方式，单链表将所有结点按顺序组织起来。
 
-![](https://imgkr.cn-bj.ufileos.com/61316588-a5ec-4b64-923f-3e2e1e58e917.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915173602.png)
 
 链表的第一个结点和最后一个结点，分别称为链表的**首结点**和**尾结点**。尾结点的特征是其 next 引用为空（null）。链表中每个结点的 next 引用都相当于一个指针，指向另一个结点，借助这些 next 引用，我们可以从链表的首结点移动到尾结点。如此定义的结点就称为**单链表**（single linked list）。
 
@@ -24,7 +24,7 @@
 
 在单链表结构中还需要注意的一点是，由于每个结点的数据域都是一个 Object 类的对象，因此，每个数据元素并非真正如图中那样，而是在结点中的数据域通过一个 Object 类的对象引用来指向数据元素的。
 
-与数组类似，单链表中的结点也具有一个线性次序，即如果结点 P 的 next 引用指向结点 S，则 P 就是 S 的**直接前驱**，S 是 P 的**直接后续**。**单链表的一个重要特性就是只能通过前驱结点找到后续结点，而无法从后续结点找到前驱结点**。
+与数组类似，单链表中的结点也具有一个线性次序，即如果结点 P 的 next 引用指向结点 S，则 P 就是 S 的**直接前驱**，S 是 P 的**直接后续**。<mark>单链表的一个重要特性就是只能通过前驱结点找到后续结点，而无法从后续结点找到前驱结点</mark>。
 
 接着我们来看下单链表的 CRUD：
 
@@ -41,7 +41,7 @@ public class SinglyListNode {
 
 ### 查找
 
-与数组不同，我们无法在常量时间内访问单链表中的随机元素。 如果我们想要获得第 i 个元素，我们必须从头结点逐个遍历。 我们按索引来访问元素平均要花费 $O(N)$ 时间，其中 N 是链表的长度
+与数组不同，我们无法在常量时间内访问单链表中的随机元素。 如果我们想要获得第 i 个元素，我们必须从头结点逐个遍历。 我们按索引来访问元素平均要花费 $O(N)$ 时间，其中 N 是链表的长度。
 
 例如需要在单链表中查找是否包含某个数据元素 e，则方法是使用一个循环变量 p，起始时从单链表的头结点开始，每次循环判断 p 所指结点的数据域是否和 e 相同，如果相同则可以返回 true，否则继续循环直到链表中所有结点均被访问，此时 p 为 null。
 
@@ -60,7 +60,7 @@ return false;
 
 单链表中数据元素的插入，是通过在链表中插入数据元素所属的结点来完成的。对于链表的不同位置，插入的过程会有细微的差别。
 
-![](https://imgkr.cn-bj.ufileos.com/74593cce-a007-4ff5-a109-969b36746bba.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174050.png)
 
 除了单链表的首结点由于没有直接前驱结点，所以可以直接在首结点之前插入一个新的结点之外，在单链表中的其他任何位置插入一个新结点时，都只能是在已知某个特定结点引用的基础上在其后面插入一个新结点。并且在已知单链表中某个结点引用的基础上，完成结点的插入操作需要的时间是 $O(1)$。
 
@@ -72,7 +72,7 @@ return false;
 
 类似的，在单链表中数据元素的删除也是通过结点的删除来完成的。在链表的不同位置删除结点，其操作过程也会有一些差别。
 
-![](https://imgkr.cn-bj.ufileos.com/1dd6cb37-f5b4-41bb-8bb4-a75b7001cb7c.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174447.png)
 
 在单链表中删除一个结点时，除首结点外都必须知道该结点的直接前驱结点的引用。并且在已知单链表中某个结点引用的基础上，完成其后续结点的删除操作需要的时间是 $O(1)$。
 
@@ -80,7 +80,7 @@ return false;
 >
 > 对于任何基于序号的插入、删除，以及任何基于数据元素所在结点的前面或后面的插入、删除，在带头结点的单链表中均可转化为在某个特定结点之后完成结点的插入、删除，而不用考虑插入、删除是在链表的首部、中间、还是尾部等不同情况。
 
-![](https://imgkr.cn-bj.ufileos.com/6b98f797-343c-4e8c-9946-bee964a62bdd.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174846.png)
 
 ## 双向链表
 
@@ -88,15 +88,11 @@ return false;
 
 所以我们在单链表结点结构中新增加一个域，该域用于指向结点的直接前驱结点。
 
-![](https://imgkr.cn-bj.ufileos.com/0c96011d-f74e-43ef-91f1-af45ba928a3d.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915175036.png)
 
-双向链表是通过上述定义的结点使用 pre 以及 next 域依次串联在一起而形成的。一个双向链表的结构如图 3-11 所示。
+双向链表是通过上述定义的结点使用 pre 以及 next 域依次串联在一起而形成的。一个双向链表的结构如下图所示。
 
-![](https://imgkr.cn-bj.ufileos.com/0d31dfc9-65ce-4bef-9841-5cbfe52aeb2d.png)
-
-
-
-
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915175120.png)
 
 接着我们来看下双向链表的 CRUD：
 
@@ -117,9 +113,9 @@ class DoublyListNode {
 
 ### 添加
 
-单链表的插入操作，除了首结点之外必须在某个已知结点后面进行，而在双向链表中插入操作在一个已知的结点之前或之后都可以进行，如下表示在结点 p（11） 之前 插入 s（9）。
+单链表的插入操作，除了首结点之外必须在某个已知结点后面进行，而在双向链表中插入操作在一个已知的结点之前或之后都可以进行，如下表示在结点 p(11) 之前 插入 s(9)。
 
-![](https://imgkr.cn-bj.ufileos.com/7b571f39-c710-4a01-a59d-89d8b0966edb.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915175312.png)
 
 使用 Java 语言实现整个过程的关键语句是
 
@@ -136,9 +132,9 @@ p.setPre(s);
 
 ### 删除
 
-单链表的删除操作，除了首结点之外必须在知道待删结点的前驱结点的基础上才能进行，而在双向链表中在已知某个结点引用的前提下，可以完成该结点自身的删除。如下表示删除 p（16） 的过程。
+单链表的删除操作，除了首结点之外必须在知道待删结点的前驱结点的基础上才能进行，而在双向链表中在已知某个结点引用的前提下，可以完成该结点自身的删除。如下表示删除 p(16) 的过程。
 
-![](https://imgkr.cn-bj.ufileos.com/955dc959-9f61-483c-bd62-5059f232f07a.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915175511.png)
 
 使用 Java 语言实现整个过程的关键语句是
 
@@ -149,11 +145,58 @@ p.getNext().setPre(p.getPre());
 
  
 
-对线性表的操作，无非就是排序、加法、减法、反转、
+对线性表的操作，无非就是排序、加法、减法、反转，说的好像很简单，我们开始刷题。
 
 
 
 ## 刷题
+
+### 反转链表(206)
+
+>反转一个单链表。
+>
+>**示例:**
+>
+>```
+>输入: 1->2->3->4->5->NULL
+>输出: 5->4->3->2->1->NULL
+>```
+
+**进阶:** 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
+
+**题目解析**
+
+设置三个节点`pre`、`cur`、`next`
+
+1. 每次查看`cur`节点是否为`NULL`，如果是，则结束循环，获得结果
+2. 如果`cur`节点不是为`NULL`，则先设置临时变量`next`为`cur`的下一个节点
+3. 让`cur`的下一个节点变成指向`pre`，而后`pre`移动`cur`，`cur`移动到`next`
+4. 重复（1）（2）（3）
+
+**动画描述**
+
+![](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0206-Reverse-Linked-List/Animation/Animation.gif)
+
+```java
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        ListNode prev = null;
+        ListNode next = null;
+        while (head.next != null) {
+            next = head.next;   //保存下一个节点
+            head.next = prev;   //重置next
+            prev = head;    //保存当前节点
+            head = next;
+        }
+        head.next = prev;
+        return head;
+    }
+```
+
+
 
 ### 环形链表(141)
 
@@ -208,50 +251,7 @@ public class linkedlistcycle_141 {
 
 
 
-### 反转链表(206)
 
->反转一个单链表。
->
->**示例:**
->
->```
->输入: 1->2->3->4->5->NULL
->输出: 5->4->3->2->1->NULL
->```
-
-**进阶:** 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
-
-**题目解析**
-
-设置三个节点`pre`、`cur`、`next`
-
-1. 每次查看`cur`节点是否为`NULL`，如果是，则结束循环，获得结果
-2. 如果`cur`节点不是为`NULL`，则先设置临时变量`next`为`cur`的下一个节点
-3. 让`cur`的下一个节点变成指向`pre`，而后`pre`移动`cur`，`cur`移动到`next`
-4. 重复（1）（2）（3）
-
-**动画描述**
-
-![](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0206-Reverse-Linked-List/Animation/Animation.gif)
-
-```java
-    public ListNode reverseList(ListNode head) {
-        if (head == null || head.next == null) {
-            return head;
-        }
-
-        ListNode prev = null;
-        ListNode next = null;
-        while (head.next != null) {
-            next = head.next;   //保存下一个节点
-            head.next = prev;   //重置next
-            prev = head;    //保存当前节点
-            head = next;
-        }
-        head.next = prev;
-        return head;
-    }
-```
 
 ### 相交链表(160)
 

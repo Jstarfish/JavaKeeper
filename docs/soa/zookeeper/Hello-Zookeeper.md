@@ -122,7 +122,7 @@ Zookeeper 数据模型的结构与 Unix 文件系统的结构相似，整体上�
 2. 交由 ZooKeeper 实现的方式
    - 可将节点信息写入 ZooKeeper 上的一个 Znode
    - 监听这个 Znode 可获取它的实时状态变化
-   - 典型应用：HBase 中 Master 状态监控和选举。（TODO:图应该是注册和Register and watch）
+   - 典型应用：HBase 中 Master 状态监控和选举。
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200817163829.jpg)
 
@@ -507,7 +507,7 @@ Zookeeper 中的监视是轻量级的，因此容易设置、维护和分发。�
 
 
 
-> 也不知道有木有人对下一篇的实战环节感兴趣~~~~~
+> 文章持续更新，可以微信搜「 **JavaKeeper** 」第一时间阅读，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 已经收录，Javaer 开发、面试必备技能兵器谱，有你想要的。
 
 
 

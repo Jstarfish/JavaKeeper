@@ -18,7 +18,8 @@
 - [![](https://icongr.am/jam/leaf.svg?size=25&color=00FF00)Spring面试](interview/Spring-FAQ.md)
 - [![](https://icongr.am/simple/bower.svg?size=25)MyBatis面试](interview/MyBatis-FAQ.md)
 - [![img](https://icongr.am/entypo/network.svg?size=25&color=6495ED)计算机网络](interview/Network-FAQ.md)
-- [![img](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka 面试](interview/Kafka-FAQ.md)
+- [![](https://icongr.am/simple/apachekafka.svg?size=25&color=121417&colored=false)Kafka 面试](interview/Kafka-FAQ.md)
+- [![](https://icongr.am/entypo/user.svg?size=25&color=864646)ZooKeeper 面试](interview/ZooKeeper-FAQ.md)
 - **开发架构**
 - [![](https://icongr.am/simple/leaflet.svg?size=25&color=11b041&colored=false)Spring](framework/Spring/readSpring.md)
 - **RPC**
