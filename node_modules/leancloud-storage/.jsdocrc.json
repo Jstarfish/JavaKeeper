@@ -1,0 +1,6 @@
+{
+  "opts": {
+    "template": "node_modules/docdash",
+    "recurse": true
+  }
+}

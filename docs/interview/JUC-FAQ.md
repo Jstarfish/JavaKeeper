@@ -41,7 +41,7 @@ JUC 面试题总共围绕的就这么几部分
 
 Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种不同状态的其中一个状态（图源《Java 并发编程艺术》4.1.4 节）。
 
-![img](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png)
+![](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png)
 
 线程在生命周期中并不是固定处于某一个状态而是随着代码的执行在不同状态之间切换。Java 线程状态变迁如下图所示（图源《Java 并发编程艺术》4.1.4 节）：
 
@@ -67,6 +67,31 @@ Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种
 new 一个 Thread，线程进入了新建状态；调用 start() 方法，会启动一个线程并使线程进入了就绪状态，当分配到时间片后就可以开始运行了。 start() 会执行线程的相应准备工作，然后自动执行 run() 方法的内容，这是真正的多线程工作。 而直接执行 run() 方法，会把 run 方法当成一个 main 线程下的普通方法去执行，并不会在某个线程中执行它，所以这并不是多线程工作。
 
 **总结： 调用 start 方法方可启动线程并使线程进入就绪状态，而 run 方法只是 thread 的一个普通方法调用，还是在主线程里执行。**
+
+
+
+### Java 线程启动的几种方式
+
+```java
+  public static void main(String[] args) {
+        new MyThread().start();     //第一种  直接通过Thread  MyThread 是继承了Thread对象的类  实现在下面
+　　　　　
+        new Thread(new MyRun()).start();      //第二种 Runnable
+        new Thread(()->{                //第三种  lambda
+            System.out.println("Hello Lambda!");
+        }).start();
+
+        Thread t = new Thread(new FutureTask<String>(new MyCall()));    //第四种
+        t.start();
+
+        ExecutorService service = Executors.newCachedThreadPool();   //第五种  使用Executor
+        service.execute(()->{
+            System.out.println("Hello ThreadPool");
+        });
+        service.shutdown();
+    }
+}
+```
 
 
 

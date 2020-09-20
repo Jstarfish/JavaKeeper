@@ -29,7 +29,7 @@ Spring的核心是**控制反转**（IOC）和**面向切面**（AOP）
 
 ## 3. Spring 模块
 
-![](../_images/Spring/spring-overview.png)
+![](../../_images/Spring/spring-overview.png)
 
 Spring 框架是一个分层架构，由 7 个定义良好的模块组成：
 
@@ -85,7 +85,7 @@ Web层由`spring-web`、`spring-webmvc`、`spring-websocket`和`spring-webmvc-po
 
 《Spring 揭秘》中的Spring框架总体结构
 
-![](../_images/Spring/spring-tree.png)
+![](../../_images/Spring/spring-tree.png)
 
 
 

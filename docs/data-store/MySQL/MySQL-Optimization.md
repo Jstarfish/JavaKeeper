@@ -135,7 +135,7 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
   - Explain + SQL语句
   - 执行计划包含的信息
 
-![expalin](../_images/mysql/expalin.jpg)
+![expalin](../../_images/mysql/expalin.jpg)
 
 - 各字段解释
 
@@ -176,7 +176,7 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
     - **查询中若使用了覆盖索引，则该索引和查询的select字段重叠，仅出现在key列表中**
 
-  ![explain-key](../_images/mysql/explain-key.png)
+  ![explain-key](../../_images/mysql/explain-key.png)
 
   - <mark> **key_len**</mark>
     - 表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。在不损失精确性的情况下，长度越短越好
@@ -186,11 +186,11 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
   - <mark> **rows**</mark> （根据表统计信息及索引选用情况，大致估算找到所需的记录所需要读取的行数）
   - <mark> **Extra**</mark>（包含不适合在其他列中显示但十分重要的额外信息）
 
-    1. <font color=red>using filesort</font>: 说明mysql会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。mysql中无法利用索引完成的排序操作称为“文件排序”![img](../_images/mysql/explain-extra-1.png)
+    1. <font color=red>using filesort</font>: 说明mysql会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。mysql中无法利用索引完成的排序操作称为“文件排序”![img](../../_images/mysql/explain-extra-1.png)
 
-    2. <font color=red>Using temporary</font>：使用了临时表保存中间结果，mysql在对查询结果排序时使用临时表。常见于排序order by和分组查询group by。![explain-extra-2](../_images/mysql/explain-extra-2.png)
+    2. <font color=red>Using temporary</font>：使用了临时表保存中间结果，mysql在对查询结果排序时使用临时表。常见于排序order by和分组查询group by。![explain-extra-2](../../_images/mysql/explain-extra-2.png)
 
-    3. <font color=red>using index</font>：表示相应的select操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现using where，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作![explain-extra-3](../_images/mysql/explain-extra-3.png)
+    3. <font color=red>using index</font>：表示相应的select操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现using where，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作![explain-extra-3](../../_images/mysql/explain-extra-3.png)
 
     4. using where：使用了where过滤
 
@@ -206,7 +206,7 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 - case:
 
-![explain-demo](../_images/mysql/explain-demo.png)
+![explain-demo](../../_images/mysql/explain-demo.png)
 
  
 
@@ -390,7 +390,7 @@ long_query_time = 3
 - - - mysql支持两种方式的排序，FileSort和Index,Index效率高，它指MySQL扫描索引本身完成排序，FileSort效率较低；
     - ORDER BY 满足两种情况，会使用Index方式排序；①ORDER BY语句使用索引最左前列 ②使用where子句与ORDER BY子句条件列组合满足索引最左前列
 
-![optimization-orderby](../_images/mysql/optimization-orderby.png)
+![optimization-orderby](../../_images/mysql/optimization-orderby.png)
 
 - - 尽可能在索引列上完成排序操作，遵照索引建的最佳最前缀
   - 如果不在索引列上，filesort有两种算法，mysql就要启动双路排序和单路排序
@@ -405,7 +405,7 @@ long_query_time = 3
 
     - 增大max_lencth_for_sort_data参数的设置
 
-      ![optimization-orderby2](../_images/mysql/optimization-orderby2.png)
+      ![optimization-orderby2](../../_images/mysql/optimization-orderby2.png)
 
 - GROUP BY关键字优化
   - group by实质是先排序后进行分组，遵照索引建的最佳左前缀

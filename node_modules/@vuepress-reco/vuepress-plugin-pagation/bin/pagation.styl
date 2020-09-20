@@ -1,0 +1,50 @@
+.pagation
+  font-weight: 700;
+  text-align: center;
+  color: #888;
+  color: var(--text-color)
+  margin: 20px auto 0;
+  background: #f2f2f2;
+  background: var(--background-color);
+  .pagation-list
+    font-size: 0;
+    line-height: 50px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    span
+      font-size: 14px;
+      &.jump, &.jumpinp input
+        box-shadow: var(--box-shadow)
+        border 1px solid var(--border-color)!important
+        border: 1px solid #ccc;
+      &.jump
+        padding: 5px 8px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+      &.jumpinp
+        input
+          width: 55px;
+          height: 26px;
+          background-color: var(--background-color)
+          font-size: 13px;
+          -webkit-border-radius: 4px;
+          -moz-border-radius: 4px;
+          border-radius: 4px;
+          text-align: center;
+          outline none
+      &.bgprimary
+        cursor: default;
+        color: #fff;
+        background: $accentColor;
+        border-color: $accentColor;
+      &.ellipsis
+        padding: 0px 8px;
+      &.jumppoint
+        margin: 0 10px 0 30px;

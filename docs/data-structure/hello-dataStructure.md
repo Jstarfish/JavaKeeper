@@ -32,19 +32,19 @@
 
 - 集合结构：集合结构中的数据元素除了同属于一个集合外，他们之间没有其他关系
 
-   ![](../_images/data-structure/集合结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1hh13a3j30dy0dw755.jpg) 
 
 - 线性结构：数据之间是一对一关系
 
-   ![](../_images/data-structure/线形结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1hldwtcj30fy080mxc.jpg) 
 
 - 树形结构：数据之间存在一对多的层次关系
 
-   ![](../_images/data-structure/树形结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1hp4ex1j30ik0c20td.jpg) 
 
 - 图形结构：数据之间多对多的关系
 
-   ![](../_images/data-structure/图形结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1hsezzfj30eu0e6gmi.jpg) 
 
 ### 物理结构
 
@@ -56,11 +56,11 @@
 
 - 顺序存储：把数据元素存放在地址连续的存储单元里，其数据间的逻辑关系和物理关系一致
 
-   ![](../_images/data-structure/顺序结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1hw6vx7j30j904qjrj.jpg) 
 
 - 链式存储：把数据元素存放在任意的存储单元里，这组存储单元可以是连续的，也可以是不连续的。
 
-   ![](../_images/data-structure/链式结构.png) 
+   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gix1i0igvfj30m00i9wfm.jpg) 
 
 
 
