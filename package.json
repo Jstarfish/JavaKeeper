@@ -7,7 +7,7 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
-  "author": "",
+  "author": "海星",
   "license": "ISC",
   "devDependencies": {
     "@vuepress-reco/vuepress-plugin-bulletin-popover": "^1.5.7",
