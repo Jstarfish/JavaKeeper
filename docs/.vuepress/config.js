@@ -35,13 +35,13 @@ module.exports = {
     nav: [
       { text: 'Java', link: '/java/' },
       { text: '数据结构与算法', link: '/data-structure-algorithms/' },
-      { text: '数据存储与缓存', link: '/data-store' },
+      { text: '数据存储与缓存', link: '/data-store/' },
       { text: '直击面试', link: '/interview/' },
     ],
     sidebar: {
         "/java/": genJavaSidebar(),
         "/data-structure-algorithms/": genDSASidebar(),
-        "/data-store/": genDataStoreSidebar(),
+        //"/data-store/": genDataStoreSidebar(),
         "/interview/": genInterviewSidebar(),
     },
     blogConfig: {
