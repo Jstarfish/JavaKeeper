@@ -1,7 +1,7 @@
 module.exports = {
-  //theme: require.resolve('./theme/vuepress-theme-reco'),
-  theme: 'reco',
-  base: "/",
+  theme: require.resolve('./theme/vuepress-theme-reco'),
+  //theme: 'reco',
+  base: "/JavaKeeper/",
   title: 'JavaKeeper',
   author: '海星',
   //description: 'Keep On Growing：Java Keeper',
@@ -31,7 +31,7 @@ module.exports = {
   },
   plugins: [
   ['@vuepress-reco/vuepress-plugin-bulletin-popover', {
-    width: '200px', // 默认 260px
+    width: '260px', // 默认 260px
     title: '消息提示',
     body: [
       {
@@ -60,13 +60,13 @@ function genJavaSidebar() {
   return [
     {
       title: "JVM",
-      //collapsable: true,
+      collapsable: false,
       sidebarDepth: 1,    // 可选的, 默认值是 1
       children: ["JVM/Runtime-Data-Areas", "JVM/OOM"]
     },
     {
       title: "JUC",
-      //collapsable: false,
+      collapsable: false,
       children: [
         "JUC/Java-Memory-Model",
         "JUC/CountDownLatch、CyclicBarrier、Semaphore"
