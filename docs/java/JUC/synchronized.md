@@ -1,41 +1,16 @@
+# Synchronized 关键字
+
 https://www.cnblogs.com/aspirant/p/11470858.html
 
 ## 一、前言
 
-```java
 
-public class SynchronizedDemo implements Runnable{
-
-    private static int count = 0;
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            Thread thread = new Thread(new SynchronizedDemo());
-            thread.start();
-        }
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("result: " + count);
-    }
-
-    @Override
-    public void run() {
-        for (int i = 0; i < 1000000; i++) {
-            count++;
-        }
-    }
-
-}
-```
-
-开启了 10 个线程，每个线程都累加了 1000000次，如果结果正确的话自然而然总数就应该是10 * 1000000 = 10000000。可就运行多次结果都不是这个数，而且每次运行结果都不一样。这是为什么了？有什么解决方案了？这就是我们今天要聊的事情。
 
 
 
 ## 二、使用
+
+每个初学多线程的 Javaer，在遇到这种多线程问题的时候，肯定会先想到 Synchronized，我们把它称为“同步”，
 
 Synchronized 是 Java 中解决并发问题的一种最常用的方法，也是最简单的一种方法。Synchronized 的作用主要有三个：
 

@@ -95,6 +95,7 @@ function genJavaSidebar() {
       collapsable: false,
       children: [
         "JUC/Java-Memory-Model",
+        "JUC/volatile","JUC/synchronized","JUC/CAS",
         "JUC/CountDownLatch、CyclicBarrier、Semaphore"
       ]
     }
@@ -146,14 +147,14 @@ function genInterviewSidebar(){
     ['Collections-FAQ', 'Java集合面试'],
     ['JUC-FAQ', 'Java 多线程面试'],
     ['JVM-FAQ', 'JVM 面试'],
-    // ['MySQL-FAQ', 'MySQL 面试'],
-    // ['Redis-FAQ', 'Redis 面试'],
-    // ['Network-FAQ', '计算机网络面试'],
-    // ['Kafka-FAQ', 'Kafka 面试'],
-    // ['Zookeeper-FAQ', 'Zookeeper 面试'],
-    // ['MyBatis-FAQ', 'MyBatis 面试'],
-    // ['Spring-FAQ', 'Spring 面试'],
-    // ['Design-Pattern-FAQ', '设计模式面试'],
-    // ['Tomcat-FAQ', 'Tomcat 面试'],
+    ['MySQL-FAQ', 'MySQL 面试'],
+    ['Redis-FAQ', 'Redis 面试'],
+    ['Network-FAQ', '计算机网络面试'],
+    ['Kafka-FAQ', 'Kafka 面试'],
+    ['ZooKeeper-FAQ', 'Zookeeper 面试'],
+    ['MyBatis-FAQ', 'MyBatis 面试'],
+    ['Spring-FAQ', 'Spring 面试'],
+    ['Design-Pattern-FAQ', '设计模式面试'],
+    ['Tomcat-FAQ', 'Tomcat 面试'],
   ];
 }
