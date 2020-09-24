@@ -4,67 +4,45 @@ https://www.cnblogs.com/aspirant/p/11470858.html
 
 ## 一、前言
 
+记得开始学习 Java 的时候，一遇到多线程情况就使用 synchronized，相对于当时的我们来说 synchronized 是这么的神奇而又强大，那个时候我们赋予它一个名字“同步”，也成为了我们解决多线程情况的百试不爽的良药。但是，随着学习的进行我们知道在 JDK1.5 之前 synchronized 是一个重量级锁，相对于 j.u.c.Lock，它会显得那么笨重，以至于我们认为它不是那么的高效而慢慢摒弃它。
+
+不过，随着 Javs SE 1.6 对 synchronized 进行的各种优化后，synchronized 并不会显得那么重了。下面来一起探索 synchronized 的基本使用、实现机制、Java是如何对它进行了优化、锁优化机制、锁的存储结构等升级过程。
 
 
 
-
-## 二、使用
-
-每个初学多线程的 Javaer，在遇到这种多线程问题的时候，肯定会先想到 Synchronized，我们把它称为“同步”，
+## 二、作用
 
 Synchronized 是 Java 中解决并发问题的一种最常用的方法，也是最简单的一种方法。Synchronized 的作用主要有三个：
 
 1. 原子性：确保线程互斥的访问同步代码；
-
 2. 可见性：保证共享变量的修改能够及时可见，其实是通过 Java 内存模型中的 “**对一个变量unlock操作之前，必须要同步到主内存中；如果对一个变量进行lock操作，则将会清空工作内存中此变量的值，在执行引擎使用此变量前，需要重新从主内存中load操作或assign操作初始化变量值**” 来保证的；
+3. 有序性：有效解决重排序问题，即 “一个 unlock 操作先行发生(happen-before)于后面对同一个锁的 lock 操作”；
 
-3. 有序性：有效解决重排序问题，即 “一个unlock操作先行发生(happen-before)于后面对同一个锁的lock操作”；
 
-### 2.1 synchronized 的用法分类
 
-synchronized 的用法可以从两个维度上面分类：
+## 三、使用
 
-#### 根据修饰对象分类
-
-synchronized 可以修饰方法和代码块
-
-- 修饰代码块
-  - synchronized(this|object) {}
-  - synchronized(类.class) {}
-- 修饰方法
-  - 修饰非静态方法
-  - 修饰静态方法
-
-#### 根据获取的锁分类
-
-- 获取对象锁
-  - synchronized(this|object) {}
-  - 修饰非静态方法
-- 获取类锁
-  - synchronized(类.class) {}
-  - 修饰静态方法
+在 Java 代码中使用 synchronized 可以使用在代码块和方法中，根据 synchronized 用的位置可以有这些使用场景：
 
 ![img](https://user-gold-cdn.xitu.io/2018/4/30/16315cc79aaac173?imageslim)
 
-如图，synchronized可以用在**方法**上也可以使用在**代码块**中，其中方法是实例方法和静态方法分别锁的是该类的实例对象和该类的对象。而使用在代码块中也可以分为三种，具体的可以看上面的表格。这里的需要注意的是：**如果锁的是类对象的话，尽管new多个实例对象，但他们仍然是属于同一个类依然会被锁住，即线程之间保证同步关系**。
+如图，synchronized 可以用在**方法**上也可以使用在**代码块**中，其中方法是实例方法和静态方法分别锁的是该类的实例对象和该类的对象。而使用在代码块中也可以分为三种，具体的可以看上面的表格。这里需要注意的是：**如果锁的是类对象的话，尽管 new 多个实例对象，但他们仍然是属于同一个类依然会被锁住，即线程之间保证同步关系**。
 
 
 
-从语法上讲，Synchronized 可以把任何一个非null对象作为"锁"，在 HotSpot JVM 实现中，**锁有个专门的名字：对象监视器（Object Monitor）**。
+## 四、原理
 
-Synchronized 概括来说其实总共有三种用法：
+从语法上讲，synchronized 可以把任何一个非 null 对象作为"锁"，在 HotSpot JVM 实现中，**锁有个专门的名字：对象监视器（Object Monitor）**。
+
+synchronized 概括来说其实总共有三种用法：
 
 1. 当 synchronized 作用在实例方法时，监视器锁（monitor）便是对象实例（this）；
 2. 当 synchronized 作用在静态方法时，监视器锁（monitor）便是对象的 Class 实例，因为 Class 数据存在于永久代，因此静态方法锁相当于该类的一个全局锁；
-3. 当 synchronized 作用在某一个对象实例时，监视器锁（monitor）便是括号括起来的对象实例；
+3. 当 synchronized 作用在某一个对象实例时（即代码块的形式），监视器锁（monitor）便是括号括起来的对象实例；
 
-| 作用范围   | 锁对象                                                       |
-| :--------- | :----------------------------------------------------------- |
-| 非静态方法 | 当前对象 => this                                             |
-| 静态方法   | 类对象  => SynchronizedSample.class （一切皆对象，这个是类对象） |
-| 代码块     | 指定对象 => lock                                             |
 
-注意，synchronized 内置锁是一种对象锁（锁的是对象而非引用变量），**作用粒度是对象 ，可以用来实现对 临界资源的同步互斥访问 ，是可重入的。其可重入最大的作用是避免死锁**，如：
+
+注意，synchronized 内置锁是一种对象锁（锁的是对象而非引用变量），**作用粒度是对象 ，可以用来实现对临界资源的同步互斥访问 ，是可重入的。其可重入最大的作用是避免死锁**，如：
 
 子类同步方法调用了父类同步方法，如没有可重入的特性，则会发生死锁；
 
@@ -97,27 +75,25 @@ public class SynchronizedDemo {
 }
 ```
 
-上面的代码中有一个同步代码块，锁住的是类对象，并且还有一个静态方法，锁住的依然是该类的类对象。编译之后，切换到 SynchronizedDemo.class 的同级目录之后，然后用**javap -v SynchronizedDemo.class**查看字节码文件：
+上面的代码中有一个同步代码块，锁住的是类对象，并且还有一个静态方法，锁住的依然是该类的类对象。编译之后，切换到 SynchronizedDemo.class 的同级目录之后，然后用 **javap -v SynchronizedDemo.class** 查看字节码文件：
 
 ![SynchronizedDemo.class](https://user-gold-cdn.xitu.io/2018/4/30/16315cce259af0d2?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
-如图，上面用黄色高亮的部分就是需要注意的部分了，这也是添Synchronized关键字之后独有的。执行同步代码块后首先要先执行**monitorenter**指令，退出的时候**monitorexit**指令。通过分析之后可以看出，使用Synchronized进行同步，其关键就是必须要对对象的监视器monitor进行获取，当线程获取monitor后才能继续往下执行，否则就只能等待。而这个获取的过程是**互斥**的，即同一时刻只有一个线程能够获取到monitor。上面的demo中在执行完同步代码块之后紧接着再会去执行一个静态同步方法，而这个方法锁的对象依然就这个类对象，那么这个正在执行的线程还需要获取该锁吗？答案是不必的，从上图中就可以看出来，执行静态同步方法的时候就只有一条monitorexit指令，并没有monitorenter获取锁的指令。这就是**锁的重入性**，即在同一锁程中，线程不需要再次获取同一把锁。Synchronized先天具有重入性。**每个对象拥有一个计数器，当线程获取该对象锁后，计数器就会加一，释放锁后就会将计数器减一**
+如图，上面用黄色高亮的部分就是需要注意的部分了，这也是添 synchronized 关键字之后独有的。执行同步代码块后首先要先执行 **monitorenter** 指令，退出的时候 **monitorexit** 指令。通过分析之后可以看出，使用synchronized 进行同步，其关键就是必须要对对象的监视器 monitor 进行获取，当线程获取 monitor 后才能继续往下执行，否则就只能等待。而这个获取的过程是**互斥**的，即同一时刻只有一个线程能够获取到 monitor。上面的 demo 中在执行完同步代码块之后紧接着再会去执行一个静态同步方法，而这个方法锁的对象依然就这个类对象，那么这个正在执行的线程还需要获取该锁吗？答案是不必的，从上图中就可以看出来，执行静态同步方法的时候就只有一条 monitorexit 指令，并没有 monitorenter 获取锁的指令。这就是**锁的重入性**，即在同一锁程中，线程不需要再次获取同一把锁。synchronized 先天具有重入性。**每个对象拥有一个计数器，当线程获取该对象锁后，计数器就会加一，释放锁后就会将计数器减一**
 
 
 
-synchronized关键字不能继承。
+synchronized 关键字不能继承。
 
- 对于父类中的 synchronized 修饰方法，子类在覆盖该方法时，默认情况下不是同步的，必须显示的使用 synchronized 关键字修饰才行。
+对于父类中的 synchronized 修饰方法，子类在覆盖该方法时，默认情况下不是同步的，必须显示的使用 synchronized 关键字修饰才行。
 
-在定义接口方法时不能使用synchronized关键字。
+在定义接口方法时不能使用 synchronized 关键字。
 
-构造方法不能使用synchronized关键字，但可以使用synchronized代码块来进行同步。
+构造方法不能使用 synchronized 关键字，但可以使用 synchronized 代码块来进行同步。
 
 
 
-## 三、原理
-
-数据同步需要依赖锁，那锁的同步又依赖谁？**synchronized给出的答案是在软件层面依赖JVM，而j.u.c.Lock给出的答案是在硬件层面依赖特殊的CPU指令。**
+数据同步需要依赖锁，那锁的同步又依赖谁？**synchronized给出的答案是在软件层面依赖 JVM，而 j.u.c.Lock给出的答案是在硬件层面依赖特殊的 CPU 指令。**
 
 ```java
 public class SynchronizedClassDemo {
@@ -178,7 +154,7 @@ TODO:为什么也会有两次退出？？？
 
 
 
-通过上面两段描述，我们应该能很清楚的看出Synchronized的实现原理，**Synchronized的语义底层是通过一个monitor的对象来完成，其实wait/notify等方法也依赖于monitor对象，这就是为什么只有在同步的块或者方法中才能调用wait/notify等方法，否则会抛出java.lang.IllegalMonitorStateException的异常的原因。**
+通过上面两段描述，我们应该能很清楚的看出 synchronized 的实现原理，**synchronized 的语义底层是通过一个monitor的对象来完成，其实wait/notify等方法也依赖于monitor对象，这就是为什么只有在同步的块或者方法中才能调用wait/notify等方法，否则会抛出java.lang.IllegalMonitorStateException的异常的原因。**
 
 
 
@@ -198,11 +174,11 @@ public class SynchronizedMethod {
 
 反编译结果 
 
-从编译的结果来看，方法的同步并没有通过指令 `monitorenter` 和 `monitorexit` 来完成（理论上其实也可以通过这两条指令来实现），不过相对于普通方法，其常量池中多了 `ACC_SYNCHRONIZED` 标示符。JVM就是根据该标示符来实现方法的同步的：
+从编译的结果来看，方法的同步并没有通过指令 `monitorenter` 和 `monitorexit` 来完成（理论上其实也可以通过这两条指令来实现），不过相对于普通方法，其常量池中多了 `ACC_SYNCHRONIZED` 标示符。JVM 就是根据该标示符来实现方法的同步的：
 
 > 当方法调用时，调用指令将会检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先获取monitor，获取成功之后才能执行方法体，方法执行完后再释放monitor。**在方法执行期间，其他任何线程都无法再获得同一个monitor对象。**
 
-两种同步方式本质上没有区别，只是方法的同步是一种隐式的方式来实现，无需通过字节码来完成。两个指令的执行是JVM通过调用操作系统的互斥原语mutex来实现，被阻塞的线程会被挂起、等待重新调度，会导致“用户态和内核态”两个态之间来回切换，对性能有较大影响。
+两种同步方式本质上没有区别，只是方法的同步是一种隐式的方式来实现，无需通过字节码来完成。两个指令的执行是 JVM 通过调用操作系统的互斥原语 mutex 来实现，被阻塞的线程会被挂起、等待重新调度，会导致“用户态和内核态”两个态之间来回切换，对性能有较大影响。
 
 
 
@@ -766,3 +742,5 @@ ObjectMonitor中有两个队列，_WaitSet 和 _EntryList，用来保存ObjectWa
 ## 参考
 
 https://juejin.im/post/5ae6dc04f265da0ba351d3ff
+
+https://blog.csdn.net/zhengwangzw/article/details/105141484

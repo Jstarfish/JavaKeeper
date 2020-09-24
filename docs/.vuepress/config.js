@@ -88,7 +88,7 @@ function genJavaSidebar() {
       title: "JVM",
       collapsable: false,
       sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["JVM/Runtime-Data-Areas", "JVM/OOM"]
+      children: ["JVM/Runtime-Data-Areas","JVM/Java-Object","JVM/OOM","JVM/Reference"]
     },
     {
       title: "JUC",
@@ -96,7 +96,8 @@ function genJavaSidebar() {
       children: [
         "JUC/Java-Memory-Model",
         "JUC/volatile","JUC/synchronized","JUC/CAS",
-        "JUC/CountDownLatch、CyclicBarrier、Semaphore"
+        "JUC/CountDownLatch、CyclicBarrier、Semaphore",
+        "JUC/Concurrent-Container"
       ]
     }
   ];

@@ -1,3 +1,5 @@
+# 你有认真了解过自己的 “Java 对象”吗
+
 > 对象在 JVM 中是怎么存储的
 >
 > 对象头里有什么？
@@ -215,7 +217,3 @@ public class Department {
 - https://blog.csdn.net/boy1397081650/article/details/89930710
 - https://www.cnblogs.com/lusaisai/p/12748869.html
 - https://juejin.im/post/5d4250def265da03ab422c79
-
-
-
-![](https://imgkr.cn-bj.ufileos.com/f8c5cc56-4e87-4821-84ab-32b105819091.png)

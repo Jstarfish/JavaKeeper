@@ -1,5 +1,3 @@
->文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
-
 ## 什么是 BloomFilter
 
 **布隆过滤器**（英语：Bloom Filter）是 1970 年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。主要用于判断一个元素是否在一个集合中。
@@ -381,7 +379,11 @@ public class RedissonBloomFilterDemo {
 
 由于使用较少，暂不深入。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdu79z432kj30ku0aumy2.jpg)
+
+
+> 文章持续更新，可以微信搜「 **JavaKeeper** 」第一时间阅读，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 已经收录，Javaer 开发、面试必备技能兵器谱，有你想要的。
+
+
 
 ## 参考与感谢
 
