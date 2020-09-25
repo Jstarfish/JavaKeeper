@@ -62,7 +62,7 @@ module.exports = {
 	    body: [
 	      {
 	        type: 'title',
-	        content: '<h4>欢迎加入Java 技术有限委员会 🎉</h4> <h4>500 + 电子书，30+ 视频教学和源码无套路获取</h4>',
+	        content: '<h5>🐳欢迎关注〖JavaKeeper〗🐳 </h5>  <h5>🎉500 + Java开发电子书免费获取🎉</h5> <br>',
 	        style: 'text-aligin: center;width: 100%;'
 	      },
 	      {
