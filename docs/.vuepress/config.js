@@ -96,7 +96,7 @@ function genJavaSidebar() {
       children: [
         "JUC/Java-Memory-Model",
         "JUC/volatile","JUC/synchronized","JUC/CAS",
-        "JUC/Concurrent-Container",
+        ['JUC/Concurrent-Container','Collection 大局观'],
         "JUC/AQS",
         'JUC/Reentrantlock', 
         "JUC/CountDownLatch、CyclicBarrier、Semaphore",

@@ -1,12 +1,10 @@
 # 阻塞队列——手写生产者消费者模式、线程池原理面试题真正的答案
 
-> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
-
 ## 队列和阻塞队列
 
 ### 队列
 
-队列（`Queue`）是一种经常使用的集合。`Queue`实际上是实现了一个先进先出（FIFO：First In First Out）的有序表。和 List、Set一样都继承自 Collection。它和`List`的区别在于，`List`可以在任意位置添加和删除元素，而`Queue` 只有两个操作：
+队列（`Queue`）是一种经常使用的集合。`Queue` 实际上是实现了一个先进先出（FIFO：First In First Out）的有序表。和 List、Set 一样都继承自 Collection。它和 `List` 的区别在于，`List`可以在任意位置添加和删除元素，而`Queue` 只有两个操作：
 
 - 把元素添加到队列末尾；
 - 从队列头部取出元素。
@@ -17,7 +15,7 @@
 
 
 
-我们常用的 LinkedList 就可以当队列使用，实现了Dequeue接口，还有 ConcurrentLinkedQueue，他们都属于非阻塞队列。
+我们常用的 LinkedList 就可以当队列使用，实现了 Dequeue 接口，还有 ConcurrentLinkedQueue，他们都属于非阻塞队列。
 
 ### 阻塞队列
 
@@ -64,7 +62,7 @@ JDK 提供了 7 个阻塞队列。分别是
 - PriorityBlockingQueue ：一个支持优先级排序的无界阻塞队列
 - DelayQueue：一个使用优先级队列实现的无界阻塞队列
 - SynchronousQueue：一个不存储元素的阻塞队列
-- LinkedTransferQueue：一个由链表结构组成的无界阻塞队列（实现了继承于 BlockingQueue的 TransferQueue）
+- LinkedTransferQueue：一个由链表结构组成的无界阻塞队列（实现了继承于 BlockingQueue 的 TransferQueue）
 - LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
 
@@ -79,7 +77,7 @@ JDK 提供了 7 个阻塞队列。分别是
 | 移除（取出） | remove()  | poll()     | take()   | poll(time,unit)    |
 | 检查         | element() | peek()     | 不可用   | 不可用             |
 
-以 ArrayBlockingQueue 来看下 Java 阻塞队列提供的常用方法
+以 ArrayBlockingQueue 为例来看下 Java 阻塞队列提供的常用方法
 
 - 抛出异常：
 
@@ -87,7 +85,7 @@ JDK 提供了 7 个阻塞队列。分别是
   - 当队列为空时，从队列里 remove 移除元素时会抛出 `NoSuchElementException` 异常 。
   - element()，返回队列头部的元素，如果队列为空，则抛出一个 `NoSuchElementException` 异常
 
-  ![](https://imgkr.cn-bj.ufileos.com/fb1a5a4c-e438-4308-92ec-9297f61136da.png)
+  ![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWdrci5jbi1iai51ZmlsZW9zLmNvbS9mYjFhNWE0Yy1lNDM4LTQzMDgtOTJlYy05Mjk3ZjYxMTM2ZGEucG5n?x-oss-process=image/format.png)
 
 - 返回特殊值：
 
@@ -95,21 +93,21 @@ JDK 提供了 7 个阻塞队列。分别是
   - poll()，移除方法，成功返回出队列的元素，队列里没有则返回 null
   - peek() ，返回队列头部的元素，如果队列为空，则返回 null
 
-  ![](https://imgkr.cn-bj.ufileos.com/00d85478-0871-40da-900d-4d6cd9047b8c.png)
+  ![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWdrci5jbi1iai51ZmlsZW9zLmNvbS8wMGQ4NTQ3OC0wODcxLTQwZGEtOTAwZC00ZDZjZDkwNDdiOGMucG5n?x-oss-process=image/format.png)
 
 - 一直阻塞：
 
   - 当阻塞队列满时，如果生产线程继续往队列里 put 元素，队列会一直阻塞生产线程，直到拿到数据，或者响应中断退出；
   - 当阻塞队列空时，消费线程试图从队列里 take 元素，队列也会一直阻塞消费线程，直到队列可用。
 
-  ![](https://imgkr.cn-bj.ufileos.com/003143ab-68bb-4f2b-943b-bc870ac96900.png)
+  ![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWdrci5jbi1iai51ZmlsZW9zLmNvbS8wMDMxNDNhYi02OGJiLTRmMmItOTQzYi1iYzg3MGFjOTY5MDAucG5n?x-oss-process=image/format.png)
 
 - 超时退出：
 
   - 当阻塞队列满时，队列会阻塞生产线程一定时间，如果超过一定的时间，生产线程就会退出，返回 false
-- 当阻塞队列空时，队列会阻塞消费线程一定时间，如果超过一定的时间，消费线程会退出，返回 null
+  - 当阻塞队列空时，队列会阻塞消费线程一定时间，如果超过一定的时间，消费线程会退出，返回 null
   
-  ![](https://imgkr.cn-bj.ufileos.com/b82734a0-8dbe-4ae9-8e4e-ea44445f46ff.png)
+  ![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWdrci5jbi1iai51ZmlsZW9zLmNvbS9iODI3MzRhMC04ZGJlLTRhZTktOGU0ZS1lYTQ0NDQ1ZjQ2ZmYucG5n?x-oss-process=image/format.png)
 
 
 
@@ -648,9 +646,9 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
 #### LinkedBlockingQueue 与 ArrayBlockingQueue 对比
 
 - ArrayBlockingQueue 入队出队采用一把锁，导致入队出队相互阻塞，效率低下；
-- LinkedBlockingQueue入队出队采用两把锁，入队出队互不干扰，效率较高；
+- LinkedBlockingQueue 入队出队采用两把锁，入队出队互不干扰，效率较高；
 - 二者都是有界队列，如果长度相等且出队速度跟不上入队速度，都会导致大量线程阻塞；
-- LinkedBlockingQueue 如果初始化不传入初始容量，则使用最大int值，如果出队速度跟不上入队速度，会导致队列特别长，占用大量内存；
+- LinkedBlockingQueue 如果初始化不传入初始容量，则使用最大 int 值，如果出队速度跟不上入队速度，会导致队列特别长，占用大量内存；
 
 
 
@@ -658,7 +656,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
 
 PriorityBlockingQueue 是一个支持优先级的无界阻塞队列。(虽说是无界队列，但是由于资源耗尽的话，也会OutOfMemoryError，无法添加元素)
 
-默认情况下元素采用自然顺序升序排列。也可以自定义类实现 compareTo() 方法来指定元素排序规则，或者初始化 PriorityBlockingQueue 时，指定构造参数 Comparator 来对元素进行排序。但需要注意的是不能保证同优先级元素的顺序。PriorityBlockingQueue 是基于**最小二叉堆**实现，使用基于 CAS 实现的自旋锁来控制队列的动态扩容，保证了扩容操作不会阻塞 take 操作的执行。
+默认情况下元素采用自然顺序升序排列。也可以自定义类实现 `compareTo()` 方法来指定元素排序规则，或者初始化 PriorityBlockingQueue 时，指定构造参数 Comparator 来对元素进行排序。但需要注意的是不能保证同优先级元素的顺序。PriorityBlockingQueue 是基于**最小二叉堆**实现，使用基于 CAS 实现的自旋锁来控制队列的动态扩容，保证了扩容操作不会阻塞 take 操作的执行。
 
 
 
@@ -826,7 +824,7 @@ static final class QNode {
 }
 ```
 
-从 put() 方法和 take() 方法可以看出最终调用的都是 TransferQueue 的 transfer() 方法。
+从 `put()` 方法和 `take()` 方法可以看出最终调用的都是 TransferQueue 的 `transfer()` 方法。
 
 ```java
 public void put(E e) throws InterruptedException {
@@ -1050,7 +1048,11 @@ public ThreadPoolExecutor(int corePoolSize,
 
 不同的线程池实现用的是不同的阻塞队列，newFixedThreadPool 和 newSingleThreadExecutor 用的是LinkedBlockingQueue，newCachedThreadPool 用的是 SynchronousQueue。
 
-![](https://user-gold-cdn.xitu.io/2020/3/20/170f5beacffbc730?w=750&h=390&f=jpeg&s=29031)
+
+
+> 文章持续更新，可以微信搜「 **JavaKeeper** 」第一时间阅读，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 已经收录，Javaer 开发、面试必备技能兵器谱，有你想要的。
+
+
 
 ## 参考与感谢
 

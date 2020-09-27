@@ -12,7 +12,7 @@ JUC 面试题总共围绕的就这么几部分
 - atomic 类（atomic常用类，方法，到 CAS，或者 ABA问题）
 - Fork/Join并行计算框架
 
-![img](https://img-blog.csdn.net/20180429141212382?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTEzMDU2ODA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200927155707.png)
 
 
 
