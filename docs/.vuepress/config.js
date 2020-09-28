@@ -88,7 +88,7 @@ function genJavaSidebar() {
       title: "JVM",
       collapsable: false,
       sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["JVM/Runtime-Data-Areas","JVM/Java-Object","JVM/OOM","JVM/Reference"]
+      children: ["JVM/JVM-Java","JVM/Class-Loading","JVM/Runtime-Data-Areas","JVM/Java-Object","JVM/OOM","JVM/Reference"]
     },
     {
       title: "JUC",

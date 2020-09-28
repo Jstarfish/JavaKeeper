@@ -24,9 +24,9 @@
 
 | Project | Version | Article                                                      |
 | :-----: | :-----: | :----------------------------------------------------------- |
-|   JVM   |         | [JVM与Java体系结构](/docs/java/JVM/JVM与Java体系结构.md)<br/>[类加载子系统](/docs/java/JVM/类加载子系统.md)<br/>[运行时数据区](/docs/java/JVM/Runtime-Data-Areas.md)<br/>[你有认真了解过自己的Java“对象”吗](https://mp.weixin.qq.com/s/4NDnFf3sripUIp3uT8W3HQ)<br/> |
-|  Java8  |         | [Java8 通关攻略](/docs/java/java8.md)<br/>                   |
-|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](/docs/java/JUC/Java-Memory-Model.md)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](/docs/java/JUC/volatile.md)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](/docs/java/JUC/Thread-Pool.md)<br/> |
+|   JVM   |         | [JVM与Java体系结构](http://www.starfish.ink/java/JVM/JVM-Java.html)<br/>[类加载子系统](http://www.starfish.ink/java/JVM/Class-Loading.html)<br/>[运行时数据区](http://www.starfish.ink/java/JVM/Runtime-Data-Areas.html)<br/>[看完这篇垃圾回收，和面试官扯皮没问题了](https://mp.weixin.qq.com/s/lmROkzhkVR0oeH-2hS-vfA)<br/>[垃圾回收-实战篇](https://mp.weixin.qq.com/s/8L_u2Pu2iUGb3Ub0pe8fAQ)<br/>[你有认真了解过自己的Java“对象”吗](https://mp.weixin.qq.com/s/4NDnFf3sripUIp3uT8W3HQ)<br/> |
+|  Java8  |         | [Java8 通关攻略](https://mp.weixin.qq.com/s/_eAT_tkRIywEErA7GUxZkQ)<br/> |
+|   JUC   |         | [不懂Java 内存模型，就先别扯什么高并发](https://mp.weixin.qq.com/s/FUHFppzcISLDMx4vc8tz4A)<br/>[面试必问的 volatile，你真的理解了吗](http://www.starfish.ink/java/JUC/volatile.html)<br/>[从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题](http://www.starfish.ink/java/JUC/CAS.html)<br/>[「阻塞队列」手写生产者消费者、线程池原理面试题真正的答案](https://mp.weixin.qq.com/s/NALM27_K4GIqNmm7kScTAw)<br/>[线程池解毒](http://www.starfish.ink/java/JUC/Thread-Pool.html)<br/> |
 |   NIO   |         |                                                              |
 
 
@@ -50,7 +50,7 @@
 |  Project  |       Version       | Article                                                      |
 | :-------: | :-----------------: | :----------------------------------------------------------- |
 | **Linux** | CentOS release 6.10 | [Linux通关攻略]( <https://github.com/Jstarfish/JavaEgg/blob/master/docs/linux/linux.md>) |
-| **Nginx** |       1.16.1        | [Nginx通关攻略](docs/nginx/nginx.md)                         |
+| **Nginx** |       1.16.1        | [Nginx通关攻略](https://mp.weixin.qq.com/s/jA-6tDcrNgd-Wtncj6D6DQ) |
 
 
 
