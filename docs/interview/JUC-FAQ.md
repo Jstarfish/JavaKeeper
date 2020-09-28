@@ -870,9 +870,6 @@ public interface Callable<V> {
 首先创建一个 `Runnable` 接口的实现类（当然也可以是 `Callable` 接口，我们上面也说了两者的区别。）
 
 ```
-MyRunnable.java
-import java.util.Date;
-
 /**
  * 这是一个简单的Runnable类，需要大约5秒钟来执行其任务。
  * @author shuang.kou
@@ -910,11 +907,6 @@ public class MyRunnable implements Runnable {
 编写测试程序，我们这里以阿里巴巴推荐的使用 `ThreadPoolExecutor` 构造函数自定义参数的方式来创建线程池。
 
 ```
-ThreadPoolExecutorDemo.java
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 public class ThreadPoolExecutorDemo {
 
     private static final int CORE_POOL_SIZE = 5;
@@ -984,7 +976,7 @@ pool-1-thread-1 End. Time = Tue Nov 12 20:59:54 CST 2019
 
 ### 线程池原理分析
 
-承接 4.6 节，我们通过代码输出结果可以看出：**线程池每次会同时执行 5 个任务，这 5 个任务执行完之后，剩余的 5 个任务才会被执行。** 大家可以先通过上面讲解的内容，分析一下到底是咋回事？（自己独立思考一会）
+承接上节，我们通过代码输出结果可以看出：**线程池每次会同时执行 5 个任务，这 5 个任务执行完之后，剩余的 5 个任务才会被执行。** 大家可以先通过上面讲解的内容，分析一下到底是咋回事？（自己独立思考一会）
 
 现在，我们就分析上面的输出内容来简单分析一下线程池原理。
 
@@ -1037,41 +1029,114 @@ pool-1-thread-1 End. Time = Tue Nov 12 20:59:54 CST 2019
 
 [![图解线程池实现原理](https://camo.githubusercontent.com/cf627f637b4c678cd77b815fbea8789dd3158b0c/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d372f2545352539422542452545382541372541332545372542412542462545372541382538422545362542312541302545352541452539452545372538452542302545352538452539462545372539302538362e706e67)](https://camo.githubusercontent.com/cf627f637b4c678cd77b815fbea8789dd3158b0c/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d372f2545352539422542452545382541372541332545372542412542462545372541382538422545362542312541302545352541452539452545372538452542302545352538452539462545372539302538362e706e67)
 
-现在，让我们在回到 4.6 节我们写的 Demo， 现在应该是不是很容易就可以搞懂它的原理了呢？
+现在，让我们在回到我们写的 Demo， 现在应该是不是很容易就可以搞懂它的原理了呢？
 
 没搞懂的话，也没关系，可以看看我的分析：
 
 > 我们在代码中模拟了 10 个任务，我们配置的核心线程数为 5 、等待队列容量为 100 ，所以每次只可能存在 5 个任务同时执行，剩下的 5 个任务会被放到等待队列中去。当前的 5 个任务之行完成后，才会之行剩下的 5 个任务。
 
-#### 
+
+
+### 当提交新任务时，异常如何处理?
+
+1. 在任务代码try/catch捕获异常
+
+2. 通过Future对象的get方法接收抛出的异常，再处理
+
+3. 为工作者线程设置UncaughtExceptionHandler，在uncaughtException方法中处理异常
+
+   ```java
+   ExecutorService threadPool = Executors.newFixedThreadPool(1, r -> {
+               Thread t = new Thread(r);
+               t.setUncaughtExceptionHandler(
+                       (t1, e) -> {
+                           System.out.println(t1.getName() + "线程抛出的异常"+e);
+                       });
+               return t;
+              });
+           threadPool.execute(()->{
+               Object object = null;
+               System.out.print("result## " + object.toString());
+           });
+   ```
+
+4. 重写ThreadPoolExecutor的afterExecute方法，处理传递的异常引用
+
+   ```java
+   class ExtendedExecutor extends ThreadPoolExecutor {
+       // 这可是jdk文档里面给的例子。。
+       protected void afterExecute(Runnable r, Throwable t) {
+           super.afterExecute(r, t);
+           if (t == null && r instanceof Future<?>) {
+               try {
+                   Object result = ((Future<?>) r).get();
+               } catch (CancellationException ce) {
+                   t = ce;
+               } catch (ExecutionException ee) {
+                   t = ee.getCause();
+               } catch (InterruptedException ie) {
+                   Thread.currentThread().interrupt(); // ignore/reset
+               }
+           }
+           if (t != null)
+               System.out.println(t);
+       }
+   }}
+   
+   ```
 
 
 
-- ConcurrentHashMap和HashMap
-- 
-- 线程池原理，拒绝策略，核心线程数
-- 线程之间的交互方式有哪些？有没有线程交互的封装类 （join）？
-- 死锁怎么避免？
-- concurrentHashMap分段锁的细节
-- 并发包里了解哪些
-- synchronizedMap知道吗，和concurrentHashMap分别用于什么场景
-- 描述一下java线程池
-- 常用的队列，阻塞队列
-- 如何获取多线程调用结果
-- 
-- synchronized内部实现，偏向锁，轻量锁，重量锁
+### 线程池都有哪几种工作队列？
 
-- 为什么需要自旋？
+- ArrayBlockingQueue ：一个由数组结构组成的有界阻塞队列
+- LinkedBlockingQueue ：一个由链表结构组成的有界阻塞队列
+- PriorityBlockingQueue ：一个支持优先级排序的无界阻塞队列
+- DelayQueue：一个使用优先级队列实现的无界阻塞队列
+- SynchronousQueue：一个不存储元素的阻塞队列
+- LinkedTransferQueue：一个由链表结构组成的无界阻塞队列（实现了继承于 BlockingQueue 的 TransferQueue）
+- LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列
 
--  sleep( ) 和 wait( n)、wait( ) 的区别：
 
-  **sleep 方法：** 是 Thread 类的静态方法，当前线程将睡眠 n 毫秒，线程进入阻塞状态。当睡眠时间到了，会解除阻塞，进行可运行状态，等待 CPU 的到来。睡眠不释放锁（如果有的话）；
 
-  **wait 方法：** 是 Object 的方法，必须与 synchronized 关键字一起使用，线程进入阻塞状态，当 notify 或者 notifyall 被调用后，会解除阻塞。但是，只有重新占用互斥锁之后才会进入可运行状态。睡眠时，释放互斥锁。
+### 合理配置线程池你是如何考虑的？
 
-synchronized和Lock的区别
+首先要考虑到 CPU 核心数，那么在 Java 中如何获取核心线程数？
 
-sleep方法和yield方法的区别
+可以使用 `Runtime.getRuntime().availableProcessor()` 方法来获取（可能不准确，作为参考）
+
+在确认了核心数后，再去判断是 CPU 密集型任务还是 IO 密集型任务：
+
+- **CPU 密集型任务**：CPU密集型也叫计算密集型，这种类型大部分状况下，CPU使用时间远高于I/O耗时。有许多计算要处理、许多逻辑判断，几乎没有I/O操作的任务就属于 CPU 密集型。
+
+  CPU 密集任务只有在真正的多核 CPU 上才可能得到加速（通过多线程）
+
+  而在单核 CPU 上，无论开几个模拟的多线程该任务都不可能得到加速，因为 CPU 总的运算能力就那些。
+
+  如果是 CPU 密集型任务，频繁切换上下线程是不明智的，此时应该设置一个较小的线程数
+
+  一般公式：**CPU 核数 + 1 个线程的线程池**
+
+  为什么 +1 呢？
+
+  《Java并发编程实战》一书中给出的原因是：**即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。**
+
+- **IO 密集型任务**：与之相反，IO 密集型则是系统运行时，大部分时间都在进行 I/O 操作，CPU 占用率不高。比如像 MySQL 数据库、文件的读写、网络通信等任务，这类任务**不会特别消耗 CPU 资源，但是 IO 操作比较耗时，会占用比较多时间**。
+
+  在单线程上运行 IO 密集型的任务会导致浪费大量的 CPU 运算能力浪费在等待。
+
+  所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费调的阻塞时间。所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费掉的阻塞时间。
+
+  IO 密集型时，大部分线程都阻塞，故需要多配置线程数：
+
+  参考公式： CPU 核数/（1- 阻塞系数）   阻塞系数在 0.8~0.9 之间
+
+  比如 8 核 CPU：8/（1 -0.9）= 80个线程数
+
+
+  这个其实没有一个特别适用的公式，肯定适合自己的业务，美团给出了个**动态更新**的逻辑，可以看看
+
+
 
 
 

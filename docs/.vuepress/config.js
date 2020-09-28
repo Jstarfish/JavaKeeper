@@ -35,12 +35,14 @@ module.exports = {
     nav: [
       { text: 'Java', link: '/java/' },
       { text: '数据结构与算法', link: '/data-structure-algorithms/' },
+      { text: '设计模式', link: '/design-pattern/' },
       { text: '数据存储与缓存', link: '/data-store/' },
       { text: '直击面试', link: '/interview/' },
     ],
     sidebar: {
         "/java/": genJavaSidebar(),
         "/data-structure-algorithms/": genDSASidebar(),
+        "/design-pattern/": genDesignPatternSidebar(),
         //"/data-store/": genDataStoreSidebar(),
         "/interview/": genInterviewSidebar(),
     },
@@ -99,9 +101,11 @@ function genJavaSidebar() {
         ['JUC/Concurrent-Container','Collection 大局观'],
         "JUC/AQS",
         'JUC/Reentrantlock', 
+        "JUC/ThreadLocal",
         "JUC/CountDownLatch、CyclicBarrier、Semaphore",
         ['JUC/BlockingQueue','阻塞队列'],
-        "JUC/Thread-Pool"
+        "JUC/Thread-Pool",
+        "JUC/Locks",
       ]
     }
   ];
@@ -123,6 +127,21 @@ function genDSASidebar() {
       	['Dynamic-Programming', '动态规划']
       ]
     }
+  ];
+}
+
+function genDesignPatternSidebar() {
+  return [
+    ['Design-Pattern-Overview', '设计模式前传'],
+    ['Singleton-Pattern', '单例模式'],
+    ['Factory-Pattern', '工厂模式'],
+    ['Prototype-Pattern', '原型模式'],
+    ['Decorator-Pattern', '装饰模式'],
+    ['Proxy-Pattern', '代理模式'],
+    ['Adapter-Pattern', '适配器模式'],
+    ['Chain-of-Responsibility-Pattern', '责任链模式'],
+    ['Observer-Pattern', '观察者模式'],
+    ['Facade-Pattern', '外观模式']
   ];
 }
 
