@@ -37,6 +37,46 @@ JUC 面试题总共围绕的就这么几部分
 
 
 
+### 什么是线程安全和线程不安全？
+
+通俗的说：加锁的就是是线程安全的，不加锁的就是是线程不安全的
+
+**线程安全: 就是多线程访问时，采用了加锁机制，当一个线程访问该类的某个数据时，进行保护，其他线程不能进行访问，直到该线程读取完，其他线程才可使用。不会出现数据不一致或者数据污染**。
+
+一个线程安全的计数器类的同一个实例对象在被多个线程使用的情况下也不会出现计算失误。很显然你可以将**集合类分成两组，线程安全和非线程安全的**。 Vector 是用同步方法来实现线程安全的, 而和它相似的ArrayList不是线程安全的。
+
+**线程不安全：就是不提供数据访问保护，有可能出现多个线程先后更改数据造成所得到的数据是脏数据**
+
+如果你的代码所在的进程中有多个线程在同时运行，而这些线程可能会同时运行这段代码。如果每次运行结果和单线程运行的结果是一样的，而且其他的变量的值也和预期的是一样的，就是线程安全的。
+
+线程安全问题都是由全局变量及静态变量引起的。 若每个线程中对全局变量、静态变量只有读操作，而无写操作，一般来说，这个全局变量是线程安全的；若有多个线程同时执行写操作，一般都需要考虑线程同步，否则的话就可能影响线程安全。
+
+
+
+### 什么是上下文切换?
+
+多线程编程中一般线程的个数都大于 CPU 核心的个数，而一个 CPU 核心在任意时刻只能被一个线程使用，为了让这些线程都能得到有效执行，CPU 采取的策略是为每个线程分配时间片并轮转的形式。当一个线程的时间片用完的时候就会重新处于就绪状态让给其他线程使用，这个过程就属于一次上下文切换。
+
+概括来说就是：当前任务在执行完 CPU 时间片切换到另一个任务之前会先保存自己的状态，以便下次再切换回这个任务时，可以再加载这个任务的状态。**任务从保存到再加载的过程就是一次上下文切换**。
+
+上下文切换通常是计算密集型的。也就是说，它需要相当可观的处理器时间，在每秒几十上百次的切换中，每次切换都需要纳秒量级的时间。所以，上下文切换对系统来说意味着消耗大量的 CPU 时间，事实上，可能是操作系统中时间消耗最大的操作。
+
+Linux 相比与其他操作系统（包括其他类 Unix 系统）有很多的优点，其中有一项就是，其上下文切换和模式切换的时间消耗非常少。
+
+
+
+### 如何在 Windows 和 Linux 上查找哪个线程cpu利用率最高？
+
+windows上面用任务管理器看，linux下可以用 top 这个工具看。
+
+1. 找出cpu耗用厉害的进程pid， 终端执行top命令，然后按下shift+p 查找出cpu利用最厉害的pid号
+2. 根据上面第一步拿到的pid号，top -H -p pid 。然后按下shift+p，查找出cpu利用率最厉害的线程号，比如top -H -p 1328
+3. 将获取到的线程号转换成16进制，去百度转换一下就行
+4. 使用jstack工具将进程信息打印输出，jstack pid号 > /tmp/t.dat，比如jstack 31365 > /tmp/t.dat
+5. 编辑/tmp/t.dat文件，查找线程号对应的信息
+
+
+
 ### 说说线程的生命周期和状态?
 
 Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种不同状态的其中一个状态（图源《Java 并发编程艺术》4.1.4 节）。
@@ -57,6 +97,12 @@ Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种
 - 两者都可以暂停线程的执行。
 - wait 通常被用于线程间交互/通信，sleep 通常被用于暂停执行。
 - wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 notify() 或者 notifyAll() 方法。sleep() 方法执行完成后，线程会自动苏醒。或者可以使用 wait(long timeout)超时后线程会自动苏醒。
+
+**yield()**
+　　yield()方法和sleep()方法类似，也不会释放“锁标志”，区别在于，它没有参数，即yield()方法只是使当前线程重新回到可执行状态，所以执行yield()的线程有可能在进入到可执行状态后马上又被执行，另外yield()方法只能使同优先级或者高优先级的线程得到执行机会，这也和sleep()方法不同。
+
+**join()**
+　　join()方法会使当前线程等待调用join()方法的线程结束后才能继续执行
 
 
 
@@ -94,6 +140,18 @@ new 一个 Thread，线程进入了新建状态；调用 start() 方法，会启
 ```
 
 
+
+### Java 多线程之间的通信方式
+
+**①同步** 这里讲的同步是指多个线程通过synchronized关键字这种方式来实现线程间的通信。
+
+**②while轮询的方式**
+
+**③wait/notify机制**
+
+**④管道通信**就是使用java.io.PipedInputStream 和 java.io.PipedOutputStream进行通信
+
+https://www.cnblogs.com/hapjin/p/5492619.html
 
 ------
 
@@ -254,12 +312,12 @@ Thread[线程 1,5,main]waiting get resource2
 Thread[线程 2,5,main]waiting get resource1
 ```
 
-线程 A 通过 synchronized (resource1) 获得 resource1 的监视器锁，然后通过`Thread.sleep(1000);`让线程 A 休眠 1s 为的是让线程 B 得到执行然后获取到 resource2 的监视器锁。线程 A 和线程 B 休眠结束了都开始企图请求获取对方的资源，然后这两个线程就会陷入互相等待的状态，这也就产生了死锁。上面的例子符合产生死锁的四个必要条件。学过操作系统的朋友都知道产生死锁必须具备以下四个条件：
+线程 A 通过 synchronized (resource1) 获得 resource1 的监视器锁，然后通过 `Thread.sleep(1000);`让线程 A 休眠 1s 为的是让线程 B 得到执行然后获取到 resource2 的监视器锁。线程 A 和线程 B 休眠结束了都开始企图请求获取对方的资源，然后这两个线程就会陷入互相等待的状态，这也就产生了死锁。上面的例子符合产生死锁的四个必要条件。学过操作系统的朋友都知道产生死锁必须具备以下四个条件：
 
 - 互斥条件：该资源任意一个时刻只由一个线程占用。
 - 请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
-- 不剥夺条件:线程已获得的资源在末使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源
-- 循环等待条件:若干进程之间形成一种头尾相接的循环等待资源关系。
+- 不剥夺条件：线程已获得的资源在末使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源
+- 循环等待条件：若干进程之间形成一种头尾相接的循环等待资源关系。
 
 #### 如何避免线程死锁?
 
@@ -305,6 +363,30 @@ Process finished with exit code 0
 我们分析一下上面的代码为什么避免了死锁的发生?
 
 线程 1 首先获得到 resource1 的监视器锁,这时候线程 2 就获取不到了。然后线程 1 再去获取 resource2 的监视器锁，可以获取到。然后线程 1 释放了对 resource1、resource2 的监视器锁的占用，线程 2 获取到就可以执行了。这样就破坏了破坏循环等待条件，因此避免了死锁。
+
+
+
+### 如何排查死锁
+
+通过jdk工具jps、jstack排查死锁问题
+
+
+
+### 死锁预防
+
+1、以确定的顺序获得锁
+
+如果必须获取多个锁，那么在设计的时候需要充分考虑不同线程之前获得锁的顺序
+
+2、超时放弃
+
+当使用synchronized关键词提供的内置锁时，只要线程没有获得锁，那么就会永远等待下去，然而Lock接口提供了`boolean tryLock(long time, TimeUnit unit) throws InterruptedException`方法，该方法可以按照固定时长等待锁，因此线程可以在获取锁超时以后，主动释放之前已经获得的所有的锁。通过这种方式，也可以很有效地避免死锁。
+
+
+作者：江溢Jonny
+链接：https://juejin.im/post/6844903577660424206
+来源：掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 
 
@@ -430,6 +512,8 @@ RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤�
 
 
 ### 谈谈 synchronized和ReentrantLock 的区别
+
+![](https://p0.meituan.net/travelcube/412d294ff5535bbcddc0d979b2a339e6102264.png)
 
 **① 两者都是可重入锁**
 
@@ -1245,6 +1329,72 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 - **Semaphore(信号量)-允许多个线程同时访问：** synchronized 和 ReentrantLock 都是一次只允许一个线程访问某个资源，Semaphore(信号量)可以指定多个线程同时访问某个资源。
 - **CountDownLatch （倒计时器）：** CountDownLatch是一个同步工具类，用来协调多个线程之间的同步。这个工具通常用来控制线程等待，它可以让某一个线程等待直到倒计时结束，再开始执行。
 - **CyclicBarrier(循环栅栏)：** CyclicBarrier 和 CountDownLatch 非常类似，它也可以实现线程间的技术等待，但是它的功能比 CountDownLatch 更加复杂和强大。主要应用场景和 CountDownLatch 类似。CyclicBarrier 的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。CyclicBarrier默认的构造方法是 CyclicBarrier(int parties)，其参数表示屏障拦截的线程数量，每个线程调用await()方法告诉 CyclicBarrier 我已经到达了屏障，然后当前线程被阻塞。
+
+
+
+### AQS是如何唤醒下一个线程的？
+
+当需要阻塞或者唤醒一个线程的时候，AQS都是使用LockSupport这个工具类来完成的。
+
+
+
+### ReetrantLock有用过吗，怎么实现重入的
+
+ReentrantLock的可重入性是AQS很好的应用之一。在ReentrantLock里面，不管是公平锁还是非公平锁，都有一段逻辑。
+
+公平锁：
+
+```java
+// java.util.concurrent.locks.ReentrantLock.FairSync#tryAcquire
+
+if (c == 0) {
+	if (!hasQueuedPredecessors() && compareAndSetState(0, acquires)) {
+		setExclusiveOwnerThread(current);
+		return true;
+	}
+}
+else if (current == getExclusiveOwnerThread()) {
+	int nextc = c + acquires;
+	if (nextc < 0)
+		throw new Error("Maximum lock count exceeded");
+	setState(nextc);
+	return true;
+}
+```
+
+非公平锁：
+
+```java
+// java.util.concurrent.locks.ReentrantLock.Sync#nonfairTryAcquire
+
+if (c == 0) {
+	if (compareAndSetState(0, acquires)){
+		setExclusiveOwnerThread(current);
+		return true;
+	}
+}
+else if (current == getExclusiveOwnerThread()) {
+	int nextc = c + acquires;
+	if (nextc < 0) // overflow
+		throw new Error("Maximum lock count exceeded");
+	setState(nextc);
+	return true;
+}
+```
+
+从上面这两段都可以看到，有一个同步状态State来控制整体可重入的情况。State是Volatile修饰的，用于保证一定的可见性和有序性。
+
+```java
+// java.util.concurrent.locks.AbstractQueuedSynchronizer
+
+private volatile int state;
+```
+
+接下来看State这个字段主要的过程：
+
+1. State初始化的时候为0，表示没有任何线程持有锁。
+2. 当有线程持有该锁时，值就会在原来的基础上+1，同一个线程多次获得锁是，就会多次+1，这里就是可重入的概念。
+3. 解锁也是对这个字段-1，一直到0，此线程对锁释放。
 
 
 

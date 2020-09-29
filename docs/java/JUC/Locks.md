@@ -4,7 +4,7 @@ Java提供了种类丰富的锁，每种锁因其特性的不同，在适当的�
 
 Java中往往是按照是否含有某一特性来定义锁，我们通过特性将锁进行分组归类
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png)
+![](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png)
 
 - 公平锁、非公平锁
 - 可重入锁（又名递归锁）、非可重入锁
@@ -71,7 +71,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
 }
 ```
 
-![](../../_images/java/juc/ReentrantLockCode.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200929143721.jpg)
 
 两个构造方法对比，可以看出公平锁和非公平锁的区别
 
@@ -142,17 +142,9 @@ public class Widget {
 }
 ```
 
-在上面的代码中，类中的两个方法都是被内置锁synchronized修饰的，doSomething()方法中调用doOthers()方法。因为内置锁是可重入的，所以同一个线程在调用doOthers()时可以直接获得当前对象的锁，进入doOthers()进行操作。
+在上面的代码中，类中的两个方法都是被内置锁 synchronized 修饰的，doSomething() 方法中调用 doOthers() 方法。因为内置锁是可重入的，所以同一个线程在调用 doOthers() 时可以直接获得当前对象的锁，进入doOthers() 进行操作。
 
-如果是一个不可重入锁，那么当前线程在调用doOthers()之前需要将执行doSomething()时获取当前对象的锁释放掉，实际上该对象锁已被当前线程所持有，且无法释放。所以此时会出现死锁。
-
-
-
-
-
-
-
-------
+如果是一个不可重入锁，那么当前线程在调用 doOthers() 之前需要将执行 doSomething() 时获取当前对象的锁释放掉，实际上该对象锁已被当前线程所持有，且无法释放。所以此时会出现死锁。
 
 
 
@@ -160,7 +152,7 @@ public class Widget {
 
 自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗 CPU
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/452a3363.png)
+![](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/452a3363.png)
 
 ```java
 /**
@@ -462,7 +454,7 @@ public class MCSLock {
 
 ## 4. 独占锁（互斥锁/写锁）、共享锁（读锁）
 
-独占锁：指该锁一次只能被一个线程所持有，对 ReentrantLock和 Synchronized 而言都是独占锁
+独占锁：指该锁一次只能被一个线程所持有，对 ReentrantLock 和 Synchronized 而言都是独占锁
 
 共享锁：指该锁可被多个线程所持有
 
@@ -541,19 +533,13 @@ class MyCache {
 
 
 
-## 对各种锁的理解？请手写一个自旋锁
-
-
-
-
-
 
 
 ### 无锁 VS 偏向锁 VS 轻量级锁 VS 重量级锁
 
-这四种锁是指锁的状态，专门针对synchronized的。在介绍这四种锁状态之前还需要介绍一些额外的知识。
+这四种锁是指锁的状态，专门针对 synchronized 的。在介绍这四种锁状态之前还需要介绍一些额外的知识。
 
-首先为什么Synchronized能实现线程同步？
+首先为什么 Synchronized 能实现线程同步？
 
 在回答这个问题之前我们需要了解两个重要的概念：“Java对象头”、“Monitor”。
 
@@ -626,7 +612,7 @@ Monitor是线程私有的数据结构，每一个线程都有一个可用monitor
 
 整体的锁状态升级流程如下：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8afdf6f2.png)
+![](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8afdf6f2.png)
 
 综上，偏向锁通过对比Mark Word解决加锁问题，避免执行CAS操作。而轻量级锁是通过用CAS操作和自旋来解决加锁问题，避免线程阻塞和唤醒而影响性能。重量级锁是将除了拥有锁的线程以外的线程都阻塞。
 

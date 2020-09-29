@@ -37,13 +37,14 @@ module.exports = {
       { text: '数据结构与算法', link: '/data-structure-algorithms/' },
       { text: '设计模式', link: '/design-pattern/' },
       { text: '数据存储与缓存', link: '/data-store/' },
+      { text: '分布式架构', link: '/' },
       { text: '直击面试', link: '/interview/' },
     ],
     sidebar: {
         "/java/": genJavaSidebar(),
         "/data-structure-algorithms/": genDSASidebar(),
         "/design-pattern/": genDesignPatternSidebar(),
-        //"/data-store/": genDataStoreSidebar(),
+        "/": genDataStoreSidebar(),
         "/interview/": genInterviewSidebar(),
     },
     blogConfig: {
@@ -100,12 +101,11 @@ function genJavaSidebar() {
         "JUC/volatile","JUC/synchronized","JUC/CAS",
         ['JUC/Concurrent-Container','Collection 大局观'],
         "JUC/AQS",
-        'JUC/Reentrantlock', 
         "JUC/ThreadLocal",
         "JUC/CountDownLatch、CyclicBarrier、Semaphore",
         ['JUC/BlockingQueue','阻塞队列'],
         "JUC/Thread-Pool",
-        "JUC/Locks",
+        "JUC/Locks"
       ]
     }
   ];
@@ -168,17 +168,18 @@ function genDataStoreSidebar(){
 
 function genInterviewSidebar(){
   return [
-    ['Collections-FAQ', 'Java集合面试'],
-    ['JUC-FAQ', 'Java 多线程面试'],
-    ['JVM-FAQ', 'JVM 面试'],
-    ['MySQL-FAQ', 'MySQL 面试'],
-    ['Redis-FAQ', 'Redis 面试'],
-    ['Network-FAQ', '计算机网络面试'],
-    ['Kafka-FAQ', 'Kafka 面试'],
-    ['ZooKeeper-FAQ', 'Zookeeper 面试'],
-    ['MyBatis-FAQ', 'MyBatis 面试'],
-    ['Spring-FAQ', 'Spring 面试'],
-    ['Design-Pattern-FAQ', '设计模式面试'],
-    ['Tomcat-FAQ', 'Tomcat 面试'],
+    ['Java-Basics-FAQ', 'Java基础部分'],
+    ['Collections-FAQ', 'Java集合部分'],
+    ['JUC-FAQ', 'Java 多线程部分'],
+    ['JVM-FAQ', 'JVM 部分'],
+    ['MySQL-FAQ', 'MySQL 部分'],
+    ['Redis-FAQ', 'Redis 部分'],
+    ['Network-FAQ', '计算机网络部分'],
+    ['Kafka-FAQ', 'Kafka 部分'],
+    ['ZooKeeper-FAQ', 'Zookeeper 部分'],
+    ['MyBatis-FAQ', 'MyBatis 部分'],
+    ['Spring-FAQ', 'Spring 部分'],
+    ['Design-Pattern-FAQ', '设计模式部分'],
+    ['Tomcat-FAQ', 'Tomcat 部分'],
   ];
 }
