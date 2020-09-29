@@ -1,0 +1,72 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2.1
+
+orbs:
+  # import Cypress orb by specifying an exact version x.y.z
+  # or the latest version 1.x.x using "@1" syntax
+  cypress: cypress-io/cypress@1
+
+defaults: &defaults
+  working_directory: ~/project
+  docker:
+    - image: circleci/node:latest
+
+jobs:
+  #  Install dependencies
+
+  install-dependencies:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "yarn.lock" }}
+            - v1-deps
+
+      - run:
+          name: "Install dependencies"
+          command: yarn --frozen-lockfile --non-interactive
+
+      - save_cache:
+          key: v1-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - node_modules
+
+  #  Build VuePress-plugin-mailchimp
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: "Run build"
+          command: yarn build
+
+#------------------------------------------------------------
+# Workflows
+#------------------------------------------------------------
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - install-dependencies
+      - cypress/run:
+          {
+            yarn: true,
+            start: yarn dev,
+            wait-on: "http://localhost:8080",
+            requires: [install-dependencies],
+          }
+      - build: { requires: [install-dependencies] }

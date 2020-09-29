@@ -405,8 +405,6 @@ synchronized(this){
 }
 ```
 
-
-
 这里我们再回过头看下对象头中 Mark Word 的存储结构（以 32 位虚拟机为例，《Java并发编程艺术》）
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200925170526.jpg)
