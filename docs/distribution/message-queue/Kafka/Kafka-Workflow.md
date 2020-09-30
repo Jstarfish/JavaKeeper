@@ -1,4 +1,4 @@
-## Kafka 工作流程和存储机制分析
+# Kafka 工作流程和存储机制分析
 
 ![](https://images.gitbook.cn/e49bc290-cf95-11e8-8388-bd48f25029c6)
 

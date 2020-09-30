@@ -2,7 +2,7 @@
 
 ### 5.1 启动zk和kafka集群
 
-![img](H:/Technical-Learning/docs/_images/message-queue/Kafka/kafka-start.png)
+
 
 ### 5.2 导入 pom 依赖 
 

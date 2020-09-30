@@ -37,14 +37,17 @@ module.exports = {
       { text: '数据结构与算法', link: '/data-structure-algorithms/' },
       { text: '设计模式', link: '/design-pattern/' },
       { text: '数据存储与缓存', link: '/data-store/' },
-      { text: '分布式架构', link: '/' },
+      { text: '开发框架', link: '/framework/' },
+      { text: '分布式架构', link: '/distribution/' },
       { text: '直击面试', link: '/interview/' },
     ],
     sidebar: {
         "/java/": genJavaSidebar(),
         "/data-structure-algorithms/": genDSASidebar(),
         "/design-pattern/": genDesignPatternSidebar(),
-        "/": genDataStoreSidebar(),
+        "/data-store/": genDataStoreSidebar(),
+        "/framework/": genFrameworkSidebar(),
+        "/distribution/": genDistributionSidebar(),
         "/interview/": genInterviewSidebar(),
     },
     blogConfig: {
@@ -117,12 +120,14 @@ function genDSASidebar() {
       title: "数据结构",
       collapsable: false,
       sidebarDepth: 1,    // 可选的, 默认值是 1
-      children: ["","Array", "Stack"]
+      children: ["","Array","Linked-List","Stack","Queue","Skip-List"]
     },
     {
       title: "算法",
       collapsable: false,
       children: [
+        "complexity",
+        "sort",
       	['Recursion', '递归'],
       	['Dynamic-Programming', '动态规划']
       ]
@@ -148,22 +153,79 @@ function genDesignPatternSidebar() {
 function genDataStoreSidebar(){
   return [
     {
-      title: "数据结构",
+      title: "MySQL",
       collapsable: false,
       sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["hello-dataStructure.md","Array", "Stack"]
+      children: [
+        ['MySQL/MySQL-Framework', 'MySQL 架构介绍'],
+        ['MySQL/MySQL-Storage-Engines', 'MySQL 存储引擎'],
+        ['MySQL/MySQL-Index', 'MySQL 索引'],
+        ['MySQL/MySQL-select', 'MySQL 查询'],
+      ]
     },
     {
-      title: "算法",
+      title: "Redis",
       collapsable: false,
       children: [
-        "JUC/Java-Memory-Model",
-        "JUC/CountDownLatch、CyclicBarrier、Semaphore"
+        ['Redis/Redis-Datatype', 'Redis 数据类型'],
+        ['Redis/Redis-Persistence', 'Redis 持久化'],
+        ['Redis/Redis-Conf', 'Redis 配置'],
+        ['Redis/Redis-Transaction', 'Redis 事务'],
+        ['Redis/Reids-Lock', 'Redis 分布式锁'],
+        ['Redis/Redis-Cluster', 'Redis 集群'],
       ]
     }
   ];
 }
 
+function genFrameworkSidebar(){
+  return [
+    {
+      title: "Spring",
+      collapsable: false,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['Spring/Spring-IOC', 'Spring IOC'],
+        ['Spring/Spring-Cycle-Dependency', 'Spring 循环依赖'],
+      ]
+    }
+  ];
+}
+
+function genDistributionSidebar(){
+  return [
+    {
+      title: "Kafka",
+      collapsable: true,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['message-queue/Kafka/Hello-Kafka', 'Hello-Kafka'],
+        ['message-queue/Kafka/Kafka-Workflow','Kafka-Workflow'],
+        ['message-queue/Kafka/Kafka-Producer','Kafka-Producer'],
+        ['message-queue/Kafka/Kafka-Consumer','Kafka-Consumer'],
+        ['message-queue/Kafka/Kafka高效读写数据的原因','Kafka高效读写数据的原因']
+      ]
+    },
+    {
+      title: " Zookeeper",
+      collapsable: true,
+      // children: [
+      //   "JUC/Java-Memory-Model",
+      //   "JUC/CountDownLatch、CyclicBarrier、Semaphore"
+      // ]
+    },    
+    {
+      title: "RPC",
+      collapsable: true,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['rpc/Hello-Protocol-Buffers', 'Hello ProtocolBuffers'],
+        ['rpc/Hello-RPC.md','Hello RPC'],
+        ['rpc/Hello-gRPC','Hello gRPC'],
+      ]
+    },
+  ];
+}
 
 
 function genInterviewSidebar(){

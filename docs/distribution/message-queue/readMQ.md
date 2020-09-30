@@ -1,6 +1,6 @@
 <div align="center">
 
-![img](../_images/message-queue/mq_index.png)
+![img](../../_images/message-queue/mq_index.png)
 
 </div>
 

@@ -56,18 +56,23 @@ const plugins = (config, file) => {
 
   if (plugins.length && plugins.length > 0) {
     plugins.forEach((plugin, i) => {
-      if (plugin.postcss) {
-        plugin = plugin.postcss
-      }
-
       if (plugin.default) {
         plugin = plugin.default
       }
 
+      if (plugin.postcss === true) {
+        plugin = plugin()
+      } else if (plugin.postcss) {
+        plugin = plugin.postcss
+      }
+
       if (
         // eslint-disable-next-line
-        !(typeof plugin === 'object' && Array.isArray(plugin.plugins) ||
-        typeof plugin === 'function')
+        !(
+          (typeof plugin === 'object' && Array.isArray(plugin.plugins)) ||
+          (typeof plugin === 'object' && plugin.postcssPlugin) ||
+          (typeof plugin === 'function')
+        )
       ) {
         throw new TypeError(`Invalid PostCSS Plugin found at: plugins[${i}]\n\n(@${file})`)
       }

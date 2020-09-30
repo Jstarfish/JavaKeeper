@@ -1,26 +1,5 @@
 # Spring IoC
 
-<!-- TOC depthFrom:2 depthTo:3 -->
-
-- [IoC 概念](#ioc-概念)
-  - [IoC 是什么](#ioc-是什么)
-  - [IoC 能做什么](#ioc-能做什么)
-  - [依赖注入](#依赖注入)
-  - [IoC 和 DI](#ioc-和-di)
-  - [IoC 容器](#ioc-容器)
-  - [Bean](#bean)
-- [IoC 容器](#ioc-容器-1)
-  - [核心接口](#核心接口)
-  - [IoC 容器工作步骤](#ioc-容器工作步骤)
-  - [Bean 概述](#bean-概述)
-  - [依赖](#依赖)
-- [IoC 容器配置](#ioc-容器配置)
-  - [Xml 配置](#xml-配置)
-  - [注解配置](#注解配置)
-  - [Java 配置](#java-配置)
-
-<!-- /TOC -->
-
 ## IoC 概念
 
 ### IoC 是什么
@@ -34,12 +13,14 @@ IoC 不是什么技术，而是一种设计思想。在 Java 开发中，IoC 意
 
 用图例说明一下，传统程序设计如图 2-1，都是主动去创建相关对象然后再组合起来：
 
-<div align="center"><img src="http://sishuok.com/forum/upload/2012/2/19/a02c1e3154ef4be3f15fb91275a26494__1.JPG"/></div>
+![](http://sishuok.com/forum/upload/2012/2/19/a02c1e3154ef4be3f15fb91275a26494__1.JPG)
+
 图 2-1 传统应用程序示意图
 
 当有了 IoC/DI 的容器后，在客户端类中不再主动去创建这些对象了，如图 2-2 所示:
 
-<div align="center"><img src="http://sishuok.com/forum/upload/2012/2/19/6fdf1048726cc2edcac4fca685f050ac__2.JPG"/></div>
+
+
 图 2-2 有 IoC/DI 容器后程序结构示意图
 
 ### IoC 能做什么
@@ -658,7 +639,7 @@ Java 配置
 
 为了让 Spring 识别这个定义类为一个 Spring 配置类，需要用到两个注解：@Configuration 和@Bean。
 
-如果你熟悉 Spring 的 xml 配置方式，你可以将@Configuration 等价于<beans>标签；将@Bean 等价于<bean>标签。
+如果你熟悉 Spring 的 xml 配置方式，你可以将@Configuration 等价于 \<beans>标签；将@Bean 等价于\<bean>标签。
 
 @Bean
 
@@ -798,7 +779,7 @@ public class Police implements Job {
 
 @Bean 注解用来表明一个方法实例化、配置合初始化一个被 Spring IoC 容器管理的新对象。
 
-如果你熟悉 Spring 的 xml 配置，你可以将@Bean 视为等价于`<beans>`标签。
+如果你熟悉 Spring 的 xml 配置，你可以将@Bean 视为等价于`\<beans>`标签。
 
 @Bean 注解可以用于任何的 Spring `@Component` bean，然而，通常被用于`@Configuration` bean。
 

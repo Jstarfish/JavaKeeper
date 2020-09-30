@@ -668,7 +668,7 @@ var QUERIES = [
   {
     regexp: /^last\s+(\d+)\s+electron\s+versions?$/i,
     select: function (context, versions) {
-      return Object.keys(e2c).reverse().slice(-versions).map(function (i) {
+      return Object.keys(e2c).slice(-versions).map(function (i) {
         return 'chrome ' + e2c[i]
       })
     }
@@ -1005,7 +1005,7 @@ var QUERIES = [
   {
     regexp: /^(firefox|ff|fx)\s+esr$/i,
     select: function () {
-      return ['firefox 68', 'firefox 78']
+      return ['firefox 78']
     }
   },
   {
@@ -1169,6 +1169,8 @@ var QUERIES = [
       }
     }
   }
+
+  browserslist.versionAliases.op_mob['59'] = '58'
 }())
 
 module.exports = browserslist

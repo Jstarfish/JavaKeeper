@@ -12,8 +12,12 @@ if (typeof reflectApply === 'function' && typeof Object.defineProperty === 'func
 			}
 		});
 		isCallableMarker = {};
+		// eslint-disable-next-line no-throw-literal
+		reflectApply(function () { throw 42; }, null, badArrayLike);
 	} catch (_) {
-		reflectApply = null;
+		if (_ !== isCallableMarker) {
+			reflectApply = null;
+		}
 	}
 } else {
 	reflectApply = null;

@@ -1,4 +1,4 @@
-
+Spring 面试集
 
 > 基于Spring Framework 4.x 总结的常见面试题，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
 
@@ -547,8 +547,8 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 ### 用事务通知声明式地管理事务
 
 - 事务管理是一种横切关注点
-- 为了在 Spring 2.x 中启用声明式事务管理，可以通过 tx Schema 中定义的 <tx:advice> 元素声明事务通知，为此必须事先将这个 Schema 定义添加到 <beans> 根元素中去
-- 声明了事务通知后，就需要将它与切入点关联起来。由于事务通知是在 <aop:config> 元素外部声明的, 所以它无法直接与切入点产生关联，所以必须在 <aop:config> 元素中声明一个增强器通知与切入点关联起来.
+- 为了在 Spring 2.x 中启用声明式事务管理，可以通过 tx Schema 中定义的 \<tx:advice> 元素声明事务通知，为此必须事先将这个 Schema 定义添加到 \<beans> 根元素中去
+- 声明了事务通知后，就需要将它与切入点关联起来。由于事务通知是在 \<aop:config> 元素外部声明的, 所以它无法直接与切入点产生关联，所以必须在 \<aop:config> 元素中声明一个增强器通知与切入点关联起来.
 - 由于 Spring AOP 是基于代理的方法，所以只能增强公共方法。因此, 只有公有方法才能通过 Spring AOP 进行事务管理。
 
 

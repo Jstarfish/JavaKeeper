@@ -17,7 +17,7 @@ export default (function (o, c, d) {
     var locale = this.$locale();
     var utils = this.$utils();
     var str = formatStr || FORMAT_DEFAULT;
-    var result = str.replace(/\[([^\]]+)]|Q|wo|ww|w|gggg|Do|X|x|k{1,2}|S/g, function (match) {
+    var result = str.replace(/\[([^\]]+)]|Q|wo|ww|w|zzz|z|gggg|Do|X|x|k{1,2}|S/g, function (match) {
       switch (match) {
         case 'Q':
           return Math.ceil((_this.$M + 1) / 3);
@@ -45,6 +45,12 @@ export default (function (o, c, d) {
 
         case 'x':
           return _this.$d.getTime();
+
+        case 'z':
+          return "[" + _this.offsetName() + "]";
+
+        case 'zzz':
+          return "[" + _this.offsetName('long') + "]";
 
         default:
           return match;

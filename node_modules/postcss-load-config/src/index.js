@@ -122,7 +122,7 @@ rc.sync = (ctx, path, options) => {
  * @license MIT
  *
  * @module postcss-load-config
- * @version 2.0.0
+ * @version 2.1.0
  *
  * @requires comsiconfig
  * @requires ./options

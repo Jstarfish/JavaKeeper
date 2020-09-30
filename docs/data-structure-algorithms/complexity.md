@@ -1,3 +1,5 @@
+# 时间复杂度
+
 > 高级工程师title的我，最近琢磨着好好刷刷算法题更高级一些，然鹅，当我准备回忆大学和面试时候学的数据结构之时，我发现自己对这个算法复杂度的记忆只有OOOOOooo
 >
 > 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
@@ -195,7 +197,3 @@ for(i=1; i<=n; ++i)
 
 《大话数据结构》
 https://zhuanlan.zhihu.com/p/50479555
-
-
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd73fpmmbwj30ku0aumy2.jpg)

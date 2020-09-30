@@ -1,3 +1,8 @@
+1.2.2 / 2020-09-21
+=================
+  * [Fix] include actual fix from 579179e
+  * [Dev Deps] update `eslint`
+
 1.2.1 / 2020-09-09
 =================
   * [Fix] phantomjs‘ Reflect.apply does not throw properly on a bad array-like

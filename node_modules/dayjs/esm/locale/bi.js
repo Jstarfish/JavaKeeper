@@ -1,3 +1,4 @@
+// Bislama [bi]
 import dayjs from '../index';
 var locale = {
   name: 'bi',

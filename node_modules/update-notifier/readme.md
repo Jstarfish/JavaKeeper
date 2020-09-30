@@ -206,7 +206,6 @@ There are a bunch projects using it:
 - [Yeoman](https://yeoman.io) - Modern workflows for modern webapps
 - [AVA](https://ava.li) - Simple concurrent test runner
 - [XO](https://github.com/xojs/xo) - JavaScript happiness style linter
-- [Pageres](https://github.com/sindresorhus/pageres) - Capture website screenshots
 - [Node GH](https://github.com/node-gh/gh) - GitHub command line tool
 
 [And 2700+ more…](https://www.npmjs.org/browse/depended/update-notifier)

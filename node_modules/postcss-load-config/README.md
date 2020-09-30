@@ -33,7 +33,7 @@ Then create a postcss config file by choosing one of the following formats
 
 ### `package.json`
 
-Create a **`postcss`** section in your projects **`package.json`**
+Create a **`postcss`** section in your project's **`package.json`**
 
 ```
 Project (Root)
