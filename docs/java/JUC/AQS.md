@@ -211,7 +211,7 @@ AQS 核心思想是，如果被请求的共享资源空闲，那么就将当前�
 
 主要原理图如下：
 
-![](https://p0.meituan.net/travelcube/7132e4cef44c26f62835b197b239147b18062.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gj8k40jvfej30ix051aa8.jpg)
 
 AQS 使用一个 volatile 的 int 类型的成员变量来表示同步状态，通过内置的 FIFO 队列来完成资源获取的排队工作，通过 CAS 完成对 state 值的修改。
 
@@ -932,7 +932,7 @@ static final long spinForTimeoutThreshold = 1000L;
 
 如果当时你理解了这个模型，再看 Condition 的实现，根本就不是问题了，首先 Condition 还是一个接口，肯定也是需要有实现类的
 
-![](https://rgyb.sunluomeng.top/20200530200503.png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gj8k4jiqe3j30g80d6wfm.jpg)
 
 那故事就从 `lock.newCondition` 说起吧
 
