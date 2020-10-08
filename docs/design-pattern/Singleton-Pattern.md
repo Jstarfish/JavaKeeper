@@ -5,7 +5,7 @@
 > 沙沙沙刷刷刷~~~ 写好了
 >
 > 面试官：你这个是怎么保证线程安全的，那你知道，volatile 关键字? 类加载器？锁机制？？？？
-> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
+> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 
 

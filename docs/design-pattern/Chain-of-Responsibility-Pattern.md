@@ -313,7 +313,3 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 https://wiki.jikexueyuan.com/project/java-design-pattern/chain-responsibility-pattern.html
 
 https://refactoringguru.cn/design-patterns/chain-of-responsibility
-
-
-
-![blog_end.png](https://i.loli.net/2020/04/14/IH5sCS42xveP3Ud.png)

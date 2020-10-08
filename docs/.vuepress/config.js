@@ -146,7 +146,8 @@ function genDesignPatternSidebar() {
     ['Adapter-Pattern', '适配器模式'],
     ['Chain-of-Responsibility-Pattern', '责任链模式'],
     ['Observer-Pattern', '观察者模式'],
-    ['Facade-Pattern', '外观模式']
+    ['Facade-Pattern', '外观模式'],
+    ['Template-Pattern', '模板方法模式']
   ];
 }
 

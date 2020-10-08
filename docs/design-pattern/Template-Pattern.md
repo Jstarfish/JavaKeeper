@@ -1,5 +1,5 @@
-> 模板方法模式——看看 JDK 和 Spring 是如何优雅复用代码的
->
+# 模板方法模式——看看 JDK 和 Spring 是如何优雅复用代码的
+
 > 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 ## 前言
