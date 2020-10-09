@@ -43,7 +43,7 @@ JUC 面试题总共围绕的就这么几部分
 
 **线程安全: 就是多线程访问时，采用了加锁机制，当一个线程访问该类的某个数据时，进行保护，其他线程不能进行访问，直到该线程读取完，其他线程才可使用。不会出现数据不一致或者数据污染**。
 
-一个线程安全的计数器类的同一个实例对象在被多个线程使用的情况下也不会出现计算失误。很显然你可以将**集合类分成两组，线程安全和非线程安全的**。 Vector 是用同步方法来实现线程安全的, 而和它相似的ArrayList不是线程安全的。
+一个线程安全的计数器类的同一个实例对象在被多个线程使用的情况下也不会出现计算失误。很显然你可以将**集合类分成两组，线程安全和非线程安全的**。 Vector 是用同步方法来实现线程安全的, 而和它相似的 ArrayList 不是线程安全的。
 
 **线程不安全：就是不提供数据访问保护，有可能出现多个线程先后更改数据造成所得到的数据是脏数据**
 
@@ -65,7 +65,7 @@ Linux 相比与其他操作系统（包括其他类 Unix 系统）有很多的�
 
 
 
-### 如何在 Windows 和 Linux 上查找哪个线程cpu利用率最高？
+### 如何在 Windows 和 Linux 上查找哪个线程 cpu 利用率最高？
 
 windows上面用任务管理器看，linux下可以用 top 这个工具看。
 
@@ -99,10 +99,10 @@ Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种
 - wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 notify() 或者 notifyAll() 方法。sleep() 方法执行完成后，线程会自动苏醒。或者可以使用 wait(long timeout)超时后线程会自动苏醒。
 
 **yield()**
-　　yield()方法和sleep()方法类似，也不会释放“锁标志”，区别在于，它没有参数，即yield()方法只是使当前线程重新回到可执行状态，所以执行yield()的线程有可能在进入到可执行状态后马上又被执行，另外yield()方法只能使同优先级或者高优先级的线程得到执行机会，这也和sleep()方法不同。
+yield() 方法和 sleep() 方法类似，也不会释放“锁标志”，区别在于，它没有参数，即 yield() 方法只是使当前线程重新回到可执行状态，所以执行 yield() 的线程有可能在进入到可执行状态后马上又被执行，另外 yield() 方法只能使同优先级或者高优先级的线程得到执行机会，这也和 sleep() 方法不同。
 
 **join()**
-　　join()方法会使当前线程等待调用join()方法的线程结束后才能继续执行
+join() 方法会使当前线程等待调用 join() 方法的线程结束后才能继续执行
 
 
 
@@ -170,8 +170,8 @@ https://www.cnblogs.com/hapjin/p/5492619.html
 那还有那些更高级的同步机制：
 
 3. 信号量（Semaphore）：是一种计数器，用来保护一个或者多个共享资源的访问，它是并发编程的一种基础工具，大多数编程语言都提供这个机制，这也是操作系统中经常提到的
-4. CountDownLatch：是Java语言提供的同步辅助类，在完成一组正在其他线程中执行的操作之前，他允许线程一直等待，这个类的使用已经在我的博客中了，大家可以去看看，自己去体验一下，平时编程不常用，但是实际中可能很有用，还是要多了解一下的；
-5. CyclicBarrier：也是 java 语言提供的同步辅助类，他允许多个线程在某一个集合点处进行相互等待；这个感觉慢有意思的
+4. CountDownLatch：是 Java 语言提供的同步辅助类，在完成一组正在其他线程中执行的操作之前，他允许线程一直等待
+5. CyclicBarrier：也是 java 语言提供的同步辅助类，他允许多个线程在某一个集合点处进行相互等待；
 6. Phaser：也是 java 语言提供的同步辅助类，他把并发任务分成多个阶段运行，在开始下一阶段之前，当前阶段中所有的线程都必须执行完成，JAVA7 才有的特性。
 7. Exchanger：他提供了两个线程之间的数据交换点。
 
@@ -315,8 +315,8 @@ Thread[线程 2,5,main]waiting get resource1
 线程 A 通过 synchronized (resource1) 获得 resource1 的监视器锁，然后通过 `Thread.sleep(1000);`让线程 A 休眠 1s 为的是让线程 B 得到执行然后获取到 resource2 的监视器锁。线程 A 和线程 B 休眠结束了都开始企图请求获取对方的资源，然后这两个线程就会陷入互相等待的状态，这也就产生了死锁。上面的例子符合产生死锁的四个必要条件。学过操作系统的朋友都知道产生死锁必须具备以下四个条件：
 
 - 互斥条件：该资源任意一个时刻只由一个线程占用。
-- 请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
-- 不剥夺条件：线程已获得的资源在末使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源
+- 占有且等待：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
+- 不可强行占有：线程已获得的资源在末使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源
 - 循环等待条件：若干进程之间形成一种头尾相接的循环等待资源关系。
 
 #### 如何避免线程死锁?
@@ -331,20 +331,20 @@ Thread[线程 2,5,main]waiting get resource1
 我们对线程 2 的代码修改成下面这样就不会产生死锁了。
 
 ```java
-    new Thread(() -> {
-        synchronized (resource1) {
-            System.out.println(Thread.currentThread() + "get resource1");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(Thread.currentThread() + "waiting get resource2");
-            synchronized (resource2) {
-                System.out.println(Thread.currentThread() + "get resource2");
-            }
+new Thread(() -> {
+    synchronized (resource1) {
+        System.out.println(Thread.currentThread() + "get resource1");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-    }, "线程 2").start();
+        System.out.println(Thread.currentThread() + "waiting get resource2");
+        synchronized (resource2) {
+            System.out.println(Thread.currentThread() + "get resource2");
+        }
+    }
+}, "线程 2").start();
 ```
 
 Output
@@ -383,18 +383,14 @@ Process finished with exit code 0
 当使用synchronized关键词提供的内置锁时，只要线程没有获得锁，那么就会永远等待下去，然而Lock接口提供了`boolean tryLock(long time, TimeUnit unit) throws InterruptedException`方法，该方法可以按照固定时长等待锁，因此线程可以在获取锁超时以后，主动释放之前已经获得的所有的锁。通过这种方式，也可以很有效地避免死锁。
 
 
-作者：江溢Jonny
-链接：https://juejin.im/post/6844903577660424206
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
-
 
 ### ReentrantLock (可重入锁) 
 
 > 何为可重入
 
 可重入的意思是某一个线程是否可多次获得一个锁，**在继承的情况下，如果不是可重入的，那就形成死锁了,比如递归调用自己的时候;**，如果不能可重入，每次都获取锁不合适，比如synchronized就是可重入的，ReentrantLock也是可重入的
+
+可重入锁，也叫做递归锁，指的是同一线程外层函数获得锁之后 ，内层递归函数仍然有获取该锁的代码，但不受影响。
 
 当某个线程A已经持有了一个锁,当线程B尝试进入被这个锁保护的代码段的时候.就会被阻塞.而锁的操作粒度是”线程”,而不是调用.同一个线程再次进入同步代码的时候.可以使用自己已经获取到的锁,这就是可重入锁
 
@@ -404,7 +400,7 @@ Process finished with exit code 0
 
  它实现方式是：
 
-为每个锁关联一个获取计数器和一个所有者线程,当计数值为0的时候,这个所就没有被任何线程只有.当线程请求一个未被持有的锁时,JVM将记下锁的持有者,并且将获取计数值置为1,如果同一个线程再次获取这个锁,技术值将递增,退出一次同步代码块,计算值递减,当计数值为0时,这个锁就被释放.ReentrantLock里面有实现
+为每个锁关联一个获取计数器和一个所有者线程,当计数值为0的时候,这个锁就没有被任何线程持有.当线程请求一个未被持有的锁时,JVM将记下锁的持有者,并且将获取计数值置为1,如果同一个线程再次获取这个锁,技术值将递增,退出一次同步代码块,计算值递减,当计数值为0时,这个锁就被释放.ReentrantLock里面有实现
 
 
 
@@ -465,7 +461,7 @@ volatile 的读性能消耗与普通变量几乎相同，但是写操作稍慢�
 
 ### synchronized 和 Lock 区别
 
-原始构成
+1、原始构成
 
 - synchronized 是关键字属于JVM 层面
   - monitorenter(底层是通过monitor对象完成，其实 wait/notify等方法也依赖于monitor对象只有在同步代码块或方法中才能调wait/notify等方法)
@@ -490,7 +486,7 @@ RenntrantLock可中断，
 
 synchronized 是非公平锁
 
-RenntrantLock两者都可以
+RenntrantLock两者都可以，默认是非公平锁
 
 5、锁绑定多个条件Condition
 
@@ -537,8 +533,6 @@ synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团�
 
 
 
-
-
 ------
 
 
@@ -553,7 +547,7 @@ synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团�
 >
 > 单核CPU有可见性问题吗
 
-Java虚拟机规范中试图定义一种「 **Java 内存模型**」来**屏蔽掉各种硬件和操作系统的内存访问差异**，以实现**让 Java 程序在各种平台下都能达到一致的内存访问效果**
+Java 虚拟机规范中试图定义一种「 **Java 内存模型**」来**屏蔽掉各种硬件和操作系统的内存访问差异**，以实现**让 Java 程序在各种平台下都能达到一致的内存访问效果**
 
 **JMM组成**：
 

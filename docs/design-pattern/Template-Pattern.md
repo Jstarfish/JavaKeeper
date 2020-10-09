@@ -103,6 +103,8 @@ public static void main(String[] args) {
 
 好嘞，又学会一个设计模式，这就是**模板方法模式**，我们的 `makingDrinks()` 就是模板方法。我们可以看到相同的步骤 `boilWater()` 和 `pourInCup()` 只在父类中进行即可，不同的步骤放在子类实现。
 
+
+
 ## 认识模板方法
 
 在阎宏博士的《JAVA与模式》一书中开头是这样描述模板方法（Template Method）模式的：
@@ -156,7 +158,7 @@ public abstract class Drinks {
 }
 ```
 
-如上，我们加了一个逻辑判断，逻辑判断的方法时一个只返回 true 的方法，这个方法我们叫做 **钩子方法**。
+如上，我们加了一个逻辑判断，逻辑判断的方法是一个只返回 true 的方法，这个方法我们叫做 **钩子方法**。
 
 > 钩子：在模板方法的父类中，我们可以定义一个方法，它默认不做任何事，子类可以视情况要不要覆盖它，该方法称为“钩子”。
 
@@ -175,7 +177,7 @@ public class Coffee extends Drinks {
     void addCondiments() {
         System.out.println("加奶加糖");
     }
-		//覆盖了钩子，提供了自己的询问功能，让用户输入是否需要加料
+	//覆盖了钩子，提供了自己的询问功能，让用户输入是否需要加料
     boolean customerLike() {
         String answer = getUserInput();
         if (answer.toLowerCase().startsWith("y")) {
@@ -255,7 +257,7 @@ public static void main(String[] args) {
 你可能会说，这个看着不像我们常规的模板方法，是的。我们看下比较器实现的步骤
 
 1. 构建对象数组
-2. 通过 Arrays.sort 方法对数组排序，传参为 `Comparable` 接口的实例
+2. 通过 `Arrays.sort` 方法对数组排序，传参为 `Comparable` 接口的实例
 3. 比较时候会调用我们的实现类的 `compareTo()` 方法
 4. 将排好序的数组设置进原数组中，排序完成
 
@@ -269,9 +271,9 @@ public static void main(String[] args) {
 
 ### Spring 中的模板方法
 
-Spring 中的设计模式太多了，而且大部分扩展功能都可以看到模板方式模式的影子。
+Spring 中的设计模式太多了，而且大部分扩展功能都可以看到模板方法模式的影子。
 
-我们看下 IOC 容器初始化时中的模板方法，不管是 XML 还是注解的方式，对于核心容器启动流程都是一致的。
+我们看下 IOC 容器初始化时的模板方法，不管是 XML 还是注解的方式，对于核心容器启动流程都是一致的。
 
 `AbstractApplicationContext` 的 `refresh` 方法实现了 IOC 容器启动的主要逻辑。
 
@@ -311,7 +313,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 打开你的 IDEA，我们会发现常用的 `ClassPathXmlApplicationContext` 和 `AnnotationConfigApplicationContext` 启动入口，都是它的实现类（子类的子类的子类的...）。
 
-`AbstractApplicationContext`的一个子类 `AbstractRefreshableWebApplicationContext` 中有钩子方法 `onRefresh() `的实现：
+`AbstractApplicationContext` 的一个子类 `AbstractRefreshableWebApplicationContext` 中有钩子方法 `onRefresh() ` 的实现：
 
 ```java
 public abstract class AbstractRefreshableWebApplicationContext extends …… {

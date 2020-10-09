@@ -1,6 +1,7 @@
 # 责任链模式
 
 责任链，顾名思义，就是用来处理相关事务责任的一条执行链，执行链上有多个节点，每个节点都有机会（条件匹配）处理请求事务，如果某个节点处理完了就可以根据实际业务需求传递给下一个节点继续处理或者返回处理完毕。
+
 这种模式给予请求的类型，对请求的发送者和接收者进行解耦。属于行为型模式。
 
 在这种模式中，通常每个接收者都包含对另一个接收者的引用。如果一个对象不能处理该请求，那么它会把相同的请求传给下一个接收者，依此类推。
@@ -25,7 +26,7 @@ public void test(int i, Request request){
 }
 ```
 
-代码的业务逻辑是这样的，方法有两个参数：整数 i 和一个请求 request，根据 i 的值来决定由谁来处理 request，如果 i==1，由 Handler1来处理，如果 i==2，由 Handler2 来处理，以此类推。在编程中，这种处理业务的方法非常常见，所有处理请求的类由if…else…条件判断语句连成一条责任链来对请求进行处理，相信大家都经常用到。这种方法的优点是非常直观，简单明了，并且比较容易维护，但是这种方法也存在着几个比较令人头疼的问题：
+代码的业务逻辑是这样的，方法有两个参数：整数 i 和一个请求 request，根据 i 的值来决定由谁来处理 request，如果 i==1，由 Handler1来处理，如果 i==2，由 Handler2 来处理，以此类推。在编程中，这种处理业务的方法非常常见，所有处理请求的类由 if…else… 条件判断语句连成一条责任链来对请求进行处理，相信大家都经常用到。这种方法的优点是非常直观，简单明了，并且比较容易维护，但是这种方法也存在着几个比较令人头疼的问题：
 
 - **代码臃肿**：实际应用中的判定条件通常不是这么简单地判断是否为1或者是否为2，也许需要复杂的计算，也许需要查询数据库等等，这就会有很多额外的代码，如果判断条件再比较多，那么这个if…else…语句基本上就没法看了。
 - **耦合度高**：如果我们想继续添加处理请求的类，那么就要继续添加if…else…判定条件；另外，这个条件判定的顺序也是写死的，如果想改变顺序，那么也只能修改这个条件语句。
@@ -46,7 +47,7 @@ public void test(int i, Request request){
 
 ## 角色
 
-- **Handler**： 抽象处理类，抽象处理类中主要包含一个指向下一处理类的成员变量nextHandler和一个处理请求的方法handRequest，handRequest方法的主要主要思想是，如果满足处理的条件，则有本处理类来进行处理，否则由nextHandler来处理
+- **Handler**： 抽象处理类，抽象处理类中主要包含一个指向下一处理类的成员变量 nextHandler 和一个处理请求的方法 handRequest，handRequest 方法的主要主要思想是，如果满足处理的条件，则由本处理类来进行处理，否则由 nextHandler 来处理
 - **ConcreteHandler**： 具体处理类主要是对具体的处理逻辑和处理的适用条件进行实现。具体处理者接到请求后，可以选择将请求处理掉，或者将请求传给下家。由于具体处理者持有对下家的引用，因此，如果需要，具体处理者可以访问下家
 - **Client**：客户端
 
@@ -127,7 +128,7 @@ public class Client {
         ConcreteHandler1 handler1 = new ConcreteHandler1(1);
         ConcreteHandler2 handler2 = new ConcreteHandler2(2);
         ConcreteHandler3 handler3 = new ConcreteHandler3(3);
-				//处理者构成一个环形
+		//处理者构成一个环形
         handler1.setNextHandler(handler2);
         handler2.setNextHandler(handler3);
 
@@ -146,7 +147,7 @@ public class Client {
 
 比如
 
-- 程序员要请3天以上的假期，在OA申请，需要直接主管、总监、HR 层层审批后才生效。类似的采购审批、报销审批。。。
+- 程序员要请 3 天以上的假期，在 OA 申请，需要直接主管、总监、HR 层层审批后才生效。类似的采购审批、报销审批。。。
 - 美团在外卖营销业务中资源位展示的逻辑  https://tech.meituan.com/2020/03/19/design-pattern-practice-in-marketing.html
 
 
@@ -205,9 +206,9 @@ public final class ApplicationFilterChain implements FilterChain {
 
 FilterChain 就是一条过滤链。其中每个过滤器（Filter）都可以决定是否执行下一步。过滤分两个方向，进和出：
 
-进：在把ServletRequest和ServletResponse交给Servlet的service方法之前，需要进行过滤
+- 进：在把 ServletRequest 和 ServletResponse 交给 Servlet 的 service 方法之前，需要进行过滤
 
-出：在service方法完成后，往客户端发送之前，需要进行过滤
+- 出：在service方法完成后，往客户端发送之前，需要进行过滤
 
 
 
@@ -265,7 +266,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
  }
 ```
 
-- SpringMVC 请求的流程中，执行了拦截器相关方法 interceptor.preHandler 等等
+- SpringMVC 请求的流程中，执行了拦截器相关方法 `interceptor.preHandler` 等等
 - 在处理 SpringMVC 请求时，使用到职责链模式还使用到适配器模式
 - HandlerExecutionChain 主要负责的是请求拦截器的执行和请求处理，但是他本身不处理请求，只是将请求分配给链上注册处理器执行，这是职责链实现方式，减少职责链本身与处理逻辑之间的耦合，规范了处理流程
 - HandlerExecutionChain 维护了 HandlerInterceptor 的集合， 可以向其中注册相应的拦截器
@@ -276,7 +277,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 ## 总结
 
-责任链模式其实就是一个灵活版的 if…else…语句，它就是将这些判定条件的语句放到了各个处理类中，这样做的优点是比较灵活了，但同样也带来了风险，比如设置处理类前后关系时，一定要特别仔细，搞对处理类前后逻辑的条件判断关系，并且注意不要在链中出现循环引用的问题。
+**责任链模式其实就是一个灵活版的 if…else…语句**，它就是将这些判定条件的语句放到了各个处理类中，这样做的优点是比较灵活了，但同样也带来了风险，比如设置处理类前后关系时，一定要特别仔细，搞对处理类前后逻辑的条件判断关系，**并且注意不要在链中出现循环引用的问题**。
 
 **优点**：
 

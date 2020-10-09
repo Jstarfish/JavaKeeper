@@ -22,7 +22,7 @@
 
 面向对象语言对事物的体现都是以对象的形式，所以为了方便对多个对象的操作，需要将对象进行存储，集合就是存储对象最常用的一种方式，也叫容器。
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdp03vldkkg30hv0gzwet.gif)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdp03vldkkg30hv0gzwet.gif)
 
 
 
@@ -50,7 +50,7 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 Map 接口和 Collection 接口是所有集合框架的父接口：
 
 1. Collection接口的子接口包括：Set、List、Queue
-2. List是有序的允许有重复元素的Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
+2. List是有序的允许有重复元素的 Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
 3. Set是一种不包含重复元素且无序的Collection，实现类主要有：HashSet、TreeSet、LinkedHashSet等
 4. Map没有继承Collection接口，Map提供key到value的映射。实现类主要有：HashMap、TreeMap、Hashtable、ConcurrentHashMap 以及 Properties 等
 
@@ -663,7 +663,7 @@ HashMap 定位数组索引位置，直接决定了 hash 方法的离散性能。
 
 > 为什么要这样呢？
 >
-> HashMap 的长度为什么是2的幂次方?
+> HashMap 的长度为什么是 2 的幂次方?
 
 目的当然是为了减少哈希碰撞，使 table 里的数据分布的更均匀。
 
@@ -685,7 +685,7 @@ HashMap 定位数组索引位置，直接决定了 hash 方法的离散性能。
 
 我们首先可能会想到采用%取余的操作来实现。但是，重点来了。
 
-取余操作中如果除数是2的幂次则等价于其除数减一的与操作，也就是说 `hash%length=hash&(length-1)`，但前提是 length 是 2 的 n 次方，并且采用 &运算比 %运算效率高，这也就解释了 HashMap 的长度为什么是2的幂次方。
+**取余操作中如果除数是2的幂次则等价于其除数减一的与操作**，也就是说 `hash%length=hash&(length-1)`，但前提是 length 是 2 的 n 次方，并且采用 &运算比 %运算效率高，这也就解释了 HashMap 的长度为什么是2的幂次方。
 
 ##### get() 方法
 
@@ -896,7 +896,7 @@ final Node<K,V>[] resize() {
 2. 每次扩展的时候，都是扩展2倍；
 3. 扩展后Node对象的位置要么在原位置，要么移动到原偏移量两倍的位置。
 
-在 `putVal()` 中，我们看到在这个函数里面使用到了2次 `resize()` 方法，`resize()` 方法表示在进行第一次初始化时会对其进行扩容，或者当该数组的实际大小大于其扩容阈值（第一次为0.75 * 16 = 12），这个时候在扩容的同时也会伴随的桶上面的元素进行重新分发，这也是JDK1.8版本的一个优化的地方，在1.7中，扩容之后需要重新去计算其Hash值，根据Hash值对其进行分发，但在1.8版本中，则是根据在同一个桶的位置中进行判断(e.hash & oldCap)是否为0，重新进行hash分配后，该元素的位置要么停留在原始位置，要么移动到原始位置+增加的数组大小这个位置上
+在 `putVal()` 中，我们看到在这个函数里面使用到了2次 `resize()` 方法，`resize()` 方法表示在进行第一次初始化时会对其进行扩容，或者当该数组的实际大小大于其扩容阈值（第一次为0.75 * 16 = 12），这个时候在扩容的同时也会伴随的桶上面的元素进行重新分发，这也是JDK1.8版本的一个优化的地方，在1.7中，扩容之后需要重新去计算其Hash值，根据Hash值对其进行分发，但在1.8 版本中，则是根据在同一个桶的位置中进行判断(e.hash & oldCap)是否为0，重新进行hash分配后，该元素的位置要么停留在原始位置，要么移动到原始位置+增加的数组大小这个位置上
 
 
 
@@ -915,30 +915,30 @@ final Node<K,V>[] resize() {
 接下来我们看看链表树化是怎么做的：
 
 ```java
-    final void treeifyBin(Node<K,V>[] tab, int hash) {
-        int n, index; Node<K,V> e;
-        // 1. 容量小于 MIN_TREEIFY_CAPACITY，优先扩容
-        if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
-            resize();
-        // 2. 桶不为空，那么进行树化操作
-        else if ((e = tab[index = (n - 1) & hash]) != null) {
-            TreeNode<K,V> hd = null, tl = null;
-             // 2.1 先将链表转成 TreeNode 表示的双向链表
-            do {
-                TreeNode<K,V> p = replacementTreeNode(e, null);
-                if (tl == null)
-                    hd = p;
-                else {
-                    p.prev = tl;
-                    tl.next = p;
-                }
-                tl = p;
-            } while ((e = e.next) != null);
-            // 2.2 将 TreeNode 表示的双向链表树化
-            if ((tab[index] = hd) != null)
-                hd.treeify(tab);
-        }
+final void treeifyBin(Node<K,V>[] tab, int hash) {
+    int n, index; Node<K,V> e;
+    // 1. 容量小于 MIN_TREEIFY_CAPACITY，优先扩容
+    if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
+        resize();
+    // 2. 桶不为空，那么进行树化操作
+    else if ((e = tab[index = (n - 1) & hash]) != null) {
+        TreeNode<K,V> hd = null, tl = null;
+        // 2.1 先将链表转成 TreeNode 表示的双向链表
+        do {
+            TreeNode<K,V> p = replacementTreeNode(e, null);
+            if (tl == null)
+                hd = p;
+            else {
+                p.prev = tl;
+                tl.next = p;
+            }
+            tl = p;
+        } while ((e = e.next) != null);
+        // 2.2 将 TreeNode 表示的双向链表树化
+        if ((tab[index] = hd) != null)
+            hd.treeify(tab);
     }
+}
 ```
 
 我们可以看到链表树化的整体思路也比较清晰。首先将链表转成 TreeNode 表示的双向链表，之后再调用 `treeify()` 方法进行树化操作。那么我们继续看看 `treeify()` 方法的实现。
@@ -1118,6 +1118,47 @@ final Node<K,V> untreeify(HashMap<K,V> map) {
 
 
 
+#### HashMap 为什么线程不安全
+
+1. put的时候导致的多线程数据不一致。
+    这个问题比较好想象，比如有两个线程A和B，首先A希望插入一个key-value对到HashMap中，首先计算记录所要落到的桶的索引坐标，然后获取到该桶里面的链表头结点，此时线程A的时间片用完了，而此时线程B被调度得以执行，和线程A一样执行，只不过线程B成功将记录插到了桶里面，假设线程A插入的记录计算出来的桶索引和线程B要插入的记录计算出来的桶索引是一样的，那么当线程B成功插入之后，线程A再次被调度运行时，它依然持有过期的链表头但是它对此一无所知，以至于它认为它应该这样做，如此一来就覆盖了线程B插入的记录，这样线程B插入的记录就凭空消失了，造成了数据不一致的行为。
+
+2. 另外一个比较明显的线程不安全的问题是HashMap的get操作可能因为resize而引起死循环（cpu100%），具体分析如下：
+
+   下面的代码是resize的核心内容：
+
+```java
+void transfer(Entry[] newTable, boolean rehash) {  
+        int newCapacity = newTable.length;  
+        for (Entry<K,V> e : table) {  
+  
+            while(null != e) {  
+                Entry<K,V> next = e.next;           
+                if (rehash) {  
+                    e.hash = null == e.key ? 0 : hash(e.key);  
+                }  
+                int i = indexFor(e.hash, newCapacity);   
+                e.next = newTable[i];  
+                newTable[i] = e;  
+                e = next;  
+            } 
+        }  
+    }  
+```
+
+这个方法的功能是将原来的记录重新计算在新桶的位置，然后迁移过去。
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201009160422.png)
+
+多线程HashMap的resize
+
+我们假设有两个线程同时需要执行resize操作，我们原来的桶数量为2，记录数为3，需要resize桶到4，原来的记录分别为：[3,A],[7,B],[5,C]，在原来的map里面，我们发现这三个entry都落到了第二个桶里面。
+ 假设线程thread1执行到了transfer方法的Entry next = e.next这一句，然后时间片用完了，此时的e = [3,A], next = [7,B]。线程thread2被调度执行并且顺利完成了resize操作，需要注意的是，此时的[7,B]的next为[3,A]。此时线程thread1重新被调度运行，此时的thread1持有的引用是已经被thread2 resize之后的结果。线程thread1首先将[3,A]迁移到新的数组上，然后再处理[7,B]，而[7,B]被链接到了[3,A]的后面，处理完[7,B]之后，就需要处理[7,B]的next了啊，而通过thread2的resize之后，[7,B]的next变为了[3,A]，此时，[3,A]和[7,B]形成了环形链表，在get的时候，如果get的key的桶索引和[3,A]和[7,B]一样，那么就会陷入死循环。
+
+如果在取链表的时候从头开始取（现在是从尾部开始取）的话，则可以保证节点之间的顺序，那样就不存在这样的问题了。
+
+
+
 #### HashMap：JDK1.7 VS JDK1.8
 
 JDK1.8主要解决或优化了一下问题：
@@ -1165,9 +1206,15 @@ Hashtable 和 HashMap 都是散列表，也是用”拉链法“实现的哈希�
 
 
 
+#### 了解过 LinkedHashMap、TreeMap 吗
+
+LinkedHashMap属于HashMap的子类，与HashMap的区别在于LinkedHashMap保存了记录插入的顺序。TreeMap实现了SortedMap接口，TreeMap 有能力对插入的记录根据 key 排序，默认按照升序排序，也可以自定义比较项，在使用 TreeMap 的时候，key 应当实现 Comparable。
+
+
+
 ## ConcurrentHashMap
 
-HashMap 在多线程情况下，在 put 的时候，插入的元素超过了容量（由负载因子决定）的范围就会触发扩容操作，就是 rehash，这个会重新将原数组的内容重新 hash 到新的扩容数组中，在多线程的环境下，存在同时其他的元素也在进行put操作，如果hash值相同，可能出现同时在同一数组下用链表表示，造成**闭环**，导致在get时会出现死循环，所以 HashMap 是线程不安全的。(可参考：https://www.jianshu.com/p/e2f75c8cce01）
+HashMap 在多线程情况下，在 put 的时候，插入的元素超过了容量（由负载因子决定）的范围就会触发扩容操作，就是 resize，这个会重新将原数组的内容重新 hash 到新的扩容数组中，在多线程的环境下，存在同时其他的元素也在进行 put 操作，如果 hash 值相同，可能出现同时在同一数组下用链表表示，造成**闭环**，导致在 get 时会出现死循环，所以 HashMap 是线程不安全的。(可参考：https://www.jianshu.com/p/e2f75c8cce01）
 
 Hashtable，是线程安全的，它在所有涉及到多线程操作的都加上了synchronized关键字来锁住整个table，这就意味着所有的线程都在竞争一把锁，在多线程的环境下，它是安全的，但是无疑是效率低下的。
 
@@ -1587,7 +1634,7 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 原理：迭代器在遍历时直接访问集合中的内容，并且在遍历过程中使用一个 modCount 变量。集合在被遍历期间如果内容发生变化，就会改变 modCount 的值。每当迭代器使用 hashNext()/next() 遍历下一个元素之前，都会检测 modCount 变量是否为 expectedmodCount 值，是的话就返回遍历；否则抛出异常，终止遍历。
 
-注意：这里异常的抛出条件是检测到 modCount！=expectedmodCount 这个条件。如果集合发生变化时修改modCount 值刚好又设置为了 expectedmodCount 值，则异常不会抛出。因此，不能依赖于这个异常是否抛出而进行并发操作的编程，这个异常只建议用于检测并发修改的bug。
+注意：这里异常的抛出条件是检测到 modCount！=expectedmodCount 这个条件。如果集合发生变化时修改modCount 值刚好又设置为了 expectedmodCount 值，则异常不会抛出。因此，不能依赖于这个异常是否抛出而进行并发操作的编程，这个异常只建议用于检测并发修改的 bug。
 
 场景：`java.util` 包下的集合类都是快速失败的，不能在多线程下发生并发修改（迭代过程中被修改）。
 
@@ -1663,7 +1710,7 @@ public interface Iterator<E> {
 
 ## Comparable 和 Comparator 接口有何区别？
 
-Java中对集合对象或者数组对象排序，有两种实现方式：
+Java 中对集合对象或者数组对象排序，有两种实现方式：
 
 - 对象实现Comparable 接口
 
@@ -1727,7 +1774,7 @@ HashSet 的底层其实就是 HashMap，只不过我们 **HashSet 是实现了 S
 
 ### Iterater 和 ListIterator 之间有什么区别？
 
-- 我们可以使用Iterator来遍历Set和List集合，而ListIterator只能遍历List
+- 我们可以使用 Iterator来遍历 Set 和 List 集合，而 ListIterator 只能遍历List
 - ListIterator有add方法，可以向List中添加对象，而Iterator不能
 - ListIterator和Iterator都有hasNext()和next()方法，可以实现顺序向后遍历，但是ListIterator有hasPrevious()和previous()方法，可以实现逆向（顺序向前）遍历。Iterator不可以
 - ListIterator可以定位当前索引的位置，nextIndex()和previousIndex()可以实现。Iterator没有此功能

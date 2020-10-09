@@ -1,6 +1,6 @@
-# 装饰模式——JDK和Spring是如何杜绝继承滥用的
+# 装饰模式——看看 JDK 和 Spring 是如何杜绝继承滥用的
 
-《Head First 设计模式》中是这么形容装饰者模式——“**给爱用继承的人一个全新的设计眼界**”，拒绝继承滥用，从装饰者模式开始。
+《Head First 设计模式》中是这么形容装饰者模式的——“**给爱用继承的人一个全新的设计眼界**”，拒绝继承滥用，从装饰者模式开始。
 
 装饰者模式允许向一个现有的对象添加新的功能，同时又不改变其结构。这种类型的设计模式属于**结构型模式**，它是作为现有的类的一个包装。
 
@@ -15,7 +15,7 @@
 一般有两种方式可以实现给一个类或对象增加行为：
 
 - 继承机制，使用继承机制是给现有类添加功能的一种有效途径，通过继承一个现有类可以使得子类在拥有自身方法的同时还拥有父类的方法。但是这种方法是静态的，用户不能控制增加行为的方式和时机。
-- 关联机制，即将一个类的对象嵌入另一个对象中，由另一个对象来决定是否调用嵌入对象的行为以便扩展自己的行为，我们称这个嵌入的对象为装饰器(Decorator)
+- 关联机制，即将一个类的对象嵌入另一个对象中，由另一个对象来决定是否调用嵌入对象的行为以便扩展自己的行为，我们称这个嵌入的对象为**装饰器**(Decorator)
 
 装饰模式以对客户透明的方式动态地给一个对象附加上更多的责任，换言之，客户端并不会觉得对象在装饰前和装饰后有什么不同。装饰模式可以在不需要创造更多子类的情况下，将对象的功能加以扩展。
 
@@ -178,7 +178,7 @@ public class Client {
 }
 ```
 
-输出
+输出：
 
 ```
 煎饼果子花费：8.0元
@@ -246,7 +246,7 @@ public class InputTest {
 
 ### Servlet 中的装饰者模式
 
-Servlet API源自于4个实现类，它很少被使用，但是十分强大：`ServletRequestWrapper`、`ServletResponseWrapper`以及 `HttpServletRequestWrapper`、`HttpServletResponseWrapper`。
+Servlet API 源自于 4 个实现类，它很少被使用，但是十分强大：`ServletRequestWrapper`、`ServletResponseWrapper`以及 `HttpServletRequestWrapper`、`HttpServletResponseWrapper`。
 
 比如`ServletRequestWrapper` 是 `ServletRequest` 接口的简单实现，开发者可以继承 `ServletRequestWrapper` 去扩展原来的`request`
 
@@ -269,9 +269,9 @@ public class ServletRequestWrapper implements ServletRequest {
 
 ### spring 中的装饰者模式
 
-Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSource 可能是各种不同类型的， 比如不同的数据库： Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。 然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以到达切换数据源的目的。
+Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSource 可能是各种不同类型的， 比如不同的数据库： Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。 然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以达到切换数据源的目的。
 
-在 spring 的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是类名中含有 `Wrapper`， 另一种是类名中含有`Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
+在 Spring 的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是类名中含有 `Wrapper`， 另一种是类名中含有 `Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
 
 - `org.springframework.cache.transaction` 包下的 `TransactionAwareCacheDecorator` 类
 - `org.springframework.session.web.http` 包下的 `SessionRepositoryFilter` 内部类 `SessionRepositoryRequestWrapper` 
@@ -290,7 +290,7 @@ Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Deco
 
 ## 总结
 
-装饰模式的本质：动态组合
+装饰模式的本质：**动态组合**
 
 动态组合是手段，组合才是目的。这里的组合有两个意思，一个是动态功能的组合，也就是动态进行装饰器的组合；另外一个是指对象组合，通过对象组合来实现为被装饰对象透明的增加功能。
 
@@ -311,7 +311,7 @@ Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Deco
 ### 何时选用
 
 - 如果需要在不影响其他对象的情况下，以动态、透明的方式给对象添加职责，可以使用装饰模式
-- 当不能采用继承的方式对系统进行扩展或者采用继承不利于系统扩展和维护时可以使用装饰模式。不能采用继承的情况主要有两类：第一类是系统中存在大量独立的扩展，为支持每一种扩展或者扩展之间的组合将产生大量的子类，使得子类数目呈爆炸性增长；第二类是因为类已定义为不能被继承（如Java语言中的final类）
+- 当不能采用继承的方式对系统进行扩展或者采用继承不利于系统扩展和维护时可以使用装饰模式。不能采用继承的情况主要有两类：第一类是系统中存在大量独立的扩展，为支持每一种扩展或者扩展之间的组合将产生大量的子类，使得子类数目呈爆炸性增长；第二类是因为类已定义为不能被继承（如 Java 语言中的 final 类）
 
 ------
 

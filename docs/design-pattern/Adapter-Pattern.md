@@ -10,7 +10,7 @@
 
 在不想改变原有代码逻辑的情况下，如何解决呢？
 
-这时候我们就可以创建一个「适配器」。这是一个特殊的对象， 能够转换对象接口， 使其能与其他对象进行交互。
+这时候我们就可以创建一个「**适配器**」。这是一个特殊的对象， 能够转换对象接口， 使其能与其他对象进行交互。
 
 适配器模式通过封装对象将复杂的转换过程隐藏于幕后。 被封装的对象甚至察觉不到适配器的存在。 
 
@@ -28,16 +28,16 @@
 
 ## 基本介绍
 
-- 适配器模式将一个类的接口，转换成客户期望的另外一个接口。适配器让原本接口不兼容的类可以合作无间。也可以叫包装器（Wrapper）。
+- 适配器模式将一个类的接口，转换成客户期望的另外一个接口。适配器让原本接口不兼容的类可以合作无间。也可以叫包装器（Wrapper）
 
-- **适配器模式**是一种结构型设计模式， 它能使接口不兼容的对象能够相互合作。
+- **适配器模式**是一种结构型设计模式， 它能使接口不兼容的对象能够相互合作
 - 主要分为两类：类适配器模式、对象适配器模式
 
 
 
 ## 工作原理
 
-- 适配器模式：将一个类的接口转换成另一种接口.让原本接口不兼容的类可以兼容
+- 适配器模式：将一个类的接口转换成另一种接口，让原本接口不兼容的类可以兼容
 - 从用户的角度看不到被适配者，是解耦的
 - 用户调用适配器转化出来的目标接口方法，适配器再调用被适配者的相关接口方法
 - 用户收到反馈结果，感觉只是和目标接口交互
@@ -207,7 +207,7 @@ Java 虽然不能实现标准的类适配器，但是有一种变通的方式，
 
 220V 的交流电相当于被适配者 Adaptee，我们的目标 Target 是 5V 直流电，充电器本身相当于一个 Adapter，将220V 的输入电压变换为 5V 输出。
 
-1. 首先是我们的名用电（我国是 220V，当然还可以有其他国家的其他准备，可随时扩展）
+1. 首先是我们的民用电（我国是 220V，当然还可以有其他国家的其他准备，可随时扩展）
 
    ```java
    public class Volatage220V {
@@ -299,7 +299,7 @@ Spring 源码中搜关键字`Adapter` 会出现很多实现类，SpringMVC 中�
 
 ![qsli.github.io](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjqoif1ddj30vq0ij0uq.jpg)
 
-Spring MVC中的适配器模式主要用于执行目标 `Controller` 中的请求处理方法。
+Spring MVC 中的适配器模式主要用于执行目标 `Controller` 中的请求处理方法。
 
 在Spring MVC中，`DispatcherServlet` 作为用户，`HandlerAdapter` 作为期望接口，具体的适配器实现类用于对目标类进行适配，`Controller` 作为需要适配的类。
 
@@ -322,11 +322,11 @@ if(mappedHandler.getHandler() instanceof MultiActionController){
 ```java
 public class DispatcherServlet extends FrameworkServlet {
   	//......
-		//维护所有HandlerAdapter类的集合
+	//维护所有HandlerAdapter类的集合
     @Nullable
     private List<HandlerAdapter> handlerAdapters;
   
-		//初始化handlerAdapters
+	//初始化handlerAdapters
     private void initHandlerAdapters(ApplicationContext context) {
         this.handlerAdapters = null;
         if (this.detectAllHandlerAdapters) {
@@ -355,15 +355,15 @@ public class DispatcherServlet extends FrameworkServlet {
   protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
         //...
     
-				//获得controller对应的适配器
+		//获得controller对应的适配器
         HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());          
 				
-				//调用适配器的handler方法处理请求，并返回ModelAndView
+		//调用适配器的handler方法处理请求，并返回ModelAndView
         mv = ha.handle(processedRequest, response, mappedHandler.getHandler());            
         //...
     }
   	
-		//返回对应的controller的处理器
+	  //返回对应的controller的处理器
       protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
         if (this.handlerAdapters != null) {
             Iterator var2 = this.handlerAdapters.iterator();
@@ -396,14 +396,14 @@ public interface HandlerAdapter {
 再来屡一下这个流程：
 
 1. 首先是适配器接口 DispatchServlet 中有一个集合维护所有的 HandlerAdapter，如果配置文件中没有对适配器进行配置，那么 DispatchServlet 会在创建时对该变量进行初始化，注册所有默认的 HandlerAdapter。
-2. 当一个请求过来时，DispatchServlet 会根据传过来的 handler 类型从该集合中寻找对应的 HandlerAdapter子类进行处理，并且调用它的 handler() 方法
-3. 对应的 HandlerAdapter 中的 handler() 方法又会执行对应 Controller 的 handleRequest() 方法
+2. 当一个请求过来时，DispatchServlet 会根据传过来的 handler 类型从该集合中寻找对应的 HandlerAdapter子类进行处理，并且调用它的 `handler()` 方法
+3. 对应的 HandlerAdapter 中的 `handler()` 方法又会执行对应 Controller 的 `handleRequest()` 方法
 
 适配器与 handler 有对应关系，而各个适配器又都是适配器接口的实现类，因此，它们都遵循相同的适配器标准，所以用户可以按照相同的方式，通过不同的 handler 去处理请求。 当然了，Spring 框架中也为我们定义了一些默认的 Handler 对应的适配器。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjrbrv96pj31ck0j0dl6.jpg)
 
-通过适配器模式我们将所有的 `controller` 统一交给 `HandlerAdapter` 处理，免去了写大量的 `if-else` 语句对 `Controller` 进行判断，也更利于扩展新的 `Controller` 类型。
+通过适配器模式我们将所有的 `controller` 统一交给 `HandlerAdapter` 处理，免去了写大量的 `if-else`  语句对 `Controller` 进行判断，也更利于扩展新的 `Controller` 类型。
 
 
 
