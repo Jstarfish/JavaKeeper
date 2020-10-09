@@ -1,4 +1,4 @@
-## 「分布式一致性协议」从2PC、3PC、Paxos到 ZAB
+# 「分布式一致性协议」从2PC、3PC、Paxos到 ZAB
 
 设计一个分布式系统必定会遇到一个问题—— **因为分区容忍性（partition tolerance）的存在，就必定要求我们需要在系统可用性（availability）和数据一致性（consistency）中做出权衡** 。这就是著名的 `CAP` 定理。
 

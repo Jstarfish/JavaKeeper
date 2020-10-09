@@ -210,10 +210,11 @@ function genDistributionSidebar(){
     {
       title: " Zookeeper",
       collapsable: true,
-      // children: [
-      //   "JUC/Java-Memory-Model",
-      //   "JUC/CountDownLatch、CyclicBarrier、Semaphore"
-      // ]
+      children: [
+        ['ZooKeeper/Consistency-Protocol','分布式一致性协议'],
+        ['ZooKeeper/Hello-Zookeeper','Hello Zookeeper'],
+        ['ZooKeeper/Zookeeper-Use','Zookeeper 实战'],
+      ]
     },    
     {
       title: "RPC",
