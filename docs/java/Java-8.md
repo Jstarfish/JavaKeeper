@@ -1,3 +1,5 @@
+# Java 8 通关攻略
+
 > 点赞+收藏 就学会系列，文章收录在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
 
 > Java8早在2014年3月就发布了，还不得全面了解下
@@ -1241,9 +1243,9 @@ Collector接口中方法的实现决定了如何对流执行收集操作(如收�
 
 | 方法              | 返回类型              | 作用                                                         | 示例                                                         |
 | ----------------- | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| toList            | List<T>               | 把流中元素收集到List                                         | List list= list.stream().collect(Collectors.toList());       |
-| toSet             | Set<T>                | 把流中元素收集到Set                                          | Set set= list.stream().collect(Collectors.toSet());          |
-| toCollection      | Collection<T>         | 把流中元素收集到创建的集合                                   | Collectione mps=list.stream().collect(Collectors.toCollection(ArrayList::new)); |
+| toList            | List\<T>              | 把流中元素收集到List                                         | List list= list.stream().collect(Collectors.toList());       |
+| toSet             | Set\<T>               | 把流中元素收集到Set                                          | Set set= list.stream().collect(Collectors.toSet());          |
+| toCollection      | Collection\<T>        | 把流中元素收集到创建的集合                                   | Collectione mps=list.stream().collect(Collectors.toCollection(ArrayList::new)); |
 | counting          | Long                  | 计算流中元素的个数                                           | long count = list.stream().collect(Collectors.counting());   |
 | summingInt        | Integer               | 对流中元素的整数属性求和                                     | Integer sum = persons.stream()    .collect(Collectors.summingInt(Person::getAge)); |
 | averagingInt      | Double                | 计算流中元素Integer属性的平均值                              | double avg= list.stream().collect(Collectors.averagingInt(Person::getAge)); |

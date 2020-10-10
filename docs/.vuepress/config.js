@@ -90,15 +90,23 @@ module.exports = {
 
 function genJavaSidebar() {
   return [
+   {
+      title: "Java",
+      collapsable: false,
+      children: [
+        "Java-8",
+        "Online-Error-Check",
+      ]
+    },
     {
       title: "JVM",
-      collapsable: false,
+      collapsable: true,
       sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["JVM/JVM-Java","JVM/Class-Loading","JVM/Runtime-Data-Areas","JVM/Java-Object","JVM/OOM","JVM/Reference"]
+      children: ["JVM/JVM-Java","JVM/Class-Loading","JVM/Runtime-Data-Areas","JVM/GC","JVM/Java-Object","JVM/OOM","JVM/Reference","JVM/JVM性能监控和故障处理工具"]
     },
     {
       title: "JUC",
-      collapsable: false,
+      collapsable: true,
       children: [
         "JUC/Java-Memory-Model",
         "JUC/volatile","JUC/synchronized","JUC/CAS",
@@ -245,5 +253,6 @@ function genInterviewSidebar(){
     ['Spring-FAQ', 'Spring 部分'],
     ['Design-Pattern-FAQ', '设计模式部分'],
     ['Tomcat-FAQ', 'Tomcat 部分'],
+    ['Elasticsearch-FAQ', 'Elasticsearch 部分'],
   ];
 }

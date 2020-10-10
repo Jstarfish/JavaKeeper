@@ -20,8 +20,8 @@ Java开发都知道JVM是Java虚拟机，上学时还用过的VM也叫虚拟机�
 
 所谓虚拟机（Virtual Machine），就是一台虚拟的计算机。它是一款软件，用来执行一系列虚拟计算机指令。大体上，虚拟机可以分为**系统虚拟机**和**程序虚拟机**。
 
-- Visaual Box，VMware就属于系统虚拟机，它们完全是对物理计算机的仿真，提供了一个可运行完整操作系统的软件平台
-- 程序虚拟机的典型代表就是Java虚拟机，它专门为执行单个计算机程序而设计，在Java虚拟机中执行的指令我们称为Java字节码指令
+- Visaual Box，VMware 就属于系统虚拟机，它们完全是对物理计算机的仿真，提供了一个可运行完整操作系统的软件平台
+- 程序虚拟机的典型代表就是 Java 虚拟机，它专门为执行单个计算机程序而设计，在 Java 虚拟机中执行的指令我们称为 Java 字节码指令
 
 
 
@@ -29,7 +29,7 @@ Java开发都知道JVM是Java虚拟机，上学时还用过的VM也叫虚拟机�
 
 `JVM` 是 `Java Virtual Machine`（**Java虚拟机**)的缩写，`JVM`是一种用于计算设备的**规范**，它是一个**虚构**的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。
 
-Java虚拟机是二进制字节码的运行环境，负责装载**字节码**到其内部，解释/编译为对应平台的机器指令执行。每一条Java指令，Java虚拟机规范中都有详细定义，如怎么取操作数，怎么处理操作数，处理结果放在哪里。
+Java 虚拟机是二进制字节码的运行环境，负责装载**字节码**到其内部，解释/编译为对应平台的机器指令执行。每一条 Java 指令，Java 虚拟机规范中都有详细定义，如怎么取操作数，怎么处理操作数，处理结果放在哪里。
 
 ### 特点
 
@@ -39,25 +39,19 @@ Java虚拟机是二进制字节码的运行环境，负责装载**字节码**到
 
 ### 字节码
 
-我们平时所说的java字节码，指的是用java语言编写的字节码，准确的说任何能在jvm平台上执行的字节码格式都是一样的，所以应该统称为**jvm字节码**。
+我们平时所说的 java 字节码，指的是用 java 语言编写的字节码，准确的说任何能在 jvm 平台上执行的字节码格式都是一样的，所以应该统称为 **jvm字节码**。
 
-不同的编译器可以编译出相同的字节码文件，字节码文件也可以在不同的jvm上运行。
+不同的编译器可以编译出相同的字节码文件，字节码文件也可以在不同的 jvm 上运行。
 
-Java虚拟机与Java语言没有必然的联系，它只与特定的二进制文件格式——Class文件格式关联，Class文件中包含了Java虚拟机指令集（或者称为字节码、Bytecodes）和符号集，还有一些其他辅助信息。
+Java 虚拟机与 Java 语言没有必然的联系，它只与特定的二进制文件格式——Class 文件格式关联，Class 文件中包含了 Java 虚拟机指令集（或者称为字节码、Bytecodes）和符号集，还有一些其他辅助信息。
 
-### Java代码执行过程
+### Java 代码执行过程
 
 ![](https://tva1.sinaimg.cn/large/0082zybply1gbnkxsppg8j30jg0pk0x9.jpg)
 
+## JVM 的位置
 
-
-
-
-
-
-## JVM的位置
-
-JVM是运行在操作系统之上的，它与硬件没有直接的交互。
+JVM 是运行在操作系统之上的，它与硬件没有直接的交互。
 
 `JDK`(Java Development Kit) 是 `Java` 语言的软件开发工具包（`SDK`）。`JDK` 物理存在，是 ` Java Language`、`Tools`、`JRE` 和 `JVM` 的一个集合。
 
@@ -67,15 +61,15 @@ JVM是运行在操作系统之上的，它与硬件没有直接的交互。
 
 
 
-## JVM整体结构
+## JVM 整体结构
 
 ![jvm-framework](https://tva1.sinaimg.cn/large/0082zybply1gbnqgrxfz4j30u00wp12d.jpg)
 
 
 
-## JVM的架构模型
+## JVM 的架构模型
 
-Java编译器输入的指令流基本上是一种基于**栈的指令集架构**，另外一种指令集架构则是基于**寄存器的指令集架构**。
+Java 编译器输入的指令流基本上是一种基于**栈的指令集架构**，另外一种指令集架构则是基于**寄存器的指令集架构**。
 
 两种架构之间的区别：
 
@@ -85,17 +79,17 @@ Java编译器输入的指令流基本上是一种基于**栈的指令集架构**
   - 指令流中的指令大部分是零地址指令，其执行过程依赖于操作栈。指令集更小，编译器容易实现；
   - 不需要硬件支持，可移植性更好，更好实现跨平台
 - 基于寄存器架构的特点
-  - 典型的应用是X86的二进制指令集：比如传统的PC以及Android的Davlik虚拟机；
+  - 典型的应用是X86的二进制指令集：比如传统的 PC 以及 Android 的 Davlik 虚拟机；
   - 指令集架构则完全依赖硬件，可移植性差；
   - 性能优秀和执行更高效；
   - 花费更少的指令去完成一项操作；
   - 大部分情况下，基于寄存器架构的指令集往往都以一地址指令、二地址指令和三地址指令为主，而基于栈式架构的指令集却是以零地址指令为主
 
-由于跨平台性的设计，Java的指令都是根据栈来设计的。不同平台CPU架构不同，所以不能设计为基于寄存器的，优点是跨平台，指令集小，编译器容易实现，缺点是性能下降，实现同样的功能需要更多的指令。
+由于跨平台性的设计，Java 的指令都是根据栈来设计的。不同平台 CPU 架构不同，所以不能设计为基于寄存器的，优点是跨平台，指令集小，编译器容易实现，缺点是性能下降，实现同样的功能需要更多的指令。
 
 ##### 分析基于栈式架构的JVM代码执行过程
 
-进入class文件所在目录，执行`javap -v xx.class`反解析（或者通过IDEA插件`Jclasslib`直接查看），可以看到当前类对应的code区（汇编指令）、本地变量表、异常表和代码行偏移量映射表、常量池等信息。
+进入 class 文件所在目录，执行`javap -v xx.class`反解析（或者通过IDEA插件`Jclasslib`直接查看），可以看到当前类对应的 code 区（汇编指令）、本地变量表、异常表和代码行偏移量映射表、常量池等信息。
 
 ![jvm-javap](https://tva1.sinaimg.cn/large/0082zybply1gbnnern41cj31cd0u0qbc.jpg)
 
@@ -181,18 +175,18 @@ Constant pool:
 
 
 
-## JVM生命周期
+## JVM 生命周期
 
 #### 虚拟机的启动
 
-Java虚拟机的启动是通过引导类加载器（Bootstrap Class Loader）创建一个初始类（initial class）来完成的，这个类是由虚拟机的具体实现指定的。
+Java 虚拟机的启动是通过引导类加载器（Bootstrap Class Loader）创建一个初始类（initial class）来完成的，这个类是由虚拟机的具体实现指定的。
 
 #### 虚拟机的执行
 
-- 一个运行中的Java虚拟机有着一个清晰的任务：执行Java程序
+- 一个运行中的 Java 虚拟机有着一个清晰的任务：执行 Java 程序
 - 程序开始执行时它才运行，程序结束时它就停止
-- 执行一个所谓的Java程序的时候，真正执行的是一个叫做Java虚拟机的进程
-- 你在同一台机器上运行三个程序，就会有三个运行中的Java虚拟机。 Java虚拟机总是开始于一个**main()**方法，这个方法必须是公有、返回void、只接受一个字符串数组。在程序执行时，你必须给Java虚拟机指明这个包含main()方法的类名。 
+- 执行一个所谓的 Java 程序的时候，真正执行的是一个叫做 Java 虚拟机的进程
+- 你在同一台机器上运行三个程序，就会有三个运行中的 Java 虚拟机。 Java 虚拟机总是开始于一个**main()**方法，这个方法必须是公有、返回 void、只接受一个字符串数组。在程序执行时，你必须给 Java 虚拟机指明这个包含 main() 方法的类名。 
 
 #### 虚拟机的退出
 
@@ -200,37 +194,37 @@ Java虚拟机的启动是通过引导类加载器（Bootstrap Class Loader）创
 
 - 程序正常执行结束
 - 程序在执行过程中遇到了异常或错误而异常终止
-- 由于操作系统出现错误而导致Java虚拟机进程终止
-- 某线程调用Runtime类或System类的exit方法，或Runtime类的halt方法，并且Java安全管理器也允许这次exit或halt操作
-- 除此之外，JNI(Java Native Interface)规范描述了用`JNI Invocation API`来加载或卸载Java虚拟机时，Java虚拟机的退出情况
+- 由于操作系统出现错误而导致 Java 虚拟机进程终止
+- 某线程调用 Runtime 类或 System 类的 exit 方法，或 Runtime 类的 halt 方法，并且 Java 安全管理器也允许这次 exit 或 halt 操作
+- 除此之外，JNI(Java Native Interface)规范描述了用`JNI Invocation API`来加载或卸载 Java 虚拟机时，Java  虚拟机的退出情况
 
 
 
-## Java和JVM规范
+## Java 和 JVM 规范
 
 [Java Language and Virtual Machine Specifications](https://docs.oracle.com/javase/specs/index.html)
 
 
 
-## JVM发展历程
+## JVM 发展历程
 
 JDK 版本升级不仅仅体现在语言和功能特性上，还包括了其编译和执行的 Java 虚拟机的升级。
 
-- 1990年，在Sun计算机公司中，由Patrick Naughton、MikeSheridan及James Gosling领导的小组Green Team，开发出的新的程序语言，命名为Oak，后期命名为Java
-- 1995年，Sun正式发布Java和HotJava产品，Java首次公开亮相
+- 1990年，在 Sun 计算机公司中，由 Patrick Naughton、MikeSheridan 及 James Gosling 领导的小组 Green Team，开发出的新的程序语言，命名为 Oak，后期命名为 Java
+- 1995年，Sun 正式发布 Java 和 HotJava 产品，Java 首次公开亮相
 - 1996 年，JDK 1.0 发布时，提供了纯解释执行的 Java 虚拟机实现：Sun Classic VM。
 - 1997 年，JDK 1.1 发布时，虚拟机没有做变更，依然使用 Sun Classic VM 作为默认的虚拟机
 - 1998 年，JDK 1.2 发布时，提供了运行在 Solaris 平台的 Exact VM 虚拟机，但此时还是用 Sun Classic VM 作为默认的 Java 虚拟机，同时发布了JSP/Servlet、EJB规范，以及将Java分成J2EE、J2SE、J2ME
 - 2000 年，JDK1.3 发布，默认的 Java 虚拟机由 Sun Classic VM 改为 Sun HotSopt VM，而 Sun Classic VM 则作为备用虚拟机
 - 2002 年，JDK 1.4 发布，Sun Classic VM 退出商用虚拟机舞台，直接使用 Sun HotSpot VM 作为默认虚拟机一直到现在
-- 2003年，Java平台的Scala正式发布，同年Groovy也加入了Java阵营
-- 2004年，JDK1.5发布，同时JDK1.5改名为JDK5.0
-- 2006年，JDK6发布，同年，Java开源并建立了OpenJDK。顺理成章，Hotspot虚拟机也成为了OpenJDK默认虚拟机
-- 2008年，Oracle收购BEA，得到了JRockit虚拟机
-- 2010年，Oracle收购了Sun，获得Java商标和HotSpot虚拟机
-- 2011年，JDK7发布，在JDK1.7u4中，正式启用了新的垃圾回收器G1
-- 2014年，JDK8发布，用元空间MetaSpace取代了PermGen
-- 2017年，JDK9发布，将G1设置为默认GC，替代CMS
+- 2003年，Java 平台的 Scala 正式发布，同年 Groovy 也加入了 Java 阵营
+- 2004年，JDK1.5 发布，同时 JDK1.5 改名为 JDK5.0
+- 2006年，JDK6 发布，同年，Java 开源并建立了 OpenJDK。顺理成章，Hotspot 虚拟机也成为了 OpenJDK 默认虚拟机
+- 2008年，Oracle 收购 BEA，得到了 JRockit 虚拟机
+- 2010年，Oracle 收购了 Sun，获得 Java 商标和 HotSpot 虚拟机
+- 2011年，JDK7 发布，在 JDK1.7u4 中，正式启用了新的垃圾回收器 G1
+- 2014年，JDK8 发布，用元空间 MetaSpace 取代了 PermGen
+- 2017年，JDK9 发布，将 G1设置为默认GC，替代CMS
 
   
 

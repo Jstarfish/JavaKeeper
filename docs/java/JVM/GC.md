@@ -1,3 +1,5 @@
+# 垃圾回收机制
+
 ## 一、前言
 
 Java 与 C++ 之间有一堵由内存动态分配和垃圾收集技术所围成的“高墙”，墙外面的人想进去，墙里面的人却想出来。
@@ -150,7 +152,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 }
 ```
 
-如上代码所示，当 Java 调用以上本地方法时，jc 会被本地方法栈压入栈中, jc 就是我们说的本地方法栈中 JNI 的对象引用，因此只会在此本地方法执行完成后才会被释放。
+如上代码所示，当 Java 调用以上本地方法时，jc 会被本地方法栈压入栈中， jc 就是我们说的本地方法栈中 JNI 的对象引用，因此只会在此本地方法执行完成后才会被释放。
 
 
 
@@ -286,7 +288,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的具体实现。Java 虚拟机规范并没有规定垃圾收集器应该如何实现，因此一般来说不同厂商，不同版本的虚拟机提供的垃圾收集器实现可能会有差别，一般会给出参数来让用户根据应用的特点来组合各个年代使用的收集器，主要有以下垃圾收集器
 
-![img](https://imgkr.cn-bj.ufileos.com/aae602aa-0dd8-4ec9-8e7f-901ffec57e71.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201010124945.png)
 
 - 在新生代工作的垃圾回收器：Serial、ParNew、ParallelScavenge
 - 在老年代工作的垃圾回收器：CMS、Serial Old(MSC)、Parallel Old
@@ -298,7 +300,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 #### Serial 收集器
 
-Serial 收集器是工作在新生代的，单线程的垃圾收集器，单线程意味着它只会使用一个 CPU 或一个收集线程来完成垃圾回收，不仅如此，还记得我们上文提到的 Stop The World 吗，它在进行垃圾收集时，其他用户线程会暂停，直到垃圾收集结束，也就是说在 GC 期间，此时的应用不可用。
+Serial 收集器是工作在新生代的，**单线程的垃圾收集器**，单线程意味着它只会使用一个 CPU 或一个收集线程来完成垃圾回收，不仅如此，还记得我们上文提到的 Stop The World 吗，它在进行垃圾收集时，其他用户线程会暂停，直到垃圾收集结束，也就是说在 GC 期间，此时的应用不可用。
 
 看起来单线程垃圾收集器不太实用，不过我们需要知道的任何技术的使用都不能脱离场景，在 **Client 模式**下，它简单有效（与其他收集器的单线程比），对于限定单个 CPU 的环境来说，Serial 单线程模式无需与其他线程交互，减少了开销，专心做 GC 能将其单线程的优势发挥到极致，另外在用户的桌面应用场景，分配给虚拟机的内存一般不会很大，收集几十甚至一两百兆（仅是新生代的内存，桌面应用基本不会再大了），STW 时间可以控制在一百多毫秒内，只要不是频繁发生，这点停顿是可以接受的，所以对于运行在 Client 模式下的虚拟机，Serial 收集器是新生代的默认收集器
 
@@ -458,7 +460,7 @@ public class TestGC {
 
 
 
-**参考**
+**参考与来源**
 
 - 主要来源“码海”公号
 - 堆外内存的回收机制分析 https://www.jianshu.com/p/35cf0f348275 
