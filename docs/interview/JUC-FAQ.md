@@ -37,6 +37,36 @@ JUC 面试题总共围绕的就这么几部分
 
 
 
+### 说下同步、异步、阻塞和非阻塞
+
+# 同步与异步#
+
+首先来解释同步和异步的概念，这两个概念与消息的通知机制有关。也就是**同步与异步主要是从消息通知机制角度来说的**。
+
+所谓同步就是一个任务的完成需要依赖另外一个任务时，只有等待被依赖的任务完成后，依赖的任务才能算完成，这是一种可靠的任务序列。
+
+所谓异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。
+
+异步的概念和同步相对。当一个同步调用发出后，调用者要一直等待返回消息（结果）通知后，才能进行后续的执行；当一个异步过程调用发出后，调用者不能立刻得到返回消息（结果）。`实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者
+
+
+
+阻塞和非阻塞这两个概念与程序（线程）等待消息通知(无所谓同步或者异步)时的状态有关。也就是说**阻塞与非阻塞主要是程序（线程）等待消息通知时的状态角度来说的**
+
+阻塞调用是指调用结果返回之前，当前线程会被挂起，一直处于等待消息通知，不能够执行其他业务。函数只有在得到结果之后才会返回
+
+**有人也许会把阻塞调用和同步调用等同起来，实际上它们是不同的。**
+
+对于同步调用来说，很多时候当前线程可能还是激活的，只是从逻辑上当前函数没有返回而已，此时，这个线程可能也会处理其他的消息
+
+1. 如果这个线程在等待当前函数返回时，仍在执行其他消息处理，那这种情况就叫做同步非阻塞；
+
+2. 如果这个线程在等待当前函数返回时，没有执行其他消息处理，而是处于挂起等待状态，那这种情况就叫做同步阻塞；
+
+所以同步的实现方式会有两种：同步阻塞、同步非阻塞；同理，异步也会有两种实现：异步阻塞、异步非阻塞
+
+
+
 ### 什么是线程安全和线程不安全？
 
 通俗的说：加锁的就是是线程安全的，不加锁的就是是线程不安全的
@@ -1332,6 +1362,15 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 
 
 
+### AQS 中独占锁和共享锁的操作流程大体描述一下
+
+##### **独占锁与共享锁的区别**
+
+- **独占锁是持有锁的线程释放锁之后才会去唤醒下一个线程。**
+- **共享锁是线程获取到锁后，就会去唤醒下一个线程，所以共享锁在获取锁和释放锁的时候都会调用doReleaseShared方法唤醒下一个线程，当然这会收共享线程数量的限制**。
+
+
+
 ### ReetrantLock有用过吗，怎么实现重入的
 
 ReentrantLock的可重入性是AQS很好的应用之一。在ReentrantLock里面，不管是公平锁还是非公平锁，都有一段逻辑。
@@ -1557,7 +1596,7 @@ ThreadLocal 是一个本地线程副本变量工具类，在每个线程中都�
 
 #### ThreadLocal造成内存泄漏的原因？
 
-`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
+`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用，而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
 
 #### ThreadLocal内存泄漏解决方案？
 
@@ -1740,27 +1779,35 @@ ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
 
 比如我们在同一个线程中声明了两个 `ThreadLocal` 对象的话，会使用 `Thread`内部都是使用仅有那个`ThreadLocalMap` 存放数据的，`ThreadLocalMap`的 key 就是 `ThreadLocal`对象，value 就是 `ThreadLocal` 对象调用`set`方法设置的值。
 
-[![ThreadLocal数据结构](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)](https://camo.githubusercontent.com/a463d65fe6b4b96dc81750d19f80f26f8e0675d0/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f373433323630342d616432666635383131323762613863632e6a70673f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970253743696d61676556696577322f322f772f383036)
+![ThreadLocal数据结构](https://tva1.sinaimg.cn/large/007S8ZIlly1gjloyg3doij30me0n9402.jpg)
 
 `ThreadLocalMap`是`ThreadLocal`的静态内部类。
 
-[![ThreadLocal内部类](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)](https://camo.githubusercontent.com/11f103a8a726894a98d431b0675f759e3d915782/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f5468726561644c6f63616c2545352538362538352545392538332541382545372542312542422e706e67)
+![ThreadLocal内部类](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlp3bpjwyj30k908cq4k.jpg)
 
 ### 3.4. ThreadLocal 内存泄露问题
 
 `ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
 
-```
-      static class Entry extends WeakReference<ThreadLocal<?>> {
-            /** The value associated with this ThreadLocal. */
-            Object value;
+```java
+static class Entry extends WeakReference<ThreadLocal<?>> {
+  /** The value associated with this ThreadLocal. */
+  Object value;
 
-            Entry(ThreadLocal<?> k, Object v) {
-                super(k);
-                value = v;
-            }
-        }
+  Entry(ThreadLocal<?> k, Object v) {
+    super(k);
+    value = v;
+  }
+}
 ```
+
+
+
+### ThreadLocalMap的enrty的key为什么要设置成弱引用
+
+将Entry的Key设置成弱引用，在配合线程池使用的情况下可能会有内存泄露的风险。之设计成弱引用的目的是为了更好地对ThreadLocal进行回收，当我们在代码中将ThreadLocal的强引用置为null后，这时候Entry中的ThreadLocal理应被回收了，但是如果Entry的key被设置成强引用则该ThreadLocal就不能被回收，这就是将其设置成弱引用的目的。
+
+
 
 **弱引用介绍：**
 

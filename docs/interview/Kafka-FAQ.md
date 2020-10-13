@@ -63,6 +63,16 @@ kafka 中的每个 partition 中的消息在写入时都是有序的，而且单
 
 
 
+## kafka 全局一致性如何保证
+
+两种方案：
+
+方案一，kafka topic 只设置一个partition分区 
+
+方案二，producer将消息发送到指定partition分区
+
+
+
 ## 7、请谈一谈 Kafka 数据一致性原理
 
 

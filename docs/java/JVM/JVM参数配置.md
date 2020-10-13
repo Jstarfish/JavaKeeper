@@ -1,6 +1,8 @@
-# 你说你做过 JVM 调优和参数配置，那你平时工作用过的配置参数有哪些？
+# JVM 参数配置
 
-![](https://images.pexels.com/photos/207924/pexels-photo-207924.jpeg?cs=srgb&dl=pexels-207924.jpg&fm=jpg)
+> 你说你做过 JVM 调优和参数配置，那你平时工作用过的配置参数有哪些？
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlfuwkbr3j31hi0u0qv7.jpg)
 
 ## JVM参数类型
 

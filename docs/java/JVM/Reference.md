@@ -6,7 +6,7 @@
 
 ### 引用
 
-先说说引用，Java中的引用，类似 C 语言中的指针。初学 Java时，我们就知道 Java 数据类型分两大类，基本类型和引用类型。
+先说说引用，Java中的引用，类似 C 语言中的指针。初学 Java 时，我们就知道 Java 数据类型分两大类，基本类型和引用类型。
 
 >基本类型：编程语言中内置的最小粒度的数据类型。它包括四大类八种类型：
 >
@@ -360,11 +360,11 @@ SoftReference、WeakReference、PhantomReference 都有一个可以传递 Refere
 
 > Abstract base class for reference objects. This class defines the operations common to all reference objects. Because reference objects are implemented in close cooperation with the garbage collector, this class may not be subclassed directly.
 
-JDK 官方文档是这么说的，`Reference`是所有引用对象的基类。这个类定义了所有引用对象的通用操作。因为引用对象是与垃圾收集器紧密协作而实现的，所以这个类可能不能直接子类化。
+JDK 官方文档是这么说的，`Reference` 是所有引用对象的基类。这个类定义了所有引用对象的通用操作。因为引用对象是与垃圾收集器紧密协作而实现的，所以这个类可能不能直接子类化。
 
-#### Reference 的4种状态
+#### Reference 的 4 种状态
 
-- Active：新创建的引用实例处于Active状态，但当GC检测到该实例引用的实际对象的可达性发生某些改变(实际对象处于 GC roots 不可达)后，它的状态将变化为`Pending`或者`Inactive`。如果 Reference 注册了ReferenceQueue，则会切换为`Pending`，并且Reference会加入`pending-Reference`链表中，如果没有注册ReferenceQueue，会切换为`Inactive`。
+- Active：新创建的引用实例处于 Active 状态，但当 GC 检测到该实例引用的实际对象的可达性发生某些改变(实际对象处于 GC roots 不可达)后，它的状态将变化为`Pending`或者`Inactive`。如果 Reference 注册了ReferenceQueue，则会切换为`Pending`，并且Reference会加入`pending-Reference`链表中，如果没有注册ReferenceQueue，会切换为`Inactive`。
 - Pending：当引用实例被放置在pending-Reference 链表中时，它处于Pending状态。此时，该实例在等待一个叫Reference-handler的线程将此实例进行enqueue操作。如果某个引用实例没有注册在一个引用队列中，该实例将永远不会进入Pending状态
 - Enqueued：在ReferenceQueue队列中的Reference的状态，如果Reference从队列中移除，会进入`Inactive`状态
 - Inactive：一旦某个引用实例处于Inactive状态，它的状态将不再会发生改变，同时说明该引用实例所指向的实际对象一定会被GC所回收
@@ -432,11 +432,11 @@ public boolean enqueue() {
 }
 ```
 
-#### ReferenceHandler线程
+#### ReferenceHandler 线程
 
-通过上文的讨论，我们知道一个Reference实例化后状态为Active，其引用的对象被回收后，垃圾回收器将其加入到`pending-Reference`链表，等待加入ReferenceQueue。
+通过上文的讨论，我们知道一个 Reference 实例化后状态为 Active，其引用的对象被回收后，垃圾回收器将其加入到`pending-Reference`链表，等待加入 ReferenceQueue。
 
-ReferenceHandler线程是由`Reference`静态代码块中建立并且运行的线程，它的运行方法中依赖了比较多的本地(native)方法，ReferenceHandler线程的主要功能就pending list中的引用实例添加到引用队列中，并将pending指向下一个引用实例。
+ReferenceHandler 线程是由 `Reference` 静态代码块中建立并且运行的线程，它的运行方法中依赖了比较多的本地(native)方法，ReferenceHandler 线程的主要功能就 pending list 中的引用实例添加到引用队列中，并将pending 指向下一个引用实例。
 
 ```java
 // 控制垃圾回收器操作与Pending状态的Reference入队操作不冲突执行的全局锁
@@ -535,7 +535,7 @@ static {
 }
 ```
 
-由于ReferenceHandler线程是`Reference`的静态代码创建的，所以只要`Reference`这个父类被初始化，该线程就会创建和运行，由于它是守护线程，除非 JVM 进程终结，否则它会一直在后台运行(注意它的`run()`方法里面使用了死循环)。
+由于 ReferenceHandler 线程是 `Reference` 的静态代码创建的，所以只要 `Reference` 这个父类被初始化，该线程就会创建和运行，由于它是守护线程，除非 JVM 进程终结，否则它会一直在后台运行(注意它的`run()`方法里面使用了死循环)。
 
 
 

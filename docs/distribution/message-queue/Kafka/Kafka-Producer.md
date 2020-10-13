@@ -2,17 +2,17 @@
 
 ## 前言
 
-Kafka，作为目前在大数据领域应用最为广泛的消息队列，其内部实现和设计有很多值得深入研究和分析的地方，使用 kafka 首先需要接触到 producer 的开发，然后是 consumer 开发，自 0.8.2.x 版本以后，kafka 提供了 java 版本的 producer 以代替以前 scala 版本的 producer，下面进行 producer 的解析（新版本指的是新版本producer 指的是 kafka-client 包的 `org.apache.kafka.clients.producer`，而不是 kafka 包下的`kafka.producer.Producer`）。
+Kafka，作为目前在大数据领域应用最为广泛的消息队列，其内部实现和设计有很多值得深入研究和分析的地方，使用 kafka 首先需要接触到 producer 的开发，然后是 consumer 开发，自 0.8.2.x 版本以后，kafka 提供了 java 版本的 producer 以代替以前 scala 版本的 producer，下面进行 producer 的解析（新版本producer 指的是 kafka-client 包的 `org.apache.kafka.clients.producer`，而不是 kafka 包下的`kafka.producer.Producer`）。
 
 ## Producer 概要设计
 
 发送简略流程图
 
-![img](https://images2015.cnblogs.com/blog/735367/201702/735367-20170204143450245-662897432.png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjmk1gaprjj30i906uwg3.jpg)
 
-大体上来说，用户首先构建待发送的消息对象ProducerRecord，然后调用KafkaProducer#send方法进行发送。KafkaProducer接收到消息后首先对其进行序列化，然后通过分区器（partitioner）确定该数据需要发送的 Topic 的分区，kafka 提供了一个默认的分区器，如果消息指定了 key，那么 partitioner 会根据 key 的hash 值来确定目标分区，如果没有指定 key，那么将使用轮询的方式确定目标分区，这样可以最大程度的均衡每个分区的消息，确定分区之后，将会进一步确认该分区的 leader 节点(处理该分区消息读写的主节点)，，最后追加写入到内存中的消息缓冲池(accumulator)。此时KafkaProducer#send方法成功返回。
+大体上来说，用户首先构建待发送的消息对象ProducerRecord，然后调用KafkaProducer#send方法进行发送。KafkaProducer接收到消息后首先对其进行序列化，然后通过分区器（partitioner）确定该数据需要发送的 Topic 的分区，kafka 提供了一个默认的分区器，如果消息指定了 key，那么 partitioner 会根据 key 的 hash 值来确定目标分区，如果没有指定 key，那么将使用轮询的方式确定目标分区，这样可以最大程度的均衡每个分区的消息，确定分区之后，将会进一步确认该分区的 leader 节点(处理该分区消息读写的主节点)，，最后追加写入到内存中的消息缓冲池(accumulator)。此时KafkaProducer#send方法成功返回。
 
-KafkaProducer中还有一个专门的Sender IO线程负责将缓冲池中的消息分批次发送给对应的broker，完成真正的消息发送逻辑。
+KafkaProducer 中还有一个专门的Sender IO线程负责将缓冲池中的消息分批次发送给对应的broker，完成真正的消息发送逻辑。
 
 
 
@@ -229,7 +229,7 @@ producer 总共创建两个线程：执行KafkaPrducer#send逻辑的线程——
 
 这是KafkaProducer#send逻辑的第一步，即为待发送消息进行序列化并计算目标分区，如下图所示：
 
-![img](https://images2015.cnblogs.com/blog/735367/201702/735367-20170204162034104-1142811823.png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjmp7vf31tj30k103uq3n.jpg)
 
 如上图所示，一条所属topic是"test"，消息体是"message"的消息被序列化之后结合KafkaProducer缓存的元数据(比如该topic分区数信息等)共同传给后面的Partitioner实现类进行目标分区的计算。
 

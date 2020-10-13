@@ -352,7 +352,11 @@ JAVA反射机制是在运行状态中，对于任意一个类，都能够知道�
 
 在我们平时的项目开发过程中，基本上很少会直接使用到反射机制，但这不能说明反射机制没有用，实际上有很多设计、开发都与反射机制有关，例如模块化的开发，通过反射去调用对应的字节码；动态代理设计模式也采用了反射机制，还有我们日常使用的 Spring／Hibernate 等框架也大量使用到了反射机制。
 
-举例：①我们在使用JDBC连接数据库时使用Class.forName()通过反射加载数据库的驱动程序；②Spring框架也用到很多反射机制，最经典的就是xml的配置模式。Spring 通过 XML 配置模式装载 Bean 的过程：1) 将程序内所有 XML 或 Properties 配置文件加载入内存中; 2)Java类里面解析xml或properties里面的内容，得到对应实体类的字节码字符串以及相关的属性信息; 3)使用反射机制，根据这个字符串获得某个类的Class实例; 4)动态配置实例的属性
+举例：
+
+①我们在使用JDBC连接数据库时使用Class.forName()通过反射加载数据库的驱动程序；
+
+②Spring框架也用到很多反射机制，最经典的就是xml的配置模式。Spring 通过 XML 配置模式装载 Bean 的过程：1) 将程序内所有 XML 或 Properties 配置文件加载入内存中; 2)Java类里面解析xml或properties里面的内容，得到对应实体类的字节码字符串以及相关的属性信息; 3)使用反射机制，根据这个字符串获得某个类的Class实例; 4)动态配置实例的属性
 
 ### Java获取反射的三种方法
 
@@ -385,10 +389,40 @@ public class Get {
 
 
 
+### 反射的原理
+
+Java反射机制是在运行状态中，对于任意一个类，都能够知道这个类中的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。
+
+简单一句话：反射技术可以对类进行解剖。
+
+反射就是在 Java 类执行过程中的加载步骤中，从 .class 字节码文件中提取出包含java类的所有信息，然后将字节码中的方法，变量，构造函数等映射成 相应的 Method、Filed、Constructor 等类，然后进行各种操作
 
 
 
+### 注解的原理
 
+注解的底层也是使用反射实现的，我们可以自定义一个注解来体会下。注解和接口有点类似，不过申明注解类需要加上@interface，注解类里面，只支持基本类型、String及枚举类型，里面所有属性被定义成方法，并允许提供默认值。
 
+https://blog.csdn.net/yuzongtao/article/details/83306182
 
-https://thinkwon.blog.csdn.net/article/details/104390612
+**注解处理器**
+
+这个是注解使用的核心了，前面我们说了那么多注解相关的，那到底java是如何去处理这些注解的呢
+
+从getAnnotation进去可以看到java.lang.class实现了**AnnotatedElement**方法
+
+```java
+MyAnTargetType t = AnnotationTest.class.getAnnotation(MyAnTargetType.class);
+```
+
+```java
+public final class Class<T> implements java.io.Serializable,
+                              GenericDeclaration,
+                              Type,
+                              AnnotatedElement
+```
+
+java.lang.reflect.AnnotatedElement 接口是所有程序元素（Class、Method和Constructor）的父接口，所以程序通过反射获取了某个类的AnnotatedElement对象之后，程序就可以调用该对象的如下四个个方法来访问Annotation信息：
+
+方法1 \<T extends Annotation> T getAnnotation(Class\<T> annotationClass):*返回改程序元素上存在的、指定类型的注解，如果该类型注解不存在，则返回null
+方法2：Annotation[] getAnnotations(): 返回该程序元素上存在的所有注解

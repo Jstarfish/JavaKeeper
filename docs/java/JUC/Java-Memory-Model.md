@@ -35,7 +35,7 @@
 
 ### Cache Line
 
-Cache 又是由很多个**「缓存行」**(Cache line) 组成的。Cache line 是 Cache 和 RAM 交换数据的最小单位。
+Cache 又是由很多个「**缓存行**」(Cache line) 组成的。Cache line 是 Cache 和 RAM 交换数据的最小单位。
 
 Cache 存储数据是固定大小为单位的，称为一个**Cache entry**，这个单位称为 **Cache line** 或 **Cache block**。给定 Cache 容量大小和 Cache line size 的情况下，它能存储的条目个数(number of cache entries)就是固定的。因为Cache 是固定大小的，所以它从主内存获取数据也是固定大小。对于 X86 来讲，是 64Bytes。对于 ARM 来讲，较旧的架构的 Cache line 是 32Bytes，但一次内存访存只访问一半的数据也不太合适，所以它经常是一次填两个 Cache line，叫做 double fill。
 

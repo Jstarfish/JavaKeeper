@@ -33,9 +33,9 @@
 
 如果有一种方式能让我们像调用本地服务一样调用远程服务，而让调用者对网络通信这些细节透明，那么将大大提高生产力。这种方式其实就是RPC（Remote Procedure Call Protocol），在各大互联网公司中被广泛使用，如阿里巴巴的hsf、dubbo（开源）、Facebook的thrift（开源）、Google grpc（开源）、Twitter的finagle等。
 
-　　我们首先看下一个RPC调用的具体流程：
+我们首先看下一个RPC调用的具体流程：
 
-![img](https://user-gold-cdn.xitu.io/2016/11/29/f99457a58f231dbeb3ca0b2f29c7f113?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlr8lf4hlj31440ny41b.jpg)
 
 1）服务消费方（client）调用以本地调用方式调用服务；
 
@@ -169,8 +169,6 @@ RPC框架的调用原理图如下：
 ## **三：RPC框架核心技术点**
 
 RPC框架实现的几个核心技术点总结如下：
-
- 
 
 1)远程服务提供者需要以某种形式提供服务调用相关的信息，包括但不限于服务接口定义、数据结构，或者中间态的服务定义文件，例如 Thrift的IDL文件， WS-RPC的WSDL文件定义，甚至也可以是服务端的接口说明文档;服务调用者需要通过一定的途径获取远程服务调用相关信息，例如服务端接口定义Jar包导入，获取服务端1DL文件等。
 

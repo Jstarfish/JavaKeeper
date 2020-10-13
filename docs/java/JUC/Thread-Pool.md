@@ -220,7 +220,7 @@ public static ExecutorService newWorkStealingPool() {
 
 ThreadPoolExecutor 是如何运行，如何同时维护线程和执行任务的呢？其运行机制如下图所示：
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdl1arsqkbj30u50d8dgz.jpg)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdl1arsqkbj30u50d8dgz.jpg)
 
 线程池在内部实际上构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程。线程池的运行主要分成两部分：**任务管理、线程管理**。
 

@@ -102,7 +102,9 @@ function genJavaSidebar() {
       title: "JVM",
       collapsable: true,
       sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["JVM/JVM-Java","JVM/Class-Loading","JVM/Runtime-Data-Areas","JVM/GC","JVM/Java-Object","JVM/OOM","JVM/Reference","JVM/JVM性能监控和故障处理工具"]
+      children: ["JVM/JVM-Java","JVM/Class-Loading","JVM/Runtime-Data-Areas","JVM/GC","JVM/GC-实战",
+      "JVM/Java-Object", "JVM/JVM参数配置",
+      "JVM/OOM","JVM/Reference","JVM/JVM性能监控和故障处理工具"]
     },
     {
       title: "JUC",
@@ -170,6 +172,7 @@ function genDataStoreSidebar(){
         ['MySQL/MySQL-Storage-Engines', 'MySQL 存储引擎'],
         ['MySQL/MySQL-Index', 'MySQL 索引'],
         ['MySQL/MySQL-select', 'MySQL 查询'],
+        ['MySQL/数据库三范式', '数据库三范式'],
       ]
     },
     {
@@ -196,6 +199,7 @@ function genFrameworkSidebar(){
       children: [
         ['Spring/Spring-IOC', 'Spring IOC'],
         ['Spring/Spring-Cycle-Dependency', 'Spring 循环依赖'],
+        ['Spring/Spring-AOP', 'Spring AOP'],
       ]
     }
   ];

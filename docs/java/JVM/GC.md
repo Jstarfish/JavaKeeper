@@ -12,7 +12,7 @@ Java 相比 C/C++ 最显著的特点便是引入了自动垃圾回收 ，它解�
 
 ### 回顾下 JVM 内存区域
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx0a1jqj30ol0ck754.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx0a1jqj30ol0ck754.jpg)
 
 
 
@@ -30,11 +30,11 @@ String ref = new String("Java");
 
 以上代码 ref1 引用了右侧定义的对象，所以引用次数是 1
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYamljaWM0aERkdkRmT3lUUWFobHQzQkt2VXdJU3p3T3NHcUZqZmFXdXZWajk5Yk9rUzdBb1JaNGcvNjQw?x-oss-process=image/format,png)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl9gdbf2mj307803adfn.jpg)
 
 如果在上述代码后面添加一个 ref = null，则由于对象没被引用，引用次数置为 0，由于不被任何变量引用，此时即被回收，动图如下
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X2dpZi9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYWXpkcGwzNmZtRUh3RDFYZ0Z2ZTM5WXlqSnNXMmliU09NZDZPTU81SExJbENIYVlpYnZFUFNpYmliQS82NDA?x-oss-process=image/format,png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl9gicofzg307204cglg.gif)
 
 看起来用引用计数确实没啥问题了，不过它无法解决一个主要的问题：**循环引用**！啥叫循环引用
 
@@ -63,7 +63,7 @@ public class TestRC {
 
 按步骤一步步画图
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYaWJkYjN3RERoQXJuRmliaFdoV2NIa2NNUjVRcndyRTJwTm9nSjZySFdpY1l6N2JqRTJOaWJXMW9jZy82NDA?x-oss-process=image/format,png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6b79565j30rj0bejrk.jpg)
 
 到了第三步，虽然 a，b 都被置为 null 了，但是由于之前它们指向的对象互相指向了对方（引用计数都为 1），所以无法回收，也正是由于无法解决循环引用的问题，所以主流的 Java 虚拟机都没有选用引用计数法来管理内存。
 
@@ -71,7 +71,7 @@ public class TestRC {
 
 现代虚拟机基本都是采用这种算法来判断对象是否存活，可达性算法的原理是以一系列叫做  **GC Root**  的对象为起点出发，引出它们指向的下一个节点，再以下个节点为起点，引出此节点指向的下一个结点。。。（这样通过 GC Root 串成的一条线就叫引用链），直到所有的结点都遍历完毕，如果相关对象不在任意一个以 **GC Root** 为起点的引用链中，则这些对象会被判断为「垃圾」,会被 GC 回收。
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYdlpMbXg5SGRlTmliUlFqbkZad1VCRlhUUTZtSnk3OWFqeDRCZHFGTWljSWlhVzRCTlFhR1RaV2liZy82NDA?x-oss-process=image/format,png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6bl1kifj30jk0b60t0.jpg)
 
 如图示，如果用可达性算法即可解决上述循环引用的问题，因为从**GC Root** 出发没有到达 a,b，所以 a，b 可回收
 
@@ -90,6 +90,9 @@ public class TestRC {
 - 方法区中类静态属性引用的对象
 - 方法区中常量引用的对象
 - 本地方法栈中 JNI（即一般说的 Native 方法）引用的对象
+- Java 虚拟机内部的引用，如基本数据类型对应的 Class 对象，一些常驻的异常对象
+- 所有被同步锁（synchronized 关键字）持有的对象
+- 反映 Java 虚拟机内部情况的 JMXBean、JVMTI 中注册的回调、本地代码缓存
 
 #### 2.2.1 虚拟机栈中引用的对象
 
@@ -139,7 +142,7 @@ public class Test {
 
 当调用 Java 方法时，虚拟机会创建一个栈桢并压入 Java 栈，而当它调用的是本地方法时，虚拟机会保持 Java 栈不变，不会在 Java 栈祯中压入新的祯，虚拟机只是简单地动态连接并直接调用指定的本地方法。
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYdWhiZDlIQ0xCSVlSQmVrUXFpY3M3WEJyajB2VlVWU1BUSFRpYkpidXRyZEdSV2liMU1sRGQxNkpRLzY0MA?x-oss-process=image/format,png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6ihuav7j30di0caq3j.jpg)
 
 ```java
 JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(JNIEnv *env, jobject instance，jstring jmsg) {
@@ -158,7 +161,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 ### JDK8 之前的方法区回收
 
-永久代的垃圾收集主要回收两部分内容：废弃常量和无用的类。
+永久代的垃圾收集主要回收两部分内容：**废弃常量和无用的类**。
 
 废弃常量：与堆中对象回收类似，以常量池中字面量的回收为例，例如资格字符串“abc”已经进入常量池，但没有任何一个 String 对象引用常量池中的"abc"常量，也没有其他地方引用了这个字面量，如果发生内存回收，且有必要的话，这个常量就会被系统清理出常量池。
 
@@ -168,7 +171,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 - 加载该类的 ClassLoader 已经被回收
 - 该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。
 
-虚拟机**可以**对满足以上 3 个条件的无用类进行回收，并不是一定会被回收。是否对类回收，HotSpot 虚拟机提供了`-Xnoclassgc` 参数进行控制
+虚拟机**可以**对满足以上 3 个条件的无用类进行回收，并不是一定会被回收。是否对类回收，HotSpot 虚拟机提供了 `-Xnoclassgc` 参数进行控制
 
 ------
 
@@ -189,15 +192,13 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 1. 先根据可达性算法**标记**出相应的可回收对象（图中黄色部分）
 
- 
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl79uspovj30ck07tt8n.jpg)
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYVWFrUFc2STJoMXhvUXBYTWV2VXpNMmVHd0cwaWE5WXJQTDFRQ0R2WGFXMW13YTNDcnZIZVJpYkEvNjQw?x-oss-process=image/format,png)
-
-​    2.对可回收的对象进行回收操作起来确实很简单，也不用做移动数据的操作，那有啥问题呢？仔细看上图，没错，内存碎片！假如我们想在上图中的堆中分配一块需要**连续内存**占用 4M 或 5M 的区域，显然是会失败，怎么解决呢，如果能把上面未使用的 2M， 2M，1M 内存能连起来就能连成一片可用空间为 5M 的区域即可，怎么做呢?
+2. 对可回收的对象进行回收操作起来确实很简单，也不用做移动数据的操作，那有啥问题呢？仔细看上图，没错，内存碎片！假如我们想在上图中的堆中分配一块需要**连续内存**占用 4M 或 5M 的区域，显然是会失败，怎么解决呢，如果能把上面未使用的 2M， 2M，1M 内存能连起来就能连成一片可用空间为 5M 的区域即可，怎么做呢?
 
 ### 3.2 复制算法
 
-把堆等分成两块区域, A 和 B，区域 A 负责分配对象，区域 B 不分配, 对区域 A 使用以上所说的标记法把存活的对象标记出来，然后把区域 A 中存活的对象都复制到区域 B（存活对象都依次**紧邻排列**）最后把 A 区对象全部清理掉释放出空间，这样就解决了内存碎片的问题了。
+把堆等分成两块区域, A 和 B，区域 A 负责分配对象，区域 B 不分配，对区域 A 使用以上所说的标记法把存活的对象标记出来，然后把区域 A 中存活的对象都复制到区域 B（存活对象都依次**紧邻排列**）最后把 A 区对象全部清理掉释放出空间，这样就解决了内存碎片的问题了。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfws4ow2i1j31gn0q075y.jpg)
 
@@ -205,7 +206,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 ### 3.3 标记整理法
 
-前面两步和标记清除法一样，不同的是它在标记清除法的基础上添加了一个整理的过程 ，即将所有的存活对象都往一端移动,紧邻排列（如图示），再清理掉另一端的所有区域，这样的话就解决了内存碎片的问题。
+前面两步和标记清除法一样，不同的是它在标记清除法的基础上添加了一个整理的过程 ，即将所有的存活对象都往一端移动，紧邻排列（如图示），再清理掉另一端的所有区域，这样的话就解决了内存碎片的问题。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYUzM1aWN4MTltaWIzZFpDRW0zZk9kbHcyY2xZYldUSnRoVTVpYm45WnRjOGtRdWFvc3hPYWNoUVd3LzY0MA?x-oss-process=image/format,png)
 
@@ -219,9 +220,9 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 *如图示：纵轴代表已分配的字节，而横轴代表程序运行时间*
 
-由图可知，大部分的对象都很短命，都在很短的时间内都被回收了（IBM 专业研究表明，一般来说，98% 的对象都是朝生夕死的，经过一次 Minor GC 后就会被回收），所以分代收集算法根据**对象存活周期的不同**将堆分成新生代和老生代（Java8以前还有个永久代），默认比例为 1 : 2，新生代又分为 Eden 区， from Survivor 区（简称S0），to Survivor 区(简称 S1)，三者的比例为 `8: 1 : 1`，这样就可以根据新老生代的特点选择最合适的垃圾回收算法，我们把新生代发生的 GC 称为 Young GC（也叫 Minor GC），老年代发生的 GC 称为 Old GC。
+由图可知，大部分的对象都很短命，都在很短的时间内都被回收了（IBM 专业研究表明，一般来说，98% 的对象都是朝生夕死的，经过一次 Minor GC 后就会被回收），所以分代收集算法根据**对象存活周期的不同**将堆分成新生代和老生代（Java8 以前还有个永久代），默认比例为 1 : 2，新生代又分为 Eden 区， from Survivor 区（简称S0），to Survivor 区(简称 S1)，三者的比例为 `8: 1 : 1`，这样就可以根据新老生代的特点选择最合适的垃圾回收算法，我们把新生代发生的 GC 称为 Young GC（也叫 Minor GC），老年代发生的 GC 称为 Old GC。
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2yeeoz8j30aj04mglm.jpg)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2yeeoz8j30aj04mglm.jpg)
 
 *画外音：思考一下，新生代为啥要分这么多区？*
 
@@ -241,13 +242,19 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2z7ahusg30hr09l0v2.gif)
 
-当触发下一次 Minor GC 时，会把 Eden 区的存活对象和 S0（或S1） 中的存活对象（S0 或 S1 中的存活对象经过每次 Minor GC 都可能被回收）一起移到 S1（Eden 和 S0 的存活对象年龄+1）, 同时清空 Eden 和 S0 的空间。![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zeh8bvg30hq09h76r.gif)
+当触发下一次 Minor GC 时，会把 Eden 区的存活对象和 S0（或S1） 中的存活对象（S0 或 S1 中的存活对象经过每次 Minor GC 都可能被回收）一起移到 S1（Eden 和 S0 的存活对象年龄+1）, 同时清空 Eden 和 S0 的空间。![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zeh8bvg30hq09h76r.gif)
 
-若再触发下一次 Minor GC，则重复上一步，只不过此时变成了 从 Eden，S1 区将存活对象复制到 S0 区，每次垃圾回收,，S0，S1 角色互换，都是从 Eden ，S0(或S1) 将存活对象移动到 S1(或S0)。也就是说在 Eden 区的垃圾回收我们采用的是**复制算法**，因为在 Eden 区分配的对象大部分在 Minor GC 后都消亡了，只剩下极少部分存活对象，S0，S1 区域也比较小，所以最大限度地降低了复制算法造成的对象频繁拷贝带来的开销。
+若再触发下一次 Minor GC，则重复上一步，只不过此时变成了从 Eden，S1 区将存活对象复制到 S0 区，每次垃圾回收，S0，S1 角色互换，都是从 Eden ，S0(或S1) 将存活对象移动到 S1(或S0)。也就是说在 Eden 区的垃圾回收我们采用的是**复制算法**，<mark>因为在 Eden 区分配的对象大部分在 Minor GC 后都消亡了，只剩下极少部分存活对象，S0，S1 区域也比较小，所以最大限度地降低了复制算法造成的对象频繁拷贝带来的开销</mark>。
+
+> 新生代采用的复制算法，其实是优化后的复制算法，即在复制算法的基础上，使用三个分区（Eden/S0/S1）进行处理
+>
+> ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl7jk4257j30i2093mxu.jpg)
+>
+> 
 
 **2、对象何时晋升老年代**
 
-- 当对象的年龄达到了我们设定的阈值，则会从S0（或S1）晋升到老年代![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zt5evgg30hs0axgnj.gif)
+- 当对象的年龄达到了我们设定的阈值，则会从S0（或S1）晋升到老年代![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zt5evgg30hs0axgnj.gif)
 
   如图示：年龄阈值设置为 15（默认为15岁）， 当发生下一次 Minor GC 时，S0 中有个对象年龄达到 15，达到我们的设定阈值，晋升到老年代！
 
@@ -265,7 +272,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 什么是 STW ？所谓的 STW，即在 GC（minor GC 或 Full GC）期间，只有垃圾回收器线程在工作，其他工作线程则被挂起。
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zzpdzfj30tk0go3zo.jpg)
+![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zzpdzfj30tk0go3zo.jpg)
 
 *画外音：为啥在垃圾收集期间其他工作线程会被挂起？想象一下，你一边在收垃圾，另外一群人一边丢垃圾，垃圾能收拾干净吗。*
 
@@ -280,6 +287,34 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 - 调用方法的 call 之后
 - 抛出异常的位置 另外需要注意的是由于新生代的特点（大部分对象经过 Minor GC后会消亡）， Minor GC 用的是复制算法，而在老生代由于对象比较多，占用的空间较大，使用复制算法会有较大开销（复制算法在对象存活率较高时要进行多次复制操作，同时浪费一半空间）所以根据老年代的特点，在老年代进行的 GC 一般采用的是标记整理法来进行回收。
 
+
+
+> 《深入理解 Java 虚拟机》中有个注意事项，整理了下各种 GC，避免混乱
+>
+> - 部分收集（Partial GC）：指目标不是完整收集整个 Java 堆的垃圾收集，其中又分为：
+>   - 新生代收集（Minor GC/Young GC）：指目标只是新生代的垃圾收集。
+>   - 老年代收集（Major GC/Old GC）：指目标只是老年代的垃圾收集。目前只有 CMS 收集器会有单独收集老年代的行为。另外请注意“Major GC”这个说法现在有点混淆，在不同资料上常有不同所指，读者需按上下文区分到底是指老年代的收集还是整堆收集。
+>   - 混合收集（Mixed GC）：指目标是收集整个新生代以及部分老年代的垃圾收集。目前只有 G1 收集器会有这种行为。
+>
+> - 整堆收集（Full GC）：收集整个 Java 堆和方法区的垃圾收集。
+
+
+
+**什么时候会触发 Full GC ?**
+
+1. `System.gc()` 方法的调用
+
+   此方法的调用是建议 JVM 进行 Full GC，虽然只是建议而非一定，但很多情况下它会触发 Full GC，从而增加Full GC 的频率，也即增加了间歇性停顿的次数。强烈影响系建议能不使用此方法就别使用，让虚拟机自己去管理它的内存，可通过通过 -XX:+ DisableExplicitGC 来禁止 RMI 调用 System.gc。
+
+2. 老年代空间不足
+
+   老年代空间只有在新生代对象转入及创建大对象、大数组时才会出现不足的现象，当执行 Full GC 后空间仍然不足，则抛出如下错误：java.lang.OutOfMemoryError: Java heap space 
+   为避免以上两种状况引起的 Full GC，调优时应尽量做到让对象在 Minor GC 阶段被回收、让对象在新生代多存活一段时间及不要创建过大的对象及数组。
+
+3. 老年代的内存使用率达到了一定阈值（可通过参数调整），直接触发 FGC
+4. 空间分配担保：在 YGC 之前，会先检查老年代最大可用的连续空间是否大于新生代所有对象的总空间。如果小于，说明 YGC 是不安全的，则会查看参数 HandlePromotionFailure 是否被设置成了允许担保失败，如果不允许则直接触发 Full GC；如果允许，那么会进一步检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果小于也会触发 Full GC
+5. Metaspace（元空间）在空间不足时会进行扩容，当扩容到了-XX:MetaspaceSize 参数的指定值时，也会触发FGC
+
 ------
 
 
@@ -288,7 +323,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的具体实现。Java 虚拟机规范并没有规定垃圾收集器应该如何实现，因此一般来说不同厂商，不同版本的虚拟机提供的垃圾收集器实现可能会有差别，一般会给出参数来让用户根据应用的特点来组合各个年代使用的收集器，主要有以下垃圾收集器
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201010124945.png)
+![](https://img3.sycdn.imooc.com/5bd714800001b3fc07070485.jpg)
 
 - 在新生代工作的垃圾回收器：Serial、ParNew、ParallelScavenge
 - 在老年代工作的垃圾回收器：CMS、Serial Old(MSC)、Parallel Old
@@ -306,7 +341,7 @@ Serial 收集器是工作在新生代的，**单线程的垃圾收集器**，单
 
 #### ParNew 收集器
 
-ParNew 收集器是 Serial 收集器的多线程版本，除了使用多线程，其他像收集算法、STW、对象分配规则、回收策略与 Serial 收集器完全一样，在底层上，这两种收集器也共用了相当多的代码，它的垃圾收集过程如下![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYYUNIUWxRNTRtR2ptSjVhYzRENzAwWDhuRkJjTXFwYXlqR1dkcmRoTmNNUFk4OU5acFB2TFNBLzY0MA?x-oss-process=image/format,png)
+ParNew 收集器是 Serial 收集器的多线程版本，除了使用多线程，其他像收集算法、STW、对象分配规则、回收策略与 Serial 收集器完全一样，在底层上，这两种收集器也共用了相当多的代码，它的垃圾收集过程如下![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlbr6leplj30mk0fsab9.jpg)
 
 ParNew 主要工作在 Server 模式，我们知道服务端如果接收的请求多了，响应时间就很重要了，多线程可以让垃圾回收得更快，也就是减少了 STW 时间，能提升响应时间，所以是许多运行在 Server 模式下的虚拟机的首选新生代收集器，另一个与性能无关的原因是因为除了 Serial  收集器，**只有它能与 CMS 收集器配合工作**，CMS 是一个划时代的垃圾收集器，是真正意义上的**并发收集器**，它第一次实现了垃圾收集线程与用户线程（基本上）同时工作，它采用的是传统的 GC 收集器代码框架，与 Serial，ParNew 共用一套代码框架，所以能与这两者一起配合工作，而后文提到的 Parallel Scavenge 与 G1 收集器没有使用传统的 GC 收集器代码框架，而是另起炉灶独立实现的，另外一些收集器则只是共用了部分的框架代码，所以无法与 CMS 收集器一起配合工作。
 
@@ -349,7 +384,7 @@ CMS（Concurrent Mark Sweep） 收集器是以实现最短 STW 时间为目标�
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYQmswSGRhQTR4MUZxa29iS1J4ZEVyaWJSTVFuODZ6RHQ5RnBjZU8xaWNtTHdkNm9pY2hTams0aWJaUS82NDA?x-oss-process=image/format,png)
 
-从图中可以的看到**初始标记和重新标记两个阶段会发生 STW**，造成用户线程挂起，不过初始标记仅标记 GC Roots 能关联的对象，速度很快，并发标记是进行 GC Roots  Tracing 的过程，重新标记是为了修正并发标记期间因用户线程继续运行而导致标记产生变动的那一部分对象的标记记录，这一阶段停顿时间一般比初始标记阶段稍长，但**远比并发标记时间短**。
+从图中可以的看到**初始标记和重新标记两个阶段会发生 STW**，造成用户线程挂起，不过初始标记仅标记 GC Roots 能关联的对象，速度很快，并发标记就是从 GC Roots 的直接关联对象开始遍历整个对象图的过程，这个过程耗时较长但是不需要停顿用户线程，重新标记是为了修正并发标记期间因用户线程继续运行而导致标记产生变动的那一部分对象的标记记录，这一阶段停顿时间一般比初始标记阶段稍长，但**远比并发标记时间短**。
 
 整个过程中耗时最长的是并发标记和标记清理，不过这两个阶段用户线程都可工作，所以不影响应用的正常使用，所以总体上看，可以认为 CMS 收集器的内存回收过程是与用户线程一起并发执行的。
 
@@ -373,7 +408,7 @@ G1 收集器是面向服务端的垃圾收集器，被称为驾驭一切的垃�
 
 - 不需要更大的 Java Heap
 
-   
+> Java8 默认使用 Parallel Scavenge + Parallel Old 组合，Java9 开始 G1 取代了它们。
 
 
 与 CMS 相比，它在以下两个方面表现更出色
@@ -381,15 +416,15 @@ G1 收集器是面向服务端的垃圾收集器，被称为驾驭一切的垃�
 1. 运作期间不会产生内存碎片，<mark>G1 从整体上看采用的是标记-整理法，局部（两个 Region）上看是基于复制算法实现的</mark>，两个算法都不会产生内存碎片，收集后提供规整的可用内存，这样有利于程序的长时间运行。
 2. 在 STW 上建立了**可预测**的停顿时间模型，用户可以指定期望停顿时间，G1 会将停顿时间控制在用户设定的停顿时间以内。
 
-为什么 G1 能建立可预测的停顿模型呢，主要原因在于 G1 对堆空间的分配与传统的垃圾收集器不一器，传统的内存分配就像我们前文所述，是连续的，分成新生代，老年代，新生代又分 Eden，S0，S1,如下
+为什么 G1 能建立可预测的停顿模型呢，主要原因在于 G1 对堆空间的分配与传统的垃圾收集器不一样，传统的内存分配就像我们前文所述，是连续的，分成新生代，老年代，新生代又分 Eden，S0，S1,如下
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYdW5xUk11aHE2RlpiY0tpY05pYmN2S21lVHdpYzA1b3Jkb1oyd2dXNGhINUt0TWxLdThEdlFpYkU1dy82NDA?x-oss-process=image/format,png)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlcc0ggtsj30cc04twem.jpg)
 
 而 G1 各代的存储地址不是连续的，每一代都使用了 n 个不连续的大小相同的 Region，每个 Region 占有一块连续的虚拟内存地址，如图示
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYN2VZbmliVUZIdW83QWliWnlMc2FIcTZ0V3BXbndMTzNqajFyazNtVGhyQVBTc2RtVk1yZ3psTFEvNjQw?x-oss-process=image/format,png)
 
-除了和传统的新老生代，幸存区的空间区别，Region还多了一个H，它代表 Humongous，这表示这些 Region 存储的是巨大对象（humongous object，H-obj），即大小大于等于 region 一半的对象，这样超大对象就直接分配到了老年代，防止了反复拷贝移动。那么 G1 分配成这样有啥好处呢？
+除了和传统的新老生代，幸存区的空间区别，Region 还多了一个H，它代表 Humongous，这表示这些 Region 存储的是巨大对象（humongous object，H-obj），即大小大于等于 region 一半的对象，这样超大对象就直接分配到了老年代，防止了反复拷贝移动。那么 G1 分配成这样有啥好处呢？
 
 传统的收集器如果发生 Full GC 是对整个堆进行全区域的垃圾收集，而分配成各个 Region 的话，方便 G1 跟踪各个 Region 里垃圾堆积的价值大小（回收所获得的空间大小及回收所需经验值），这样根据价值大小维护一个优先列表，根据允许的收集时间，优先收集回收价值最大的 Region，也就避免了整个老年代的回收，也就减少了 STW 造成的停顿时间。同时由于只收集部分 Region，也就做到了 STW 时间的可控。
 
@@ -438,7 +473,7 @@ public class TestGC {
 10.088: 2[Full GC 3(Allocation Failure) 0.088: 4[Tenured: 50K->210K(10240K), 60.0009420 secs] 74603K->210K(19456K), [Metaspace: 2630K->2630K(1056768K)], 80.0009700 secs]9 [Times: user=0.01 sys=0.00, real=0.02 secs]
 ```
 
-两者格式其实差不多，一起来看看，主要以本例触发的 Minor GC 来讲解, 以上日志中标的每一个数字与以下序号一一对应
+两者格式其实差不多，一起来看看，主要以本例触发的 Minor GC 来讲解，以上日志中标的每一个数字与以下序号一一对应
 
 1. 开头的 0.080，0.088 代表了 GC 发生的时间，这个数字的含义是从 Java 虚拟机启动以来经过的秒数
 2. **[GC** 或者 **[Full GC** 说明了这次垃圾收集的停顿类型，注意不是用来区分新生代 GC 还是老年化 GC 的，如果有 **Full**，说明这次 GC 是发生了**Stop The World** 的，如果是调用 System.gc() 所触发的收集，这里会显示 **[Full GC（System）**
@@ -463,8 +498,8 @@ public class TestGC {
 **参考与来源**
 
 - 主要来源“码海”公号
+- 《深入理解 Java 虚拟机》 
 - 堆外内存的回收机制分析 https://www.jianshu.com/p/35cf0f348275 
 - java调用本地方法--jni简介 https://blog.csdn.net/w1992wishes/article/details/80283403 
 - 咱们从头到尾说一次 Java 垃圾回收 https://mp.weixin.qq.com/s/pR7U1OTwsNSg5fRyWafucA 
-- 深入理解 Java 虚拟机 
 - Java Hotspot G1 GC的一些关键技术 https://tech.meituan.com/2016/09/23/g1.html

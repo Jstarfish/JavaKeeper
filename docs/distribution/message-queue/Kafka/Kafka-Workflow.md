@@ -113,7 +113,7 @@ log.segment.bytes=1073741824
 - 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
 - 偏移量：分区中的每一条消息都会被分配的一个连续的id值，该值用于唯一标识分区中的每一条消息
 - 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项`log.retention.hours=168` 就表示 7 天后删除老的消息文件
-- [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数log.index.interval.bytes限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是4KB，写4kb的数据然后在索引里写一条索引。
+- [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数 log.index.interval.bytes 限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是4KB，写4kb的数据然后在索引里写一条索引。
 
 举个栗子：00000000000000170410 的 “.index” 文件和 “.log” 文件的对应的关系，如下图
 
@@ -392,9 +392,9 @@ Math.abs(groupID.hashCode()) % numPartitions
 - consumer 订阅的 topic 发生变化，比如订阅的 topic 采用的是正则表达式的形式，如 `test-*` 此时如果有一个新建了一个topic `test-user`，那么这个 topic 的所有分区也是会自动分配给当前的 consumer 的，此时就会发生再平衡；
 - consumer 所订阅的 topic 发生了新增分区的行为，那么新增的分区就会分配给当前的 consumer，此时就会触发再平衡。
 
-Kafka提供的再平衡策略主要有三种：`Round Robin`，`Range`和`Sticky`，默认使用的是`Range`。这三种分配策略的主要区别在于：
+Kafka 提供的再平衡策略主要有三种：`Round Robin`，`Range` 和 `Sticky`，默认使用的是 `Range`。这三种分配策略的主要区别在于：
 
-- `Round Robin`：会采用轮询的方式将当前所有的分区依次分配给所有的consumer；
+- `Round Robin`：会采用轮询的方式将当前所有的分区依次分配给所有的 consumer；
 - `Range`：首先会计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer；
 - `Sticky`：这种分区策略是最新版本中新增的一种策略，其主要实现了两个目的：
   - 将现有的分区尽可能均衡的分配给各个consumer，存在此目的的原因在于`Round Robin`和`Range`分配策略实际上都会导致某几个consumer承载过多的分区，从而导致消费压力不均衡；

@@ -80,11 +80,11 @@ SortSet: ZADD、ZCARD、ZCOUNT、ZRANGE
 
 在 Redis 中，常用的 5 种数据结构和应用场景如下：
 
-- **String：**缓存、计数器、分布式锁等。
-- **List：**链表、队列、微博关注人时间轴列表等。
-- **Hash：**用户信息、Hash 表等。
-- **Set：**去重、赞、踩、共同好友等。
-- **Zset：**访问量排行榜、点击量排行榜等
+- **String**：缓存、计数器、分布式锁等。
+- **List**：链表、队列、微博关注人时间轴列表等。
+- **Hash**：用户信息、Hash 表等。
+- **Set**：去重、赞、踩、共同好友等。
+- **Zset**：访问量排行榜、点击量排行榜等
 
 还有一些，比如：
 
@@ -219,9 +219,9 @@ Redis 为了平衡空间和时间效率，针对 value 的具体类型在底层�
 
 Redis 是用 C 语言开发完成的，但在 Redis 字符串中，并没有使用 C 语言中的字符串，而是用一种称为 **SDS**（Simple Dynamic String）的结构体来保存字符串。
 
-![](https://mmbiz.qpic.cn/mmbiz_png/wAkAIFs11qaA2ZaXlTAia5iaX3a8qiavzP7EGGNrDicROyDnkvhYmZ6lViayMsibXe0kgr4PIVkAyK3xj93ic8K8JEViaA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjno8bake1j30rk06dwei.jpg)
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/wAkAIFs11qaA2ZaXlTAia5iaX3a8qiavzP7vXLKujk5GzJI27Y6LpV6K7Ft18MJ7W9OEPGWbX8UZmlcsE39bZFK1Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjno8fzv2ej30d207r3yr.jpg)
 
 String 是 Redis 最基本的类型，你可以理解成与 Memcached一模一样的类型，一个 key 对应一个 value。
 

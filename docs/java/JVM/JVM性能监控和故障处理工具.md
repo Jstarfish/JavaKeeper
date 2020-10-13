@@ -285,7 +285,7 @@ public class KeylessEntry {
 
 打开 jvisualvm （终端输入 jvisualvm 执行即可），打开后，将堆大小设置为 500M，执行命令 **java Xms500m -Xmx500m KeylessEntry**，此时可以观察到左边出现了对应的应用 KeylessEntry,双击点击 open
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk445FOl7e3SFFMlmBibKvluGrMlzjIicIoLtfX2p5iaqPYpBbBjYOLzBAmZw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlg8p0960j30ci09775m.jpg)
 
 打开之后可以看到展示了 CPU，堆内存使用，加载类及线程的情况
 
