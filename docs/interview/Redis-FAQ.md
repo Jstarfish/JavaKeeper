@@ -825,6 +825,20 @@ Redis并不能保证数据的强一致性，这意味这在实际中集群在特
 
 Reids 采用的是 **惰性删除和定时删除** 的结合，一般来说可以借助最小堆来实现定时器，不过 Redis 的设计考虑到时间事件的有限种类和数量，使用了无序链表存储时间事件，这样如果在此基础上实现定时删除，就意味着 `O(N)` 遍历获取最近需要删除的数据。
 
+实现过期键惰性删除策略的核心是 `db.c/expireIfNeeded` 函数 —— 所有命令在读取或写入数据库之前，程序都会调用 `expireIfNeeded` 对输入键进行检查， 并将过期键删除：
+
+![digraph expire_check {          node [style = filled, shape = plaintext];      edge [style = bold];      // node      write_commands [label = "SET 、\n LPUSH 、\n SADD 、 \n 等等", fillcolor = "#FADCAD"];      read_commands [label = "GET 、\n LRANGE 、\n SMEMBERS 、 \n 等等", fillcolor = "#FADCAD"];      expire_if_needed [label = "调用 expire_if_needed() \n 删除过期键", shape = box, fillcolor = "#A8E270"];      process [label = "执行实际的命令流程"];      // edge      write_commands -> expire_if_needed [label = "写请求"];      read_commands -> expire_if_needed [label = "读请求"];      expire_if_needed -> process;  }](https://redisbook.readthedocs.io/en/latest/_images/graphviz-efb7f7ae1a793feea33285531dfe0023f3017b90.svg)
+
+比如说， `GET` 命令的执行流程可以用下图来表示：
+
+![digraph get_with_expire {      node [style = filled, shape = plaintext];      edge [style = bold];      // node        get [label = "GET key", fillcolor = "#FADCAD"];      expire_if_needed [label = "调用\n expire_if_needed() \n 如果键已经过期 \n 那么将它删除", shape = diamond, fillcolor = "#A8E270"];      expired_and_deleted [label = "key 不存在\n 向客户端返回 NIL"];      not_expired [label = "向客户端返回 key 的值"];      get -> expire_if_needed;      expire_if_needed -> expired_and_deleted [label = "已过期"];     expire_if_needed -> not_expired [label = "未过期"];  }](https://redisbook.readthedocs.io/en/latest/_images/graphviz-acca43b0dd583eb92a1ce7193dc6b9bb14e9c0f9.svg)
+
+`expireIfNeeded` 的作用是， 如果输入键已经过期的话， 那么将键、键的值、键保存在 `expires` 字典中的过期时间都删除掉。
+
+
+
+对过期键的定期删除由 `redis.c/activeExpireCycle` 函执行： 每当 Redis 的例行处理程序 `serverCron` 执行时， `activeExpireCycle` 都会被调用 —— 这个函数在规定的时间限制内， 尽可能地遍历各个数据库的 `expires` 字典， 随机地检查一部分键的过期时间， 并删除其中的过期键。
+
 
 
 ### Redis 的淘汰策略有哪些？
@@ -874,7 +888,7 @@ Reids 采用的是 **惰性删除和定时删除** 的结合，一般来说可�
 
 串行化之后，就会导致系统的吞吐量会大幅度的降低，用比正常情况下多几倍的机器去支撑线上的一个请求。
 
-操作缓存的时候我们都是采取**删除缓存**缓存策略的，原因如下：
+操作缓存的时候我们都是采取**删除缓存**策略的，原因如下：
 
 1. 高并发环境下，无论是先操作数据库还是后操作数据库而言，如果加上更新缓存，那就**更加容易**导致数据库与缓存数据不一致问题。(删除缓存**直接和简单**很多)
 2. 如果每次更新了数据库，都要更新缓存【这里指的是频繁更新的场景，这会耗费一定的性能】，倒不如直接删除掉。等再次读取时，缓存里没有，那我到数据库找，在数据库找到再写到缓存里边(体现**懒加载**)
@@ -943,7 +957,7 @@ https://zhuanlan.zhihu.com/p/48334686
 
 1. 缓存数据的过期时间设置随机，防止同一时间大量数据过期现象发生。
 
-2. 一般并发量不是特别多的时候，使用最多的解决方案是加锁排队。
+2. 一般并发量不是特别多的时候，使用最多的解决方案是加锁排队(key上锁，其他线程不能访问，假设在高并发下，缓存重建期间key是锁着的，这是过来1000个请求999个都在阻塞的。同样会导致用户等待超时，这是个治标不治本的方法！)。
 
 3. 给每一个缓存数据增加相应的缓存标记，记录缓存的是否失效，如果缓存标记失效，则更新数据缓存。
 
