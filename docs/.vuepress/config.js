@@ -118,7 +118,8 @@ function genJavaSidebar() {
         "JUC/CountDownLatch、CyclicBarrier、Semaphore",
         ['JUC/BlockingQueue','阻塞队列'],
         "JUC/Thread-Pool",
-        "JUC/Locks"
+        "JUC/Locks",
+        "JUC/多个线程顺序执行问题",
       ]
     }
   ];
@@ -201,6 +202,16 @@ function genFrameworkSidebar(){
         ['Spring/Spring-Cycle-Dependency', 'Spring 循环依赖'],
         ['Spring/Spring-AOP', 'Spring AOP'],
       ]
+    },
+    {
+      title: "Spring Boot",
+      collapsable: false,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['SpringBoot/Hello-SpringBoot', 'Hello-SpringBoot'],
+        ['SpringBoot/Spring Boot 最流行的 16 条实践解读', 'Spring Boot 最流行的 16 条实践解读'],
+        ['SpringBoot/@Scheduled', '@Scheduled'],
+      ]
     }
   ];
 }
@@ -255,6 +266,7 @@ function genInterviewSidebar(){
     ['ZooKeeper-FAQ', 'Zookeeper 部分'],
     ['MyBatis-FAQ', 'MyBatis 部分'],
     ['Spring-FAQ', 'Spring 部分'],
+    ['SpringBoot-FAQ', 'Spring Boot 部分'],
     ['Design-Pattern-FAQ', '设计模式部分'],
     ['Tomcat-FAQ', 'Tomcat 部分'],
     ['Elasticsearch-FAQ', 'Elasticsearch 部分'],

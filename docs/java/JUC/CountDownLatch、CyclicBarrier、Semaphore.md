@@ -98,7 +98,7 @@ Semaphore 翻译过来是**信号量**的意思，其实我们叫它令牌或者
 
 这个解释太官方，我们用例子来理解：
 
-如果我 `Semaphore s = new Semaphore(1)` 写的是1，我取一下（acquire），他就变成 0，当变成 0 之后别人是 acquire 不到的，然后继续执行，线程结束之后注意要 `s.release()`，执行完该执行的就把他 release 掉，release 又把0变回去1， 还原化。
+如果我 `Semaphore s = new Semaphore(1)` 写的是1，我取一下（acquire），他就变成 0，当变成 0 之后别人是 acquire 不到的，然后继续执行，线程结束之后注意要 `s.release()`，执行完该执行的就把他 release 掉，release 又把 0 变回去 1， 还原化。
 
 Semaphore 的含义就是限流，比如说你在买票，Semaphore 写 5 就是只能有5个人可以同时买票。acquire 的意思叫获得这把锁，线程如果想继续往下执行，必须得从 Semaphore 里面获得一 个许可， 他一共有 5 个许可，用到 0 了剩下的就得等着。
 

@@ -1,12 +1,11 @@
 # Spring Boot从初识到实战
 
-![微信图片_20191219180720.png](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga26zho09tj20p00an0yr.jpg)
+![](http://ww1.sinaimg.cn/large/9b9f09a9ly1ga26zho09tj20p00an0yr.jpg)
 
 
 
->  文章收集在 GitHub [JavaEgg](https://github.com/Jstarfish/JavaEgg) 中，欢迎star+指导
+>  文章收集在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 中，欢迎star+指导
 >
-> [JavaEgg](https://github.com/Jstarfish/JavaEgg)——《“Java技术员”成长手册》，包含Java基础、框架、存储、搜索、优化、分布式等必备知识，N线互联网开发必备技能兵器谱。 
 
 # 一、Hello Spring Boot
 
