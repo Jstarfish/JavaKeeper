@@ -95,6 +95,7 @@ function genJavaSidebar() {
       collapsable: false,
       children: [
         "Java-8",
+        "Java-Throwable",
         "Online-Error-Check",
       ]
     },
