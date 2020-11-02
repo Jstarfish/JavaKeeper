@@ -1,14 +1,14 @@
 # JVM 参数配置
 
-> 你说你做过 JVM 调优和参数配置，那你平时工作用过的配置参数有哪些？
+> 面试官：你说你做过 JVM 调优和参数配置，那你平时工作用过的配置参数有哪些？
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlfuwkbr3j31hi0u0qv7.jpg)
 
-## JVM参数类型
+## JVM 参数类型
 
 JVM 参数类型大致分为以下几类：
 
-- **标准参数**（-），即在 JVM 的各个版本中基本不变的，相对比较稳定的参数，向后兼容
+- **标准参数**（-），即在 JVM 的各个版本中基本不变的，相对比较稳定的参数，向后兼容;
 - **非标准参数**（-X），变化比较小的参数，默认 JVM 实现这些参数的功能，但是并不保证所有 JVM 实现都满足，且不保证向后兼容；
 - **非Stable参数**（-XX），此类参数各个 JVM 实现会有所不同，将来可能会随时取消，需要慎重使用；
 
@@ -16,7 +16,9 @@ JVM 参数类型大致分为以下几类：
 
 ### 标准参数
 
-![](https://imgkr.cn-bj.ufileos.com/798c9e1c-5aae-4798-a2eb-7bb7e454c9e1.png)
+通过命令 `java` 即可查看
+
+![](https://tva1.sinaimg.cn/large/0081Kckwly1gkamd9p5slj30u011mjzk.jpg)
 
 - `-version`：输出 java 的版本信息，比如 jdk 版本、vendor、model
 - `-help`：输出 java 标准参数列表及其描述
@@ -35,9 +37,9 @@ JVM 参数类型大致分为以下几类：
 
 ### X 参数
 
-非标准参数又称为扩展参数，其列表如下
+非标准参数又称为扩展参数，通过命令 `java -X` 查看，其列表如下
 
-![](https://imgkr.cn-bj.ufileos.com/52aa1112-79d8-495b-9dae-ff284aefc204.png)
+![](https://tva1.sinaimg.cn/large/0081Kckwly1gkamht10qaj30u00yaqbu.jpg)
 
 - `-Xint`：设置 jvm 以解释模式运行，所有的字节码将被直接执行，而不会编译成本地码
 - -Xmixed：混合模式，JVM自己来决定是否编译成本地代码，默认使用的就是混合模式 
@@ -54,8 +56,41 @@ JVM 参数类型大致分为以下几类：
 
 
 
+### xx 参数
 
-### xx参数
+- -XX:+PrintFlagsInitial
+
+  - 主要查看初始默认值
+
+  - java -XX:+PrintFlagsInitial
+
+  - java -XX:+PrintFlagsInitial -version
+
+  - ![](https://tva1.sinaimg.cn/large/0081Kckwly1gkan7em5moj318o0peq9p.jpg)
+
+    **等号前有冒号** :=  说明 jvm 参数有人为修改过或者 JVM加载修改
+
+    false 说明是Boolean 类型 参数，数字说明是 KV 类型参数
+
+- -XX:+PrintFlagsFinal
+
+  ![](https://tva1.sinaimg.cn/large/0081Kckwly1gkanbdiozxj31700q2dmr.jpg)
+
+  - 主要查看修改更新
+  - java -XX:+PrintFlagsFinal
+  - java -XX:+PrintFlagsFinal -version
+  - 运行java命令的同时打印出参数 java -XX:+PrintFlagsFinal -XX:MetaspaceSize=512m Hello.java
+
+- -XX:+PrintCommondLineFlags
+
+  - 打印命令行参数
+  - java -XX:+PrintCommandLineFlags -version
+  - 可以方便的看到垃圾回收器
+  - ![](https://tva1.sinaimg.cn/large/0081Kckwly1gkangitwxaj31py06ijtn.jpg)
+
+
+
+xx 参数主要分为 Boolean 类型参数和 KV 类型参数，我们一一介绍下
 
 #### Boolean 类型
 
@@ -68,7 +103,7 @@ JVM 参数类型大致分为以下几类：
     - `-XX:+PrintGCDetails `
     - `-XX:-PrintGCDetails `
 
-    ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdebpozfgwj315o0sgtcy.jpg)
+    ![](https://tva1.sinaimg.cn/large/00831rSTly1gdebpozfgwj315o0sgtcy.jpg)
 
     添加如下参数后，重新查看，发现是 + 号了
 
@@ -192,15 +227,15 @@ System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double
 
 经过前面对 JVM 参数的介绍及相关例子的实验，相信大家对 JVM 的参数有了比较深刻的理解，接下来我们再谈谈如何设置 JVM 参数
 
-1、首先 Oracle 官方推荐堆的初始化大小与堆可设置的最大值一般是相等的，即 Xms = Xmx，因为起始堆内存太小（Xms），会导致启动初期频繁 GC，起始堆内存较大（Xmx）有助于减少 GC 次数
+1. 首先 Oracle 官方推荐堆的初始化大小与堆可设置的最大值一般是相等的，即 Xms = Xmx，因为起始堆内存太小（Xms），会导致启动初期频繁 GC，起始堆内存较大（Xmx）有助于减少 GC 次数
 
-2、调试的时候设置一些打印参数，如-XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -Xloggc:log/gc.log，这样可以从gc.log里看出一些端倪出来
+2. 调试的时候设置一些打印参数，如 `-XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -Xloggc:log/gc.log`，这样可以从 gc.log 里看出一些端倪出来
 
-3、系统停顿时间过长可能是 GC 的问题也可能是程序的问题，多用 jmap 和 jstack 查看，或者killall -3 Java，然后查看 Java 控制台日志，能看出很多问题
+3. 系统停顿时间过长可能是 GC 的问题也可能是程序的问题，多用 jmap 和 jstack 查看，或者 `killall -3 Java`，然后查看 Java 控制台日志，能看出很多问题
 
-4、 采用并发回收时，年轻代小一点，年老代要大，因为年老大用的是并发回收，即使时间长点也不会影响其他程序继续运行，网站不会停顿
+4. 采用并发回收时，年轻代小一点，年老代要大，因为年老大用的是并发回收，即使时间长点也不会影响其他程序继续运行，网站不会停顿
 
-5、仔细了解自己的应用，如果用了缓存，那么年老代应该大一些，缓存的 HashMap 不应该无限制长，建议采用 LRU 算法的 Map 做缓存，LRUMap 的最大长度也要根据实际情况设定
+5. 仔细了解自己的应用，如果用了缓存，那么年老代应该大一些，缓存的 HashMap 不应该无限制长，建议采用 LRU 算法的 Map 做缓存，LRUMap 的最大长度也要根据实际情况设定
 
 要设置好各种 JVM 参数，还可以对 server 进行压测， 预估自己的业务量，设定好一些 JVM 参数进行压测看下这些设置好的 JVM 参数是否能满足要求
 
@@ -208,79 +243,11 @@ System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double
 
 
 
-## JVM 参数简介
-
-在开始实践之前我们有必要先简单了解一下 JVM 参数配置，因为本文之后的实验中提到的 JVM 中的栈，堆大小，使用的垃圾收集器等都需要通过 JVM 参数来设置
-
-先来看下如何运行一个 Java 程序
-
-```java
-public class Test {
-    public static  void main(String[] args) {
-        System.out.println("test");
-    }
-}
-```
-
-1. 首先我们通过 **javac Test.java** 将其转成字节码
-
-2. 其次我们往往会输入 **java Test** 这样的命令来启动 JVM 进程来执行此程序,其实我们在启动 JVM 进程的时候，可以指定相应的 JVM 的参数,如下蓝色部分
-
-   ![img](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLVIoXNqicyWxibebAvTuJxk44ib4JwRjzBAdiaI7oY4dmXe1oNIQfRluUy9xPvjXX5ZF15XNZFKmDnxVA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-指定这些 JVM 参数我们就可以指定启动 JVM 进程以哪种模式（server 或 client），运行时分配的堆大小，栈大小，用什么垃圾收集器等等，JVM 参数主要分以下三类
-
-1、 标准参数（-），所有的 JVM 实现都必须实现这些参数的功能，而且向后兼容；例如 **-verbose:gc**（输出每次GC的相关情况)
-
-2、 非标准参数（-X），默认 JVM 实现这些参数的功能，但是并不保证所有 JVM 实现都满足，且不保证向后兼容，栈，堆大小的设置都是通过这个参数来配置的，用得最多的如下
-
-| 参数示例 | 表示意义                          |
-| :------- | :-------------------------------- |
-| -Xms512m | JVM 启动时设置的初始堆大小为 512M |
-| -Xmx512m | JVM 可分配的最大堆大小为 512M     |
-| -Xmn200m | 设置的年轻代大小为 200M           |
-| -Xss128k | 设置每个线程的栈大小为 128k       |
-
-3、非Stable参数（-XX），此类参数各个 jvm 实现会有所不同，将来可能会随时取消，需要慎重使用, -XX:-option 代表关闭 option 参数，-XX:+option 代表要关闭 option 参数,例如要启用串行 GC，对应的 JVM 参数即为 -XX:+UseSerialGC。非 Stable 参数主要有三大类
-
-- 行为参数（Behavioral Options）：用于改变 JVM 的一些基础行为，如启用串行/并行 GC
-
-| 参数示例                | 表示意义                                                  |
-| :---------------------- | :-------------------------------------------------------- |
-| -XX:-DisableExplicitGC  | 禁止调用System.gc()；但jvm的gc仍然有效                    |
-| -XX:-UseConcMarkSweepGC | 对老生代采用并发标记交换算法进行GC                        |
-| -XX:-UseParallelGC      | 启用并行GC                                                |
-| -XX:-UseParallelOldGC   | 对Full GC启用并行，当-XX:-UseParallelGC启用时该项自动启用 |
-| -XX:-UseSerialGC        | 启用串行GC                                                |
-
-- 性能调优（Performance Tuning）：用于 jvm 的性能调优，如设置新老生代内存容量比例
-
-| 参数示例                      | 表示意义                              |
-| :---------------------------- | :------------------------------------ |
-| -XX:MaxHeapFreeRatio=70       | GC后java堆中空闲量占的最大比例        |
-| -XX:NewRatio=2                | 新生代内存容量与老生代内存容量的比例  |
-| -XX:NewSize=2.125m            | 新生代对象生成时占用内存的默认值      |
-| -XX:ReservedCodeCacheSize=32m | 保留代码占用的内存容量                |
-| -XX:ThreadStackSize=512       | 设置线程栈大小，若为0则使用系统默认值 |
-
-- 调试参数（Debugging Options）：一般用于打开跟踪、打印、输出等 JVM 参数，用于显示 JVM 更加详细的信息
-
-| 参数示例                          | 表示意义                            |
-| :-------------------------------- | :---------------------------------- |
-| -XX:HeapDumpPath=./java_pid.hprof | 指定导出堆信息时的路径或文件名      |
-| -XX:-HeapDumpOnOutOfMemoryError   | 当首次遭遇OOM时导出此时堆中相关信息 |
-| -XX:-PrintGC                      | 每次GC时打印相关信息                |
-| -XX:-PrintGC Details              | 每次GC时打印详细信息                |
-
-*画外音：以上只是列出了比较常用的 JVM 参数，更多的 JVM 参数介绍请查看文末的参考资料*
-
-明白了 JVM 参数是干啥用的，接下来我们进入实战演练，下文中所有程序运行时对应的 JVM 参数都以 VM Args 的形式写在开头的注释里，读者如果在执行程序时记得要把这些 JVM 参数给带上哦
-
-
+## 工作中常用配置
 
 https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
 
-参数不懂，推荐直接去看官网，
+参数不懂，推荐直接去看官网
 
 - -Xms
 
@@ -318,7 +285,7 @@ https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions
 
     定义一个大对象，撑爆堆内存，
 
-    ```
+    ```java
     public static void main(String[] args) throws InterruptedException {
         System.out.println("==hello gc===");
     
@@ -328,14 +295,8 @@ https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions
     
         byte[] bytes = new byte[11 * 1024 * 1024];
     
-    }![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehkvas3vzj31a90u0n7t.jpg)
+    }
     ```
-
-  - Full GC![img](https://tva1.sinaimg.cn/large/00831rSTly1gdefrc3lmbj31hy0gk7of.jpg)
-
-    ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdefr8tvx0j31h60m41eq.jpg) 
-
-  - GC![img](https://tva1.sinaimg.cn/large/00831rSTly1gdefrf0dfqj31fs0honjk.jpg)
 
 - -XX:SurvivorRatio
 
@@ -352,53 +313,16 @@ https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions
 - -XX:MaxTenuringThreshold
 
   - 设置垃圾的最大年龄（java8 固定设置最大 15）
-  - ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdefr4xeq1j31g80lek6e.jpg)
 
 
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdee0iss88j31eu0n6aqi.jpg)
-
-## 3. 你平时工作用过的 JVM 常用基本配置参数有哪些？
-
-- -XX:+PrintFlagsInitial
-
-  - 主要查看初始默认值
-
-  - java -XX:+PrintFlagsInitial
-
-  - java -XX:+PrintFlagsInitial -version
-
-  - ![img](https://tva1.sinaimg.cn/large/00831rSTly1gdee0ndg33j31ci0m6k5w.jpg)
-
-    **等号前有冒号** :=  说明 jvm 参数有人为修改过或者 JVM加载修改
-
-    false 说明是Boolean 类型 参数，数字说明是 KV 类型参数
-
-- -XX:+PrintFlagsFinal
-
-  - 主要查看修改更新
-  - java -XX:+PrintFlagsFinal
-  - java -XX:+PrintFlagsFinal -version
-  - 运行java命令的同时打印出参数 java -XX:+PrintFlagsFinal -XX:MetaspaceSize=512m Hello.java
-
-- -XX:+PrintCommondLineFlags
-
-  - 打印命令行参数
-  - java -XX:+PrintCommondLineFlags -version
-  - 可以方便的看到垃圾回收器
-  - ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1e54soj31e006qjz6.jpg)
-
-### 盘点家底查看JVM默认值
-
-
+## 最后
 
 参数不懂，推荐直接去看官网，
 
-https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
-
-
-
 https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BGBCIEFC
+
+https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
 
 https://docs.oracle.com/javase/8/
 
@@ -406,9 +330,7 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 
 
-
-
-
+参考：
 
 https://www.cnblogs.com/duanxz/p/3482366.html
 
