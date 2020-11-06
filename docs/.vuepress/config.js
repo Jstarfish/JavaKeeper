@@ -200,8 +200,10 @@ function genFrameworkSidebar(){
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
         ['Spring/Spring-IOC', 'Spring IOC'],
+        ['Spring/Spring-IOC-Source', 'Spring IOC 源码解毒'],
         ['Spring/Spring-Cycle-Dependency', 'Spring 循环依赖'],
         ['Spring/Spring-AOP', 'Spring AOP'],
+        ['Spring/Spring-MVC', 'Spring MVC'],
       ]
     },
     {

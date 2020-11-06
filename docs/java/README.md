@@ -19,3 +19,6 @@
 
 > 在路上的你，可以微信搜「 **JavaKeeper** 」一起前行，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 已经收录，服务端开发、面试必备技能兵器谱，有你想要的！
 
+
+
+**Quick Learner, Earnest Curiosity, Self-driven, Get Things Done**

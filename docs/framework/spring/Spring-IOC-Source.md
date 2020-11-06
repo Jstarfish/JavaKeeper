@@ -1,27 +1,34 @@
-很多人一提IOC，便张口就来：控制反转。究竟哪些方面被反转了呢？答案是依赖对象的获得被反转了。很多时候，我们通过多个对象之间的协作来完成一个功能，如果获取所依赖对象靠自身来实现，这将导致代码的耦合度高和难以测试。当然,控制反转还有一个好听的名字:依赖注入。
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201105184149.png)Spring IOC 源码解毒
 
-一、搞清楚ApplicationContext实例化Bean的过程
-二、搞清楚这个过程中涉及的核心类
-三、搞清楚IOC容器提供的扩展点有哪些，学会扩展
-四、学会IOC容器这里使用的设计模式
-五、搞清楚不同创建方式的bean的创建过程
+很多人一提 IOC，便张口就来：**控制反转**。究竟哪些方面被反转了呢？答案是依赖对象的获得被反转了。很多时候，我们通过多个对象之间的协作来完成一个功能，如果获取所依赖对象靠自身来实现，这将导致代码的耦合度高和难以测试。
 
 
 
-1. 先回顾下 IOC 的知识
-2. 搞清楚ApplicationContext实例化Bean的过程
+这篇文章，我们从五个疑问展开
+
+1. 搞清楚 ApplicationContext 实例化 Bean 的过程
+2. 搞清楚这个过程中涉及的核心类
+3. 搞清楚 IOC 容器提供的扩展点有哪些，学会扩展
+4. 学会 IOC 容器这里使用的设计模式
+5. 搞清楚不同创建方式的 bean 的创建过程
 
 
 
-## IOC 回顾
+## 一、IOC 回顾
 
-IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将原本在程序中手动创建对象的控制权，交由Spring框架来管理。** IoC 在其他语言中也有应用，并非 Spring 特有。 **IoC 容器是 Spring 用来实现 IoC 的载体， IoC 容器实际上就是个Map（key，value）,Map 中存放的是各种对象。**
+IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将原本在程序中手动创建对象的控制权，交由Spring框架来管理**。 IoC 在其他语言中也有应用，并非 Spring 特有。 **IoC 容器是 Spring 用来实现 IoC 的载体， IoC 容器实际上就是个Map（key，value），Map 中存放的是各种对象**。
 
 将对象之间的相互依赖关系交给 IoC 容器来管理，并由 IoC 容器完成对象的注入。这样可以很大程度上简化应用的开发，把应用从复杂的依赖关系中解放出来。 **IoC 容器就像是一个工厂一样，当我们需要创建一个对象的时候，只需要配置好配置文件/注解即可，完全不用考虑对象是如何被创建出来的。** 在实际项目中一个 Service 类可能有几百甚至上千个类作为它的底层，假如我们需要实例化这个 Service，你可能要每次都要搞清这个 Service 所有底层类的构造函数，这可能会把人逼疯。如果利用 IoC 的话，你只需要配置好，然后在需要的地方引用就行了，这大大增加了项目的可维护性且降低了开发难度。
 
+Spring IOC 通过引入 xml 配置，由 IOC 容器来管理对象的生命周期，依赖关系等。
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201106153609.png)
+
+从图中可以看出，我们以前获取两个有依赖关系的对象，要用 set 方法，而用容器之后，它们之间的关系就由容器来管理。
+
 ### 什么是 Spring IOC 容器？
 
-Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。Spring 容器使用依赖注入来管理组成应用程序的组件。容器通过读取提供的配置元数据来接收对象进行实例化，配置和组装的指令。该元数据可以通过 XML，Java 注解或 Java 代码提供。
+Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。Spring 容器使用**依赖注入**来管理组成应用程序的组件。容器通过读取提供的配置元数据来接收对象进行实例化，配置和组装的指令。该元数据可以通过 XML，Java 注解或 Java 代码提供。
 
 ![container magic](https://docs.spring.io/spring/docs/5.0.18.RELEASE/spring-framework-reference/images/container-magic.png)
 
@@ -37,42 +44,26 @@ Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配�
 
 ### Spring 中有多少种 IOC 容器？
 
-在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前，必须对它进行实例化。只有在容器实例化后， 才可以从 IOC 容器里获取 Bean 实例并使用
+在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前，必须对它进行实例化。只有在容器实例化后， 才可以从 IOC 容器里获取 Bean 实例并使用。
 
 Spring 提供了两种类型的 IOC 容器实现
 
-- BeanFactory：IOC 容器的基本实现
-- ApplicationContext：提供了更多的高级特性，是 BeanFactory 的子接口
+- **BeanFactory**：IOC 容器的基本实现
+- **ApplicationContext**：提供了更多的高级特性，是 BeanFactory 的子接口
 
 BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；ApplicationContext 面向使用 Spring 框架的开发者，几乎所有的应用场合都直接使用 ApplicationContext 而非底层的 BeanFactory；
 
-无论使用何种方式, 配置文件是相同的。
+无论使用何种方式，配置文件是相同的。
 
 
 
-## ApplicationContext 实例化 Bean 的过程
+### BeanFactory
 
-还是从最简单的 hello world 来看
-
-```java
-ApplicationContext ac = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-Hello hello = (Hello)ac.getBean("hello");
-hello.sayHello();
-```
-
-这个从写法上我们可以知道从 ClassPath 中寻找 xml 配置文件，然后根据 xml 文件的内容来构建ApplicationContext 对象实例（容器），然后通过容器获取一个叫”hello“的bean，执行该bean 的 sayHello 方法。
-
-当然我们之前也知道这不是唯一的构建容器方式，如下。
-
-![javadoop.com](https://www.javadoop.com/blogimages/spring-context/1.png)
-
-我们先来说说 BeanFactory
-
-**BeanFactory**
+我们先来说说 BeanFactory。
 
 BeanFactory，从名字上可以看出来它是 bean 的工厂，它负责生产和管理各个 bean 实例。
 
-![2](https://user-gold-cdn.xitu.io/2018/10/16/1667c977252c3284?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201105184149.png)
 
 大概了解下这里提到的几个类：
 
@@ -82,6 +73,22 @@ BeanFactory，从名字上可以看出来它是 bean 的工厂，它负责生产
 - **ConfigurableListableBeanFactory** ：也是一个特殊的接口，看图，特殊之处在于它继承了第二层所有的三个接口，而 ApplicationContext 没有。这点之后会用到。
 
 
+
+## 二、ApplicationContext 实例化 Bean 的过程
+
+还是从最简单的 hello world 来看
+
+```java
+ApplicationContext ac = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+Hello hello = (Hello)ac.getBean("hello");
+hello.sayHello();
+```
+
+这个从写法上我们可以知道从 ClassPath 中寻找 xml 配置文件，然后根据 xml 文件的内容来构建ApplicationContext 对象实例（容器），然后通过容器获取一个叫 ”hello“ 的 bean，执行该 bean 的 sayHello 方法。
+
+当然我们之前也知道这不是唯一的构建容器方式，我们先来看看大体的继承结构是怎么样的：
+
+![javadoop.com](https://www.javadoop.com/blogimages/spring-context/1.png)
 
 **启动过程分析**
 
@@ -101,81 +108,94 @@ public ClassPathXmlApplicationContext(
 }
 ```
 
-接下来，就是 refresh()，这里简单说下为什么是 refresh()，而不是 init() 这种名字的方法。因为 ApplicationContext 建立起来以后，其实我们是可以通过调用 refresh() 这个方法重建的，refresh() 会将原来的 ApplicationContext 销毁，然后再重新执行一次初始化操作。
+接下来，就是 `refresh()`，这里简单说下为什么是 `refresh()`，而不是 `init()` 这种名字的方法。因为 ApplicationContext 建立起来以后，其实我们是可以通过调用 `refresh()` 这个方法重建的，`refresh()` 会将原来的 ApplicationContext 销毁，然后再重新执行一次初始化操作。
 
 ```java
 @Override
 public void refresh() throws BeansException, IllegalStateException {
-   // 来个锁，不然 refresh() 还没结束，你又来个启动或销毁容器的操作，那不就乱套了嘛
-   synchronized (this.startupShutdownMonitor) {
-      //一些准备操作，记录下容器的启动时间、标记“已启动”状态、处理配置文件中的占位符
-      prepareRefresh();
+    // 来个锁，不然 refresh() 还没结束，你又来个启动或销毁容器的操作，那不就乱套了嘛
+    synchronized (this.startupShutdownMonitor) {
+        // Prepare this context for refreshing.
+        // 准备工作，记录下容器的启动时间、标记“已启动”状态、处理配置文件中的占位符
+        prepareRefresh();
 
-      // Tell the subclass to refresh the internal bean factory.
-      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+        // Tell the subclass to refresh the internal bean factory.
+        // 这步比较关键，这步完成后，配置文件就会解析成一个个 Bean 定义，注册到 BeanFactory 中，
+        // 当然，这里说的 Bean 还没有初始化，只是配置信息都提取出来了，
+        // 注册也只是将这些信息都保存到了注册中心(说到底核心是一个 beanName-> beanDefinition 的 map)
+        ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-      // Prepare the bean factory for use in this context.
-      prepareBeanFactory(beanFactory);
+        // Prepare the bean factory for use in this context.
+        // 设置 BeanFactory 的类加载器，添加几个 BeanPostProcessor，手动注册几个特殊的 bean
+        prepareBeanFactory(beanFactory);
 
-      try {
-         // Allows post-processing of the bean factory in context subclasses.
-         postProcessBeanFactory(beanFactory);
+        try {
+            // Allows post-processing of the bean factory in context subclasses.
+            //提供给子类实现一些postProcess的注册，如AbstractRefreshableWebApplicationContext注册一些Servlet相关的
+            postProcessBeanFactory(beanFactory);
 
-         // Invoke factory processors registered as beans in the context.
-         invokeBeanFactoryPostProcessors(beanFactory);
+            // Invoke factory processors registered as beans in the context.
+            //调用所有BeanFactoryProcessor的postProcessBeanFactory()方法
+            invokeBeanFactoryPostProcessors(beanFactory);
 
-         // Register bean processors that intercept bean creation.
-         registerBeanPostProcessors(beanFactory);
+            // Register bean processors that intercept bean creation.
+            //注册BeanPostProcessor，BeanPostProcessor作用是用于拦截Bean的创建
+            registerBeanPostProcessors(beanFactory);
 
-         // Initialize message source for this context.
-         initMessageSource();
+            // Initialize message source for this context.
+            //初始化消息Bean
+            initMessageSource();
 
-         // Initialize event multicaster for this context.
-         initApplicationEventMulticaster();
+            // Initialize event multicaster for this context.
+            //初始化上下文的事件多播组建，ApplicationEvent触发时由multicaster通知给ApplicationListener
+            initApplicationEventMulticaster();
 
-         // Initialize other special beans in specific context subclasses.
-         onRefresh();
+            // Initialize other special beans in specific context subclasses.
+            //ApplicationContext初始化一些特殊的bean
+            onRefresh();
 
-         // Check for listener beans and register them.
-         registerListeners();
+            // Check for listener beans and register them.
+            //注册事件监听器，事件监听Bean统一注册到multicaster里头，ApplicationEvent事件触发后会由multicaster广播
+            registerListeners();
 
-         // Instantiate all remaining (non-lazy-init) singletons.
-         finishBeanFactoryInitialization(beanFactory);
+            // Instantiate all remaining (non-lazy-init) singletons.(重点)
+            // 非延迟加载的单例Bean实例化
+            finishBeanFactoryInitialization(beanFactory);
 
-         // Last step: publish corresponding event.
-         finishRefresh();
-      }
+            // Last step: publish corresponding event.(最后，广播事件，ApplicationContext 初始化完成)
+            finishRefresh();
+        }
 
-      catch (BeansException ex) {
-         if (logger.isWarnEnabled()) {
-            logger.warn("Exception encountered during context initialization - " +
-                  "cancelling refresh attempt: " + ex);
-         }
+        catch (BeansException ex) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception encountered during context initialization - " +
+                            "cancelling refresh attempt: " + ex);
+            }
 
-         // Destroy already created singletons to avoid dangling resources.
-         destroyBeans();
+            // Destroy already created singletons to avoid dangling resources.
+            destroyBeans();
 
-         // Reset 'active' flag.
-         cancelRefresh(ex);
+            // Reset 'active' flag.
+            cancelRefresh(ex);
 
-         // Propagate exception to caller.
-         throw ex;
-      }
+            // Propagate exception to caller.
+            throw ex;
+        }
 
-      finally {
-         // Reset common introspection caches in Spring's core, since we
-         // might not ever need metadata for singleton beans anymore...
-         resetCommonCaches();
-      }
-   }
+        finally {
+            // Reset common introspection caches in Spring's core, since we
+            // might not ever need metadata for singleton beans anymore...
+            resetCommonCaches();
+        }
+    }
 }
 ```
 
 
 
-下面，我们开始一步步来肢解这个 refresh() 方法。
+下面，我们开始一步步来肢解这个 `refresh()` 方法。
 
-#### 创建 Bean 容器前的准备工作
+#### 2.1 创建 Bean 容器前的准备工作
 
 ```java
 /**
@@ -197,6 +217,7 @@ protected void prepareRefresh() {
 
    // Validate that all properties marked as required are resolvable:
    // see ConfigurablePropertyResolver#setRequiredProperties
+    // 校验 xml 配置文件
    getEnvironment().validateRequiredProperties();
 
    // Store pre-refresh ApplicationListeners...
@@ -215,25 +236,19 @@ protected void prepareRefresh() {
 }
 ```
 
-#### 创建 Bean 容器，加载并注册 Bean
+#### 2.2 创建 Bean 容器，加载并注册 Bean
 
-我们回到 refresh() 方法中的下一行 obtainFreshBeanFactory()。
+我们回到 `refresh()` 方法中的下一行 `obtainFreshBeanFactory()`。
 
 注意，这个方法是全文最重要的部分之一，这里将会初始化 BeanFactory、加载 Bean、注册 Bean 等等。
 
 当然，这步结束后，Bean 并没有完成初始化。这里指的是 Bean 实例并未在这一步生成。
 
 ```java
-/**
- * Tell the subclass to refresh the internal bean factory.
- * @return the fresh BeanFactory instance
- * @see #refreshBeanFactory()
- * @see #getBeanFactory()
- */
 protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
    // 关闭旧的 BeanFactory (如果有)，创建新的 BeanFactory，加载 Bean 定义、注册 Bean 等等
    refreshBeanFactory();
-    // 返回刚刚创建的 BeanFactory
+   // 返回刚刚创建的 BeanFactory
    ConfigurableListableBeanFactory beanFactory = getBeanFactory();
    if (logger.isDebugEnabled()) {
       logger.debug("Bean factory for " + getDisplayName() + ": " + beanFactory);
@@ -242,7 +257,7 @@ protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 }
 ```
 
-// AbstractRefreshableApplicationContext.java 120
+// AbstractRefreshableApplicationContext.java
 
 ```java
 @Override
@@ -257,7 +272,7 @@ protected final void refreshBeanFactory() throws BeansException {
    try {
       // 初始化一个 DefaultListableBeanFactory，为什么用这个，我们马上说。
       DefaultListableBeanFactory beanFactory = createBeanFactory();
-      // 用于 BeanFactory 的序列化，我想不部分人应该都用不到
+      // 用于 BeanFactory 的序列化
       beanFactory.setSerializationId(getId());
 
       // 下面这两个方法很重要，别跟丢了，具体细节之后说
@@ -280,7 +295,7 @@ protected final void refreshBeanFactory() throws BeansException {
 
 我们说说为什么选择实例化 **DefaultListableBeanFactory** ？前面我们说了有个很重要的接口 ConfigurableListableBeanFactory，它实现了 BeanFactory 下面一层的所有三个接口，我把之前的继承图再拿过来大家再仔细看一下：
 
-![3](https://user-gold-cdn.xitu.io/2018/10/16/1667c97725002b83?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201105184149.png)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 我们可以看到 ConfigurableListableBeanFactory 只有一个实现类 DefaultListableBeanFactory，而且实现类 DefaultListableBeanFactory 还通过实现右边的 AbstractAutowireCapableBeanFactory 通吃了右路。所以结论就是，最底下这个家伙 DefaultListableBeanFactory 基本上是最牛的 BeanFactory 了，这也是为什么这边会使用这个类来实例化的原因。
 
@@ -295,6 +310,10 @@ protected final void refreshBeanFactory() throws BeansException {
 所以，如果有人问你 Bean 是什么的时候，你要知道 Bean 在代码层面上可以认为是 BeanDefinition 的实例。
 
 > BeanDefinition 中保存了我们的 Bean 信息，比如这个 Bean 指向的是哪个类、是否是单例的、是否懒加载、这个 Bean 依赖了哪些 Bean 等等。
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201106154018.png)
+
+BeanDefinition 是一个接口，用于属性承载，比如 \<bean> 元素标签拥有 class、scope、lazy-init 等配置。bean的定义方式有千千万万种，无论是何种标签，无论是何种资源定义，无论是何种容器，只要按照 Spring 的规范编写xml配置文件，最终的 bean 定义内部表示都将转换为内部的唯一结构：BeanDefinition。当 BeanDefinition 注册完毕以后，Spring 的 BeanFactory 就可以随时根据需要进行实例化了。
 
 ##### BeanDefinition 接口定义
 
@@ -327,10 +346,11 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
    // 获取 Bean 的类名称
    String getBeanClassName();
 
-
    // 设置 bean 的 scope
+   @Nullable
    void setScope(String scope);
-
+   
+   @Nullable
    String getScope();
 
    // 设置是否懒加载
@@ -397,7 +417,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 >
 > 这里接口虽然那么多，但是没有类似 getInstance() 这种方法来获取我们定义的类的实例，真正的我们定义的类生成的实例到哪里去了呢？别着急，这个要很后面才能讲到。
 
-有了 BeanDefinition 的概念以后，我们再往下看 refreshBeanFactory() 方法中的剩余部分：
+有了 BeanDefinition 的概念以后，我们再往下看 `refreshBeanFactory()` 方法中的剩余部分：
 
 ```java
 customizeBeanFactory(beanFactory);
@@ -431,11 +451,11 @@ BeanDefinition 的覆盖问题可能会有开发者碰到这个坑，就是在�
 
 至于这两个属性怎么配置？我在附录中进行了介绍，尤其对于覆盖问题，很多人都希望禁止出现 Bean 覆盖，可是 Spring 默认是不同文件的时候可以覆盖的。
 
-之后的源码中还会出现这两个属性，读者有个印象就可以了。
+之后的源码中还会出现这两个属性，先有个印象就可以了。
 
 ##### loadBeanDefinitions()：加载 Bean
 
-接下来是最重要的 loadBeanDefinitions(beanFactory) 方法了，这个方法将根据配置，加载各个 Bean，然后放到 BeanFactory 中。
+接下来是最重要的 `loadBeanDefinitions(beanFactory)` 方法了，这个方法将根据配置，加载各个 Bean，然后放到 BeanFactory 中。
 
 读取配置的操作在 XmlBeanDefinitionReader 中，其负责加载配置、解析。
 
@@ -549,6 +569,7 @@ protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
    }
    catch (...
 }
+          
 // 还在这个文件中，第 505 行
 // 返回值：返回从当前配置文件加载了多少数量的 Bean
 public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
@@ -559,7 +580,7 @@ public int registerBeanDefinitions(Document doc, Resource resource) throws BeanD
    return getRegistry().getBeanDefinitionCount() - countBefore;
 }
           
-// DefaultBeanDefinitionDocumentReader 90
+// DefaultBeanDefinitionDocumentReader.java
 @Override
 public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
    this.readerContext = readerContext;
@@ -575,7 +596,7 @@ public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext
 ##### doRegisterBeanDefinitions()
 
 ```java
-// DefaultBeanDefinitionDocumentReader 116
+// DefaultBeanDefinitionDocumentReader.java
 protected void doRegisterBeanDefinitions(Element root) {
    // 我们看名字就知道，BeanDefinitionParserDelegate 必定是一个重要的类，它负责解析 Bean 定义，
    // 这里为什么要定义一个 parent? 看到后面就知道了，是递归问题，
@@ -610,7 +631,7 @@ protected void doRegisterBeanDefinitions(Element root) {
 }
 ```
 
-preProcessXml(root) 和 postProcessXml(root) 是给子类用的钩子方法，鉴于没有被使用到，也不是我们的重点，我们直接跳过。
+`preProcessXml(root)` 和 `postProcessXml(root)` 是给子类用的钩子方法，鉴于没有被使用到，也不是我们的重点，我们直接跳过。
 
 这里涉及到了 profile 的问题，对于不了解的读者，我在附录中对 profile 做了简单的解释，读者可以参考一下。接下来，看核心解析方法
 
@@ -643,9 +664,9 @@ protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate d
 }
 ```
 
-从上面的代码，我们可以看到，对于每个配置来说，分别进入到 parseDefaultElement(ele, delegate); 和 delegate.parseCustomElement(ele); 这两个分支了。
+从上面的代码，我们可以看到，对于每个配置来说，分别进入到 `parseDefaultElement(ele, delegate);` 和 `delegate.parseCustomElement(ele);` 这两个分支了。
 
-parseDefaultElement(ele, delegate) 代表解析的节点是 `<import />`、`<alias />`、`<bean />`、`<beans />` 这几个。
+`parseDefaultElement(ele, delegate)` 代表解析的节点是 `<import />`、`<alias />`、`<bean />`、`<beans />` 这几个。
 
 > 这里的四个标签之所以是 default 的，是因为它们是处于这个 namespace 下定义的：
 >
@@ -662,11 +683,11 @@ parseDefaultElement(ele, delegate) 代表解析的节点是 `<import />`、`<ali
 >        default-autowire="byName">
 > ```
 >
-> 而对于其他的标签，将进入到 delegate.parseCustomElement(element) 这个分支。如我们经常会使用到的 `<mvc />`、`<task />`、`<context />`、`<aop />`等。
+> 而对于其他的标签，将进入到 `delegate.parseCustomElement(element)` 这个分支。如我们经常会使用到的 `<mvc />`、`<task />`、`<context />`、`<aop />`等。
 >
 > 这些属于扩展，如果需要使用上面这些 ”非 default“ 标签，那么上面的 xml 头部的地方也要引入相应的 namespace 和 .xsd 文件的路径，如下所示。同时代码中需要提供相应的 parser 来解析，如 MvcNamespaceHandler、TaskNamespaceHandler、ContextNamespaceHandler、AopNamespaceHandler 等。
 >
-> 假如读者想分析 `` 的实现原理，就应该到 ContextNamespaceHandler 中找答案。
+> 假如读者想分析 `<context:property-placeholder location="classpath:xx.properties" />` 的实现原理，就应该到 ContextNamespaceHandler 中找答案。
 >
 > ```xml
 > <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -710,11 +731,11 @@ private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate deleg
 
 如果每个标签都说，那我不吐血，你们都要吐血了。我们挑我们的重点 `<bean />` 标签出来说。
 
-processBeanDefinition 解析 bean 标签
+##### processBeanDefinition 解析 bean 标签
 
-下面是 processBeanDefinition 解析 `<bean />`标签：
+下面是 processBeanDefinition 解析 `<bean />` 标签：
 
-// DefaultBeanDefinitionDocumentReader 298
+// DefaultBeanDefinitionDocumentReader.java
 
 ```java
 protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
@@ -781,7 +802,7 @@ protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate d
 
 有了以上这些知识以后，我们再继续往里看怎么解析 bean 元素，是怎么转换到 BeanDefinitionHolder 的。
 
-// BeanDefinitionParserDelegate 428
+// BeanDefinitionParserDelegate.java
 
 ```java
 public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
@@ -971,9 +992,9 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
 
 下面，我们开始说说注册 Bean 吧。
 
-注册 Bean
+##### 注册 Bean
 
-// BeanDefinitionReaderUtils 143
+// BeanDefinitionReaderUtils.java
 
 ```java
 public static void registerBeanDefinition(
@@ -998,7 +1019,7 @@ public static void registerBeanDefinition(
 
 别名注册的放一边，毕竟它很简单，我们看看怎么注册 Bean。
 
-// DefaultListableBeanFactory 793
+// DefaultListableBeanFactory.java 793
 
 ```java
 @Override
@@ -1091,17 +1112,100 @@ public void registerBeanDefinition(String beanName, BeanDefinition beanDefinitio
 
 #### Bean 容器实例化完成后
 
-说到这里，我们回到 refresh() 方法，我重新贴了一遍代码，看看我们说到哪了。是的，我们才说完 obtainFreshBeanFactory() 方法。
+说到这里，我们回到 refresh() 方法，我重新贴了一遍代码，看看我们说到哪了。是的，我们才说完 	`obtainFreshBeanFactory()` 方法。
 
 考虑到篇幅，这里开始大幅缩减掉没必要详细介绍的部分，大家直接看下面的代码中的注释就好了。
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+```java
+@Override
+public void refresh() throws BeansException, IllegalStateException {
+   // 来个锁，不然 refresh() 还没结束，你又来个启动或销毁容器的操作，那不就乱套了嘛
+   synchronized (this.startupShutdownMonitor) {
 
-#### 准备 Bean 容器: prepareBeanFactory
+      // 准备工作，记录下容器的启动时间、标记“已启动”状态、处理配置文件中的占位符
+      prepareRefresh();
+     
+      // 这步比较关键，这步完成后，配置文件就会解析成一个个 Bean 定义，注册到 BeanFactory 中，
+      // 当然，这里说的 Bean 还没有初始化，只是配置信息都提取出来了，
+      // 注册也只是将这些信息都保存到了注册中心(说到底核心是一个 beanName-> beanDefinition 的 map)
+      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+      // 设置 BeanFactory 的类加载器，添加几个 BeanPostProcessor，手动注册几个特殊的 bean
+      // 这块待会会展开说
+      prepareBeanFactory(beanFactory);
+
+      try {
+         // 【这里需要知道 BeanFactoryPostProcessor 这个知识点，Bean 如果实现了此接口，
+         // 那么在容器初始化以后，Spring 会负责调用里面的 postProcessBeanFactory 方法。】
+        
+         // 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化
+         // 具体的子类可以在这步的时候添加一些特殊的 BeanFactoryPostProcessor 的实现类或做点什么事
+         postProcessBeanFactory(beanFactory);
+         // 调用 BeanFactoryPostProcessor 各个实现类的 postProcessBeanFactory(factory) 回调方法
+         invokeBeanFactoryPostProcessors(beanFactory);          
+         
+          
+
+         // 注册 BeanPostProcessor 的实现类，注意看和 BeanFactoryPostProcessor 的区别
+         // 此接口两个方法: postProcessBeforeInitialization 和 postProcessAfterInitialization
+         // 两个方法分别在 Bean 初始化之前和初始化之后得到执行。这里仅仅是注册，之后会看到回调这两方法的时机
+         registerBeanPostProcessors(beanFactory);
+
+         // 初始化当前 ApplicationContext 的 MessageSource，国际化这里就不展开说了，不然没完没了了
+         initMessageSource();
+
+         // 初始化当前 ApplicationContext 的事件广播器，这里也不展开了
+         initApplicationEventMulticaster();
+
+         // 从方法名就可以知道，典型的模板方法(钩子方法)，不展开说
+         // 具体的子类可以在这里初始化一些特殊的 Bean（在初始化 singleton beans 之前）
+         onRefresh();
+
+         // 注册事件监听器，监听器需要实现 ApplicationListener 接口。这也不是我们的重点，过
+         registerListeners();
+
+         // 重点，重点，重点
+         // 初始化所有的 singleton beans
+         //（lazy-init 的除外）
+         finishBeanFactoryInitialization(beanFactory);
+
+         // 最后，广播事件，ApplicationContext 初始化完成，不展开
+         finishRefresh();
+      }
+
+      catch (BeansException ex) {
+         if (logger.isWarnEnabled()) {
+            logger.warn("Exception encountered during context initialization - " +
+                  "cancelling refresh attempt: " + ex);
+         }
+
+         // Destroy already created singletons to avoid dangling resources.
+         // 销毁已经初始化的 singleton 的 Beans，以免有些 bean 会一直占用资源
+         destroyBeans();
+
+         // Reset 'active' flag.
+         cancelRefresh(ex);
+
+         // 把异常往外抛
+         throw ex;
+      }
+
+      finally {
+         // Reset common introspection caches in Spring's core, since we
+         // might not ever need metadata for singleton beans anymore...
+         resetCommonCaches();
+      }
+   }
+}
+```
+
+
+
+#### 2.3 准备 Bean 容器: prepareBeanFactory
 
 之前我们说过，Spring 把我们在 xml 配置的 bean 都注册以后，会"手动"注册一些特殊的 bean。
 
-这里简单介绍下 prepareBeanFactory(factory) 方法：
+这里简单介绍下 `prepareBeanFactory(factory)` 方法：
 
 ##### prepareBeanFactory(factory)
 
@@ -1184,9 +1288,9 @@ protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 
 在上面这块代码中，Spring 对一些特殊的 bean 进行了处理，读者如果暂时还不能消化它们也没有关系，慢慢往下看。
 
-#### 初始化所有的 singleton beans
+#### 2.4 初始化所有的 singleton beans
 
-我们的重点当然是 finishBeanFactoryInitialization(beanFactory); 这个巨头了，这里会负责初始化所有的 singleton beans。
+我们的重点当然是 `finishBeanFactoryInitialization(beanFactory);` 这个巨头了，这里会负责初始化所有的 singleton beans。
 
 注意，后面的描述中，我都会使用**初始化**或**预初始化**来代表这个阶段，Spring 会在这个阶段完成所有的 singleton beans 的实例化。
 
@@ -1242,9 +1346,7 @@ protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory b
 
 从上面最后一行往里看，我们就又回到 DefaultListableBeanFactory 这个类了，这个类大家应该都不陌生了吧。
 
-preInstantiateSingletons
-
-// DefaultListableBeanFactory 728
+// DefaultListableBeanFactory.java 728
 
 ```java
 @Override
@@ -1320,37 +1422,44 @@ public void preInstantiateSingletons() throws BeansException {
 
 接下来，我们就进入到 getBean(beanName) 方法了，这个方法我们经常用来从 BeanFactory 中获取一个 Bean，而初始化的过程也封装到了这个方法里。
 
-##### getBean(String)
 
-在继续前进之前，读者应该具备 FactoryBean 的知识，如果读者还不熟悉，请移步附录部分了解 FactoryBean。
 
-// AbstractBeanFactory 196
+## 三、获取 Bean
+
+容器和 Bean 已经准备好了，接着就是获取 Bean 去使用了。
+
+### 3.1 俯瞰 getBean(String) 源码
+
+在本小节，我们先从战略上俯瞰 getBean(String) 方法的实现源码。代码如下：
 
 ```java
-@Override
 public Object getBean(String name) throws BeansException {
-   return doGetBean(name, null, null, false);
+    // getBean 是一个空壳方法，所有的逻辑都封装在 doGetBean 方法中
+    return doGetBean(name, null, null, false);
 }
 
-// 我们在剖析初始化 Bean 的过程，但是 getBean 方法我们经常是用来从容器中获取 Bean 用的，注意切换思路，
-// 已经初始化过了就从容器中直接返回，否则就先初始化再返回
-@SuppressWarnings("unchecked")
 protected <T> T doGetBean(
-      final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
-      throws BeansException {
-   // 获取一个 “正统的” beanName，处理两种情况，一个是前面说的 FactoryBean(前面带 ‘&’)，
-   // 一个是别名问题，因为这个方法是 getBean，获取 Bean 用的，你要是传一个别名进来，是完全可以的
-   final String beanName = transformedBeanName(name);
+        final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
+        throws BeansException {
 
-   // 注意跟着这个，这个是返回值
-   Object bean; 
+    /*
+     * 通过 name 获取 beanName。这里不使用 name 直接作为 beanName 有两点原因：
+     * 1. name 可能会以 & 字符开头，表明调用者想获取 FactoryBean 本身，而非 FactoryBean 
+     *    实现类所创建的 bean。在 BeanFactory 中，FactoryBean 的实现类和其他的 bean 存储
+     *    方式是一致的，即 <beanName, bean>，beanName 中是没有 & 这个字符的。所以我们需要
+     *    将 name 的首字符 & 移除，这样才能从缓存里取到 FactoryBean 实例。
+     * 2. 若 name 是一个别名，则应将别名转换为具体的实例名，也就是 beanName。
+     */
+    final String beanName = transformedBeanName(name);
+    // 注意跟着这个，这个是返回值
+    Object bean;
 
     /*
      * 从缓存中获取单例 bean。Spring 是使用 Map 作为 beanName 和 bean 实例的缓存的，所以这
      * 里暂时可以把 getSingleton(beanName) 等价于 beanMap.get(beanName)。当然，实际的
      * 逻辑并非如此简单，后面再细说。
      */
-   Object sharedInstance = getSingleton(beanName);
+    Object sharedInstance = getSingleton(beanName);
 
     /*
      * 如果 sharedInstance = null，则说明缓存里没有对应的实例，表明这个实例还没创建。
@@ -1361,163 +1470,194 @@ protected <T> T doGetBean(
      * 去匹配合适的构造方法构造 bean 实例。当然，如果单例 bean 早已创建好，这里的 args 就没有
      * 用了，BeanFactory 不会多次实例化单例 bean。
      */
-   if (sharedInstance != null && args == null) {
-      if (logger.isDebugEnabled()) {
-         if (isSingletonCurrentlyInCreation(beanName)) {
-            logger.debug("...");
-         }
-         else {
-            logger.debug("Returning cached instance of singleton bean '" + beanName + "'");
-         }
-      }
-      /*
+    if (sharedInstance != null && args == null) {
+        if (logger.isDebugEnabled()) {
+            if (isSingletonCurrentlyInCreation(beanName)) {
+                logger.debug("Returning eagerly cached instance of singleton bean '" + beanName +
+                        "' that is not fully initialized yet - a consequence of a circular reference");
+            }
+            else {
+                logger.debug("Returning cached instance of singleton bean '" + beanName + "'");
+            }
+        }
+      
+        /*
          * 如果 sharedInstance 是普通的单例 bean，下面的方法会直接返回。但如果 
          * sharedInstance 是 FactoryBean 类型的，则需调用 getObject 工厂方法获取真正的 
          * bean 实例。如果用户想获取 FactoryBean 本身，这里也不会做特别的处理，直接返回
          * 即可。毕竟 FactoryBean 的实现类本身也是一种 bean，只不过具有一点特殊的功能而已。
          */
-      bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
-   }
+        bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
+    }
+    /*
+     * 如果上面的条件不满足，则表明 sharedInstance 可能为空，此时 beanName 对应的 bean 
+     * 实例可能还未创建。这里还存在另一种可能，如果当前容器有父容器，beanName 对应的 bean 实例
+     * 可能是在父容器中被创建了，所以在创建实例前，需要先去父容器里检查一下。
+     */
+    else {
+        // BeanFactory 不缓存 Prototype 类型的 bean，无法处理该类型 bean 的循环依赖问题
+        if (isPrototypeCurrentlyInCreation(beanName)) {
+            throw new BeanCurrentlyInCreationException(beanName);
+        }
 
-   else {
-      if (isPrototypeCurrentlyInCreation(beanName)) {
-         // 创建过了此 beanName 的 prototype 类型的 bean，那么抛异常，
-         // 往往是因为陷入了循环引用
-         throw new BeanCurrentlyInCreationException(beanName);
-      }
+        // 如果 sharedInstance = null，则到父容器中查找 bean 实例
+        BeanFactory parentBeanFactory = getParentBeanFactory();
+        if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
+            // 获取 name 对应的 beanName，如果 name 是以 & 字符开头，则返回 & + beanName
+            String nameToLookup = originalBeanName(name);
+            // 根据 args 是否为空，以决定调用父容器哪个方法获取 bean
+            if (args != null) {
+                // 返回父容器的查询结果
+                return (T) parentBeanFactory.getBean(nameToLookup, args);
+            } 
+            else {
+                return parentBeanFactory.getBean(nameToLookup, requiredType);
+            }
+        }
 
-      // 检查一下这个 BeanDefinition 在容器中是否存在
-      BeanFactory parentBeanFactory = getParentBeanFactory();
-      if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
-         // 如果当前容器不存在这个 BeanDefinition，试试父容器中有没有
-         String nameToLookup = originalBeanName(name);
-         if (args != null) {
-            // 返回父容器的查询结果
-            return (T) parentBeanFactory.getBean(nameToLookup, args);
-         }
-         else {
-            // No args -> delegate to standard getBean method.
-            return parentBeanFactory.getBean(nameToLookup, requiredType);
-         }
-      }
+        if (!typeCheckOnly) {
+            markBeanAsCreated(beanName);
+        }
 
-      if (!typeCheckOnly) {
-         // typeCheckOnly 为 false，将当前 beanName 放入一个 alreadyCreated 的 Set 集合中。
-         markBeanAsCreated(beanName);
-      }
-
-      /*
+       /*
        * 稍稍总结一下：
        * 到这里的话，要准备创建 Bean 了，对于 singleton 的 Bean 来说，容器中还没创建过此 Bean；
        * 对于 prototype 的 Bean 来说，本来就是要创建一个新的 Bean。
        */
-      try {
-         final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-         checkMergedBeanDefinition(mbd, beanName, args);
+        try {
+            // 合并父 BeanDefinition 与子 BeanDefinition，后面会单独分析这个方法
+            final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+            checkMergedBeanDefinition(mbd, beanName, args);
 
-         // 先初始化依赖的所有 Bean，这个很好理解。
-         // 注意，这里的依赖指的是 depends-on 中定义的依赖
-         String[] dependsOn = mbd.getDependsOn();
-         if (dependsOn != null) {
-            for (String dep : dependsOn) {
-               // 检查是不是有循环依赖，这里的循环依赖和我们前面说的循环依赖又不一样，这里肯定是不允许出现的，不然要乱套了，读者想一下就知道了
-               if (isDependent(beanName, dep)) {
-                  throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-                        "Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
-               }
-               // 注册一下依赖关系
-               registerDependentBean(dep, beanName);
-               // 先初始化被依赖项
-               getBean(dep);
+            // 检查是否有 dependsOn 依赖，如果有则先初始化所依赖的 bean
+            String[] dependsOn = mbd.getDependsOn();
+            if (dependsOn != null) {
+                for (String dep : dependsOn) {
+                    /*
+                     * 检测是否存在 depends-on 循环依赖，若存在则抛异常。比如 A 依赖 B，
+                     * B 又依赖 A，他们的配置如下：
+                     *   <bean id="beanA" class="BeanA" depends-on="beanB">
+                     *   <bean id="beanB" class="BeanB" depends-on="beanA">
+                     *   
+                     * beanA 要求 beanB 在其之前被创建，但 beanB 又要求 beanA 先于它
+                     * 创建。这个时候形成了循环，对于 depends-on 循环，Spring 会直接
+                     * 抛出异常
+                     */
+                    if (isDependent(beanName, dep)) {
+                        throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                                "Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
+                    }
+                    // 注册依赖记录
+                    registerDependentBean(dep, beanName);
+                    try {
+                        // 先初始化被依赖项 加载 depends-on 依赖 
+                        getBean(dep);
+                    } 
+                    catch (NoSuchBeanDefinitionException ex) {
+                        throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                                "'" + beanName + "' depends on missing bean '" + dep + "'", ex);
+                    }
+                }
             }
-         }
 
-         // 如果是 singleton scope 的，创建 singleton 的实例
-         if (mbd.isSingleton()) {
-            sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
-               @Override
-               public Object getObject() throws BeansException {
-                  try {
-                     // 执行创建 Bean，详情后面再说
-                     return createBean(beanName, mbd, args);
-                  }
-                  catch (BeansException ex) {
-                     destroySingleton(beanName);
-                     throw ex;
-                  }
-               }
-            });
-            bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
-         }
+            // 创建 bean 实例
+            if (mbd.isSingleton()) {
+                /*
+                 * 这里并没有直接调用 createBean 方法创建 bean 实例，而是通过 
+                 * getSingleton(String, ObjectFactory) 方法获取 bean 实例。
+                 * getSingleton(String, ObjectFactory) 方法会在内部调用 
+                 * ObjectFactory 的 getObject() 方法创建 bean，并会在创建完成后，
+                 * 将 bean 放入缓存中。关于 getSingleton 方法的分析，本文先不展开，我会在
+                 * 后面的文章中进行分析
+                 */
+                sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
+                    @Override
+                    public Object getObject() throws BeansException {
+                        try {
+                            // 创建 bean 实例
+                            return createBean(beanName, mbd, args);
+                        }
+                        catch (BeansException ex) {
+                            destroySingleton(beanName);
+                            throw ex;
+                        }
+                    }
+                });
+                // 如果 bean 是 FactoryBean 类型，则调用工厂方法获取真正的 bean 实例。否则直接返回 bean 实例
+                bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+            }
 
-         // 如果是 prototype scope 的，创建 prototype 的实例
-         else if (mbd.isPrototype()) {
-            // It's a prototype -> create a new instance.
-            Object prototypeInstance = null;
-            try {
-               beforePrototypeCreation(beanName);
-               // 执行创建 Bean
-               prototypeInstance = createBean(beanName, mbd, args);
+            // 创建 prototype 类型的 bean 实例
+            else if (mbd.isPrototype()) {
+                Object prototypeInstance = null;
+                try {
+                    beforePrototypeCreation(beanName);
+                    prototypeInstance = createBean(beanName, mbd, args);
+                }
+                finally {
+                    afterPrototypeCreation(beanName);
+                }
+                bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
             }
-            finally {
-               afterPrototypeCreation(beanName);
-            }
-            bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
-         }
 
-         // 如果不是 singleton 和 prototype 的话，需要委托给相应的实现类来处理
-         else {
-            String scopeName = mbd.getScope();
-            final Scope scope = this.scopes.get(scopeName);
-            if (scope == null) {
-               throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
+            // 创建其他类型的 bean 实例
+            else {
+                String scopeName = mbd.getScope();
+                final Scope scope = this.scopes.get(scopeName);
+                if (scope == null) {
+                    throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
+                }
+                try {
+                    Object scopedInstance = scope.get(beanName, new ObjectFactory<Object>() {
+                        @Override
+                        public Object getObject() throws BeansException {
+                            beforePrototypeCreation(beanName);
+                            try {
+                                return createBean(beanName, mbd, args);
+                            }
+                            finally {
+                                afterPrototypeCreation(beanName);
+                            }
+                        }
+                    });
+                    bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
+                }
+                catch (IllegalStateException ex) {
+                    throw new BeanCreationException(beanName,
+                            "Scope '" + scopeName + "' is not active for the current thread; consider " +
+                            "defining a scoped proxy for this bean if you intend to refer to it from a singleton",
+                            ex);
+                }
             }
-            try {
-               Object scopedInstance = scope.get(beanName, new ObjectFactory<Object>() {
-                  @Override
-                  public Object getObject() throws BeansException {
-                     beforePrototypeCreation(beanName);
-                     try {
-                        // 执行创建 Bean
-                        return createBean(beanName, mbd, args);
-                     }
-                     finally {
-                        afterPrototypeCreation(beanName);
-                     }
-                  }
-               });
-               bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
-            }
-            catch (IllegalStateException ex) {
-               throw new BeanCreationException(beanName,
-                     "Scope '" + scopeName + "' is not active for the current thread; consider " +
-                     "defining a scoped proxy for this bean if you intend to refer to it from a singleton",
-                     ex);
-            }
-         }
-      }
-      catch (BeansException ex) {
-         cleanupAfterBeanCreationFailure(beanName);
-         throw ex;
-      }
-   }
+        }
+        catch (BeansException ex) {
+            cleanupAfterBeanCreationFailure(beanName);
+            throw ex;
+        }
+    }
 
-   // 最后，检查一下类型对不对，不对的话就抛异常，对的话就返回了
-   if (requiredType != null && bean != null && !requiredType.isInstance(bean)) {
-      try {
-         return getTypeConverter().convertIfNecessary(bean, requiredType);
-      }
-      catch (TypeMismatchException ex) {
-         if (logger.isDebugEnabled()) {
-            logger.debug("Failed to convert bean '" + name + "' to required type '" +
-                  ClassUtils.getQualifiedName(requiredType) + "'", ex);
-         }
-         throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
-      }
-   }
-   return (T) bean;
+    // 如果需要进行类型转换，则在此处进行转换。类型转换这一块我没细看，就不多说了。
+    if (requiredType != null && bean != null && !requiredType.isInstance(bean)) {
+        try {
+            return getTypeConverter().convertIfNecessary(bean, requiredType);
+        }
+        catch (TypeMismatchException ex) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Failed to convert bean '" + name + "' to required type '" +
+                        ClassUtils.getQualifiedName(requiredType) + "'", ex);
+            }
+            throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+        }
+    }
+
+    // 返回 bean
+    return (T) bean;
 }
 ```
+
+
+
+### 3.2 createBean 
 
 大家应该也猜到了，接下来当然是分析 createBean 方法：
 
@@ -1543,14 +1683,14 @@ public class MessageServiceImpl implements MessageService {
 ```
 
 ```xml
-<bean id="messageService" class="com.javadoop.example.MessageServiceImpl" />
+<bean id="messageService" class="com.example.MessageServiceImpl" />
 ```
 
 以上这种属于混用了 xml 和 注解 两种方式的配置方式，Spring 会处理这种情况。
 
 好了，读者要知道这么回事就可以了，继续向前。
 
-// AbstractAutowireCapableBeanFactory 447
+// AbstractAutowireCapableBeanFactory.java 447
 
 ```java
 /**
@@ -1585,7 +1725,6 @@ protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] ar
 
    try {
       // 让 InstantiationAwareBeanPostProcessor 在这一步有机会返回代理，
-      // 在 《Spring AOP 源码分析》那篇文章中有解释，这里先跳过
       Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
       if (bean != null) {
          return bean; 
@@ -1601,28 +1740,12 @@ protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] ar
       logger.debug("Finished creating instance of bean '" + beanName + "'");
    }
    return beanInstance;
-}![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+}
 ```
-
-创建 Bean
 
 我们继续往里看 doCreateBean 这个方法：
 
 ```java
-/**
- * Actually create the specified bean. Pre-creation processing has already happened
- * at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
- * <p>Differentiates between default bean instantiation, use of a
- * factory method, and autowiring a constructor.
- * @param beanName the name of the bean
- * @param mbd the merged bean definition for the bean
- * @param args explicit arguments to use for constructor or factory method invocation
- * @return a new instance of the bean
- * @throws BeanCreationException if the bean could not be created
- * @see #instantiateBean
- * @see #instantiateUsingFactoryMethod
- * @see #autowireConstructor
- */
 protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args)
       throws BeanCreationException {
 
@@ -1658,7 +1781,7 @@ protected Object doCreateBean(final String beanName, final RootBeanDefinition mb
 
    // Eagerly cache singletons to be able to resolve circular references
    // even when triggered by lifecycle interfaces like BeanFactoryAware.
-   // 下面这块代码是为了解决循环依赖的问题，以后有时间，我再对循环依赖这个问题进行解析吧
+   // 下面这块代码是为了解决循环依赖的问题
    boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
          isSingletonCurrentlyInCreation(beanName));
    if (earlySingletonExposure) {
@@ -1738,11 +1861,13 @@ protected Object doCreateBean(final String beanName, final RootBeanDefinition mb
 
 到这里，我们已经分析完了 doCreateBean 方法，总的来说，我们已经说完了整个初始化流程。
 
-接下来我们挑 doCreateBean 中的三个细节出来说说。一个是创建 Bean 实例的 createBeanInstance 方法，一个是依赖注入的 populateBean 方法，还有就是回调方法 initializeBean。
+接下来我们挑 doCreateBean 中的三个细节出来说说。
+
+一个是创建 Bean 实例的 createBeanInstance 方法，一个是依赖注入的 populateBean 方法，还有就是回调方法 initializeBean。
 
 注意了，接下来的这三个方法要认真说那也是极其复杂的，很多地方我就点到为止了，感兴趣的读者可以自己往里看，最好就是碰到不懂的，自己写代码去调试它。
 
-创建 Bean 实例
+#### 创建 Bean 实例
 
 我们先看看 createBeanInstance 方法。需要说明的是，这个方法如果每个分支都分析下去，必然也是极其复杂冗长的，我们挑重点说。此方法的目的就是实例化我们指定的类。
 
@@ -1837,8 +1962,6 @@ protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefin
 beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
 这里会进行实际的实例化过程，我们进去看看:
 
 // SimpleInstantiationStrategy 59
@@ -1890,7 +2013,7 @@ public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory ow
 
 到这里，我们就算实例化完成了。我们开始说怎么进行属性注入。
 
-bean 属性注入
+#### bean 属性注入
 
 看完了 createBeanInstance(...) 方法，我们来看看 populateBean(...) 方法，该方法负责进行属性设值，处理依赖。
 
@@ -1979,7 +2102,7 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper
 
 
 
-initializeBean
+#### initializeBean
 
 属性注入完成后，这一步其实就是处理各种回调了，这块代码比较简单。
 
@@ -2030,354 +2153,22 @@ protected Object initializeBean(final String beanName, final Object bean, RootBe
 
 
 
+## 四、最后
 
+#### Spring 的 bean 在什么时候实例化?
 
+如果你使用BeanFactory，如 XmlBeanFactory 作为 Spring Bean 的工厂类，则所有的 bean 都是在第一次使用该bean 的时候实例化 。
 
-Spring IOC通过引入xml配置，由IOC容器来管理对象的生命周期,依赖关系等。
+如果你使用 ApplicationContext 作为 Spring Bean 的工厂类，则又分为以下几种情况： 
 
-![img](https://picb.zhimg.com/50/v2-035f3673ab0c762f3f5fb2ba09573a72_hd.jpg?source=1940ef5c)![img](https://picb.zhimg.com/80/v2-035f3673ab0c762f3f5fb2ba09573a72_720w.jpg?source=1940ef5c)
+1. 如果 bean 的 scope 是 singleton 的，并且 lazy-init 为 false（默认是false，所以可以不用设置），则ApplicationContext 启动的时候就实例化该 bean，并且将实例化的 bean 放在一个线程安全的 ConcurrentHashMap 结构的缓存中，下次再使用该 Bean 的时候，直接从这个缓存中取 
+2. 如果 bean 的 scope 是 singleton 的，并且 lazy-init 为 true，则该 bean 的实例化是在第一次使用该 bean 的时候进行实例化 
+3. 如果 bean 的 scope 是 prototype 的，则该 bean 的实例化是在第一次使用该 bean 的时候进行实例化 。
 
-从图中可以看出，我们以前获取两个有依赖关系的对象，要用set方法，而用容器之后，它们之间的关系就由容器来管理。那么，Spring容器的加载过程是什么样的呢?
 
-![img](https://pic1.zhimg.com/50/v2-3ef45ea35401ffbdc432fa42ad025b96_hd.jpg?source=1940ef5c)![img](https://pic1.zhimg.com/80/v2-3ef45ea35401ffbdc432fa42ad025b96_720w.jpg?source=1940ef5c)
 
- BeanDefinition是一个接口，用于属性承载，比如<bean>元素标签拥有class、scope、lazy-init等配置。bean的定义方式有千千万万种，无论是何种标签，无论是何种资源定义，无论是何种容器，只要按照Spring的规范编写xml配置文件，最终的bean定义内部表示都将转换为内部的唯一结构：BeanDefinition。当BeanDefinition注册完毕以后，Spring的BeanFactory就可以随时根据需要进行实例化了。
-
-
-
-
-
-## 2.ApplicationContext与BeanFactory探究.
-
-实例化的工作会在容器启动后过 AbstractApplicationContext 中 refresh方法自动进行。我们常用的ApplicationContext 实现类 ClassPathXmlApplicationContext继承了AbstractApplicationContext类，继承关系如下图.
-
-![img](https://pic1.zhimg.com/50/v2-7277317c9434645b9f6efb95d295d25b_hd.jpg?source=1940ef5c)![img](https://pic1.zhimg.com/80/v2-7277317c9434645b9f6efb95d295d25b_720w.jpg?source=1940ef5c)
-
-AbstractApplicationContext里的reflash方法是Spring初始IOC容器一个非常重要的方法，不管你是ApplicationContext 哪个实现类，最终都会进入这个方法。
-
-```java
-@Override  
-    public void refresh() throws BeansException, IllegalStateException {  
-        synchronized (this.startupShutdownMonitor) {  
-            // 设置和校验系统变量和环境变量的值
-            prepareRefresh();  
-
-            //主要是创建beanFactory，同时加载配置文件.xml中的beanDefinition  
-            //通过String[] configLocations = getConfigLocations()获取资源路径，然后加载beanDefinition  
-            ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();  
-
-
-            //给beanFactory注册一些标准组建，如ClassLoader，StandardEnvironment，BeanProcess  
-            prepareBeanFactory(beanFactory);  
-
-            try {  
-
-                //提供给子类实现一些postProcess的注册，如AbstractRefreshableWebApplicationContext注册一些Servlet相关的  
-                //postProcess，真对web进行生命周期管理的Scope，通过registerResolvableDependency()方法注册指定ServletRequest，HttpSession，WebRequest对象的工厂方法  
-                postProcessBeanFactory(beanFactory);  
-
-                //调用所有BeanFactoryProcessor的postProcessBeanFactory()方法  
-                invokeBeanFactoryPostProcessors(beanFactory);  
-
-                //注册BeanPostProcessor，BeanPostProcessor作用是用于拦截Bean的创建  
-                registerBeanPostProcessors(beanFactory);  
-
-                //初始化消息Bean  
-                initMessageSource();  
-
-                //初始化上下文的事件多播组建，ApplicationEvent触发时由multicaster通知给ApplicationListener  
-                initApplicationEventMulticaster();  
-
-                //ApplicationContext初始化一些特殊的bean  
-                onRefresh();  
-
-                //注册事件监听器，事件监听Bean统一注册到multicaster里头，ApplicationEvent事件触发后会由multicaster广播  
-                registerListeners();  
-
-                //非延迟加载的单例Bean实例化  
-                finishBeanFactoryInitialization(beanFactory);  
-
-                finishRefresh();  
-            }  
-
-            catch (BeansException ex) {  
-                logger.warn("Exception encountered during context initialization - cancelling refresh attempt", ex);  
-
-                destroyBeans();  
-
-                cancelRefresh(ex);  
-
-                throw ex;  
-            }  
-        }  
-    }
-```
-
-​       代码逻辑清晰的值得mark一下。这个方法的作用是创建加载Spring容器配置（包括.xml配置，property文件和数据库模式等）。
-
-​        BeanFactory体系结构是典型的工厂方法模式，即什么样的工厂生产什么样的产品。要知道工厂是如何产生对象的，我们需要看具体的IOC容器实现，具体的实现有：如 DefaultListableBeanFactory 、 XmlBeanFactory 、 ApplicationContext 等。那么，究竟BeanFactory里到底是什么样的呢？
-
-```java
-package org.springframework.beans.factory;
-
-public interface BeanFactory {
-
-    /**
-     * 用来引用一个实例，或把它和工厂产生的Bean区分开，就是说，如果一个FactoryBean的名字为a，那么，&a会得到那个Factory
-     */
-    String FACTORY_BEAN_PREFIX = "&";
-
-    /*
-     * 四个不同形式的getBean方法，获取实例
-     */
-    Object getBean(String name) throws BeansException;
-
-    <T> T getBean(String name, Class<T> requiredType) throws BeansException;
-
-    <T> T getBean(Class<T> requiredType) throws BeansException;
-
-    Object getBean(String name, Object... args) throws BeansException;
-
-    boolean containsBean(String name); // 是否存在
-
-    boolean isSingleton(String name) throws NoSuchBeanDefinitionException;// 是否为单实例
-
-    boolean isPrototype(String name) throws NoSuchBeanDefinitionException;// 是否为原型（多实例）
-
-    boolean isTypeMatch(String name, Class<?> targetType)
-            throws NoSuchBeanDefinitionException;// 名称、类型是否匹配
-
-    Class<?> getType(String name) throws NoSuchBeanDefinitionException; // 获取类型
-
-    String[] getAliases(String name);// 根据实例的名字获取实例的别名
-
-}
-```
-
-​      我们可以看出BeanFactory里只对IOC容器的基本行为作了定义，根本不关心你的bean是如何定义怎样加载的，它规定了所有的容器至少需要实现的标准。说到实现，BeanFactory有几个比较重要的实现类需要知道，ref：[【Spring4揭秘 BeanFactory】基本容器-BeanFactory](https://link.zhihu.com/?target=http%3A//blog.csdn.net/u011179993/article/details/51636742)。那么BeanFactory的基本实现类XmlBeanFactory与我们常用的ApplicationContext有什么区别呢?答案是bean的加载。
-
-## 3.bean的加载。
-
-​         我们先看一道面试经常会问到的问题:**Spring的bean在什么时候实例化?** ——第一：如果你使用BeanFactory，如XmlBeanFactory作为Spring Bean的工厂类，则所有的bean都是在第一次使用该bean的时候实例化 。第二：如果你使用ApplicationContext作为Spring Bean的工厂类，则又分为以下几种情况： 
-
-​      1.如果bean的scope是singleton的，并且lazy-init为false（默认是false，所以可以不用设置），则ApplicationContext启动的时候就实例化该bean，并且将实例化的bean放在一个线程安全的 ConcurrentHashMap 结构的缓存中，下次再使用该Bean的时候，直接从这个缓存中取 。
-
-​       2.如果bean的scope是singleton的，并且lazy-init为true，则该bean的实例化是在第一次使用该bean的时候进行实例化 。
-
-​      3.如果bean的scope是prototype的，则该bean的实例化是在第一次使用该Bean的时候进行实例化 。
-
-ClassPathXmlApplicationContext有几个重载的构造函数最终都会调用父类AbstractApplicationContext的reflash方法，reflash方法在前文有介绍，作用是创建加载Spring容器配置。AbstractApplicationContext也有getBean方法：
-
-```java
-AbstractApplicationContext下的代码：
-public Object getBean(String name) throws BeansException {
-        //Bean的获取外部容器交给了内部容器
-        return getBeanFactory().getBean(name);
-}
-```
-
-内部容器由DefaultListableBeanFactory承当，但真实的getBean方法实现是由其父类AbstractBeanFactory实现的，AbstractBeanFactory类同样实现了BeanFactory接口的方法，它有四个重载的getBean方法，不管哪一个都会去调用doGetBean方法：
-
-![img](https://pic3.zhimg.com/50/v2-1399fa8d35b3f3c516f811b0d51895af_hd.jpg?source=1940ef5c)![img](https://pic3.zhimg.com/80/v2-1399fa8d35b3f3c516f811b0d51895af_720w.jpg?source=1940ef5c)
-
-![img](https://pic3.zhimg.com/50/v2-4bde828630325f9fda2e9fa3f4ac2a80_hd.jpg?source=1940ef5c)![img](https://pic3.zhimg.com/80/v2-4bde828630325f9fda2e9fa3f4ac2a80_720w.jpg?source=1940ef5c)
-
-那么doGetBean里干了什么事情呢？
-
-```java
-protected <T> T doGetBean(
-			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
-			throws BeansException { 
-//bean name处理，去除FactoryBean前缀等  
-     final String beanName = transformedBeanName(name);  
-     Object bean = null;  
-
-//先从singleton缓存中查看是否已经实例化过该Bean，根据是否有缓存分为两个分支分别处理  
-    Object sharedInstance = getSingleton(beanName);  
-    if (sharedInstance != null && args == null) {  
-// 分支一，若缓存中获取到了并且该BeanDefinition信息表明该bean是singleton的，直接将获取到的缓存Bean  
-//(有可能是半成品)交给getObjectForBeanInstance处理  
- /*.........省略logger部分代码............*/  
-//调用getObjectForBeanInstance处理  
-     bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);  
-    }else {  
-// 分之二：没有缓存，则需要从头实例化该bean  
-            // We're assumably within a circular reference.  
-      if (isPrototypeCurrentlyInCreation(beanName)) {   
-           throw new BeanCurrentlyInCreationException(beanName);}  
-
-// 检查BeanDefinition是否在当前工厂或父工厂  
-            BeanFactory parentBeanFactory = getParentBeanFactory();  
-            if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {  
-                // Not found -> check parent.  
-                String nameToLookup = originalBeanName(name);  
-                if (args != null) {  
-// 父工厂getBean  
-                    return parentBeanFactory.getBean(nameToLookup, args);  
-                }  
-                else {  
-                    // No args -> delegate to standard getBean method.  
-                    return parentBeanFactory.getBean(nameToLookup, requiredType);  
-                }  
-            }  
-//将bean加入“正在创建”的集合，完成后会remove,对应afterSingletonCreation/afterPrototypeCreation方法  
-            if (!typeCheckOnly) {  
-                markBeanAsCreated(beanName);  
-            }  
-
-            final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);  
-            checkMergedBeanDefinition(mbd, beanName, args);  
-
-// 解决依赖关系，将依赖的bean提前实例化  
-            String[] dependsOn = mbd.getDependsOn();  
-            if (dependsOn != null) {  
-                for (int i = 0; i < dependsOn.length; i++) {  
-                    String dependsOnBean = dependsOn[i];  
-                    getBean(dependsOnBean);  
-                    registerDependentBean(dependsOnBean, beanName);  
-                }  
-            }  
-
-// 这里又需要根据bean的类型分为三种情况：singleton、prototype、request/session  
-            if (mbd.isSingleton()) {  
-                           //通过自定义ObjectFactory实例化Bean，此结果可能是半成品(是FactoryBean等)  
-                sharedInstance = getSingleton(beanName, new ObjectFactory() {  
-                    public Object getObject() throws BeansException {  
-                        try {  
-                          //真正实例化装配的逻辑在createBean方法中  
-                            return createBean(beanName, mbd, args);  
-                        }  
-                        catch (BeansException ex) {   
-                            destroySingleton(beanName);  
-                            throw ex;  
-                        }  
-                    }  
-                });  
-                        //上一步半成品的Bean交给getObjectForBeanInstance方法处理  
-                bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);  
-            }  
-
-            else if (mbd.isPrototype()) {  
-                Object prototypeInstance = null;  
-                try {  
-                    beforePrototypeCreation(beanName);  
-                     //真正实例化装配的逻辑在createBean方法中  
-                    prototypeInstance = createBean(beanName, mbd, args);  
-                }  
-                finally {  
-                    afterPrototypeCreation(beanName);  
-                }  
-                    //上一步半成品的Bean交给getObjectForBeanInstance方法处理  
-               bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);  
-            }  
-
-            else {  
-                            //request、session 的bean  
-                String scopeName = mbd.getScope();  
-                final Scope scope = (Scope) this.scopes.get(scopeName);  
-                if (scope == null) {  
-        throw new IllegalStateException("No Scope registered for scope '" + scopeName + "'");  
-                }  
-                try {  
-                    Object scopedInstance = scope.get(beanName, new ObjectFactory() {  
-                        public Object getObject() throws BeansException {  
-                            beforePrototypeCreation(beanName);  
-                            try {  
-                         //真正实例化装配的逻辑在createBean方法中  
-                                return createBean(beanName, mbd, args);  
-                            }  
-                            finally {  
-                                afterPrototypeCreation(beanName);  
-                            }  
-                        }  
-                    });  
-                       //上一步半成品的Bean交给getObjectForBeanInstance方法处理  
-                bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);  
-                }  
-                catch (IllegalStateException ex) {  
-                    throw new BeanCreationException(beanName,  
-                "Scope '" + scopeName + "' is not active for the current thread; " +  
-    "consider defining a scoped proxy for this bean if you intend to refer to it from a singleton",  
-                            ex);  
-                }  
-            }  
-        }  
-
-        if (requiredType != null && bean != null &&  
-                              !requiredType.isAssignableFrom(bean.getClass())) {  
-            throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());  
-        }  
-        return bean;  
-    }
-```
-
-   bean的加载经历了一个复杂的过程，上面代码主要做了以下几件事(此段摘抄自[《Spring源码深度解析》](https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1jGxdGTg))：
-
-​       1.转换对应的beanName。如果name=“&aa”的，会去除&符号。或者<bean>标签带有alias（别名的意思），则取alias所表示最终的beanName。
-
-​        2.尝试从缓存中加载单例bean。如果加载不成功，会再次尝试从singletonFactories中加载。
-
-​       3.bean的实例化。假如我们需要对工厂bean进行处理，那么这里得到的其实是工厂bean 的初始状态。真正干活的则是getObjectForBeanInstance定义factory-method方法返回的bean。
-
-​       4.原型模式的依赖检查。如果A类有B的属性，B中有A的属性，则会产生循环依赖。[spring如何解决循环依赖问题](https://link.zhihu.com/?target=http%3A//www.cnblogs.com/bhlsheji/p/5208076.html)
-
-​       5.将存储的Xml配置文件的GernericBeanDefinition转换为RootBeanDefinition。前文提到的用于承载属性的BeanDefinition有三个实现，GernericBeanDefinition，RootBeanDefinition和ChildBeanDefinition，如果父类bean不为空的话，这里会把所有的属性一并合并父类属性，因为后续所有的Bean都是针对RootBeanDefinition的。
-
-​       6.寻找依赖。在初始化一个bean的时候，会首先初始化这个bean所对应的依赖。
-
-​       7.根据不同的scope创建bean。scope属性默认是singleton，还有prototype、request等。
-
-​       8.类型转换。如果bean是个String，而requiredType传入了Integer，然后返回bean，加载结束。
-
-其中,最重要的步骤是(7),spring的常用特性都在那里实现.
-
-## 4.FactoryBean
-
-​       首先要分辨BeanFactory 与 FactoryBean的区别， 两个名字很像，所以容易搞混。这里做一个简单的比喻你就明白了：
-
-​        1.FactoryBean：工厂类接口，用户可以通过实现该接口定制实例化 bean的逻辑。我们把bean比作是人，那么FactoryBean则是女娲，首先它本身有人的特征，但它能够生产人。
-
-​        2.BeanFactory ：BeanFactory定义了 IOC 容器的最基本形式。如果bean还比作是人，那么它可以理解成三界，三界里有各种功能的人，它是一个容器，可以管理很多的人。
-
-FactoryBean里干了什么事情？
-
-```java
-public interface FactoryBean<T> {
-
-    //返回由FactoryBean创建的Bean实例,如果isSingleton返回true,则该实例会放到spring容器中单例缓存池中.
-	T getObject() throws Exception;
-
-   //返回FactoryBean创建的bean类型.
-	Class<?> getObjectType();
-
-    //返回由FactoryBean创建的bean实例的作用域是singleton还是prototype
-	boolean isSingleton();
-
-}
-```
-
-它的作用不在这里做阐述，ref：[Spring的FactoryBean使用](https://link.zhihu.com/?target=http%3A//www.cnblogs.com/quanyongan/p/4133724.html)
-
-写到这里,博主总结一下阅读Spring源码的心得:
-
-​     1.学习Spring思想和编码规范。Spring的很多函数代码量大，逻辑复杂,而Spring的编码风格就是将复杂的逻辑分解，分成N个小函数的嵌套，每一层都是对下一层的总结和概要。博主在工作中最佩服的一个大神说过：学习Spring源码思想为我所用，哪怕是一天学习一个变量名，他在工作中设计很多小组件的时候都是基于Spring思想和规范。他说，不要迷茫学什么技术，其实每天只要进步一点点就好，突破的是自己，而不是某个领域。用10年其实才敢说入门一门技术。
-
-   2.跟了Spring代码的函数，你会或多或少发现一些规律：一个真正干活的函数其实是以do开头的，如doGetBean，而给我们错觉的函数，如getBean和createBean等等方法，其实只是从全局角度做一些统筹工作。
-
-​    3.放弃阅读源码是一个不明智的选择，因为你失去了跟大师学习的机会。当你硬着头皮读完一个框架的源码，则其他框架都是相通的。
-
-​    \4. 因为篇幅有限,而博主的已经搞了一天代码，手已经快练成麒麟臂，AOP又是一个重要且内容比较多的部分，所以打算以后再更新Spring AOP是什么？可以做什么？
-
-
-
-
-
-
-
-
+参考与来源：
 
 https://www.zhihu.com/question/21346206/answer/366816411
-
-
 
 Spring IOC 容器源码分析 https://juejin.im/post/6844903694039793672#heading-7
