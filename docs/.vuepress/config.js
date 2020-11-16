@@ -181,6 +181,7 @@ function genDataStoreSidebar(){
       title: "Redis",
       collapsable: false,
       children: [
+        ['Redis/ReadRedis', 'Redis 开篇'],
         ['Redis/Redis-Datatype', 'Redis 数据类型'],
         ['Redis/Redis-Persistence', 'Redis 持久化'],
         ['Redis/Redis-Conf', 'Redis 配置'],

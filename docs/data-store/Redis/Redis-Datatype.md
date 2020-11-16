@@ -1,16 +1,80 @@
-## Redis的五种基本数据类型
+# Redis 数据类型篇
 
-由于 Redis 是基于标准 C 写的，只有最基础的数据类型，因此 Redis 为了满足对外使用的 5 种数据类型，开发了属于自己**独有的一套基础数据结构**，使用这些数据结构来实现5种数据类型。
+> 一提到 Redis，我们的脑子里马上就会出现一个词：“快。”
+>
+> 数据库这么多，为啥 Redis 能有这么突出的表现呢？一方面，这是因为它是内存数据库，所有操作都在内存上完成，内存的访问速度本身就很快。另一方面，这要归功于它的数据结构。
+>
+> 这是因为，键值对是按一定的数据结构来组织的，操作键值对最终就是对数据结构进行增删改查操作，所以高效的数据结构是 Redis 快速处理数据的基础。
 
-**Redis** 有 5 种基础数据结构，它们分别是：**string(字符串)**、**list(列表)**、**hash(字典)**、**set(集合)** 和 **zset(有序集合)**。
 
-Redis底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、压缩列表、对象。**
+
+## 一、Redis 的五种基本数据类型和其数据结构
+
+由于 Redis 是基于标准 C 写的，只有最基础的数据类型，因此 Redis 为了满足对外使用的 5 种数据类型，开发了属于自己**独有的一套基础数据结构**，使用这些数据结构来实现 5 种数据类型。
+
+**Redis** 有 5 种基础数据类型，它们分别是：**string(字符串)**、**list(列表)**、**hash(字典)**、**set(集合)** 和 **zset(有序集合)**。
+
+Redis 底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、压缩列表、对象。**
 
 Redis 为了平衡空间和时间效率，针对 value 的具体类型在底层会采用不同的数据结构来实现，其中哈希表和压缩列表是复用比较多的数据结构，如下图展示了对外数据类型和底层数据结构之间的映射关系：
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1ge0k8do3s3j30im0el7aa.jpg)
 
+![img](https://static001.geekbang.org/resource/image/82/01/8219f7yy651e566d47cc9f661b399f01.jpg)
+
 > 安装好 Redis，我们可以使用 `redis-cli` 来对 Redis 进行命令行的操作，当然 Redis 官方也提供了在线的调试器，你也可以在里面敲入命令进行操作：http://try.redis.io/#run
+
+
+
+### 键和值用什么结构组织？
+
+为了实现从键到值的快速访问，Redis 使用了一个哈希表来保存所有键值对。一个哈希表，其实就是一个数组，数组的每个元素称为一个哈希桶。类似我们的 HashMap
+
+看到这里，你可能会问了：“如果值是集合类型的话，作为数组元素的哈希桶怎么来保存呢？”
+
+其实，哈希桶中的元素保存的并不是值本身，而是指向具体值的指针。这也就是说，不管值是 String，还是集合类型，哈希桶中的元素都是指向它们的指针。
+
+在下图中，可以看到，哈希桶中的 entry 元素中保存了 `*key` 和  `*value` 指针，分别指向了实际的键和值，这样一来，即使值是一个集合，也可以通过 `*value` 指针被查找到。
+
+![img](https://static001.geekbang.org/resource/image/1c/5f/1cc8eaed5d1ca4e3cdbaa5a3d48dfb5f.jpg)
+
+因为这个哈希表保存了所有的键值对，所以，我也把它称为全局哈希表。哈希表的最大好处很明显，就是让我们可以用 $O(1)$ 的时间复杂度来快速查找到键值对——我们只需要计算键的哈希值，就可以知道它所对应的哈希桶位置，然后就可以访问相应的 entry 元素。
+
+你看，这个查找过程主要依赖于哈希计算，和数据量的多少并没有直接关系。也就是说，不管哈希表里有 10 万个键还是 100 万个键，我们只需要一次计算就能找到相应的键。但是，如果你只是了解了哈希表的 $O(1)$ 复杂度和快速查找特性，那么，当你往 Redis 中写入大量数据后，就可能发现操作有时候会突然变慢了。这其实是因为你忽略了一个潜在的风险点，那就是哈希表的冲突问题和 rehash 可能带来的操作阻塞。
+
+### 为什么哈希表操作变慢了？
+
+当你往哈希表中写入更多数据时，哈希冲突是不可避免的问题。这里的哈希冲突，也就是指，两个 key 的哈希值和哈希桶计算对应关系时，正好落在了同一个哈希桶中。毕竟，哈希桶的个数通常要少于 key 的数量，这也就是说，难免会有一些 key 的哈希值对应到了同一个哈希桶中。
+
+Redis 解决哈希冲突的方式，就是链式哈希。和 JDK7 中的 HahsMap 类似，链式哈希也很容易理解，**就是指同一个哈希桶中的多个元素用一个链表来保存，它们之间依次用指针连接**。
+
+如下图所示：entry1、entry2 和 entry3 都需要保存在哈希桶 3 中，导致了哈希冲突。此时，entry1 元素会通过一个 `*next` 指针指向 entry2，同样，entry2 也会通过 `*next` 指针指向 entry3。这样一来，即使哈希桶 3 中的元素有 100 个，我们也可以通过 entry 元素中的指针，把它们连起来。这就形成了一个链表，也叫作哈希冲突链。
+
+![img](https://static001.geekbang.org/resource/image/8a/28/8ac4cc6cf94968a502161f85d072e428.jpg)
+
+但是，这里依然存在一个问题，哈希冲突链上的元素只能通过指针逐一查找再操作。如果哈希表里写入的数据越来越多，哈希冲突可能也会越来越多，这就会导致某些哈希冲突链过长，进而导致这个链上的元素查找耗时长，效率降低。对于追求“快”的 Redis 来说，这是不太能接受的。
+
+所以，Redis 会对哈希表做 rehash 操作。rehash 也就是增加现有的哈希桶数量，让逐渐增多的 entry 元素能在更多的桶之间分散保存，减少单个桶中的元素数量，从而减少单个桶中的冲突。那具体怎么做呢？
+
+其实，为了使 rehash 操作更高效，Redis 默认使用了两个全局哈希表：哈希表 1 和哈希表 2。一开始，当你刚插入数据时，默认使用哈希表 1，此时的哈希表 2 并没有被分配空间。随着数据逐步增多，Redis 开始执行 rehash，这个过程分为三步：
+
+1. 给哈希表 2 分配更大的空间，例如是当前哈希表 1 大小的两倍；
+2. 把哈希表 1 中的数据重新映射并拷贝到哈希表 2 中；
+3. 释放哈希表 1 的空间。
+
+到此，我们就可以从哈希表 1 切换到哈希表 2，用增大的哈希表 2 保存更多数据，而原来的哈希表 1 留作下一次 rehash 扩容备用。这个过程看似简单，但是第二步涉及大量的数据拷贝，如果一次性把哈希表 1 中的数据都迁移完，会造成 Redis 线程阻塞，无法服务其他请求。此时，Redis 就无法快速访问数据了。为了避免这个问题，Redis 采用了渐进式 rehash。
+
+简单来说就是在第二步拷贝数据时，Redis 仍然正常处理客户端请求，每处理一个请求时，从哈希表 1 中的第一个索引位置开始，顺带着将这个索引位置上的所有 entries 拷贝到哈希表 2 中；等处理下一个请求时，再顺带拷贝哈希表 1 中的下一个索引位置的 entries。如下图所示：
+
+![img](https://static001.geekbang.org/resource/image/73/0c/73fb212d0b0928d96a0d7d6ayy76da0c.jpg)
+
+渐进式 rehash 这样就巧妙地把一次性大量拷贝的开销，分摊到了多次处理请求的过程中，避免了耗时操作，保证了数据的快速访问。
+
+好了，到这里，你应该就能理解，Redis 的键和值是怎么通过哈希表组织的了。对于 String 类型来说，找到哈希桶就能直接增删改查了，所以，哈希表的 $O(1)$ 操作复杂度也就是它的复杂度了。但是，对于集合类型来说，即使找到哈希桶了，还要在集合中再进一步操作。
+
+下面我们具体看下各种数据类型的底层实现和操作。
+
+
 
 ### 1、String（字符串）
 
@@ -38,15 +102,15 @@ C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis �
 
 - **常数复杂度获取字符串长度**
 
-  因为 C 字符串并不记录自身的长度信息， 所以为了获取一个 C 字符串的长度， 程序必须遍历整个字符串，对遇到的每个字符进行计数， 直到遇到代表字符串结尾的空字符为止， 这个操作的复杂度为 O(N) 
+  因为 C 字符串并不记录自身的长度信息， 所以为了获取一个 C 字符串的长度， 程序必须遍历整个字符串，对遇到的每个字符进行计数， 直到遇到代表字符串结尾的空字符为止， 这个操作的复杂度为 $O(N)$
 
-  和 C 字符串不同， 因为 SDS 在 `len` 属性中记录了 SDS 本身的长度， 所以获取一个 SDS 长度的复杂度仅为 O(1) 
+  和 C 字符串不同， 因为 SDS 在 `len` 属性中记录了 SDS 本身的长度， 所以获取一个 SDS 长度的复杂度仅为 $O(1)$
 
   举个例子， 对于图 2-5 所示的 SDS 来说， 程序只要访问 SDS 的 `len` 属性， 就可以立即知道 SDS 的长度为 `5` 字节：
 
   ![](http://redisbook.com/_images/graphviz-dbd2f4d49a9f495f18093129393569f93e645529.png)
 
-  通过使用 SDS 而不是 C 字符串， Redis 将获取字符串长度所需的复杂度从 O(N) 降低到了 O(1) ， 这确保了获取字符串长度的工作不会成为 Redis 的性能瓶颈
+  通过使用 SDS 而不是 C 字符串， Redis 将获取字符串长度所需的复杂度从 $O(N)$ 降低到了 $O(1)$ ， 这确保了获取字符串长度的工作不会成为 Redis 的性能瓶颈
 
 - **缓冲区溢出/内存泄漏**
 
@@ -77,7 +141,7 @@ C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis �
 
 当列表弹出了最后一个元素之后，该数据结构自动被删除，内存被回收。
 
-![img](https://user-gold-cdn.xitu.io/2018/7/2/1645918c2cdf772e?imageslim)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116153913.gif)
 
 Redis 的列表结构常用来做异步队列使用。将需要延后处理的任务结构体序列化成字符串塞进 Redis 的列表，另一个线程从这个列表中轮询数据进行处理
 
@@ -157,19 +221,15 @@ Redis 的字典相当于 Java 语言里面的 HashMap，它是无序字典， �
 
 不同的是，Redis 的字典的值只能是字符串，另外它们 rehash 的方式不一样，因为 Java 的 HashMap 在字典很大时，rehash 是个耗时的操作，需要一次性全部 rehash。Redis 为了高性能，不能堵塞服务，所以采用了渐进式 rehash 策略。
 
-
-
-![img](https://user-gold-cdn.xitu.io/2018/7/28/164dc873b2a899a8?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![redis-rehash](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116154218.png)
 
 
 
-渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个 hash 结构，然后在后续的定时任务中以及 hash 操作指令中，循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。当搬迁完成了，就会使用新的hash结构取而代之。
+渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个 hash 结构，然后在后续的定时任务中以及 hash 操作指令中，循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。当搬迁完成了，就会使用新的 hash 结构取而代之。
 
 当 hash 移除了最后一个元素之后，该数据结构自动被删除，内存被回收。
 
-
-
-![img](https://user-gold-cdn.xitu.io/2018/7/2/16458ef82907e5e1?imageslim)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116154311.gif)
 
 
 
@@ -221,7 +281,7 @@ Redis 的 Set 是 String 类型的无序集合。它是通过 HashTable 实现�
 
 当集合中最后一个元素移除之后，数据结构自动删除，内存被回收。
 
-![img](https://user-gold-cdn.xitu.io/2018/7/2/16458e2da04f1a2d?imageslim)
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116154820.gif)
 
 
 
@@ -237,13 +297,92 @@ Redis 正是通过分数来为集合中的成员进行从小到大的排序。zs
 
 zset 中最后一个 value 被移除后，数据结构自动删除，内存被回收。
 
-![img](https://user-gold-cdn.xitu.io/2018/7/2/16458f9f679a8bb0?imageslim)
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116154851.gif)
+
+## 二、其他数据类型
+
+### bitmaps
+
+#####  ☆☆位图：
+
+在我们平时开发过程中，会有一些 bool 型数据需要存取，比如用户一年的签到记录，签了是 1，没签是 0，要记录 365 天。如果使用普通的 key/value，每个用户要记录 365 个，当用户上亿的时候，需要的存储空间是惊人的。
+
+为了解决这个问题，Redis 提供了位图数据结构，这样每天的签到记录只占据一个位，365 天就是 365 个位，46 个字节 (一个稍长一点的字符串) 就可以完全容纳下，这就大大节约了存储空间。
+
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116155417.gif)
 
 
 
+位图不是特殊的数据结构，它的内容其实就是普通的字符串，也就是 byte 数组。我们可以使用普通的 get/set 直接获取和设置整个位图的内容，也可以使用位图操作 getbit/setbit 等将 byte 数组看成「位数组」来处理
+
+ Redis 的位数组是自动扩展，如果设置了某个偏移位置超出了现有的内容范围，就会自动将位数组进行零扩充。 
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201116155452.gif)
+
+接下来我们使用 redis-cli 设置第一个字符，也就是位数组的前 8 位，我们只需要设置值为 1 的位，如上图所示，h 字符只有 1/2/4 位需要设置，e 字符只有 9/10/13/15 位需要设置。值得注意的是位数组的顺序和字符的位顺序是相反的。
+
+```
+127.0.0.1:6379> setbit s 1 1
+(integer) 0
+127.0.0.1:6379> setbit s 2 1
+(integer) 0
+127.0.0.1:6379> setbit s 4 1
+(integer) 0
+127.0.0.1:6379> setbit s 9 1
+(integer) 0
+127.0.0.1:6379> setbit s 10 1
+(integer) 0
+127.0.0.1:6379> setbit s 13 1
+(integer) 0
+127.0.0.1:6379> setbit s 15 1
+(integer) 0
+127.0.0.1:6379> get s
+"he"
+```
+
+上面这个例子可以理解为「零存整取」，同样我们还也可以「零存零取」，「整存零取」。「零存」就是使用 setbit 对位值进行逐个设置，「整存」就是使用字符串一次性填充所有位数组，覆盖掉旧值。
+
+bitcount 和 bitop,  bitpos, bitfield 都是操作位图的指令。
 
 
-## Redis常见数据类型查阅：
+
+### HyperLogLog
+
+Redis 在 2.8.9 版本添加了 HyperLogLog 结构。
+
+场景：可以用来统计站点的UV...
+
+Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。但是会有误差。
+
+| 命令    | 用法                                       | 描述                                      |
+| ------- | ------------------------------------------ | ----------------------------------------- |
+| pfadd   | [PFADD key element [element ...]           | 添加指定元素到 HyperLogLog 中             |
+| pfcount | [PFCOUNT key [key ...]                     | 返回给定 HyperLogLog 的基数估算值。       |
+| pfmerge | [PFMERGE destkey sourcekey [sourcekey ...] | 将多个 HyperLogLog 合并为一个 HyperLogLog |
+
+```java
+public class JedisTest {
+  public static void main(String[] args) {
+    Jedis jedis = new Jedis();
+    for (int i = 0; i < 100000; i++) {
+      jedis.pfadd("codehole", "user" + i);
+    }
+    long total = jedis.pfcount("codehole");
+    System.out.printf("%d %d\n", 100000, total);
+    jedis.close();
+  }
+}
+```
+
+[HyperLogLog图解](http://content.research.neustar.biz/blog/hll.html )
+
+
+
+### Geo
+
+
+
+## 三、Redis常见数据类型和命令查阅：
 
 [Redis命令中心](http://www.redis.cn/commands.html)
 
@@ -387,93 +526,6 @@ zset 中最后一个 value 被移除后，数据结构自动删除，内存被�
 | ZRANGEBYLEX      | ZRANGEBYLEX key min max [LIMIT offset count]                 | 当有序集合的所有成员都具有相同的分值时，有序集合的元素会根据成员的字典序（lexicographical ordering）来进行排序，而这个命令则可以返回给定的有序集合键 key 中，值介于 min 和 max 之间的成员。 |      |
 | ZLEXCOUNT        | ZLEXCOUNT key min max                                        | 对于一个所有成员的分值都相同的有序集合键 key 来说，这个命令会返回该集合中，成员介于 min 和 max 范围内的元素数量。这个命令的 min 参数和 max 参数的意义和 ZRANGEBYLEX 命令的 min 参数和 max 参数的意义一样 |      |
 | ZREMRANGEBYLEX   | ZREMRANGEBYLEX key min max                                   | 对于一个所有成员的分值都相同的有序集合键 key 来说，这个命令会移除该集合中，成员介于 min 和 max 范围内的所有元素。这个命令的 min 参数和 max 参数的意义和 ZRANGEBYLEX 命令的 min 参数和 max 参数的意义一样 |      |
-
-
-
-## 其他数据类型
-
-### bitmaps
-
-#####  ☆☆位图：
-
-String命令中包含了一种特殊的操作，直接操作bit，某些特殊场景下，会节省存储空间。可以在存取bool型数据的场景使用，比如存取用户男女比例，用户某一段日期签到记录，
-
-​	在我们平时开发过程中，会有一些 bool 型数据需要存取，比如用户一年的签到记录，签了是 1，没签是 0，要记录 365 天。如果使用普通的 key/value，每个用户要记录 365 个，当用户上亿的时候，需要的存储空间是惊人的。
-
-为了解决这个问题，Redis 提供了位图数据结构，这样每天的签到记录只占据一个位，365 天就是 365 个位，46 个字节 (一个稍长一点的字符串) 就可以完全容纳下，这就大大节约了存储空间。
-
-
-
-![img](https://user-gold-cdn.xitu.io/2018/7/2/1645926f4520d0ce?imageslim)
-
-
-
-位图不是特殊的数据结构，它的内容其实就是普通的字符串，也就是 byte 数组。我们可以使用普通的 get/set 直接获取和设置整个位图的内容，也可以使用位图操作 getbit/setbit 等将 byte 数组看成「位数组」来处理
-
- Redis 的位数组是自动扩展，如果设置了某个偏移位置超出了现有的内容范围，就会自动将位数组进行零扩充。 
-
-![img](https://user-gold-cdn.xitu.io/2018/7/2/16459860644097de?imageslim)
-
-接下来我们使用 redis-cli 设置第一个字符，也就是位数组的前 8 位，我们只需要设置值为 1 的位，如上图所示，h 字符只有 1/2/4 位需要设置，e 字符只有 9/10/13/15 位需要设置。值得注意的是位数组的顺序和字符的位顺序是相反的。
-
-```
-127.0.0.1:6379> setbit s 1 1
-(integer) 0
-127.0.0.1:6379> setbit s 2 1
-(integer) 0
-127.0.0.1:6379> setbit s 4 1
-(integer) 0
-127.0.0.1:6379> setbit s 9 1
-(integer) 0
-127.0.0.1:6379> setbit s 10 1
-(integer) 0
-127.0.0.1:6379> setbit s 13 1
-(integer) 0
-127.0.0.1:6379> setbit s 15 1
-(integer) 0
-127.0.0.1:6379> get s
-"he"
-```
-
-上面这个例子可以理解为「零存整取」，同样我们还也可以「零存零取」，「整存零取」。「零存」就是使用 setbit 对位值进行逐个设置，「整存」就是使用字符串一次性填充所有位数组，覆盖掉旧值。
-
-bitcount和bitop, bitpos,bitfield 都是操作位图的指令。
-
-
-
-### HyperLogLog
-
-Redis 在 2.8.9 版本添加了 HyperLogLog 结构。
-
-场景：可以用来统计站点的UV...
-
-Redis HyperLogLog 是用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。但是会有误差。
-
-| 命令    | 用法                                       | 描述                                      |
-| ------- | ------------------------------------------ | ----------------------------------------- |
-| pfadd   | [PFADD key element [element ...]           | 添加指定元素到 HyperLogLog 中             |
-| pfcount | [PFCOUNT key [key ...]                     | 返回给定 HyperLogLog 的基数估算值。       |
-| pfmerge | [PFMERGE destkey sourcekey [sourcekey ...] | 将多个 HyperLogLog 合并为一个 HyperLogLog |
-
-```java
-public class JedisTest {
-  public static void main(String[] args) {
-    Jedis jedis = new Jedis();
-    for (int i = 0; i < 100000; i++) {
-      jedis.pfadd("codehole", "user" + i);
-    }
-    long total = jedis.pfcount("codehole");
-    System.out.printf("%d %d\n", 100000, total);
-    jedis.close();
-  }
-}
-```
-
-[HyperLogLog图解](http://content.research.neustar.biz/blog/hll.html )
-
-
-
-### Geo
 
 
 
