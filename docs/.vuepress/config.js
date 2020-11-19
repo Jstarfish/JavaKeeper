@@ -33,10 +33,10 @@ module.exports = {
     //logo: './public/img/logo.png',
     subSidebar: 'auto',//在所有页面中启用自动生成子侧边栏，原 sidebar 仍然兼容
     nav: [
-      { text: 'Java', link: '/java/' },
+      { text: 'Java', link: '/java/' , icon: 'reco-api'},
       { text: '数据结构与算法', link: '/data-structure-algorithms/' },
       { text: '设计模式', link: '/design-pattern/' },
-      { text: '数据存储与缓存', link: '/data-store/' },
+      { text: '数据存储与缓存', link: '/data-store/'},
       { text: '开发框架', link: '/framework/' },
       { text: '分布式架构', link: '/distribution/' },
       { text: '直击面试', link: '/interview/' },
@@ -84,7 +84,16 @@ module.exports = {
 	    //     link: '/donate'
 	    //   }
 	    // ]
-	  }]
+	  }],
+	  [
+      'vuepress-plugin-mathjax',
+      {
+        target: 'svg',
+        macros: {
+          '*': '\\times',
+        },
+      },
+    ],
 	]
 }
 
@@ -187,6 +196,8 @@ function genDataStoreSidebar(){
         ['Redis/Redis-Conf', 'Redis 配置'],
         ['Redis/Redis-Transaction', 'Redis 事务'],
         ['Redis/Reids-Lock', 'Redis 分布式锁'],
+        ['Redis/Redis-Master-Slave', 'Redis 主从'],
+        ['Redis/Redis-Sentinel', 'Redis 哨兵'],
         ['Redis/Redis-Cluster', 'Redis 集群'],
       ]
     }
