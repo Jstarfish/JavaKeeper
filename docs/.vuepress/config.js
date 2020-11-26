@@ -33,13 +33,13 @@ module.exports = {
     //logo: './public/img/logo.png',
     subSidebar: 'auto',//在所有页面中启用自动生成子侧边栏，原 sidebar 仍然兼容
     nav: [
-      { text: 'Java', link: '/java/' , icon: 'reco-api'},
-      { text: '数据结构与算法', link: '/data-structure-algorithms/' },
-      { text: '设计模式', link: '/design-pattern/' },
-      { text: '数据存储与缓存', link: '/data-store/'},
-      { text: '开发框架', link: '/framework/' },
-      { text: '分布式架构', link: '/distribution/' },
-      { text: '直击面试', link: '/interview/' },
+      { text: 'Java', link: '/java/' , icon: 'icon-java'},
+      { text: '数据结构与算法', link: '/data-structure-algorithms/', icon: 'icon-tree' },
+      { text: '设计模式', link: '/design-pattern/', icon: 'icon-design' },
+      { text: '数据存储与缓存', link: '/data-store/', icon: 'icon-ic_datastores'},
+      { text: '开发框架', link: '/framework/', icon: 'icon-framework1' },
+      { text: '分布式架构', link: '/distribution/', icon: 'icon-distributed' },
+      { text: '直击面试', link: '/interview/', icon: 'icon-interview' },
     ],
     sidebar: {
         "/java/": genJavaSidebar(),
