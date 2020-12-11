@@ -199,6 +199,7 @@ function genDataStoreSidebar(){
         ['Redis/Redis-Master-Slave', 'Redis 主从'],
         ['Redis/Redis-Sentinel', 'Redis 哨兵'],
         ['Redis/Redis-Cluster', 'Redis 集群'],
+        ['Redis/Redis-MQ', 'Redis 消息队列方案'],
       ]
     }
   ];
