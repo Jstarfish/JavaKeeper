@@ -224,9 +224,9 @@ function genFrameworkSidebar(){
       collapsable: false,
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
-        ['SpringBoot/Hello-SpringBoot', 'Hello-SpringBoot'],
-        ['SpringBoot/Spring Boot 最流行的 16 条实践解读', 'Spring Boot 最流行的 16 条实践解读'],
-        ['SpringBoot/@Scheduled', '@Scheduled'],
+        //['SpringBoot/Hello-SpringBoot', 'Hello-SpringBoot'],
+        // ['SpringBoot/Spring Boot 最流行的 16 条实践解读', 'Spring Boot 最流行的 16 条实践解读'],
+        // ['SpringBoot/@Scheduled', '@Scheduled'],
       ]
     }
   ];
