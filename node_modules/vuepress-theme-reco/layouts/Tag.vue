@@ -36,7 +36,7 @@ import Common from '@theme/components/Common'
 import NoteAbstract from '@theme/components/NoteAbstract'
 import TagList from '@theme/components/TagList'
 import pagination from '@theme/mixins/pagination'
-import ModuleTransition from '@theme/components/ModuleTransition'
+import { ModuleTransition } from '@vuepress-reco/core/lib/components'
 import { sortPostsByStickyAndDate, filterPosts } from '@theme/helpers/postData'
 import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
@@ -100,7 +100,7 @@ export default {
 <style src="../styles/theme.styl" lang="stylus"></style>
 
 <style lang="stylus" scoped>
-@require '../styles/mode.styl'
+
 .tag-wrapper
   max-width: $contentWidth;
   margin: 0 auto;

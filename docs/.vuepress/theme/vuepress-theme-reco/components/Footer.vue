@@ -1,15 +1,15 @@
 <template>
   <div class="footer-wrapper">
     <span>
-      <i class="iconfont reco-theme"></i>
+      <reco-icon icon="reco-theme" />
       <a target="blank" href="https://vuepress-theme-reco.recoluan.com">{{`vuepress-theme-reco@${version}`}}</a>
     </span>
     <span v-if="$themeConfig.record">
-      <i class="iconfont reco-beian"></i>
+      <reco-icon icon="reco-beian" />
       <a :href="$themeConfig.recordLink || '#'">{{ $themeConfig.record }}</a>
     </span>
     <span>
-      <i class="iconfont reco-copyright"></i>
+      <reco-icon icon="reco-copyright" />
       <a>
         <span v-if="$themeConfig.author || $site.title">{{ $themeConfig.author || $site.title }}</span>
         &nbsp;&nbsp;
@@ -18,7 +18,7 @@
       </a>
     </span>
     <span v-show="showAccessNumber">
-      <i class="iconfont reco-eye"></i>
+      <reco-icon icon="reco-eye" />
       <AccessNumber idVal="/" />
     </span>
     <p class="cyber-security" v-if="$themeConfig.cyberSecurityRecord">
@@ -30,28 +30,25 @@
 </template>
 
 <script>
+import { defineComponent, computed } from '@vue/composition-api'
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
 import { version } from '../package.json'
-export default {
-  data () {
-    return {
-      version
-    }
-  },
-  computed: {
-    showAccessNumber () {
+export default defineComponent({
+  components: { RecoIcon },
+  setup (props, ctx) {
+    const showAccessNumber = computed(() => {
       const {
         $themeConfig: { valineConfig },
         $themeLocaleConfig: { valineConfig: valineLocalConfig }
-      } = this
+      } = ctx.root
 
       const vc = valineLocalConfig || valineConfig
-      if (vc && vc.visitor != false) {
-        return true
-      }
-      return false
-    }
+
+      return vc && vc.visitor != false
+    })
+    return { version, showAccessNumber }
   }
-}
+})
 </script>
 
 <style lang="stylus" scoped>

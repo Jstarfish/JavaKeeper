@@ -4,7 +4,7 @@
     class="algolia-search-wrapper search-box"
     role="search"
   >
-    <i class="iconfont reco-search"></i>
+    <reco-icon icon="reco-search" />
     <input
       id="algolia-search-input"
       class="search-query"
@@ -14,7 +14,10 @@
 </template>
 
 <script>
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
+
 export default {
+  components: { RecoIcon },
   props: ['options'],
   data () {
     return {
@@ -71,7 +74,6 @@ export default {
 </script>
 
 <style lang="stylus">
-@require '../styles/mode.styl'
 .algolia-search-wrapper
   & > span
     vertical-align middle

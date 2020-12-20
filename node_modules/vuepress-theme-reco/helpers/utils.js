@@ -216,6 +216,14 @@ export function addLinkToHead (href) {
   document.head.append(iconLink)
 }
 
+// 向 head 中添加 script
+export function addScriptToHead (href) {
+  const iconLink = document.createElement('script')
+  iconLink.src = href
+
+  document.head.append(iconLink)
+}
+
 function ensureEndingSlash (path) {
   return /(\.html|\/)$/.test(path)
     ? path

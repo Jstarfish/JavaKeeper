@@ -49,7 +49,7 @@ npm install leancloud-realtime@3 --save
 ## 文档
 
 - [安装文档](https://leancloud.cn/docs/sdk_setup-js.html)
-- [使用文档](https://leancloud.cn/docs/realtime_guide-js.html)
+- [使用文档](https://leancloud.cn/docs/realtime_v2.html)
 - [API 文档](https://leancloud.github.io/js-realtime-sdk/docs/)
 
 ## Demo

@@ -40,7 +40,7 @@
 <script>
 import Common from '@theme/components/Common'
 import NoteAbstract from '@theme/components/NoteAbstract'
-import ModuleTransition from '@theme/components/ModuleTransition'
+import { ModuleTransition } from '@vuepress-reco/core/lib/components'
 import pagination from '@theme/mixins/pagination'
 import { sortPostsByStickyAndDate, filterPosts } from '@theme/helpers/postData'
 import { getOneColor } from '@theme/helpers/other'
@@ -105,7 +105,6 @@ export default {
 <style src="../styles/theme.styl" lang="stylus"></style>
 
 <style lang="stylus" scoped>
-@require '../styles/mode.styl'
 .categories-wrapper
   max-width: $contentWidth;
   margin: 0 auto;

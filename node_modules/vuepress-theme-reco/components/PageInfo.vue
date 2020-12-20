@@ -1,40 +1,44 @@
 <template>
   <div>
-    <i
-      class="iconfont reco-account"
-      v-if="pageInfo.frontmatter.author || $themeConfig.author || $site.title">
+    <reco-icon
+      v-if="pageInfo.frontmatter.author || $themeConfig.author || $site.title"
+      icon="reco-account"
+    >
       <span>{{ pageInfo.frontmatter.author || $themeConfig.author || $site.title }}</span>
-    </i>
-    <i
+    </reco-icon>
+    <reco-icon
       v-if="pageInfo.frontmatter.date"
-      class="iconfont reco-date">
+      icon="reco-date"
+    >
       <span>{{ pageInfo.frontmatter.date | formatDateValue }}</span>
-    </i>
-    <i
+    </reco-icon>
+    <reco-icon
       v-if="showAccessNumber === true"
-      class="iconfont reco-eye">
-      <AccessNumber
-        :idVal="pageInfo.path"
-        :numStyle="numStyle" />
-    </i>
-    <i
+      icon="reco-eye"
+    >
+      <AccessNumber :idVal="pageInfo.path" :numStyle="numStyle" />
+    </reco-icon>
+    <reco-icon
       v-if="pageInfo.frontmatter.tags"
-      class="iconfont reco-tag tags">
+      icon="reco-tag"
+      class="tags"
+    >
       <span
         v-for="(subItem, subIndex) in pageInfo.frontmatter.tags"
         :key="subIndex"
         class="tag-item"
         :class="{ 'active': currentTag == subItem }"
-        @click.stop="goTags(subItem)">{{subItem}}</span>
-    </i>
+        @click.stop="goTags(subItem)"
+      >{{subItem}}</span>
+    </reco-icon>
   </div>
 </template>
 
 <script>
-// 引入时间格式化js文件
-import { formatDate } from '@theme/helpers/utils'
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
 
 export default {
+  components: { RecoIcon },
   props: {
     pageInfo: {
       type: Object,
@@ -62,23 +66,9 @@ export default {
   },
   filters: {
     formatDateValue (value) {
-      if (!value) return ''
-      // 返回的value的值都是这个样子2019-09-20T18:22:30.000Z
-      // 对value进行处理
-      value = value.replace('T', ' ').slice(0, value.lastIndexOf('.'))
-      // 转化后的value 2019-09-20 18:22:30
-      // 获取到时分秒
-      const h = Number(value.substr(11, 2))
-      const m = Number(value.substr(14, 2))
-      const s = Number(value.substr(17, 2))
-      // 判断时分秒是不是 00:00:00 (如果是用户手动输入的00:00:00也会不显示)
-      if (h > 0 || m > 0 || s > 0) {
-        // 时分秒有一个> 0 就说明用户输入一个非 00:00:00 的时分秒
-        return formatDate(value)
-      } else {
-        // 用户没有输入或者输入了 00:00:00
-        return formatDate(value, 'yyyy-MM-dd')
-      }
+      let localDate = new Date(value).toLocaleString()
+      if (value.split(' ').length === 1) localDate = localDate.split(' ')[0]
+      return localDate
     }
   },
   methods: {

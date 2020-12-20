@@ -1,10 +1,8 @@
-@require './mode'
 @require './code'
 @require './custom-blocks'
 @require './arrow'
 @require './wrapper'
 @require './toc'
-// @require './iconfont.css'
 
 html, body
   padding 0
@@ -13,7 +11,7 @@ body
   font-family Ubuntu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
-  font-size 16px
+  font-size 15px
   color var(--text-color)
   background-color var(--background-color)
 
@@ -120,30 +118,13 @@ h1, h2, h3, h4, h5, h6
       margin-top -3.5rem
 
 h1
-  display none
   font-size 1.6rem
-  &.title
-    display block
 
 h2
-  position relative
-  padding-left 0.8rem
-  font-size 1.7rem
-  &::before
-    position: absolute
-    left 0
-    bottom 0
-    display: block
-    height 1.8rem
-    content: ''
-    border-left 5px solid $accentColor
-
-h3
   font-size 1.4rem
 
-h4
+h3
   font-size 1.2rem
-  font-weight:550
 
 a.header-anchor
   font-size 0.85em

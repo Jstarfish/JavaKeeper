@@ -70,6 +70,14 @@ function addRouteRecord (
         path || name
       )} cannot be a ` + `string id. Use an actual component instead.`
     )
+
+    warn(
+      // eslint-disable-next-line no-control-regex
+      !/[^\u0000-\u007F]+/.test(path),
+      `Route with path "${path}" contains unencoded characters, make sure ` +
+        `your path is correctly encoded before passing it to the router. Use ` +
+        `encodeURI to encode static segments of your path.`
+    )
   }
 
   const pathToRegexpOptions: PathToRegexpOptions =
@@ -85,6 +93,7 @@ function addRouteRecord (
     regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
     components: route.components || { default: route.component },
     instances: {},
+    enteredCbs: {},
     name,
     parent,
     matchAs,

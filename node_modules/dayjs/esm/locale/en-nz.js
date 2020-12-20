@@ -9,7 +9,9 @@ var locale = {
   monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
   weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
   ordinal: function ordinal(n) {
-    return n;
+    var s = ['th', 'st', 'nd', 'rd'];
+    var v = n % 100;
+    return "[" + n + (s[(v - 20) % 10] || s[v] || s[0]) + "]";
   },
   formats: {
     LT: 'h:mm A',

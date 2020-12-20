@@ -7,7 +7,15 @@ export default {
   mounted () {
     this.recoShowModule = true
   },
-  destroyed () {
-    this.recoShowModule = false
+  watch: {
+    '$route' (newV, oldV) {
+      if (newV.path === oldV.path) return
+
+      this.recoShowModule = false
+
+      setTimeout(() => {
+        this.recoShowModule = true
+      }, 200)
+    }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="search-box">
-    <i class="iconfont reco-search"></i>
+    <reco-icon icon="reco-search" />
     <input
       @input="query = $event.target.value"
       aria-label="Search"
@@ -40,7 +40,10 @@
 </template>
 
 <script>
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
+
 export default {
+  components: { RecoIcon },
   data () {
     return {
       query: '',

@@ -35,7 +35,7 @@ import Common from '@theme/components/Common'
 import TagList from '@theme/components/TagList'
 import NoteAbstract from '@theme/components/NoteAbstract'
 import pagination from '@theme/mixins/pagination'
-import ModuleTransition from '@theme/components/ModuleTransition'
+import { ModuleTransition } from '@vuepress-reco/core/lib/components'
 import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
 export default {

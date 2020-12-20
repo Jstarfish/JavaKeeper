@@ -42,7 +42,7 @@
         </div>
         <div class="info-wrapper">
           <PersonalInfo/>
-          <h4><i class="iconfont reco-category"></i> {{homeBlogCfg.category}}</h4>
+          <h4><reco-icon icon="reco-category" /> {{homeBlogCfg.category}}</h4>
           <ul class="category-wrapper">
             <li class="category-item" v-for="(item, index) in this.$categories.list" :key="index">
               <router-link :to="item.path">
@@ -52,9 +52,9 @@
             </li>
           </ul>
           <hr>
-          <h4 v-if="$tags.list.length !== 0"><i class="iconfont reco-tag"></i> {{homeBlogCfg.tag}}</h4>
+          <h4 v-if="$tags.list.length !== 0"><reco-icon icon="reco-tag" /> {{homeBlogCfg.tag}}</h4>
           <TagList @getCurrentTag="getPagesByTags" />
-          <h4 v-if="$themeConfig.friendLink && $themeConfig.friendLink.length !== 0"><i class="iconfont reco-friend"></i> {{homeBlogCfg.friendLink}}</h4>
+          <h4 v-if="$themeConfig.friendLink && $themeConfig.friendLink.length !== 0"><reco-icon icon="reco-friend" /> {{homeBlogCfg.friendLink}}</h4>
           <FriendLink />
         </div>
       </div>
@@ -71,14 +71,13 @@ import TagList from '@theme/components/TagList'
 import FriendLink from '@theme/components/FriendLink'
 import NoteAbstract from '@theme/components/NoteAbstract'
 import pagination from '@theme/mixins/pagination'
-import ModuleTransition from '@theme/components/ModuleTransition'
+import { ModuleTransition, RecoIcon } from '@vuepress-reco/core/lib/components'
 import PersonalInfo from '@theme/components/PersonalInfo'
 import { getOneColor } from '@theme/helpers/other'
-import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
 export default {
-  mixins: [pagination, moduleTransitonMixin],
-  components: { NoteAbstract, TagList, FriendLink, ModuleTransition, PersonalInfo },
+  mixins: [pagination],
+  components: { NoteAbstract, TagList, FriendLink, ModuleTransition, PersonalInfo, RecoIcon },
   data () {
     return {
       recoShow: false,
@@ -87,6 +86,9 @@ export default {
     }
   },
   computed: {
+    recoShowModule () {
+      return this.$parent.recoShowModule
+    },
     homeBlogCfg () {
       return this.$recoLocales.homeBlog
     },
@@ -243,6 +245,7 @@ export default {
           a {
             display flex
             justify-content: space-between
+            align-items: center
             color var(--text-color)
             .post-num {
               width 1.6rem;

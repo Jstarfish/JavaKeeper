@@ -1,3 +1,15 @@
+1.1.2 / 2020-11-26
+=================
+  * [Fix] do not mutate the native function when present
+  * [Deps] update `es-abstract`; use `call-bind` where applicable
+  * [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `tape`, `functions-have-names`; add `aud`, `safe-publish-latest`
+  * [Tests] only audit prod deps
+  * [Tests] migrate tests to Github Actions
+  * [Tests] run `nyc` on all tests
+  * [Tests] add `implementation` test; run `es-shim-api` in postlint; use `tape` runner
+  * [actions] add "Allow Edits" workflow
+  * [actions] switch Automatic Rebase workflow to `pull_request_target` event
+
 1.1.1 / 2019-12-12
 =================
   * [Refactor] use split-up `es-abstract` (85% bundle size decrease)

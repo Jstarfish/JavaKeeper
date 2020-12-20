@@ -9,18 +9,18 @@ This was created since the `path` methods in Node outputs `\\` paths on Windows.
 
 ## Install
 
-```
-$ npm install slash
+```sh
+$ npm install --save slash
 ```
 
 
 ## Usage
 
 ```js
-const path = require('path');
-const slash = require('slash');
+var path = require('path');
+var slash = require('slash');
 
-const str = path.join('foo', 'bar');
+var str = path.join('foo', 'bar');
 // Unix    => foo/bar
 // Windows => foo\\bar
 
@@ -41,4 +41,4 @@ Accepts a Windows backslash path and returns a slash path.
 
 ## License
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+MIT © [Sindre Sorhus](http://sindresorhus.com)

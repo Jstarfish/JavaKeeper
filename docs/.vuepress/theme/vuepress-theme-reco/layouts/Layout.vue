@@ -1,5 +1,5 @@
 <template>
-  <Common :sidebarItems="sidebarItems">
+  <Common :sidebarItems="sidebarItems" :recoShowModule="recoShowModule">
     <component v-if="$frontmatter.home" :is="homeCom"/>
     <Page v-else :sidebar-items="sidebarItems"/>
     <Footer v-if="$frontmatter.home" class="footer" />
@@ -13,8 +13,10 @@ import Page from '@theme/components/Page'
 import Footer from '@theme/components/Footer'
 import Common from '@theme/components/Common'
 import { resolveSidebarItems } from '@theme/helpers/utils'
+import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
 export default {
+  mixins: [moduleTransitonMixin],
   components: { HomeBlog, Home, Page, Common, Footer },
   computed: {
     sidebarItems () {

@@ -50,8 +50,15 @@ export default {
 
       const headers = this.$page.headers || []
 
-      return [themeSubSidebar, themeSidebar, pageSubSidebar, pageSidebar].indexOf('auto') > -1 &&
-             headers.length > 0
+      if ([pageSubSidebar, pageSidebar].indexOf(false) > -1) {
+        return false
+      } else if ([pageSubSidebar, pageSidebar].indexOf('auto') > -1 && headers.length > 0) {
+        return true
+      } else if ([themeSubSidebar, themeSidebar].indexOf('auto') > -1 && headers.length > 0) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }

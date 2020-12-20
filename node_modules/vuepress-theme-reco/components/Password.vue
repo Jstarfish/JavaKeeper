@@ -24,11 +24,11 @@
     <ModuleTransition delay="0.24">
       <div v-show="recoShowModule" class="footer">
         <span>
-          <i class="iconfont reco-theme"></i>
+          <reco-icon icon="reco-theme" />
           <a target="blank" href="https://vuepress-theme-reco.recoluan.com">vuePress-theme-reco</a>
         </span>
         <span>
-          <i class="iconfont reco-copyright"></i>
+          <reco-icon icon="reco-copyright" />
           <a>
             <span v-if="$themeConfig.author || $site.title">{{ $themeConfig.author || $site.title }}</span>
             &nbsp;&nbsp;
@@ -43,12 +43,10 @@
 
 <script>
 import md5 from 'md5'
-import ModuleTransition from '@theme/components/ModuleTransition'
-import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
+import { ModuleTransition, RecoIcon } from '@vuepress-reco/core/lib/components'
 
 export default {
-  mixins: [moduleTransitonMixin],
-  components: { ModuleTransition },
+  components: { ModuleTransition, RecoIcon },
   props: {
     isPage: {
       type: Boolean,
@@ -63,6 +61,9 @@ export default {
     }
   },
   computed: {
+    recoShowModule () {
+      return this.$parent.recoShowModule
+    },
     year () {
       return new Date().getFullYear()
     }
@@ -118,8 +119,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@require '../styles/mode.styl'
-
 .password-shadow {
   overflow hidden
   position relative

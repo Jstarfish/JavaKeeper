@@ -1,11 +1,11 @@
 'use strict';
-module.exports = input => {
-	const isExtendedLengthPath = /^\\\\\?\\/.test(input);
-	const hasNonAscii = /[^\u0000-\u0080]+/.test(input); // eslint-disable-line no-control-regex
+module.exports = function (str) {
+	var isExtendedLengthPath = /^\\\\\?\\/.test(str);
+	var hasNonAscii = /[^\x00-\x80]+/.test(str);
 
 	if (isExtendedLengthPath || hasNonAscii) {
-		return input;
+		return str;
 	}
 
-	return input.replace(/\\/g, '/');
+	return str.replace(/\\/g, '/');
 };

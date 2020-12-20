@@ -1,22 +1,26 @@
 <script>
+import { defineComponent, computed } from '@vue/composition-api'
 import { isActive } from '@theme/helpers/utils'
 
-export default {
-  computed: {
-    headers () {
-      return this.$showSubSideBar ? this.$page.headers : []
-    }
-  },
-  methods: {
-    isLinkActive (header) {
-      const active = isActive(this.$route, this.$page.path + '#' + header.slug)
+export default defineComponent({
+  setup (props, ctx) {
+    const { root } = ctx
+
+    const headers = computed(() => {
+      return root.$showSubSideBar ? root.$page.headers : []
+    })
+
+    const isLinkActive = (header) => {
+      const active = isActive(root.$route, root.$page.path + '#' + header.slug)
       if (active) {
         setTimeout(() => {
-          document.querySelector(`.reco-${header.slug}`).scrollIntoView()
+          document.querySelector(`.reco-side-${header.slug}`).scrollIntoView()
         }, 300)
       }
       return active
     }
+
+    return { headers, isLinkActive }
   },
   render (h) {
     return h('ul', {
@@ -32,15 +36,14 @@ export default {
           attr: { key: header.title }
         }, [
           h('router-link', {
-            class: { 'sidebar-link': true, [`reco-${header.slug}`]: true },
+            class: { 'sidebar-link': true, [`reco-side-${header.slug}`]: true },
             props: { to: `${this.$page.path}#${header.slug}` }
           }, header.title)
         ])
       })
     ])
   }
-}
-
+})
 </script>
 
 <style lang="stylus" scoped>

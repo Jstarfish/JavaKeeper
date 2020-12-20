@@ -23,7 +23,7 @@
       class="repo-link"
       target="_blank"
       rel="noopener noreferrer">
-      <i :class="`iconfont reco-${repoLabel.toLowerCase()}`"></i>
+      <reco-icon :icon="`reco-${repoLabel.toLowerCase()}`" />
       {{ repoLabel }}
       <OutboundLink/>
     </a>
@@ -31,12 +31,13 @@
 </template>
 
 <script>
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
 import DropdownLink from '@theme/components/DropdownLink'
 import { resolveNavLinkItem } from '@theme/helpers/utils'
 import NavLink from '@theme/components/NavLink'
 
 export default {
-  components: { NavLink, DropdownLink },
+  components: { NavLink, DropdownLink, RecoIcon },
 
   computed: {
     userNav () {

@@ -4,7 +4,7 @@
     :to="link"
     v-if="!isExternal(link)"
     :exact="exact">
-    <i :class="`iconfont ${item.icon}`"></i>
+    <reco-icon :icon="`${item.icon}`" />
     {{ item.text }}
   </router-link>
   <a
@@ -14,7 +14,7 @@
     :target="isMailto(link) || isTel(link) ? null : '_blank'"
     :rel="isMailto(link) || isTel(link) ? null : 'noopener noreferrer'"
   >
-    <i :class="`iconfont ${item.icon}`"></i>
+    <reco-icon :icon="`${item.icon}`" />
     {{ item.text }}
     <OutboundLink/>
   </a>
@@ -22,8 +22,11 @@
 
 <script>
 import { isExternal, isMailto, isTel, ensureExt } from '@theme/helpers/utils'
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
 
 export default {
+  components: { RecoIcon },
+
   props: {
     item: {
       required: true

@@ -14,17 +14,39 @@ var locale = {
   relativeTime: {
     future: '%s múlva',
     past: '%s',
-    s: 'néhány másodperc',
-    m: 'egy perc',
-    mm: '%d perc',
-    h: 'egy óra',
-    hh: '%d óra',
-    d: 'egy nap',
-    dd: '%d nap',
-    M: 'egy hónap',
-    MM: '%d hónap',
-    y: 'egy éve',
-    yy: '%d év'
+    s: function s(_, _s, ___, isFuture) {
+      return "n\xE9h\xE1ny m\xE1sodperc" + (isFuture || _s ? '' : 'e');
+    },
+    m: function m(_, s, ___, isFuture) {
+      return "egy perc" + (isFuture || s ? '' : 'e');
+    },
+    mm: function mm(n, s, ___, isFuture) {
+      return n + " perc" + (isFuture || s ? '' : 'e');
+    },
+    h: function h(_, s, ___, isFuture) {
+      return "egy " + (isFuture || s ? 'óra' : 'órája');
+    },
+    hh: function hh(n, s, ___, isFuture) {
+      return n + " " + (isFuture || s ? 'óra' : 'órája');
+    },
+    d: function d(_, s, ___, isFuture) {
+      return "egy " + (isFuture || s ? 'nap' : 'napja');
+    },
+    dd: function dd(n, s, ___, isFuture) {
+      return n + " " + (isFuture || s ? 'nap' : 'napja');
+    },
+    M: function M(_, s, ___, isFuture) {
+      return "egy " + (isFuture || s ? 'hónap' : 'hónapja');
+    },
+    MM: function MM(n, s, ___, isFuture) {
+      return n + " " + (isFuture || s ? 'hónap' : 'hónapja');
+    },
+    y: function y(_, s, ___, isFuture) {
+      return "egy " + (isFuture || s ? 'év' : 'éve');
+    },
+    yy: function yy(n, s, ___, isFuture) {
+      return n + " " + (isFuture || s ? 'év' : 'éve');
+    }
   },
   formats: {
     LT: 'H:mm',

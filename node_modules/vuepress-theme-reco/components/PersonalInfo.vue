@@ -22,18 +22,38 @@
       <h6>{{homeBlogCfg.tag}}</h6>
     </div>
   </div>
+  <ul class="social-links">
+    <li
+      class="social-item"
+      v-for="(item, index) in socialLinks"
+      :key="index"
+    >
+      <reco-icon :icon="item.icon" :link="item.link" :style="{ color: item.color }" />
+    </li>
+  </ul>
   <hr>
 </div>
 </template>
 
 <script>
-export default {
-  computed: {
-    homeBlogCfg () {
-      return this.$recoLocales.homeBlog
-    }
+import { defineComponent, computed } from '@vue/composition-api'
+import { RecoIcon } from '@vuepress-reco/core/lib/components'
+import { getOneColor } from '@theme/helpers/other'
+
+export default defineComponent({
+  components: { RecoIcon },
+  setup (props, ctx) {
+    const { root: _this } = ctx
+
+    const homeBlogCfg = computed(() => _this.$recoLocales.homeBlog)
+    const socialLinks = computed(() => (_this.$themeConfig.blogConfig && _this.$themeConfig.blogConfig.socialLinks || []).map(item => {
+      if (!item.color) item.color = getOneColor()
+      return item
+    }))
+
+    return { homeBlogCfg, socialLinks }
   }
-}
+})
 </script>
 
 <style lang="stylus" scoped>
@@ -69,6 +89,27 @@ export default {
         line-height auto
         color var(--text-color)
         margin 0
+      }
+    }
+  }
+  .social-links {
+    box-sizing border-box
+    display flex
+    flex-wrap wrap
+    padding 10px
+    .social-item {
+      width 39px
+      height 36px
+      line-height 36px
+      text-align center
+      list-style none
+      transition transform .3s
+      &:hover {
+        transform scale(1.08)
+      }
+      i {
+        cursor pointer
+        font-size 22px
       }
     }
   }

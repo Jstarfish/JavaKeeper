@@ -1,34 +1,22 @@
 <template>
-  <div
-    class="theme-container"
-    :class="pageClasses"
-    @touchstart="onTouchStart"
-    @touchend="onTouchEnd">
+  <div class="theme-container" :class="pageClasses">
     <div v-if="!absoluteEncryption">
       <transition name="fade">
         <LoadingPage v-show="firstLoad" class="loading-wrapper" />
       </transition>
+
       <transition name="fade">
         <Password v-show="!isHasKey" class="password-wrapper-out" key="out" />
       </transition>
+
       <div :class="{ 'hide': firstLoad || !isHasKey }">
-        <Navbar
-        v-if="shouldShowNavbar"
-        @toggle-sidebar="toggleSidebar"/>
+        <Navbar v-if="shouldShowNavbar" @toggle-sidebar="toggleSidebar" />
 
-        <div
-          class="sidebar-mask"
-          @click="toggleSidebar(false)"></div>
+        <div class="sidebar-mask" @click="toggleSidebar(false)"></div>
 
-        <Sidebar
-          :items="sidebarItems"
-          @toggle-sidebar="toggleSidebar">
-          <template slot="top">
-            <PersonalInfo />
-          </template>
-          <slot
-            name="sidebar-bottom"
-            slot="bottom"/>
+        <Sidebar :items="sidebarItems" @toggle-sidebar="toggleSidebar">
+          <PersonalInfo slot="top" />
+          <slot name="sidebar-bottom" slot="bottom"/>
         </Sidebar>
 
         <Password v-show="!isHasPageKey" :isPage="true" class="password-wrapper-in" key="in"></Password>
@@ -42,29 +30,17 @@
         <LoadingPage v-if="firstLoad" />
         <Password v-else-if="!isHasKey" />
         <div v-else>
-          <Navbar
-          v-if="shouldShowNavbar"
-          @toggle-sidebar="toggleSidebar"/>
+          <Navbar v-if="shouldShowNavbar" @toggle-sidebar="toggleSidebar"/>
 
-          <div
-            class="sidebar-mask"
-            @click="toggleSidebar(false)"></div>
+          <div class="sidebar-mask" @click="toggleSidebar(false)"></div>
 
-          <Sidebar
-            :items="sidebarItems"
-            @toggle-sidebar="toggleSidebar">
-            <template slot="top">
-              <PersonalInfo />
-            </template>
-            <slot
-              name="sidebar-bottom"
-              slot="bottom"/>
+          <Sidebar :items="sidebarItems" @toggle-sidebar="toggleSidebar">
+            <PersonalInfo slot="top" />
+            <slot name="sidebar-bottom" slot="bottom"/>
           </Sidebar>
 
           <Password v-if="!isHasPageKey" :isPage="true"></Password>
-          <div v-else>
-            <slot></slot>
-          </div>
+          <slot v-else></slot>
         </div>
       </transition>
     </div>
@@ -72,16 +48,14 @@
 </template>
 
 <script>
+import { defineComponent, computed, ref, onMounted } from '@vue/composition-api'
 import Navbar from '@theme/components/Navbar'
 import Sidebar from '@theme/components/Sidebar'
 import PersonalInfo from '@theme/components/PersonalInfo'
 import Password from '@theme/components/Password'
 import { setTimeout } from 'timers'
-import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
-export default {
-  mixins: [moduleTransitonMixin],
-
+export default defineComponent({
   components: { Sidebar, Navbar, Password, PersonalInfo },
 
   props: {
@@ -92,26 +66,28 @@ export default {
     sidebarItems: {
       type: Array,
       default: () => []
-    }
-  },
-
-  data () {
-    return {
-      isSidebarOpen: false,
-      isHasKey: true,
-      isHasPageKey: true,
-      firstLoad: true
-    }
-  },
-
-  computed: {
-    absoluteEncryption () {
-      return this.$themeConfig.keyPage && this.$themeConfig.keyPage.absoluteEncryption === true
     },
+    recoShowModule: {
+      type: Boolean,
+      default: false
+    }
+  },
 
-    shouldShowNavbar () {
-      const { themeConfig } = this.$site
-      const { frontmatter } = this.$page
+  setup (props, ctx) {
+    const { root } = ctx
+
+    const isSidebarOpen = ref(false)
+    const isHasKey = ref(true)
+    const isHasPageKey = ref(true)
+    const firstLoad = ref(true)
+
+    const shouldShowSidebar = computed(() => props.sidebarItems.length > 0)
+    const absoluteEncryption = computed(() => {
+      return root.$themeConfig.keyPage && root.$themeConfig.keyPage.absoluteEncryption === true
+    })
+    const shouldShowNavbar = computed(() => {
+      const { themeConfig } = root.$site
+      const { frontmatter } = root.$page
 
       if (
         frontmatter.navbar === false ||
@@ -119,95 +95,71 @@ export default {
       ) return false
 
       return (
-        this.$title ||
+        root.$title ||
         themeConfig.logo ||
         themeConfig.repo ||
         themeConfig.nav ||
-        this.$themeLocaleConfig.nav
+        root.$themeLocaleConfig.nav
       )
-    },
-
-    shouldShowSidebar () {
-      return this.sidebarItems.length > 0
-    },
-
-    pageClasses () {
-      const userPageClass = this.$frontmatter.pageClass
-      return [
-        {
-          'no-navbar': !this.shouldShowNavbar,
-          'sidebar-open': this.isSidebarOpen,
-          'no-sidebar': !this.shouldShowSidebar
+    })
+    const pageClasses = computed(() => {
+      const userPageClass = root.$frontmatter.pageClass
+      return {
+        ...{
+          'no-navbar': !shouldShowNavbar.value,
+          'sidebar-open': isSidebarOpen.value,
+          'no-sidebar': !shouldShowSidebar.value
         },
-        userPageClass
-      ]
-    }
-  },
-
-  mounted () {
-    this.$router.afterEach(() => {
-      this.isSidebarOpen = false
+        ...userPageClass
+      }
     })
 
-    this.hasKey()
-    this.hasPageKey()
-    this.handleLoading()
-  },
-
-  methods: {
-    hasKey () {
-      const keyPage = this.$themeConfig.keyPage
+    const hasKey = () => {
+      const { keyPage } = root.$themeConfig
       if (!keyPage || !keyPage.keys || keyPage.keys.length === 0) {
-        this.isHasKey = true
+        isHasKey.value = true
         return
       }
 
       let { keys } = keyPage
       keys = keys.map(item => item.toLowerCase())
-      this.isHasKey = keys && keys.indexOf(sessionStorage.getItem('key')) > -1
-    },
-    hasPageKey () {
-      let pageKeys = this.$frontmatter.keys
+      isHasKey.value = keys && keys.indexOf(sessionStorage.getItem('key')) > -1
+    }
+    const initRouterHandler = () => {
+      root.$router.afterEach(() => {
+        isSidebarOpen.value = false
+      })
+    }
+    const hasPageKey = () => {
+      let pageKeys = root.$frontmatter.keys
       if (!pageKeys || pageKeys.length === 0) {
-        this.isHasPageKey = true
+        isHasPageKey.value = true
         return
       }
 
       pageKeys = pageKeys.map(item => item.toLowerCase())
 
-      this.isHasPageKey = pageKeys.indexOf(sessionStorage.getItem(`pageKey${window.location.pathname}`)) > -1
-    },
-    toggleSidebar (to) {
-      this.isSidebarOpen = typeof to === 'boolean' ? to : !this.isSidebarOpen
-    },
-
-    // side swipe
-    onTouchStart (e) {
-      this.touchStart = {
-        x: e.changedTouches[0].clientX,
-        y: e.changedTouches[0].clientY
-      }
-    },
-
-    onTouchEnd (e) {
-      const dx = e.changedTouches[0].clientX - this.touchStart.x
-      const dy = e.changedTouches[0].clientY - this.touchStart.y
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-        if (dx > 0 && this.touchStart.x <= 80) {
-          this.toggleSidebar(true)
-        } else {
-          this.toggleSidebar(false)
-        }
-      }
-    },
-
-    handleLoading () {
-      const time = this.$frontmatter.home && sessionStorage.getItem('firstLoad') == undefined ? 1000 : 0
+      isHasPageKey.value = pageKeys.indexOf(sessionStorage.getItem(`pageKey${window.location.pathname}`)) > -1
+    }
+    const toggleSidebar = (to) => {
+      isSidebarOpen.value = typeof to === 'boolean' ? to : !isSidebarOpen.value
+    }
+    const handleLoading = () => {
+      const time = root.$frontmatter.home && sessionStorage.getItem('firstLoad') == undefined ? 1000 : 0
       setTimeout(() => {
-        this.firstLoad = false
+        firstLoad.value = false
         if (sessionStorage.getItem('firstLoad') == undefined) sessionStorage.setItem('firstLoad', false)
       }, time)
     }
+
+    onMounted(() => {
+      initRouterHandler()
+      hasKey()
+      hasPageKey()
+      handleLoading()
+    })
+
+    return { isSidebarOpen, absoluteEncryption, shouldShowNavbar, shouldShowSidebar, pageClasses, hasKey, hasPageKey, isHasKey, isHasPageKey, toggleSidebar, firstLoad }
   },
 
   watch: {
@@ -216,7 +168,7 @@ export default {
       this.hasPageKey()
     }
   }
-}
+})
 </script>
 
 <style lang="stylus" scoped>
@@ -249,7 +201,7 @@ export default {
     overflow hidden
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
+  transition: opacity .5s ease-in-out .5s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;

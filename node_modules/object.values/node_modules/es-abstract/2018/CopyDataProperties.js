@@ -1,5 +1,9 @@
 'use strict';
 
+var GetIntrinsic = require('../GetIntrinsic');
+
+var $TypeError = GetIntrinsic('%TypeError%');
+
 var callBound = require('../helpers/callBound');
 var forEach = require('../helpers/forEach');
 var OwnPropertyKeys = require('../helpers/OwnPropertyKeys');
@@ -20,15 +24,15 @@ var Type = require('./Type');
 
 module.exports = function CopyDataProperties(target, source, excludedItems) {
 	if (Type(target) !== 'Object') {
-		throw new TypeError('Assertion failed: "target" must be an Object');
+		throw new $TypeError('Assertion failed: "target" must be an Object');
 	}
 
 	if (!IsArray(excludedItems)) {
-		throw new TypeError('Assertion failed: "excludedItems" must be a List of Property Keys');
+		throw new $TypeError('Assertion failed: "excludedItems" must be a List of Property Keys');
 	}
 	for (var i = 0; i < excludedItems.length; i += 1) {
 		if (!IsPropertyKey(excludedItems[i])) {
-			throw new TypeError('Assertion failed: "excludedItems" must be a List of Property Keys');
+			throw new $TypeError('Assertion failed: "excludedItems" must be a List of Property Keys');
 		}
 	}
 

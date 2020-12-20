@@ -16,6 +16,7 @@
 			"markup",
 			"csharp"
 		],
+		"birb": "clike",
 		"bison": "c",
 		"c": "clike",
 		"csharp": "clike",
@@ -76,6 +77,7 @@
 		"lilypond": "scheme",
 		"markdown": "markup",
 		"markup-templating": "markup",
+		"mongodb": "javascript",
 		"n4js": "javascript",
 		"nginx": "clike",
 		"objectivec": "c",
@@ -98,6 +100,7 @@
 			"javascript"
 		],
 		"purebasic": "clike",
+		"purescript": "haskell",
 		"qml": "javascript",
 		"qore": "clike",
 		"racket": "scheme",
@@ -160,6 +163,7 @@
 		"shell": "bash",
 		"shortcode": "bbcode",
 		"rbnf": "bnf",
+		"oscript": "bsl",
 		"cs": "csharp",
 		"dotnet": "csharp",
 		"coffee": "coffeescript",
@@ -187,6 +191,7 @@
 		"md": "markdown",
 		"moon": "moonscript",
 		"n4jsd": "n4js",
+		"nani": "naniscript",
 		"objc": "objectivec",
 		"objectpascal": "pascal",
 		"px": "pcaxis",
@@ -194,17 +199,22 @@
 		"pq": "powerquery",
 		"mscript": "powerquery",
 		"pbfasm": "purebasic",
+		"purs": "purescript",
 		"py": "python",
 		"rkt": "racket",
 		"rpy": "renpy",
 		"robot": "robotframework",
 		"rb": "ruby",
+		"sh-session": "shell-session",
+		"shellsession": "shell-session",
+		"smlnj": "sml",
 		"sol": "solidity",
 		"sln": "solution-file",
 		"rq": "sparql",
 		"t4": "t4-cs",
 		"trig": "turtle",
 		"ts": "typescript",
+		"tsconfig": "typoscript",
 		"uscript": "unrealscript",
 		"uc": "unrealscript",
 		"vb": "visual-basic",
@@ -227,8 +237,8 @@
 
 	var script = Prism.util.currentScript();
 	if (script) {
-		var autoloaderFile = /\bplugins\/autoloader\/prism-autoloader\.(?:min\.)js(?:\?[^\r\n/]*)?$/i;
-		var prismFile = /(^|\/)[\w-]+\.(?:min\.)js(?:\?[^\r\n/]*)?$/i;
+		var autoloaderFile = /\bplugins\/autoloader\/prism-autoloader\.(?:min\.)?js(?:\?[^\r\n/]*)?$/i;
+		var prismFile = /(^|\/)[\w-]+\.(?:min\.)?js(?:\?[^\r\n/]*)?$/i;
 
 		var autoloaderPath = script.getAttribute('data-autoloader-path');
 		if (autoloaderPath != null) {

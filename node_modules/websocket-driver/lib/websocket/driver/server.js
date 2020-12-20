@@ -14,7 +14,7 @@ var Server = function(options) {
 util.inherits(Server, Base);
 
 var instance = {
-  EVENTS: ['open', 'message', 'error', 'close'],
+  EVENTS: ['open', 'message', 'error', 'close', 'ping', 'pong'],
 
   _bindEventListeners: function() {
     this.messages.on('error', function() {});
@@ -95,11 +95,15 @@ Server.http = function(request, options) {
   if (options.requireMasking === undefined) options.requireMasking = true;
 
   var headers = request.headers,
+      version = headers['sec-websocket-version'],
+      key     = headers['sec-websocket-key'],
+      key1    = headers['sec-websocket-key1'],
+      key2    = headers['sec-websocket-key2'],
       url     = this.determineUrl(request);
 
-  if (headers['sec-websocket-version'])
+  if (version || key)
     return new Hybi(request, url, options);
-  else if (headers['sec-websocket-key1'])
+  else if (key1 || key2)
     return new Draft76(request, url, options);
   else
     return new Draft75(request, url, options);

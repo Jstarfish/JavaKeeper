@@ -94,6 +94,7 @@ module.exports = {
         },
       },
     ],
+    ['@vuepress/last-updated']
 	]
 }
 

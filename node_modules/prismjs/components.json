@@ -73,6 +73,7 @@
 			"title": "JavaScript",
 			"require": "clike",
 			"modify": "markup",
+			"optional": "regex",
 			"alias": "js",
 			"option": "default"
 		},
@@ -126,7 +127,7 @@
 		"arduino": {
 			"title": "Arduino",
 			"require": "cpp",
-			"owner": "eisbehr-"
+			"owner": "dkern"
 		},
 		"arff": {
 			"title": "ARFF",
@@ -178,6 +179,11 @@
 			},
 			"owner": "RunDevelopment"
 		},
+		"birb": {
+			"title": "Birb",
+			"require": "clike",
+			"owner": "Calamity210"
+		},
 		"bison": {
 			"title": "Bison",
 			"require": "c",
@@ -202,6 +208,14 @@
 		"bro": {
 			"title": "Bro",
 			"owner": "wayward710"
+		},
+		"bsl": {
+			"title": "BSL (1C:Enterprise)",
+			"alias": "oscript",
+			"aliasTitles": {
+				"oscript": "OneScript"
+			},
+			"owner": "Diversus23"
 		},
 		"c": {
 			"title": "C",
@@ -704,6 +718,11 @@
 			"title": "Mizar",
 			"owner": "Golmote"
 		},
+		"mongodb": {
+			"title": "MongoDB",
+			"owner": "airs0urce",
+			"require": "javascript"
+		},
 		"monkey": {
 			"title": "Monkey",
 			"owner": "Golmote"
@@ -727,6 +746,11 @@
 		"nand2tetris-hdl": {
 			"title": "Nand To Tetris HDL",
 			"owner": "stephanmax"
+		},
+		"naniscript": {
+			"title": "Naninovel Script",
+			"owner": "Elringus",
+			"alias": "nani"
 		},
 		"nasm": {
 			"title": "NASM",
@@ -895,6 +919,12 @@
 			"alias": "pbfasm",
 			"owner": "HeX0R101"
 		},
+		"purescript": {
+			"title": "PureScript",
+			"require": "haskell",
+			"alias": "purs",
+			"owner": "sriharshachilakapati"
+		},
 		"python": {
 			"title": "Python",
 			"alias": "py",
@@ -945,14 +975,6 @@
 		},
 		"regex": {
 			"title": "Regex",
-			"modify": [
-				"actionscript",
-				"coffeescript",
-				"flow",
-				"javascript",
-				"typescript",
-				"vala"
-			],
 			"owner": "RunDevelopment"
 		},
 		"renpy": {
@@ -1015,6 +1037,7 @@
 		"shell-session": {
 			"title": "Shell session",
 			"require": "bash",
+			"alias": ["sh-session", "shellsession"],
 			"owner": "RunDevelopment"
 		},
 		"smali": {
@@ -1029,6 +1052,14 @@
 			"title": "Smarty",
 			"require": "markup-templating",
 			"owner": "Golmote"
+		},
+		"sml": {
+			"title": "SML",
+			"alias": "smlnj",
+			"aliasTitles": {
+				"smlnj": "SML/NJ"
+			},
+			"owner": "RunDevelopment"
 		},
 		"solidity": {
 			"title": "Solidity (Ethereum)",
@@ -1064,6 +1095,10 @@
 		"sql": {
 			"title": "SQL",
 			"owner": "multipetros"
+		},
+		"stan": {
+			"title": "Stan",
+			"owner": "RunDevelopment"
 		},
 		"iecst": {
 			"title": "Structured Text (IEC 61131-3)",
@@ -1137,6 +1172,14 @@
 			"alias": "ts",
 			"owner": "vkbansal"
 		},
+		"typoscript": {
+			"title": "TypoScript",
+			"alias": "tsconfig",
+			"aliasTitles": {
+				"tsconfig": "TSConfig"
+			},
+			"owner": "dkern"
+		},
 		"unrealscript": {
 			"title": "UnrealScript",
 			"alias": ["uscript", "uc"],
@@ -1145,6 +1188,7 @@
 		"vala": {
 			"title": "Vala",
 			"require": "clike",
+			"optional": "regex",
 			"owner": "TemplarVolk"
 		},
 		"vbnet": {

@@ -35,7 +35,9 @@ var locale = {
     yy: '%d anys'
   },
   ordinal: function ordinal(n) {
-    return n + "\xBA";
+    var ord;
+    if (n === 1 || n === 3) ord = 'r';else if (n === 2) ord = 'n';else if (n === 4) ord = 't';else ord = 'è';
+    return "" + n + ord;
   }
 };
 dayjs.locale(locale, null, true);

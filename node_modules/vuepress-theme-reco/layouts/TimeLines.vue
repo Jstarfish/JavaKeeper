@@ -24,7 +24,7 @@
 
 <script>
 import Common from '@theme/components/Common'
-import ModuleTransition from '@theme/components/ModuleTransition'
+import { ModuleTransition } from '@vuepress-reco/core/lib/components'
 import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
 
 export default {

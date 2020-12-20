@@ -61,8 +61,6 @@ export default {
 </script>
 
 <style lang="stylus">
-@require '../../styles/mode.styl'
-
 .mode-options
   background-color var(--background-color)
   min-width: 125px;

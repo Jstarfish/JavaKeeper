@@ -1,18 +1,18 @@
 <template>
   <main class="page" :style="pageStyle">
     <ModuleTransition>
-      <div v-show="recoShowModule && $page.title" class="page-title">
+      <div v-if="recoShowModule && $page.title" class="page-title">
         <h1 class="title">{{$page.title}}</h1>
         <PageInfo :pageInfo="$page" :showAccessNumber="showAccessNumber"></PageInfo>
       </div>
     </ModuleTransition>
 
     <ModuleTransition delay="0.08">
-      <Content v-show="recoShowModule" class="theme-reco-content" />
+      <Content v-if="recoShowModule" class="theme-reco-content" />
     </ModuleTransition>
 
     <ModuleTransition delay="0.16">
-      <footer v-show="recoShowModule" class="page-edit">
+      <footer v-if="recoShowModule" class="page-edit">
         <div
           class="edit-link"
           v-if="editLink"
@@ -81,12 +81,10 @@
 <script>
 import PageInfo from '@theme/components/PageInfo'
 import { resolvePage, outboundRE, endingSlashRE } from '@theme/helpers/utils'
-import ModuleTransition from '@theme/components/ModuleTransition'
-import moduleTransitonMixin from '@theme/mixins/moduleTransiton'
+import { ModuleTransition } from '@vuepress-reco/core/lib/components'
 import SubSidebar from '@theme/components/SubSidebar'
 
 export default {
-  mixins: [moduleTransitonMixin],
   components: { PageInfo, ModuleTransition, SubSidebar },
 
   props: ['sidebarItems'],
@@ -98,6 +96,9 @@ export default {
   },
 
   computed: {
+    recoShowModule () {
+      return this.$parent.recoShowModule
+    },
     // 是否显示评论
     shouldShowComments () {
       const { isShowComments } = this.$frontmatter
@@ -117,7 +118,7 @@ export default {
       return false
     },
     lastUpdated () {
-      return this.$page.lastUpdated
+      return new Date(this.$page.lastUpdated).toLocaleString()
     },
     lastUpdatedText () {
       if (typeof this.$themeLocaleConfig.lastUpdated === 'string') {
@@ -260,6 +261,17 @@ function flatten (items, res) {
     margin: 0 auto;
     padding: 1rem 2.5rem;
     color var(--text-color)
+  .theme-reco-content h2
+    position relative
+    padding-left 0.8rem
+    &::before
+      position absolute
+      left 0
+      bottom 0
+      display block
+      height 1.8rem
+      content ''
+      border-left 5px solid $accentColor
   .page-edit
     @extend $wrapper
     padding-top 1rem

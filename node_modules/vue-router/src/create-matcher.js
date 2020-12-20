@@ -7,6 +7,7 @@ import { createRoute } from './util/route'
 import { fillParams } from './util/params'
 import { createRouteMap } from './create-route-map'
 import { normalizeLocation } from './util/location'
+import { decode } from './util/query'
 
 export type Matcher = {
   match: (raw: RawLocation, current?: Route, redirectedFrom?: Location) => Route;
@@ -185,10 +186,9 @@ function matchRoute (
 
   for (let i = 1, len = m.length; i < len; ++i) {
     const key = regex.keys[i - 1]
-    const val = typeof m[i] === 'string' ? decodeURIComponent(m[i]) : m[i]
     if (key) {
       // Fix #1994: using * with props: true generates a param named 0
-      params[key.name || 'pathMatch'] = val
+      params[key.name || 'pathMatch'] = typeof m[i] === 'string' ? decode(m[i]) : m[i]
     }
   }
 

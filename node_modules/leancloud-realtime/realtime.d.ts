@@ -566,16 +566,12 @@ declare interface PatchReason {
   detail?: string;
 }
 
-export type MessageDecorator<T extends AVMessage> = (
-  target: MessageConstructor<T>
-) => MessageConstructor<T>;
+export type TypedMessageDecorator = (
+  target: typeof TypedMessage
+) => typeof TypedMessage;
 
-export function messageType<T extends AVMessage>(
-  type: number
-): MessageDecorator<T>;
-export function messageField<T extends AVMessage>(
-  fields: string[]
-): MessageDecorator<T>;
+export function messageType(type: number): TypedMessageDecorator;
+export function messageField(fields: string[]): TypedMessageDecorator;
 export function IE10Compatible<T extends AVMessage>(
   target: MessageConstructor<T>
 ): MessageConstructor<T>;

@@ -143,8 +143,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@require '../styles/mode.styl'
-
 .friend-link-wrapper
   position relative
   margin 30px 0

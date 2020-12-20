@@ -8,16 +8,15 @@
 </template>
 
 <script>
+import { defineComponent } from '@vue/composition-api'
 import SidebarLinks from '@theme/components/SidebarLinks'
 import NavLinks from '@theme/components/NavLinks'
 
-export default {
+export default defineComponent({
   name: 'Sidebar',
-
   components: { SidebarLinks, NavLinks },
-
   props: ['items']
-}
+})
 </script>
 
 <style lang="stylus">

@@ -1,3 +1,7 @@
+# 7.0.5
+
+- Fixed: reduction
+
 # 7.0.4
 
 - Fixed: strips away important factors from multiplications in calc() ([#107](https://github.com/postcss/postcss-calc/issues/107))

@@ -5,28 +5,33 @@ export interface PlatformInfo {
   userAgent?: string;
 }
 
+export type HTTPMethod =
+  | "OPTIONS"
+  | "GET"
+  | "HEAD"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "TRACE"
+  | "CONNECT";
 export interface ProgressEvent {
   loaded: number;
   percent?: number;
   total?: number;
 }
-export interface UploadOptions {
+export interface AbortSignal {
+  readonly aborted: boolean;
+  onabort: () => any;
+  addEventListener: (type: string, listener: () => any) => any;
+}
+export interface RequestOptions {
+  method?: HTTPMethod;
   headers?: Record<string, string>;
   data?: Record<string, string>;
   onprogress?: (event: ProgressEvent) => void;
+  signal?: AbortSignal;
 }
-interface RequestOptions extends UploadOptions {
-  method?:
-    | "OPTIONS"
-    | "GET"
-    | "HEAD"
-    | "POST"
-    | "PUT"
-    | "DELETE"
-    | "TRACE"
-    | "CONNECT";
-}
-interface Response {
+export interface Response {
   status?: number;
   ok?: boolean;
   headers?: object;
@@ -54,7 +59,7 @@ export declare type AsyncStorage = {
 };
 export declare type Storage = SyncStorage | AsyncStorage;
 
-interface WebSocket {
+export interface WebSocket {
   addEventListener(
     event: string,
     handler: (...args: any[]) => any,
@@ -83,7 +88,7 @@ export interface Adapters {
   upload: (
     url: string,
     file: FormDataPart,
-    options?: UploadOptions
+    options?: RequestOptions
   ) => Promise<Response>;
   storage: Storage;
   WebSocket: {
