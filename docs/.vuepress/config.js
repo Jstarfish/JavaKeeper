@@ -39,6 +39,7 @@ module.exports = {
       { text: '数据存储与缓存', link: '/data-store/', icon: 'icon-ic_datastores'},
       { text: '开发框架', link: '/framework/', icon: 'icon-framework1' },
       { text: '分布式架构', link: '/distribution/', icon: 'icon-distributed' },
+      { text: '网络编程', link: '/network/' , icon: 'icon-network'},
       { text: '直击面试', link: '/interview/', icon: 'icon-interview' },
     ],
     sidebar: {
@@ -48,6 +49,7 @@ module.exports = {
         "/data-store/": genDataStoreSidebar(),
         "/framework/": genFrameworkSidebar(),
         "/distribution/": genDistributionSidebar(),
+        "/network/": genNetworkSidebar(),
         "/interview/": genInterviewSidebar(),
     },
     blogConfig: {
@@ -131,6 +133,13 @@ function genJavaSidebar() {
         "JUC/Thread-Pool",
         "JUC/Locks",
         "JUC/多个线程顺序执行问题",
+      ]
+    },
+        {
+      title: "Other",
+      collapsable: true,
+      children: [
+        "other/Git-Specification"
       ]
     }
   ];
@@ -269,6 +278,11 @@ function genDistributionSidebar(){
   ];
 }
 
+function genNetworkSidebar(){
+  return [
+    ['RMI', 'RMI远程调用'],
+  ];
+}
 
 function genInterviewSidebar(){
   return [
