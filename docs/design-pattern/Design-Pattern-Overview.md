@@ -6,7 +6,7 @@
 - 设计模式是软件开发人员的“标准词汇”，学习设计模式是个人技术能力提高的捷径
 - 设计模式包含了面向对象的精髓，“懂了设计模式，你就懂了面向对象分析和设计（OOA/D）的精要”
 
-![img](https://i01piccdn.sogoucdn.com/8c1a368c985c0e5d)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/knowledge.jpeg)
 
 ## 软件设计模式概述
 

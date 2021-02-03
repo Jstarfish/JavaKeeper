@@ -36,7 +36,7 @@ module.exports = {
       { text: 'Java', link: '/java/' , icon: 'icon-java'},
       { text: '数据结构与算法', link: '/data-structure-algorithms/', icon: 'icon-tree' },
       { text: '设计模式', link: '/design-pattern/', icon: 'icon-design' },
-      { text: '数据存储与缓存', link: '/data-store/', icon: 'icon-ic_datastores'},
+      { text: '数据管理', link: '/data-management/', icon: 'icon-ic_datastores'},
       { text: '开发框架', link: '/framework/', icon: 'icon-framework1' },
       { text: '分布式架构', link: '/distribution/', icon: 'icon-distributed' },
       { text: '网络编程', link: '/network/' , icon: 'icon-network'},
@@ -46,7 +46,7 @@ module.exports = {
         "/java/": genJavaSidebar(),
         "/data-structure-algorithms/": genDSASidebar(),
         "/design-pattern/": genDesignPatternSidebar(),
-        "/data-store/": genDataStoreSidebar(),
+        "/data-management/": genDataManagementSidebar(),
         "/framework/": genFrameworkSidebar(),
         "/distribution/": genDistributionSidebar(),
         "/network/": genNetworkSidebar(),
@@ -139,7 +139,7 @@ function genJavaSidebar() {
       title: "Other",
       collapsable: true,
       children: [
-        "other/Git-Specification"
+        "other/Git-Specification",
       ]
     }
   ];
@@ -182,11 +182,11 @@ function genDesignPatternSidebar() {
   ];
 }
 
-function genDataStoreSidebar(){
+function genDataManagementSidebar(){
   return [
     {
       title: "MySQL",
-      collapsable: false,
+      collapsable: true,
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
         ['MySQL/MySQL-Framework', 'MySQL 架构介绍'],
@@ -198,7 +198,7 @@ function genDataStoreSidebar(){
     },
     {
       title: "Redis",
-      collapsable: false,
+      collapsable: true,
       children: [
         ['Redis/ReadRedis', 'Redis 开篇'],
         ['Redis/Redis-Datatype', 'Redis 数据类型'],
@@ -211,6 +211,15 @@ function genDataStoreSidebar(){
         ['Redis/Redis-Cluster', 'Redis 集群'],
         ['Redis/Redis-MQ', 'Redis 消息队列方案'],
       ]
+    },
+    {
+      title: "Big-Data",
+      collapsable: true,
+      children: [
+        ['Big-Data/Hello-BigData', '大数据'],
+        ['Big-Data/Bloom-Filter', '布隆过滤器']
+        
+      ]
     }
   ];
 }
@@ -219,7 +228,7 @@ function genFrameworkSidebar(){
   return [
     {
       title: "Spring",
-      collapsable: false,
+      collapsable: true,
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
         ['Spring/Spring-IOC', 'Spring IOC'],
@@ -231,11 +240,21 @@ function genFrameworkSidebar(){
     },
     {
       title: "Spring Boot",
-      collapsable: false,
+      collapsable: true,
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
-        //['SpringBoot/Hello-SpringBoot', 'Hello-SpringBoot'],
+        ['SpringBoot/Hello-SpringBoot', 'Hello-SpringBoot'],
         // ['SpringBoot/Spring Boot 最流行的 16 条实践解读', 'Spring Boot 最流行的 16 条实践解读'],
+        // ['SpringBoot/@Scheduled', '@Scheduled'],
+      ]
+    },
+    {
+      title: "Quartz",
+      collapsable: true,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['Quartz/Quartz', 'Hello Quartz'],
+        ['Quartz/Quartz-MySQL', 'jobstore 数据库表结构'],
         // ['SpringBoot/@Scheduled', '@Scheduled'],
       ]
     }

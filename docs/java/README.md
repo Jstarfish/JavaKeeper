@@ -22,3 +22,8 @@
 
 
 **Quick Learner, Earnest Curiosity, Self-driven, Get Things Done**
+
+
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/end%20(13).jpg)
+
