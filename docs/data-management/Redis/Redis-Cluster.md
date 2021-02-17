@@ -1,56 +1,36 @@
-> 文章来源：wmyskxz.com
+## 一、Redis 集群是啥
 
-> 我们总说的 Redis 具有高可靠性，是什么意思呢？
->
-> 其实，这里有两层含义：一是数据尽量少丢失，二是服务尽量少中断。AOF 和 RDB 保证了前者，而对于后者，Redis 的做法就是增加副本冗余量，将一份数据同时保存在多个实例上。即使有一个实例出现了故障，需要过一段时间才能恢复，其他实例也可以对外提供服务，不会影响业务使用。
+我们先回顾下前边介绍的几种 Redis 高可用方案：持久化、主从同步和哨兵机制。但这些方案仍有痛点，其中最主要的问题就是存储能力受单机限制，以及没办法实现写操作的负载均衡。
 
-> Redis 单节点存在单点故障问题，为了解决单点问题，一般都需要对 Redis 配置从节点，然后使用哨兵来监听主节点的存活状态，如果主节点挂掉，从节点能继续提供缓存功能
-
-## 一、Redis 集群概述
-
-### Redis 主从复制
-
-到目前为止，我们所学习的 Redis 都是 **单机版** 的，这也就意味着一旦我们所依赖的 Redis 服务宕机了，我们的主流程也会受到一定的影响，这当然是我们不能够接受的。
-
-所以一开始我们的想法是：搞一台备用机。这样我们就可以在一台服务器出现问题的时候切换动态地到另一台去：
-
-![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-c48d255bc0b13672.gif)
-
-幸运的是，两个节点数据的同步我们可以使用 Redis 的 **主从同步** 功能帮助到我们，这样一来，有个备份，心里就踏实多了。
+Redis 集群刚好解决了上述问题，实现了较为完善的高可用方案。
 
 
 
-### Redis 哨兵
+### 1.1 Redis 集群化
 
-后来因为某种神秘力量，Redis 老会在莫名其妙的时间点出问题 *(比如半夜 2 点)*，我总不能 24 小时时刻守在电脑旁边切换节点吧，于是另一个想法又开始了：给所有的节点找一个 **“管家”**，自动帮我监听照顾节点的状态并切换：
+集群，即 Redis Cluster，是 Redis 3.0 开始引入的分布式存储方案。
 
-![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-de8d9ce9e77bf211.gif)
-
-
-
-这大概就是 **Redis 哨兵** *(Sentinel)* 的简单理解啦。什么？管家宕机了怎么办？相较于有大量请求的 Redis 服务来说，管家宕机的概率就要小得多啦.. 如果真的宕机了，我们也可以直接切换成当前可用的节点保证可用..
+集群由多个节点(Node)组成，Redis的数据分布在这些节点中。集群中的节点分为主节点和从节点：只有主节点负责读写请求和集群信息的维护；从节点只进行主节点数据和状态信息的复制。
 
 
 
-### Redis 集群化
+### 1.2 集群的主要作用
 
-好了，通过上面的一些解决方案我们对 Redis 的 **稳定性** 稍微有了一些底气了，但单台节点的计算能力始终有限，所谓人多力量大，如果我们把 **多个节点组合** 成 **一个可用的工作节点**，那就大大增加了 Redis 的 **高可用、可扩展、分布式、容错** 等特性：
+1. **数据分区**： 数据分区 *(或称数据分片)* 是集群最核心的功能。集群将数据分散到多个节点，**一方面** 突破了 Redis 单机内存大小的限制，**存储容量大大增加**；**另一方面** 每个主节点都可以对外提供读服务和写服务，**大大提高了集群的响应能力**。
 
-![img](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-8957aa6d1484c5de.png)
+   Redis 单机内存大小受限问题，例如，如果单机内存太大，`bgsave` 和 `bgrewriteaof` 的 `fork` 操作可能导致主进程阻塞，主从环境下主机切换时可能导致从节点长时间无法提供服务，全量复制阶段主节点的复制缓冲区可能溢出……
 
+2. **高可用**： 集群支持主从复制和主节点的 **自动故障转移** *（与哨兵类似）*，当任一节点发生故障时，集群仍然可以对外提供服务。
 
-
-
-
-## 四、Redis 集群
-
-![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-516eb4a9465451a6.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-framework.png)
 
 上图展示了 **Redis Cluster** 典型的架构图，集群中的每一个 Redis 节点都 **互相两两相连**，客户端任意 **直连** 到集群中的 **任意一台**，就可以对其他 Redis 节点进行 **读写** 的操作。
 
-#### 基本原理
 
-![img](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-f65c71ca6811c634.png)
+
+### 1.3 Redis 集群的基本原理
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-slot.png)
 
 Redis 集群中内置了 `16384` 个哈希槽。当客户端连接到 Redis 集群之后，会同时得到一份关于这个 **集群的配置信息**，当客户端具体对某一个 `key` 值进行操作时，会计算出它的一个 Hash 值，然后把结果对 `16384` **求余数**，这样每个 `key` 都会对应一个编号在 `0-16383` 之间的哈希槽，Redis 会根据节点数量 **大致均等** 的将哈希槽映射到不同的节点。
 
@@ -63,30 +43,19 @@ GET x
 
 `MOVED` 指令第一个参数 `3999` 是 `key` 对应的槽位编号，后面是目标节点地址，`MOVED` 命令前面有一个减号，表示这是一个错误的消息。客户端在收到 `MOVED` 指令后，就立即纠正本地的 **槽位映射表**，那么下一次再访问 `key` 时就能够到正确的地方去获取了。
 
-#### 集群的主要作用
 
-1. **数据分区**： 数据分区 *(或称数据分片)* 是集群最核心的功能。集群将数据分散到多个节点，**一方面** 突破了 Redis 单机内存大小的限制，**存储容量大大增加**；**另一方面** 每个主节点都可以对外提供读服务和写服务，**大大提高了集群的响应能力**。Redis 单机内存大小受限问题，在介绍持久化和主从复制时都有提及，例如，如果单机内存太大，`bgsave` 和 `bgrewriteaof` 的 `fork` 操作可能导致主进程阻塞，主从环境下主机切换时可能导致从节点长时间无法提供服务，全量复制阶段主节点的复制缓冲区可能溢出……
-2. **高可用**： 集群支持主从复制和主节点的 **自动故障转移** *（与哨兵类似）*，当任一节点发生故障时，集群仍然可以对外提供服务。
 
-### 快速体验
+## 二、Hello World
 
-#### 第一步：创建集群节点配置文件
+#### 2.1 创建集群节点配置文件
 
-首先我们找一个地方创建一个名为 `redis-cluster` 的目录：
-
-```bash
-mkdir -p ~/Desktop/redis-cluster
-```
-
-然后按照上面的方法，创建六个配置文件，分别命名为：`redis_7000.conf`/`redis_7001.conf`…..`redis_7005.conf`，然后根据不同的端口号修改对应的端口值就好了：
+创建六个配置文件，分别命名为：`redis_7000.conf`/`redis_7001.conf`…..`redis_7005.conf`，然后根据不同的端口号修改对应的端口值就好了（方便管理可以将这些配置文件放在同一个目录下，我这里放在了 `cluster_config` 目录下）：
 
 ```bash
 # 后台执行
 daemonize yes
 # 端口号
 port 7000
-# 为每一个集群节点指定一个 pid_file
-pidfile ~/Desktop/redis-cluster/redis_7000.pid
 # 启动集群模式
 cluster-enabled yes
 # 每一个集群节点都有一个配置文件，这个文件是不能手动编辑的。确保每一个集群节点的配置文件不通
@@ -97,42 +66,44 @@ cluster-node-timeout 5000
 appendonly yes
 ```
 
-记得把对应上述配置文件中根端口对应的配置都修改掉 *(port/ pidfile/ cluster-config-file)*。
+#### 2.2 启动 Redis 实例
 
-#### 第二步：分别启动 6 个 Redis 实例
+启动刚才配置的 6 个 Redis 实例
 
 ```bash
-redis-server ~/Desktop/redis-cluster/redis_7000.conf
-redis-server ~/Desktop/redis-cluster/redis_7001.conf
-redis-server ~/Desktop/redis-cluster/redis_7002.conf
-redis-server ~/Desktop/redis-cluster/redis_7003.conf
-redis-server ~/Desktop/redis-cluster/redis_7004.conf
-redis-server ~/Desktop/redis-cluster/redis_7005.conf
+redis-server cluster_config/redis_7000.conf
+redis-server cluster_config/redis_7001.conf
+redis-server cluster_config/redis_7002.conf
+redis-server cluster_config/redis_7003.conf
+redis-server cluster_config/redis_7004.conf
+redis-server cluster_config/redis_7005.conf 
 ```
 
 然后执行 `ps -ef | grep redis` 查看是否启动成功：
 
-![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-452c3152054c36f1.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluseter-ps.png)
 
 可以看到 `6` 个 Redis 节点都以集群的方式成功启动了，**但是现在每个节点还处于独立的状态**，也就是说它们每一个都各自成了一个集群，还没有互相联系起来，我们需要手动地把他们之间建立起联系。
 
-#### 第三步：建立集群
+#### 2.3 建立集群
 
-执行下列命令：
+创建集群，其实就是节点执行下列命令（Redis 5 之后的方式）：
 
 ```bash
-redis-cli --cluster create --cluster-replicas 1 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
+redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 --cluster-replicas 1
 ```
 
 这里稍微解释一下这个 `--replicas 1` 的意思是：我们希望为集群中的每个主节点创建一个从节点。
 
 观察控制台输出：
 
-![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-d5ab644e76e9cc87.png)
+![](/Users/apple/JavaKeeper/docs/_images/redis/redis-cluster-new.jpg)
 
 看到 `[OK]` 的信息之后，就表示集群已经搭建成功了，可以看到，这里我们正确地创建了三主三从的集群。
 
-#### 第四步：验证集群
+（这里可能会遇到一些坑，槽没有被完全覆盖，或者 node 不为空这种错误）
+
+#### 2.4 验证集群
 
 我们先使用 `redic-cli` 任意连接一个节点：
 
@@ -141,62 +112,46 @@ redis-cli -c -h 127.0.0.1 -p 7000
 127.0.0.1:7000>
 ```
 
-`-c`表示集群模式；`-h` 指定 ip 地址；`-p` 指定端口。
+`-c` 表示集群模式；`-h` 指定 ip 地址；`-p` 指定端口。
 
 然后随便 `set` 一些值观察控制台输入：
 
 ```bash
-127.0.0.1:7000> SET name wmyskxz
+127.0.0.1:7000> set name javakeeper
 -> Redirected to slot [5798] located at 127.0.0.1:7001
 OK
-127.0.0.1:7001>
+127.0.0.1:7001> 
 ```
 
 可以看到这里 Redis 自动帮我们进行了 `Redirected` 操作跳转到了 `7001` 这个实例上。
 
 我们再使用 `cluster info` *(查看集群信息)* 和 `cluster nodes` *(查看节点列表)* 来分别看看：*(任意节点输入均可)*
 
-```bash
-127.0.0.1:7001> CLUSTER INFO
-cluster_state:ok
-cluster_slots_assigned:16384
-cluster_slots_ok:16384
-cluster_slots_pfail:0
-cluster_slots_fail:0
-cluster_known_nodes:6
-cluster_size:3
-cluster_current_epoch:6
-cluster_my_epoch:2
-cluster_stats_messages_ping_sent:1365
-cluster_stats_messages_pong_sent:1358
-cluster_stats_messages_meet_sent:4
-cluster_stats_messages_sent:2727
-cluster_stats_messages_ping_received:1357
-cluster_stats_messages_pong_received:1369
-cluster_stats_messages_meet_received:1
-cluster_stats_messages_received:2727
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/cluster-info.png)
 
-127.0.0.1:7001> CLUSTER NODES
-56a04742f36c6e84968cae871cd438935081e86f 127.0.0.1:7003@17003 slave 4ec8c022e9d546c9b51deb9d85f6cf867bf73db6 0 1584428884000 4 connected
-4ec8c022e9d546c9b51deb9d85f6cf867bf73db6 127.0.0.1:7000@17000 master - 0 1584428884000 1 connected 0-5460
-e2539c4398b8258d3f9ffa714bd778da107cb2cd 127.0.0.1:7005@17005 slave a3406db9ae7144d17eb7df5bffe8b70bb5dd06b8 0 1584428885222 6 connected
-d31cd1f423ab1e1849cac01ae927e4b6950f55d9 127.0.0.1:7004@17004 slave 236cefaa9cdc295bc60a5bd1aed6a7152d4f384d 0 1584428884209 5 connected
-236cefaa9cdc295bc60a5bd1aed6a7152d4f384d 127.0.0.1:7001@17001 myself,master - 0 1584428882000 2 connected 5461-10922
-a3406db9ae7144d17eb7df5bffe8b70bb5dd06b8 127.0.0.1:7002@17002 master - 0 1584428884000 3 connected 10923-16383
-127.0.0.1:7001>
-```
 
-### 数据分区方案简析
 
-#### 方案一：哈希值 % 节点数
+## 三、深入集群原理
+
+Redis 集群最核心的功能就是数据分区，数据分区之后又伴随着通信机制和数据结构的建设，所以我们从这 3 个方面来一一深入
+
+### 3.1 数据分区方案
+
+数据分区有**顺序分区**、**哈希分区**等，其中哈希分区由于其天然的随机性，使用广泛；集群的分区方案便是哈希分区的一种。
+
+哈希分区的基本思路是：对数据的特征值（如key）进行哈希，然后根据哈希值决定数据落在哪个节点。常见的哈希分区包括：哈希取余分区、一致性哈希分区、带虚拟节点的一致性哈希分区等。
+
+#### 方案一：哈希取余分区
 
 哈希取余分区思路非常简单：计算 `key` 的 hash 值，然后对节点数量进行取余，从而决定数据映射到哪个节点上。
 
 不过该方案最大的问题是，**当新增或删减节点时**，节点数量发生变化，系统中所有的数据都需要 **重新计算映射关系**，引发大规模数据迁移。
 
+这种方式的突出优点是简单性，常用于数据库的分库分表规则，一般采 用预分区的方式，提前根据数据量规划好分区数，比如划分为 512或1024 张表，保证可支撑未来一段时间的数据量，再根据负载情况将表迁移到其他数 据库中。扩容时通常采用翻倍扩容，避免数据映射全部被打乱导致全量迁移 的情况
+
 #### 方案二：一致性哈希分区
 
-一致性哈希算法将 **整个哈希值空间** 组织成一个虚拟的圆环，范围是 0 - $2^{(32-1)}$，对于每一个数据，根据 `key` 计算 hash 值，确定数据在环上的位置，然后从此位置沿顺时针行走，找到的第一台服务器就是其应该映射到的服务器：
+一致性哈希算法将 **整个哈希值空间** 组织成一个虚拟的圆环，范围一般是 0 - $2^{32}$，对于每一个数据，根据 `key` 计算 hash 值，确定数据在环上的位置，然后从此位置沿顺时针行走，找到的第一台服务器就是其应该映射到的服务器：
 
 ![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/Redis%EF%BC%889%EF%BC%89%E2%80%94%E2%80%94%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%BA%E3%80%90%E9%9B%86%E7%BE%A4%E3%80%91%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B/7896890-40e8a2c096c8da92.png)
 
@@ -206,7 +161,7 @@ a3406db9ae7144d17eb7df5bffe8b70bb5dd06b8 127.0.0.1:7002@17002 master - 0 1584428
 
 #### 方案三：带有虚拟节点的一致性哈希分区
 
-该方案在 **一致性哈希分区的基础上**，引入了 **虚拟节点** 的概念。Redis 集群使用的便是该方案，其中的虚拟节点称为 **槽（slot）**。槽是介于数据和实际节点之间的虚拟概念，每个实际节点包含一定数量的槽，每个槽包含哈希值在一定范围内的数据。
+该方案在 **一致性哈希分区的基础上**，引入了 **虚拟节点** 的概念。Redis 集群使用的便是该方案，其中的虚拟节点称为 **槽（slot）**。槽是介于数据和实际节点之间的虚拟概念，每个实际节点包含一定数量的槽，每个槽包含哈希值在一定范围内的数据。槽的范围一般远大于节点数。
 
 在使用了槽的一致性哈希分区中，**槽是数据管理和迁移的基本单位**。槽 **解耦** 了 **数据和实际节点** 之间的关系，增加或删除节点对系统的影响很小。仍以上图为例，系统中有 `4` 个实际节点，假设为其分配 `16` 个槽(0-15)；
 
@@ -214,7 +169,57 @@ a3406db9ae7144d17eb7df5bffe8b70bb5dd06b8 127.0.0.1:7002@17002 master - 0 1584428
 
 如果此时删除 `node2`，只需要将槽 4-7 重新分配即可，例如槽 4-5 分配给 `node1`，槽 6 分配给 `node3`，槽 7 分配给 `node4`；可以看出删除 `node2` 后，数据在其他节点的分布仍然较为均衡。
 
-### 节点通信机制简析
+
+
+Redis 虚拟槽分区的特点:
+
+- 解耦数据和节点之间的关系，简化了节点扩容和收缩难度。 
+
+- 节点自身维护槽的映射关系，不需要客户端或者代理服务维护槽分区元数据。
+
+- 支持节点、槽、键之间的映射查询，用于数据路由、在线伸缩等场 景。
+
+
+
+### 3.2 集群功能限制
+
+Redis 集群相对单机在功能上存在一些限制，需要开发人员提前了解，在使用时做好规避。限制如下:
+
+- key 批量操作支持有限。如 mset、mget，目前只支持具有相同 slot 值的 key 执行批量操作。对于映射为不同 slot 值的 key 由于执行mget、mget 等操作可能存在于多个节点上因此不被支持。
+
+  (为此，Redis 引入 HashTag 的概念，使得数据分布算法可以根据 key 的某一部分进行计算，让相关的两条记录落到同一个数据分片，**当一个key包含 {} 的时候，就不对整个key做hash，而仅对 {} 包括的字符串做hash。**)
+
+  ```bash
+  127.0.0.1:7000> mset javaframework Spring cframework Libevent
+  (error) CROSSSLOT Keys in request don't hash to the same slot
+  127.0.0.1:7000> mset java{framework} Spring c{framework} Libevent
+  -> Redirected to slot [10840] located at 127.0.0.1:7001
+  OK
+  127.0.0.1:7001> mget java{framework} c{framework}
+  1) "Spring"
+  2) "Libevent"
+  127.0.0.1:7001> 
+  ```
+
+- key 事务操作支持有限。同理只支持多 key 在同一节点上的事务操作，当多个 key 分布在不同的节点上时无法使用事务功能。
+
+- key 作为数据分区的最小粒度，因此不能将一个大的键值对象如 hash、list 等映射到不同的节点。
+
+- 不支持多数据库空间。单机下的 Redis 可以支持 16 个数据库，集群模式下只能使用一个数据库空间，即 db0。
+
+- 复制结构只支持一层，从节点只能复制主节点，不支持嵌套树状复制结构。
+
+
+
+### 3.3 节点通信
+
+在分布式存储中需要提供维护节点元数据信息的机制，所谓元数据是指：节点负责哪些数据，是否出现故障等状态信息。
+
+常见的元数据维护方式分为：集中式和 P2P 方式。
+
+Redis 集群采用 P2P 的 Gossip(流言)协议， Gossip 协议工作原理就是节点彼此不断通信交换信息，一段时间后所有的节点都会知道集群完整的信息，这种方式类似流言传播
+
+
 
 集群的建立离不开节点之间的通信，例如我们上面在 *快速体验* 中刚启动六个集群节点之后通过 `redis-cli` 命令帮助我们搭建起来了集群，实际上背后每个集群之间的两两连接是通过了 `CLUSTER MEET  ` 命令发送 `MEET` 消息完成的，下面我们展开详细说说。
 
@@ -307,8 +312,7 @@ typedef struct clusterState {
 
 
 
-## 参考与来源
+## 参考
 
-1. [Redis(9)——史上最强【集群】入门实践教程](https://www.wmyskxz.com/2020/03/17/redis-9-shi-shang-zui-qiang-ji-qun-ru-men-shi-jian-jiao-cheng/)
-2. [深入学习Redis（3）：主从复制](https://www.cnblogs.com/kismetv/p/9236731.html)
-3. 
+1. https://redis.io/topics/cluster-tutorial
+2. https://www.cnblogs.com/kismetv/p/9853040.html
