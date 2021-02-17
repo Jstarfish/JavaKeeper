@@ -1,0 +1,38 @@
+{
+  "name": "vuepress-theme-reco",
+  "version": "1.6.1",
+  "description": "A simple and beautiful vuepress Blog & Doc theme.",
+  "keywords": [
+    "vuepress",
+    "vue",
+    "theme"
+  ],
+  "homepage": "https://vuepress-theme-reco.recoluan.com",
+  "bugs": {
+    "url": "https://github.com/vuepress-reco/vuepress-theme-reco/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuepress-reco/vuepress-theme-reco.git"
+  },
+  "license": "MIT",
+  "author": "reco_luan",
+  "main": "index.js",
+  "dependencies": {
+    "@vue/composition-api": "^1.0.0-beta.20",
+    "@vuepress-reco/core": "^1.6.0",
+    "@vuepress-reco/vuepress-plugin-back-to-top": "^1.6.0",
+    "@vuepress-reco/vuepress-plugin-comments": "^1.6.0",
+    "@vuepress-reco/vuepress-plugin-loading-page": "^1.6.0",
+    "@vuepress-reco/vuepress-plugin-pagation": "^1.6.0",
+    "@vuepress/plugin-blog": "1.9.2",
+    "@vuepress/plugin-medium-zoom": "1.5.0",
+    "docsearch.js": "2.6.3",
+    "md5": "2.2.1",
+    "vue-click-outside": "1.1.0",
+    "vuepress-plugin-smooth-scroll": "^0.0.9"
+  },
+  "gitHead": "c3a1db8487bece9341b6269a0f6ebf910cd5462a",
+  "_from": "vuepress-theme-reco@0.2.1",
+  "_resolved": "http://registry.npm.taobao.org/vuepress-theme-reco/download/vuepress-theme-reco-0.2.1.tgz"
+}
