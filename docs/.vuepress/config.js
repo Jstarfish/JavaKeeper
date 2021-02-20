@@ -217,6 +217,7 @@ function genDataManagementSidebar(){
       collapsable: true,
       children: [
         ['Big-Data/Hello-BigData', '大数据'],
+        ['Big-Data/Kylin', 'Kylin'],
         ['Big-Data/Bloom-Filter', '布隆过滤器']
         
       ]
