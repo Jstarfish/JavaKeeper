@@ -36,7 +36,7 @@ Redis 为了平衡空间和时间效率，针对 value 的具体类型在底层�
 
 在下图中，可以看到，哈希桶中的 entry 元素中保存了 `*key` 和  `*value` 指针，分别指向了实际的键和值，这样一来，即使值是一个集合，也可以通过 `*value` 指针被查找到。
 
-![img](https://static001.geekbang.org/resource/image/1c/5f/1cc8eaed5d1ca4e3cdbaa5a3d48dfb5f.jpg)
+![](https://static001.geekbang.org/resource/image/1c/5f/1cc8eaed5d1ca4e3cdbaa5a3d48dfb5f.jpg)
 
 因为这个哈希表保存了所有的键值对，所以，我也把它称为全局哈希表。哈希表的最大好处很明显，就是让我们可以用 $O(1)$ 的时间复杂度来快速查找到键值对——我们只需要计算键的哈希值，就可以知道它所对应的哈希桶位置，然后就可以访问相应的 entry 元素。
 
@@ -386,7 +386,7 @@ public class JedisTest {
 
 [Redis命令中心](http://www.redis.cn/commands.html)
 
-
+[Redis 命令参考](http://redisdoc.com/ )
 
 #### Key（键）常用命令
 

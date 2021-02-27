@@ -135,7 +135,7 @@ function genJavaSidebar() {
         "JUC/多个线程顺序执行问题",
       ]
     },
-        {
+    {
       title: "Other",
       collapsable: true,
       children: [
@@ -257,6 +257,14 @@ function genFrameworkSidebar(){
         ['Quartz/Quartz', 'Hello Quartz'],
         ['Quartz/Quartz-MySQL', 'jobstore 数据库表结构'],
         // ['SpringBoot/@Scheduled', '@Scheduled'],
+      ]
+    },
+     {
+      title: "Logging",
+      collapsable: true,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['logging/Java-Logging', 'Hello Logging']
       ]
     }
   ];
