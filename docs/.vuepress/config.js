@@ -70,7 +70,7 @@ module.exports = {
 	    body: [
 	      {
 	        type: 'title',
-	        content: '<h5>🐳欢迎关注〖JavaKeeper〗🐳 </h5>  <h5>🎉500 + Java开发电子书免费获取🎉</h5> <br>',
+	        content: '<h5>🐳 欢迎关注〖JavaKeeper〗🐳 </h5>  <h5>🎉 500 + Java开发电子书免费获取 🎉</h5> <br>',
 	        style: 'text-aligin: center;width: 100%;'
 	      },
 	      {
@@ -217,9 +217,9 @@ function genDataManagementSidebar(){
       collapsable: true,
       children: [
         ['Big-Data/Hello-BigData', '大数据'],
-        ['Big-Data/Kylin', 'Kylin'],
-        ['Big-Data/Bloom-Filter', '布隆过滤器']
-        
+        ['Big-Data/Hive', 'Hive'],
+        ['Big-Data/Bloom-Filter', '布隆过滤器'],
+        ['Big-Data/Kylin', 'Kylin']
       ]
     }
   ];
