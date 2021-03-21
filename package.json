@@ -12,7 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@vuepress-reco/vuepress-plugin-bulletin-popover": "^1.5.7",
-    "vuepress": "^1.7.1",
+    "vuepress": "^1.8.2",
     "vuepress-plugin-mathjax": "^1.2.8",
     "vuepress-theme-reco": "^1.5.7"
   }
