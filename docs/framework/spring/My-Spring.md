@@ -1,8 +1,6 @@
 # 手写 Spring
 
 ![image-20201106173130849](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201106173132.png)
-
-<<<<<<< HEAD
 配置阶段：主要是完成application.xml配置和Annotation配置。
 
 初始化阶段：主要是加载并解析配置信息，然后，初始化IOC容器，完成容器的DI操作，已经完成HandlerMapping的初始化。
@@ -34,5 +32,3 @@
 
    ⑾ DispatcherServlet响应用户。
 ```
-
->>>>>>> 4e1ddf5a75a905b28c1e7ad17661188dd4f191b0

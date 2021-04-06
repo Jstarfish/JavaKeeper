@@ -12,7 +12,6 @@
 
 - 可以简单的理解为“排好序的快速查找数据结构”，数据本身之外，<font color=#FF0000>**数据库还维护者一个满足特定查找算法的数据结构**</font>，这些数据结构以某种方式引用（指向）数据，这样就可以在这些数据结构上实现高级查找算法。这种数据结构，就是索引。下图是一种可能的索引方式示例。
 
-<<<<<<< HEAD
   ![](https://static01.imgkr.com/temp/5dda88d8f792449eb6ba7206265aab40.png)
 =======
   ![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghphshtu04j30gt08xmxn.jpg)
