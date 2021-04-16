@@ -1,179 +1,232 @@
-# 策略模式——独一无二的对象
+# 策略模式——略施小计就彻底消除了多重 if else
 
-> 面试官：带笔了吧，那写两种单例模式的实现方法吧
+> 最近接手了一个新项目，有段按不同类型走不同检验逻辑的代码，将近小 10 个 `if -else` 判断，真正的“屎山”代码。
 >
-> 沙沙沙刷刷刷~~~ 写好了
+> 所以在项目迭代的时候，就打算重构一下，写设计方案后，刚好再总结总结策略模式。
 >
-> 面试官：你这个是怎么保证线程安全的，那你知道，volatile 关键字? 类加载器？锁机制？？？？
-> 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+> 先贴个阿里的《 Java 开发手册》中的一个规范
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/ali-strategy.png) 
+
+我们先不探讨其他方式，主要讲策略模式。
 
 
 
-![](https://i01piccdn.sogoucdn.com/d4a728c10d74ab67)
+## 定义
 
-单例模式，从我看 《Java 10分钟入门》那天就听过的一个设计模式，还被面试过好几次的设计模式问题，今天一网打尽~~
+**策略模式**：封装可以互换的行为，并使用委托来决定要使用哪一个。
 
-有一些对象我们确实只需要一个，比如，线程池、数据库连接、缓存、日志对象等，如果有多个的话，会造成程序的行为异常，资源使用过量或者不一致的问题。你也许会说，这种我用全局变量不也能实现吗，还整个单例模式，好像你很流弊的样子，如果将对象赋值给一个全局变量，那程序启动就会创建好对象，万一这个对象很耗资源，我们还可能在某些时候用不到，这就造成了资源的浪费，不合理，所以就有了单例模式。
+策略模式是一种**行为设计模式**， 它能让你定义一系列算法， 并将每种算法分别放入独立的类中， 以使算法的对象能够相互替换。
 
-## 单例模式的定义
+> 用人话翻译后就是：运行时我给你这个类的方法传不同的 “key”，你这个方法会执行不同的业务逻辑。
+>
+> 细品一下，这不就是 if else 干的事吗？
 
-**单例模式确保一个类只有一个实例，并提供一个全局唯一访问点**
 
 
-
-## 单例模式的类图
-
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbjeonzilrj309u064t93.jpg)
-
-## 单例模式的实现
-
-### 饿汉式
-
-- static 变量在类装载的时候进行初始化
-- 多个实例的 static 变量会共享同一块内存区域
-
-用这两个知识点写出的单例类就是饿汉式了，初始化类的时候就创建，饥不择食，饿汉
+先直观的看下传统的多重  `if else` 代码
 
 ```java
-public class Singleton {
+public String getCheckResult(String type) {
+  if ("校验1".equals(type)) {
+    return "执行业务逻辑1";
+  } else if ("校验2".equals(type)) {
+    return "执行业务逻辑2";
+  } else if ("校验3".equals(type)) {
+    return "执行业务逻辑3";
+  } else if ("校验4".equals(type)) {
+    return "执行业务逻辑4";
+  } else if ("校验5".equals(type)) {
+    return "执行业务逻辑5";
+  } else if ("校验6".equals(type)) {
+    return "执行业务逻辑6";
+  } else if ("校验7".equals(type)) {
+    return "执行业务逻辑7";
+  } else if ("校验8".equals(type)) {
+    return "执行业务逻辑8";
+  } else if ("校验9".equals(type)) {
+    return "执行业务逻辑9";
+  }
+  return "不在处理的逻辑中返回业务错误";
+}
+```
 
-    //构造私有化，防止直接new
-    private Singleton(){}
+这么看，你要是还觉得挺清晰的话，想象下这些 return 里是各种复杂的业务逻辑方法~~
 
-    //静态初始化器（static initializer）中创建实例，保证线程安全
-    private static Singleton instance = new Singleton();
+![](https://img03.sogoucdn.com/app/a/100520093/e18d20c94006dfe0-0381536966d1161a-7f08208216d08261f99e84e5bf306d20.jpg)
 
-    public static Singleton getInstance(){
-        return instance;
+网上的示例很多，比如不同路线的规划、不同支付方式的选择 都是典型的 if else 问题，也都是典型的策略模式问题，我们先看下策略模式的类图~
+
+
+
+## 类图
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/strategy-pattern.jpg)
+
+策略模式涉及到三个角色：
+
+- **Strategy**：策略接口或者策略抽象类，并且策略执行的接口（Context 使用这个接口来调用具体的策略实现算法）
+- **ConcreateStrategy**：实现策略接口的具体策略类
+- **Context**：上下文类，持有具体策略类的实例，并负责调用相关的算法
+
+
+
+应用策略模式来解决问题的思路
+
+## 实例
+
+先看看最简单的策略模式 demo:
+
+1、策略接口
+
+```java
+public interface Strategy {
+    void operate();
+}
+```
+
+2、具体的算法实现
+
+```java
+public class ConcreteStrategyA implements Strategy {
+    @Override
+    public void operate() {
+        //具体的算法实现
+        System.out.println("执行业务逻辑A");
+    }
+}
+
+public class ConcreteStrategyB implements Strategy {
+    @Override
+    public void operate() {
+        //具体的算法实现
+        System.out.println("执行业务逻辑B");
     }
 }
 ```
 
-饿汉式是线程安全的，JVM在加载类时马上创建唯一的实例对象，且只会装载一次。
-
-Java 实现的单例是一个虚拟机的范围，因为装载类的功能是虚拟机的，所以一个虚拟机通过自己的ClassLoader 装载饿汉式实现单例类的时候就会创建一个类实例。（如果一个虚拟机里有多个ClassLoader的话，就会有多个实例）
-
-### 懒汉式
-
-懒汉式，就是实例在用到的时候才去创建，比较“懒”
-
-单例模式的懒汉式实现方式体现了延迟加载的思想（延迟加载也称懒加载Lazy Load，就是一开始不要加载资源或数据，等到要使用的时候才加载）
-
-#### 同步方法
+3、上下文的实现
 
 ```java
-public class Singleton {
-    private static Singleton singleton;
+public class Context {
 
-    private Singleton(){}
+    //持有一个具体的策略对象
+    private Strategy strategy;
 
-  	//解决了线程不安全问题，但是效率太低了，每个线程想获得类的实例的时候，都需要同步方法，不推荐
-    public static synchronized Singleton getInstance(){
-        if(singleton == null){
-            singleton = new Singleton();
-        }
-        return singleton;
+    //构造方法，传入具体的策略对象
+    public Context(Strategy strategy){
+        this.strategy = strategy;
     }
+
+    public void doSomething(){
+        //调用具体的策略对象进操作
+        strategy.operate();
+    }
+}
+```
+
+4、客户端使用
+
+```java
+public static void main(String[] args) {
+  Context context = new Context(new ConcreteStrategyA());
+  context.doSomething();
 }
 ```
 
 
 
-#### 双重检查加锁
+## 解析策略模式
 
-```java
-public class Singleton {
+策略模式的功能就是把具体的算法实现从具体的业务处理中独立出来，把它们实现成单独的算法类，从而形成一系列算法，并让这些算法可以互相替换。
 
-  	//volatitle关键词确保，多线程正确处理singleton
-    private static volatile Singleton singleton;
-  
-    private Singleton(){}
-  
-    public static Singleton getInstance(){
-        if(singleton ==null){
-            synchronized (Singleton.class){
-                if(singleton == null){
-                    singleton = new Singleton();
-                }
-            }
-        }
-        return singleton;
-    }
-}
-```
-
-Double-Check 概念（进行两次检查）是多线程开发中经常使用的，为什么需要双重检查锁呢？因为第一次检查是确保之前是一个空对象，而非空对象就不需要同步了，空对象的线程然后进入同步代码块，如果不加第二次空对象检查，两个线程同时获取同步代码块，一个线程进入同步代码块，另一个线程就会等待，而这两个线程就会创建两个实例化对象，所以需要在线程进入同步代码块后再次进行空对象检查，才能确保只创建一个实例化对象。
-
-双重检查加锁（double checked locking）线程安全、延迟加载、效率比较高
-
-**volatile**：volatile一般用于多线程的可见性，这里用来防止**指令重排**（防止new Singleton时指令重排序导致其他线程获取到未初始化完的对象）。被volatile 修饰的变量的值，将不会被本地线程缓存，所有对该变量的读写都是直接操作共享内存，从而确保多个线程能正确的处理该变量。
-
-##### 指令重排
-
-指令重排是指在程序执行过程中, 为了性能考虑, 编译器和CPU可能会对指令重新排序。
-
-Java中创建一个对象，往往包含三个过程。对于singleton = new Singleton()，这不是一个原子操作，在 JVM 中包含如下三个过程。
-
-1. 给 singleton 分配内存
-
-2. 调用 Singleton 的构造函数来初始化成员变量，形成实例
-
-3. 将 singleton 对象指向分配的内存空间（执行完这步 singleton才是非 null 了）
-
-但是，由于JVM会进行指令重排序，所以上面的第二步和第三步的顺序是不能保证的，最终的执行顺序可能是 1-2-3，也可能是 1-3-2。如果是 1-3-2，则在 3 执行完毕，2 未执行之前，被另一个线程抢占了，这时 instance 已经是非 null 了（但却没有初始化），所以这个线程会直接返回 instance，然后使用，那肯定就会报错了，所以要加入 volatile关键字。
+> 策略模式的重心不是如何来实现算法，而是如何组织、调用这些算法，从而让程序结构更灵活，具有更好的维护性和扩展性。
 
 
 
-### 静态内部类
+实际上，每个策略算法具体实现的功能，就是原来在 if-else 结构中的具体实现，每个 if-else 语句都是一个平等的功能结构，可以说是兄弟关系。
 
-```java
-public class Singleton {
+策略模式呢，就是把各个平等的具体实现封装到单独的策略实现类了，然后通过上下文与具体的策略类进行交互
 
-    private Singleton(){}
+所以说，策略模式只是在代码结构上的一个调整，
 
-    private static class SingletonInstance{
-        private static final Singleton INSTANCE = new Singleton();
-    }
-  
-    public static Singleton getInstance(){
-        return SingletonInstance.INSTANCE;
-    }
-}
-```
+ 『 **策略模式 = 实现策略接口（或抽象类）的每个策略类 + 上下文的逻辑分派** 』
 
-采用类加载的机制来保证初始化实例时只有一个线程；
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/if-else.jpg)
 
-静态内部类方式在Singleton 类被装载的时候并不会立即实例化，而是在调用getInstance的时候，才去装载内部类SingletonInstance ,从而完成Singleton的实例化
+> 策略模式的本质：分离算法，选择实现  ——《研磨设计模式》
 
-类的静态属性只会在第一次加载类的时候初始化，所以，JVM帮我们保证了线程的安全性，在类初始化时，其他线程无法进入
+即使用了策略模式，你该写的业务逻辑照常写，到逻辑分派的时候，只是变相的 `if-else`。
 
-优点：线程安全，利用静态内部类实现延迟加载，效率较高，推荐使用
-
-### 枚举
-
-```java
-enum Singleton{
-  INSTANCE;
-  public void method(){}
-}
-```
-
-借助JDK5 添加的枚举实现单例，不仅可以避免多线程同步问题，还能防止反序列化重新创建新的对象，但是在枚举中的其他任何方法的线程安全由程序员自己负责。还有防止上面的通过反射机制调用私用构造器。不过，由于Java1.5中才加入enum特性，所以使用的人并不多。
-
-这种方式是《Effective Java》 作者Josh Bloch 提倡的方式。
+而它的优化点是抽象了出了接口，将业务逻辑封装成一个一个的实现类，任意地替换。在复杂场景（业务逻辑较多）时比直接 `if-else` 更好维护和扩展些。
 
 
 
-## 单例模式在JDK 中的源码分析
+### 谁来选择具体的策略算法
 
-JDK 中，`java.lang.Runtime` 就是经典的单例模式（饿汉式）
+如果你手写了上边的 demo，就会发现，这玩意不及 `if-else` 来的顺手，尤其是在判断逻辑的时候，每个逻辑都要要构造一个上下文对象，费劲。
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbig3eaoe8j31al0u0qg5.jpg)
+其实，策略模式中，我们可以自己定义谁来选择具体的策略算法，有两种：
+
+- 客户端：当使用上下文时，由客户端选择，像我们的 demo
+- 上下文：客户端不用选，由上下文选
 
 
 
-## 单例模式注意事项和细节
+### 优缺点
 
-- 单例模式保证了系统内存中该类只存在一个对象，节省了系统资源，对于一些需要频繁创建销毁的对象，使用单例模式可以提高系统性能
-- 当想实例化一个单例类的时候，必须要记住使用相应的获取对象的方法，而不是使 用new
-- 单例模式使用的场景：需要频繁的进行创建和销毁的对象、创建对象时耗时过多或 耗费资源过多(即:重量级对象)，但又经常用到的对象、工具类对象、频繁访问数 据库或文件的对象(比如数据源、session工厂等)
+#### 优点：
+
+- 定义一系列算法：策略模式的功能就是定义一系列算法，实现让这些算法可以相互替换，所以为这一系列算法定义公共的接口，以约束一系列算法要实现的功能。如果这一系列算法具有公共功能，可以把策略接口实现为抽象类，把这些公共功能实现到父类
+- 避免多重条件语句：也就是避免大量的 `if-else`
+- 更好的扩展性（完全符合开闭原则）：策略模式中扩展新的策略实现很容易，无需对上下文修改，只增加新的策略实现类就可以
+
+#### 缺点：
+
+- 客户必须了解每种策略的不同
+- 增加了对象数：每个具体策略都封装成了类，可能备选的策略会很多
+- 只适合扁平的算法结构：
+
+
+
+### 适用场景
+
+> 策略模式的本质：分离算法，选择实现
+
+- 当你想使用对象中各种不同的算法变体， 并希望能在运行时切换算法时，可使用策略模式。
+
+- 当你有许多仅在执行某些行为时略有不同的相似类时（它们之间的区别仅在于它们的行为），使用策略模式可以动态地让一个对象在许多行为中选择一种行为
+
+- 如果算法在上下文的逻辑中不是特别重要， 使用该模式能将类的业务逻辑与其算法实现细节隔离开来。
+
+   策略模式让你能将各种算法的代码、 内部数据和依赖关系与其他代码隔离开来。 不同客户端可通过一个简单接口执行算法， 并能在运行时进行切换。
+
+- **当类中使用了复杂条件运算符以在同一算法的不同变体中切换时，可使用该模式**
+
+  - 策略模式将所有继承自同样接口的算法抽取到独立类中， 因此不再需要条件语句。 原始对象并不实现所有算法的变体， 而是将执行工作委派给其中的一个独立算法对象。
+
+
+
+实际使用中，往往不会只是单一的某个设计模式的套用，一般都会混合使用，而且模式之间的结合也是没有定势的，要具体问题具体分析。
+
+策略模式往往会结合其他模式一起使用，
+
+### 策略模式在 JDK 中的应用
+
+#### 策略模式在 Spring 中的应用
+
+https://mp.weixin.qq.com/s?__biz=MzAxODcyNjEzNQ==&mid=2247487480&idx=2&sn=461a012afd41d4e2466a9024b81b6e39&chksm=9bd0a260aca72b760e429753beb1fa12270c18b5cc6829538ccbfefcc23214fefc0aadd575c8&scene=27#wechat_redirect
+
+
+
+最后：
+
+并不是说，看到if-else 就想着用策略模式去优化，业务逻辑简单，可能几个枚举，或者几个卫语句就搞定的场景，就不用非得硬套设计模式了，杀鸡焉用牛刀，是吧，可以看看参考文章第一篇
+
+
+
+参考与感谢：
+
+- [《用 Map + 函数式接口来实现策略模式》](https://www.cnblogs.com/keeya/p/13187727.html)
+- 《研磨设计模式》
+
