@@ -16,13 +16,13 @@
 
 通俗来讲，集合就是将一组事物组合在一起。你可以将力扣的题库看作一个集合：
 
-![1.png](https://pic.leetcode-cn.com/3561000569d63aeed8957e9e45a63c67991900ca463234a3aa8a9299794bde27-1.png)
+![1.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozoy8b55j30xq047tbg.jpg)
 
  
 
 也可以将力扣商店里的礼品看作一个集合：
 
-![2.png](https://pic.leetcode-cn.com/c26f86483c1cdd909fa3788f32292113fc0876cdd60cbd0bb4692da722ec80e5-2.png)
+![2.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozpjcnmvj31dv0lngxp.jpg)
 
 甚至可以将桌面上的物品当作一个集合。
 
@@ -42,7 +42,7 @@
 
 列表的概念是在集合的特征上形成的，它具有顺序，且长度是可变的。你可以把它看作一张购物清单：
 
-![3.png](https://pic.leetcode-cn.com/6453f8d5b22edca6906f8a26df2c06758102f78939cc497407ac63c5c2e4c1d9-3.png)
+![3.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozqdf70vj30dg0cwmxx.jpg)
 
 在这张清单中：
 
@@ -63,17 +63,13 @@
 
 首先，数组会用一些名为 `索引` 的数字来标识每项数据在数组中的位置，且在大多数编程语言中，索引是从 `0` 算起的。我们可以根据数组中的索引，快速访问数组中的元素。
 
-![4.png](https://pic.leetcode-cn.com/628b6f699aa49ffcc9d3c75806457c4a1a66ffe025bb651d9f8e78b4242249b9-4.png)
+![4.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozrdvktdj30iy06qmx4.jpg)
 
 **而列表中没有索引，这是数组与列表最大的不同点**。
 
 其次，数组中的元素在内存中是连续存储的，且每个元素占用相同大小的内存。
 
- 
-
-![5.png](https://pic.leetcode-cn.com/7b17543e4e39ae894bba0b2b6f8431b40d3df04556df06a3b974146d9e5c7d0d-5.png)
-
- 
+![5.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozrke8wuj30ux0gr409.jpg)
 
 相反，列表中的元素在内存中可能彼此相邻，也可能不相邻。比如列表的另一种实现方式——链表，它的元素在内存中则不一定是连续的。
 
@@ -89,11 +85,11 @@
 
 可以形象地将计算机中的内存看作一系列排列好的格子，这些格子中，每一个格子对应一个内存地址，数据会存储在不同的格子中。
 
-![1.png](https://pic.leetcode-cn.com/401fd00075501cac82e3605f91fa64ead061cfcabf839b2ba5a2eb87cd784b73-1.png)
+![1.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozs98zimj30zk0k0ab5.jpg)
 
 而对于数组，计算机会在内存中申请一段 **连续** 的空间，并且会记下索引为 `0` 处的内存地址。例如对于一个数组 `['oranges', 'apples', 'bananas', 'pears', 'tomatoes']`，为了方便起见，我们假设每个元素只占用一个字节，它的索引与内存地址的关系如下图所示。
 
-![2.png](https://pic.leetcode-cn.com/65312e6dff56fc0c2ffad8752d6ca08da9bb7ec03211619754abd407e05147e8-2.png)
+![2.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozslroucj30zk0akdgn.jpg)
 
 当我们访问数组中索引为 `3` 处的元素时，计算机会进行如下计算：
 
@@ -110,7 +106,7 @@
 
 还是上面的例子，如果我们要查找数组中是否包含元素 `pears`，计算机会从索引 `0` 开始，逐个比较对应的元素，直到找到该元素后停止搜索，或到达数组的末尾后停止。
 
-![3.gif](https://pic.leetcode-cn.com/e592cf43d44a9e8f7a15b85c9fd6679668fc36134b10161bfc430b85491c8b9e-3.gif)
+![3.gif](https://tva1.sinaimg.cn/large/008i3skNly1gqozxdyr51g316o0dce89.gif)
 
 我们发现，该数组的长度为 `5`，最坏情况下（比如我们查找元素 `tomatoes` 或查找数组中不包含的元素），我们需要查询数组中的每个元素，因此时间复杂度为$ O(N)$，*N* 为数组的长度。
 
@@ -122,11 +118,11 @@
 
 如果要将该元素插入到数组的末尾，只需要一步。即计算机通过数组的长度和位置计算出即将插入元素的内存地址，然后将该元素插入到指定位置即可。
 
-![4.gif](https://pic.leetcode-cn.com/c3074c34fd36fd6f8b042421660705e2b376046fe50bc4af9fddc176e19f3eab-4.gif)
+![4.gif](https://tva1.sinaimg.cn/large/008i3skNly1gqozvafsuog30uh0dcu0x.gif)
 
 然而，如果要将该元素插入到数组中的其他位置，则会有所区别，这时我们首先需要为该元素所要插入的位置`腾出` 空间，然后进行插入操作。比如，我们想要在索引 `2` 处插入 `flowers`。
 
-![5.gif](https://pic.leetcode-cn.com/27ee29524a3538e4c1de14953698a66b3e860e6b4984c1f454eb91fa9fbbc2f3-5.gif)
+![5.gif](https://tva1.sinaimg.cn/large/008i3skNly1gqozvjtbgtg30uh0dcu0z.gif)
 
 我们发现，如果需要频繁地对数组元素进行插入操作，会造成时间的浪费。事实上，另一种数据结构，即链表可以有效解决这个问题。
 
@@ -138,7 +134,7 @@
 
 以删除索引 `1` 中的元素 `apples` 为例，具体过程如图所示。
 
-![6.gif](https://pic.leetcode-cn.com/20e80a7fd6d2d34ec8d59dffe1da115c76dd1c06a9a2959a03d3261a1eab67a4-6.gif)
+![6.gif](https://tva1.sinaimg.cn/large/008i3skNly1gqozvs74g7g30uh0dcu0x.gif)
 
 同样地，数组的长度为 `5`，最坏情况下，我们删除第一个元素，后面的 `4` 个元素需要向前移动，加上删除操作，共需执行 `5` 步，因此时间复杂度为 $O(N)$，*N* 为数组的长度。
 
@@ -150,7 +146,7 @@
 
 二维数组是一种结构较为特殊的数组，只是将数组中的每个元素变成了一维数组。
 
-![1.png](https://pic.leetcode-cn.com/e64116dc9c9c8f9f8ad2a5c251c0e76a677ba874a3bab0e22ce164384237a55c-1.png)
+![1.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozw53udoj30zk0ftdgm.jpg)
 
 所以二维数组的本质上仍然是一个一维数组，内部的一维数组仍然从索引 `0` 开始，我们可以将它看作一个矩阵，并处理矩阵的相关问题。
 
@@ -160,7 +156,7 @@
 
 类似一维数组，对于一个二维数组 `A = [[1, 2, 3, 4],[2, 4, 5, 6],[1, 4, 6, 8]]`，计算机同样会在内存中申请一段 **连续** 的空间，并记录第一行数组的索引位置，即 `A[0][0]` 的内存地址，它的索引与内存地址的关系如下图所示。
 
-![2.png](https://pic.leetcode-cn.com/bf1bd2a80e026f8ce335724e54a457301f5909cfd8ae5a25f8d2692c7cdae720-2.png)
+![2.png](https://tva1.sinaimg.cn/large/008i3skNly1gqozwtoa8xj30zk0ftq6g.jpg)
 
 注意，实际数组中的元素由于类型的不同会占用不同的字节数，因此每个方格地址之间的差值可能不为 `1`。
 
