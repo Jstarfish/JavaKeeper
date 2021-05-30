@@ -151,7 +151,7 @@ function genDSASidebar() {
       title: "数据结构",
       collapsable: false,
       sidebarDepth: 1,    // 可选的, 默认值是 1
-      children: ["","Array","Linked-List","Stack","Queue","Skip-List"]
+      children: ["","Array","Linked-List","Stack","Queue","Binary-Tree","Skip-List"]
     },
     {
       title: "算法",
@@ -179,7 +179,8 @@ function genDesignPatternSidebar() {
     ['Observer-Pattern', '观察者模式'],
     ['Facade-Pattern', '外观模式'],
     ['Template-Pattern', '模板方法模式'],
-    ['Strategy-Pattern', '策略模式']
+    ['Strategy-Pattern', '策略模式'],
+    ['Pipeline-Pattern', '管道模式']
   ];
 }
 
