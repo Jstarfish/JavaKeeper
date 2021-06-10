@@ -9,6 +9,7 @@
 - [单例模式](Singleton-Pattern.md)
 - [工厂模式](Factory-Pattern.md)
 - [原型模式](Prototype-Pattern.md)
+- [建造者模式](Builder-Pattern.md)
 
 #### 结构型模式
 
