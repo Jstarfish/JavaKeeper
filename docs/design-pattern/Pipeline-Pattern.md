@@ -1,8 +1,6 @@
 # 管道模式
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/GettyImages-908614722.jpg)
-
-
+![](https://tva1.sinaimg.cn/large/008i3skNly1gre4983htzj30hs0a0wg3.jpg)
 
 
 
