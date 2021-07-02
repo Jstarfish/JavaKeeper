@@ -3,6 +3,8 @@
 ![](https://tva1.sinaimg.cn/large/008i3skNly1grm8yuyywxj30zk0qomyg.jpg)
 
 > Redis 是怎么想的：用跳表来实现有序集合？
+>
+> Redis 的 zset 是一个复合结构，一方面它需要一个 hash 结构来存储 value 和 score 的对应关系，另一方面需要提供按照 score 来排序的功能，还需要能够指定 score 的范围来获取 value 列表的功能
 
 干过服务端开发的应该都知道 Redis 的 ZSet 使用跳表实现的（当然还有压缩列表），我就不从 1990 年的那个美国大佬 William Pugh 发表的那篇论文开始了，直接开跳
 
@@ -19,13 +21,15 @@
 
 ### 跳表的简历
 
-跳表，英文名：Skip List。
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skiplist-resume.png)
 
-父亲：从英文名可以看出来，它首先是个 List，实际上，它是在有序链表的基础上发展起来的。
+跳表，英文名：Skip List
 
-竞争对手：跳表(skip list) 对标的是平衡树(AVL Tree)，
+父亲：从英文名可以看出来，它首先是个 List，实际上，它是在有序链表的基础上发展起来的
 
-优点：是一种 插入/删除/搜索 都是 `O(log n)` 的数据结构。它最大的优势是原理简单、容易实现、方便扩展、效率更高。
+竞争对手：跳表（skip list）对标的是平衡树（AVL Tree）
+
+优点：是一种 插入/删除/搜索 都是 $O(logn)$ 的数据结构。它最大的优势是原理简单、容易实现、方便扩展、效率更高
 
 
 
@@ -43,166 +47,227 @@
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skip-index.png)
 
-像这样，我们每隔一个节点取一个数据作为索引节点，比如我们要找 31 直接在索引链表就找到了（遍历 3 次），如果找 16 的话，在遍历到 31的时候，发现大于目标节点，就跳到下一层，接着遍历~ (蓝线表示搜索路径)
+像这样，我们每隔一个节点取一个数据作为索引节点（或者增加一个指针），比如我们要找 31 直接在索引链表就找到了（遍历 3 次），如果找 16 的话，在遍历到 31的时候，发现大于目标节点，就跳到下一层，接着遍历~ (蓝线表示搜索路径)
 
-> 恩，如果你数了下遍历次数，没错，加不加索引都是 4 次遍历才能找到 16，这是因为数据量太少，数据量多的话，我们也可以多建几层索引
+> 恩，如果你数了下遍历次数，没错，加不加索引都是 4 次遍历才能找到 16，这是因为数据量太少
+>
+> 数据量多的话，我们也可以多建几层索引，如下 4 层索引，效果就比较明显了
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skip-list.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skiplist.png)
 
-每家一层索引，我们搜索的时间复杂度就降为原来的 $O(n/2)$
+每加一层索引，我们搜索的时间复杂度就降为原来的 $O(n/2)$
 
 加了几层索引，查找一个节点需要遍历的节点个数明线减少了，效率提高不少，bingo~
 
+有没有似曾相识的感觉，像不像二分查找或者二叉搜索树，通过索引来跳过大量的节点，从而提高搜索效率。
+
+这样的多层链表结构，就是『**跳表**』了~~
 
 
-**那到底提高了多少呢？要加多少层索引呢？**
+
+**那到底提高了多少呢？**
+
+推理一番：
+
+1. 如果一个链表有 n 个结点，如果每两个结点抽取出一个结点建立索引的话，那么第一级索引的结点数大约就是 n/2，第二级索引的结点数大约为 n/4，以此类推第 m 级索引的节点数大约为 $n/(2^m)$。
+
+2. 假如一共有 m 级索引，第 m 级的结点数为两个，通过上边我们找到的规律，那么得出 $n/(2^m)=2$，从而求得 m=$log(n)$-1。如果加上原始链表，那么整个跳表的高度就是 $log(n)$。
+
+3. 我们在查询跳表的时候，如果每一层都需要遍历 k 个结点，那么最终的时间复杂度就为 $O(k*log(n))$。
+
+4. 那这个 k 值为多少呢，按照我们每两个结点提取一个基点建立索引的情况，我们每一级最多需要遍历两个节点，所以 k=2。
+
+   > 为什么每一层最多遍历两个结点呢？
+   >
+   > 因为我们是每两个节点提取一个节点建立索引，最高一级索引只有两个节点，然后下一层索引比上一层索引两个结点之间增加了一个结点，也就是上一层索引两结点的中值，看到这里是不是想起了二分查找，每次我们只需要判断要找的值在不在当前节点和下一个节点之间就可以了。
+   >
+   > 不信，你照着下图比划比划，看看同一层能画出 3 条线不~~
+   >
+   > ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skiplist-index-count.png)
+
+5. 既然知道了每一层最多遍历两个节点，那跳表查询数据的时间复杂度就是 $O(2*log(n))$，常数 2 忽略不计，就是 $O(logn)$ 了。
 
 
 
-我们知道上层的节点数目为 $n/2$，因此，有了这层索引，我们搜索的时间复杂度降为了：$O(n/2)$。同理，我们可以不断地增加层数，来减少搜索的时间：
+**空间换时间**
 
-![Linked List Level 4](https://lotabout.me/2018/skip-list/linked-list-4.svg)
+跳表的效率比链表高了，但是跳表需要额外存储多级索引，所以需要更多的内存空间。
 
-在上面的 4 层链表中搜索 `25`，在最上层搜索时就可以直接跳过 `21` 之前的所有节点，因此十分高效。
+跳表的空间复杂度分析并不难，如果一个链表有 n 个节点，每两个节点抽取出一个节点建立索引的话，那么第一级索引的节点数大约就是 n/2，第二级索引的节点数大约为 n/4，以此类推第 m 级索引的节点数大约为 $n/(2^m)$，我们可以看出来这是一个等比数列。
 
-更一般地，如果有 kk 层，我们需要的搜索次数会小于 $\frac{n}{2^3} + k$，这样当层数 $k$ 增加到 $\log_2n$时，搜索的时间复杂度就变成了 $logn$。其实这背后的原理和二叉搜索树或二分查找很类似，通过索引来跳过大量的节点，从而提高搜索效率。
+这几级索引的结点总和就是 n/2+n/4+n/8…+8+4+2=n-2，所以跳表的空间复杂度为  $O(n)$。
 
-## 跳表
+> 实际上，在软件开发中，我们不必太在意索引占用的额外空间。在讲数据结构和算法时，我们习惯性地把要处理的数据看成整数，但是在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引结点大很多时，那索引占用的额外空间就可以忽略了。
 
-上节的结构是“静态”的，即我们先拥有了一个链表，再在之上建了多层的索引。但是在实际使用中，我们的链表是通过多次插入/删除形成的，换句话说是“动态”的。上节的结构要求上层相邻节点与对应下层节点间的个数比是 `1:2`，随意插入/删除一个节点，这个要求就被被破坏了。
 
-因此跳表（skip list）表示，我们就不强制要求 `1:2` 了，一个节点要不要被索引，建几层的索引，都在节点插入时由抛硬币决定。当然，虽然索引的节点、索引的层数是随机的，为了保证搜索的效率，要大致保证每层的节点数目与上节的结构相当。下面是一个随机生成的跳表：
 
-![Skip List](https://lotabout.me/2018/skip-list/skip-list.svg)
+#### 插入数据
 
-可以看到它每层的节点数还和上节的结构差不多，但是上下层的节点的对应关系已经完全被打破了。
+其实插入数据和查找一样，先找到元素要插入的位置，时间复杂度也是 $O(logn)$，但有个问题就是如果一直往原始列表里加数据，不更新我们的索引层，极端情况下就会出现两个索引节点中间数据非常多，相当于退化成了单链表，查找效率直接变成 $O(n)$
 
-现在假设节点 `17` 是最后插入的，在插入之前，我们需要搜索得到插入的位置：
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/skiplist-insert.png)
 
-![Skip List Search Path](https://lotabout.me/2018/skip-list/skip-list-insert-17.svg)
 
-接着，抛硬币决定要建立几层的索引，伪代码如下：
 
+#### 跳表索引动态更新
+
+我们上边建立索引层都是下层节点个数的 1/2，最高层索引的节点数就是 2 个，但是我们随意插入或者删除一个原有链表的节点，这个比例就肯定会被破坏。
+
+作为一种动态数据结构，我们需要某种手段来维护索引与原始链表大小之间的平衡，也就是说，如果链表中结点多了，索引结点就相应地增加一些，避免复杂度退化。
+
+如果重建索引的话，效率就不能保证了。
+
+> 如果你了解红黑树、AVL 树这样平衡二叉树，你就知道它们是通过左右旋的方式保持左右子树的大小平衡，而跳表是通过随机函数来维护前面提到的“平衡性”。
+
+所以跳表（skip list）索性就不强制要求 `1:2` 了，一个节点要不要被索引，建几层的索引，就随意点吧，都在节点插入时由抛硬币决定。
+
+比如我们要插入新节点 X，那要不要为 X 向上建索引呢，就是抛硬币决定的，正面的话建索引，否则就不建了，就是这么随意（哪几层建索引同样这么随机）。
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/20210626125654.gif)
+
+其实是因为我们不能预测跳表的添加和删除操作，很难用一种有效的算法保证索引部分始终均匀。学过概率论的我们都知道抛硬币虽然不能让索引位置绝对均匀，当数量足够多的时候最起码可以保证大体上相对均匀。
+
+删除节点相对来说就容易很多了，在索引层找到节点的话，就顺藤摸瓜逐个往下删除该索引节点和原链表上的节点，如果哪一层索引节点被删的就剩 1 个节点的话，直接把这一层搞掉就可以了。
+
+
+
+其实跳表的思想很容易理解，可是架不住实战
+
+### 跳表的实现
+
+> https://leetcode-cn.com/problems/design-skiplist/
+
+差不多了解了跳表，其实就是加了几层索引的链表，一共有 N 层，以 0 ~ N-1 层表示，设第 0 层是原链表，抽取其中部分元素，在第 1 层形成新的链表，上下层的相同元素之间连起来；再抽取第 1 层部分元素，构成第 2 层，以此类推。
+
+
+
+```java
+package skiplist;
+
+import java.util.Random;
+
+/**
+ * 跳表的一种实现方法。
+ * 跳表中存储的是正整数，并且存储的是不重复的。
+ */
+public class SkipList {
+
+  private static final int MAX_LEVEL = 16;
+
+  private static final float SKIPLIST_P = 0.5f;
+
+  private int levelCount = 1;
+
+  private Node head = new Node();  // 带头链表
+
+  private Random r = new Random();
+
+  public Node find(int value) {
+    Node p = head;
+    for (int i = levelCount - 1; i >= 0; --i) {
+      while (p.forwards[i] != null && p.forwards[i].data < value) {
+        p = p.forwards[i];
+      }
+    }
+
+    if (p.forwards[0] != null && p.forwards[0].data == value) {
+      return p.forwards[0];
+    } else {
+      return null;
+    }
+  }
+
+  public void insert(int value) {
+    int level = randomLevel();
+    Node newNode = new Node();
+    newNode.data = value;
+    newNode.maxLevel = level;
+    Node update[] = new Node[level];
+    for (int i = 0; i < level; ++i) {
+      update[i] = head;
+    }
+
+    // record every level largest value which smaller than insert value in update[]
+    Node p = head;
+    for (int i = level - 1; i >= 0; --i) {
+      while (p.forwards[i] != null && p.forwards[i].data < value) {
+        p = p.forwards[i];
+      }
+      update[i] = p;// use update save node in search path
+    }
+
+    // in search path node next node become new node forwords(next)
+    for (int i = 0; i < level; ++i) {
+      newNode.forwards[i] = update[i].forwards[i];
+      update[i].forwards[i] = newNode;
+    }
+
+    // update node hight
+    if (levelCount < level) levelCount = level;
+  }
+
+  public void delete(int value) {
+    Node[] update = new Node[levelCount];
+    Node p = head;
+    for (int i = levelCount - 1; i >= 0; --i) {
+      while (p.forwards[i] != null && p.forwards[i].data < value) {
+        p = p.forwards[i];
+      }
+      update[i] = p;
+    }
+
+    if (p.forwards[0] != null && p.forwards[0].data == value) {
+      for (int i = levelCount - 1; i >= 0; --i) {
+        if (update[i].forwards[i] != null && update[i].forwards[i].data == value) {
+          update[i].forwards[i] = update[i].forwards[i].forwards[i];
+        }
+      }
+    }
+  }
+
+ // 理论来讲，一级索引中元素个数应该占原始数据的 50%，二级索引中元素个数占 25%，三级索引12.5% ，一直到最顶层。
+  // 因为这里每一层的晋升概率是 50%。对于每一个新插入的节点，都需要调用 randomLevel 生成一个合理的层数。
+  // 该 randomLevel 方法会随机生成 1~MAX_LEVEL 之间的数，且 ：
+  //        50%的概率返回 1
+  //        25%的概率返回 2
+  //      12.5%的概率返回 3 ...
+  private int randomLevel() {
+    int level = 1;
+
+    while (Math.random() < SKIPLIST_P && level < MAX_LEVEL)
+      level += 1;
+    return level;
+  }
+
+  public void printAll() {
+    Node p = head;
+    while (p.forwards[0] != null) {
+      System.out.print(p.forwards[0] + " ");
+      p = p.forwards[0];
+    }
+    System.out.println();
+  }
+
+  public class Node {
+    private int data = -1;
+    private Node forwards[] = new Node[MAX_LEVEL];
+    private int maxLevel = 0;
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("{ data: ");
+      builder.append(data);
+      builder.append("; levels: ");
+      builder.append(maxLevel);
+      builder.append(" }");
+
+      return builder.toString();
+    }
+  }
+
+}
 ```
-randomLevel()
-    lvl := 1
-    -- random() that returns a random value in [0...1)
-    while random() < p and lvl < MaxLevel do
-        lvl := lvl + 1
-    return lvl
-```
-
-上面的伪代码相当于抛硬币，如果是正面（`random() < p`）则层数加一，直到抛出反面为止。其中的 `MaxLevel` 是防止如果运气太好，层数就会太高，而太高的层数往往并不会提供额外的性能，一般 $MaxLevel=\log_(\frac{1}{p})n$。现在假设 `randomLevel` 返回的结果是 `2`，那么就得到下面的结果。
-
-![Skip List](https://lotabout.me/2018/skip-list/skip-list.svg)
-
-如果要删除节点，则把节点和对应的所有索引节点全部删除即可。当然，要删除节点时需要先搜索得到该节点，搜索过程中可以把路径记录下来，这样删除索引层节点的时候就不需要多次搜索了。
-
-显然，在最坏的情况下，所有节点都没有创建索引，时间复杂度为$O(n)$，但在平均情况下，搜索的时间复杂度却是 $O(logn)$，为什么呢？
-
-## 简单的性能分析
-
-一些严格的证明会涉及到比较复杂的概率统计学知识，所以这里只是简单地说明。
-
-### 每层的节点数目
-
-上面我们提到 `MaxLevel`，[原版论文 ](ftp://ftp.cs.umd.edu/pub/skipLists/skiplists.pdf)中用 `L(n)` 来表示，要求 `L(n)` 层有 `1/p` 个节点，在搜索时可以不理会比 `L(n)` 更高的层数，直接从 `L(n)` 层开始搜索，这样效率最高。
-
-直观上看，第 l 层的节点中在第 $l+1$ 层也有索引的个数是 $n_{l+1}=n_lp$ 因此第 l 层的节点个数为：
-
-$n_l=np^{l−1}$
-
-于是代入 $n_{L(n)}=1/p$ 得到 $L(n)=log_{1/p}n$。
-
-### 最高的层数
-
-上面推导到每层的节点数目，直观上看，如果某一层的节点数目小于等于 1，则可以认为它是最高层了，代入 $np^{l−1}=1$ 得到层数 $Lmax=log_{1/p}n+1=L(n)+1=O(logn)$。
-
-实际上这个问题并没有直接的解析解，我们能知道的是，当 $n$ 足够大时，最大能达到的层数为 $O(logn)$。
-
-### 搜索的时间复杂度
-
-为了计算搜索的时间复杂度，我们可以将查找的过程倒过来，从搜索最后的节点开始，一直向左或向上，直到最顶层。如下图，在路径上的每一点，都可能有两种情况：
-
-![Skip List Search Backward](https://lotabout.me/2018/skip-list/skip-list-back-search.svg)
-
-1. 节点有上一层的节点，向上。这种情况出现的概率是 `p`。
-2. 节点没有上一层的节点，向左。出现的概率是 `1-p`。
-
-于是，设 `C(k)` 为反向搜索爬到第 `k` 层的平均路径长度，则有：
-
-```
-C(0) = 0
-C(k) = p * (情况1) + (1-p) * (情况2)
-```
-
-将两种情况也用 `C` 代入，有：
-
-```
-C(k) = p*(1 + C(k–1)) + (1–p)*(1 + C(k))
-C(k) = C(k–1) + 1/p
-C(k) = k/p
-```
-
-上式表明，搜索时，平均在每层上需要搜索的路径长度为 $1/p$，从平均的角度上和我们第一小节构造的“静态”结构相同（p 取 `1/2`）。
-
-又注意到，上小节我们知道跳表的最大层数为 $O(logn)$，因此，搜索的复杂度 $O(logn)/p=O(logn)$。
-
-P.S. 这里我们用到的是最大层数，原论文证明时用到的是 $L(n)$，然后再考虑从 $L(n)$ 层到最高层的平均节点个数。这里为了理解方便不再详细证明。
-
-
-
-### 空间复杂度
-
-比起单纯的单链表，跳表需要存储多级索引，肯定要消耗更多的存储空间。那到底需要消耗多少额外的存储空间呢？
-
-跳表的空间复杂度分析并不难，我在前面说了，假设原始链表大小为 n，那第一级索引大约有 n/2 个结点，第二级索引大约有 n/4 个结点，以此类推，每上升一级就减少一半，直到剩下 2 个结点。如果我们把每层索引的结点数写出来，就是一个等比数列。
-
-![img](https://static001.geekbang.org/resource/image/10/55/100e9d6e5abeaae542cf7841be3f8255.jpg)
-
-这几级索引的结点总和就是 n/2+n/4+n/8…+8+4+2=n-2。所以，跳表的空间复杂度是 O(n)。也就是说，如果将包含 n 个结点的单链表构造成跳表，我们需要额外再用接近 n 个结点的存储空间。那我们有没有办法降低索引占用的内存空间呢？
-
-我们前面都是每两个结点抽一个结点到上级索引，如果我们每三个结点或五个结点，抽一个结点到上级索引，是不是就不用那么多索引结点了呢？我画了一个每三个结点抽一个的示意图，你可以看下。
-
-![img](https://static001.geekbang.org/resource/image/0b/f7/0b0680ecf500f9349fc142e1a9eb73f7.jpg)
-
-从图中可以看出，第一级索引需要大约 n/3 个结点，第二级索引需要大约 n/9 个结点。每往上一级，索引结点个数都除以 3。为了方便计算，我们假设最高一级的索引结点个数是 1。我们把每级索引的结点个数都写下来，也是一个等比数列。
-
-![img](https://static001.geekbang.org/resource/image/19/95/192c480664e35591360cee96ff2f8395.jpg)
-
-通过等比数列求和公式，总的索引结点大约就是 n/3+n/9+n/27+...+9+3+1=n/2。尽管空间复杂度还是 O(n)，但比上面的每两个结点抽一个结点的索引构建方法，要减少了一半的索引结点存储空间。
-
-实际上，在软件开发中，我们不必太在意索引占用的额外空间。在讲数据结构和算法时，我们习惯性地把要处理的数据看成整数，但是在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引结点大很多时，那索引占用的额外空间就可以忽略了。
-
-
-
-### 高效的动态插入和删除
-
-跳表长什么样子我想你应该已经很清楚了，它的查找操作我们刚才也讲过了。实际上，跳表这个动态数据结构，不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是 O(logn)。
-
-
-
-### 跳表索引动态更新
-
-当我们不停地往跳表中插入数据时，如果我们不更新索引，就有可能出现某 2 个索引结点之间数据非常多的情况。极端情况下，跳表还会退化成单链表。
-
-![img](https://static001.geekbang.org/resource/image/c8/c5/c863074c01c26538cf0134eaf8dc67c5.jpg)
-
-作为一种动态数据结构，我们需要某种手段来维护索引与原始链表大小之间的平衡，也就是说，如果链表中结点多了，索引结点就相应地增加一些，避免复杂度退化，以及查找、插入、删除操作性能下降。
-
-如果你了解红黑树、AVL 树这样平衡二叉树，你就知道它们是通过左右旋的方式保持左右子树的大小平衡（如果不了解也没关系，我们后面会讲），而跳表是通过随机函数来维护前面提到的“平衡性”。
-
-当我们往跳表中插入数据的时候，我们可以选择同时将这个数据插入到部分索引层中。如何选择加入哪些索引层呢？
-
-我们通过一个随机函数，来决定将这个结点插入到哪几级索引中，比如随机函数生成了值 K，那我们就将这个结点添加到第一级到第 K 级这 K 级索引中。
-
-![img](https://static001.geekbang.org/resource/image/a8/a7/a861445d0b53fc842f38919365b004a7.jpg)
-
-随机函数的选择很有讲究，从概率上来讲，能够保证跳表的索引大小和数据大小平衡性，不至于性能过度退化。至于随机函数的选择，我就不展开讲解了。
-
-如果你感兴趣的话，可以看看我在 GitHub 上的代码或者 Redis 中关于有序集合的跳表实现。
-
-
 
 
 
@@ -210,7 +275,7 @@ P.S. 这里我们用到的是最大层数，原论文证明时用到的是 $L(n)
 
 为什么 Redis 要用跳表来实现有序集合，而不是红黑树？
 
-Redis 中的有序集合是通过跳表来实现的，严格点讲，其实还用到了散列表。不过散列表我们后面才会讲到，所以我们现在暂且忽略这部分。
+Redis 中的有序集合是通过跳表来实现的，严格点讲，其实还用到了散列表。
 
 如果你去查看 Redis 的开发手册，就会发现，Redis 中的有序集合支持的核心操作主要有下面这几个：
 
@@ -222,9 +287,226 @@ Redis 中的有序集合是通过跳表来实现的，严格点讲，其实还�
 
 其中，插入、删除、查找以及迭代输出有序序列这几个操作，红黑树也可以完成，时间复杂度跟跳表是一样的。但是，按照区间来查找数据这个操作，红黑树的效率没有跳表高。
 
-对于按照区间查找数据这个操作，跳表可以做到 O(logn) 的时间复杂度定位区间的起点，然后在原始链表中顺序往后遍历就可以了。这样做非常高效。
+对于按照区间查找数据这个操作，跳表可以做到 $O(logn)$ 的时间复杂度定位区间的起点，然后在原始链表中顺序往后遍历就可以了。这样做非常高效。
 
 当然，Redis 之所以用跳表来实现有序集合，还有其他原因，比如，跳表更容易代码实现。虽然跳表的实现也不简单，但比起红黑树来说还是好懂、好写多了，而简单就意味着可读性好，不容易出错。还有，跳表更加灵活，它可以通过改变索引构建策略，有效平衡执行效率和内存消耗。
+
+
+
+> 有序集合的英文全称明明是**sorted sets**，为啥叫zset呢？
+>
+> edis官网上没有解释，但是在Github上有人向作者提问了。作者是这么回答的哈哈哈
+>
+> Hello. Z is as in XYZ, so the idea is, sets with another dimension: the
+> order. It’s a far association… I know 😃
+>
+> 原来前面的Z代表的是XYZ中的Z，最后一个英文字母，zset是在说这是比set有更多一个维度的set 😦
+>
+> 是不没道理？
+>
+> 更没道理的有个，Redis 默认端口 6379 ，因为作者喜欢的一个叫Merz的女明星，其名字在手机上输入正好对应号码6379，索性就把Redis的默认端口叫6379了…
+
+
+
+
+
+Redis 的跳跃表共有 64 层，容纳 2^64 个元素应该不成问题。每一个 kv 块对应的结构如下面的代码中的`zslnode`结构，kv header 也是这个结构，只不过 value 字段是 null 值——无效的，score 是 Double.MIN_VALUE，用来垫底的。kv 之间使用指针串起来形成了双向链表结构，它们是 **有序** 排列的，从小到大。不同的 kv 层高可能不一样，层数越高的 kv 越少。同一层的 kv 会使用指针串起来。每一个层元素的遍历都是从 kv header 出发。
+
+```c
+struct zslnode {
+  string value;
+  double score;
+  zslnode*[] forwards;  // 多层连接指针
+  zslnode* backward;  // 回溯指针
+}
+
+struct zsl {
+  zslnode* header; // 跳跃列表头指针
+  int maxLevel; // 跳跃列表当前的最高层
+  map<string, zslnode*> ht; // hash 结构的所有键值对
+}
+```
+
+
+
+## 查找过程
+
+设想如果跳跃列表只有一层会怎样？插入删除操作需要定位到相应的位置节点 (定位到最后一个比「我」小的元素，也就是第一个比「我」大的元素的前一个)，定位的效率肯定比较差，复杂度将会是 O(n)，因为需要挨个遍历。也许你会想到二分查找，但是二分查找的结构只能是有序数组。跳跃列表有了多层结构之后，这个定位的算法复杂度将会降到 O(lg(n))。
+
+
+
+![img](https://user-gold-cdn.xitu.io/2018/7/27/164dc52ae7e6444c?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+如图所示，我们要定位到那个紫色的 kv，需要从 header 的最高层开始遍历找到第一个节点 (最后一个比「我」小的元素)，然后从这个节点开始降一层再遍历找到第二个节点 (最后一个比「我」小的元素)，然后一直降到最底层进行遍历就找到了期望的节点 (最底层的最后一个比我「小」的元素)。
+
+我们将中间经过的一系列节点称之为「搜索路径」，它是从最高层一直到最底层的每一层最后一个比「我」小的元素节点列表。
+
+有了这个搜索路径，我们就可以插入这个新节点了。不过这个插入过程也不是特别简单。因为新插入的节点到底有多少层，得有个算法来分配一下，跳跃列表使用的是随机算法。
+
+## 随机层数
+
+对于每一个新插入的节点，都需要调用一个随机算法给它分配一个合理的层数。直观上期望的目标是 50% 的 Level1，25% 的 Level2，12.5% 的 Level3，一直到最顶层`2^-63`，因为这里每一层的晋升概率是 50%。
+
+```
+/* Returns a random level for the new skiplist node we are going to create.
+ * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL
+ * (both inclusive), with a powerlaw-alike distribution where higher
+ * levels are less likely to be returned. */
+int zslRandomLevel(void) {
+    int level = 1;
+    while ((random()&0xFFFF) < (ZSKIPLIST_P * 0xFFFF))
+        level += 1;
+    return (level<ZSKIPLIST_MAXLEVEL) ? level : ZSKIPLIST_MAXLEVEL;
+}
+```
+
+不过 Redis 标准源码中的晋升概率只有 25%，也就是代码中的 ZSKIPLIST_P 的值。所以官方的跳跃列表更加的扁平化，层高相对较低，在单个层上需要遍历的节点数量会稍多一点。
+
+也正是因为层数一般不高，所以遍历的时候从顶层开始往下遍历会非常浪费。跳跃列表会记录一下当前的最高层数`maxLevel`，遍历时从这个 maxLevel 开始遍历性能就会提高很多。
+
+## 插入过程
+
+下面是插入过程的源码，它稍微有点长，不过整体的过程还是比较清晰的。
+
+```
+/* Insert a new node in the skiplist. Assumes the element does not already
+ * exist (up to the caller to enforce that). The skiplist takes ownership
+ * of the passed SDS string 'ele'. */
+zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
+    // 存储搜索路径
+    zskiplistNode *update[ZSKIPLIST_MAXLEVEL], *x;
+    // 存储经过的节点跨度
+    unsigned int rank[ZSKIPLIST_MAXLEVEL];
+    int i, level;
+
+    serverAssert(!isnan(score));
+    x = zsl->header;
+    // 逐步降级寻找目标节点，得到「搜索路径」
+    for (i = zsl->level-1; i >= 0; i--) {
+        /* store rank that is crossed to reach the insert position */
+        rank[i] = i == (zsl->level-1) ? 0 : rank[i+1];
+        // 如果score相等，还需要比较value
+        while (x->level[i].forward &&
+                (x->level[i].forward->score < score ||
+                    (x->level[i].forward->score == score &&
+                    sdscmp(x->level[i].forward->ele,ele) < 0)))
+        {
+            rank[i] += x->level[i].span;
+            x = x->level[i].forward;
+        }
+        update[i] = x;
+    }
+    // 正式进入插入过程
+    /* we assume the element is not already inside, since we allow duplicated
+     * scores, reinserting the same element should never happen since the
+     * caller of zslInsert() should test in the hash table if the element is
+     * already inside or not. */
+    // 随机一个层数
+    level = zslRandomLevel();
+    // 填充跨度
+    if (level > zsl->level) {
+        for (i = zsl->level; i < level; i++) {
+            rank[i] = 0;
+            update[i] = zsl->header;
+            update[i]->level[i].span = zsl->length;
+        }
+        // 更新跳跃列表的层高
+        zsl->level = level;
+    }
+    // 创建新节点
+    x = zslCreateNode(level,score,ele);
+    // 重排一下前向指针
+    for (i = 0; i < level; i++) {
+        x->level[i].forward = update[i]->level[i].forward;
+        update[i]->level[i].forward = x;
+
+        /* update span covered by update[i] as x is inserted here */
+        x->level[i].span = update[i]->level[i].span - (rank[0] - rank[i]);
+        update[i]->level[i].span = (rank[0] - rank[i]) + 1;
+    }
+
+    /* increment span for untouched levels */
+    for (i = level; i < zsl->level; i++) {
+        update[i]->level[i].span++;
+    }
+    // 重排一下后向指针
+    x->backward = (update[0] == zsl->header) ? NULL : update[0];
+    if (x->level[0].forward)
+        x->level[0].forward->backward = x;
+    else
+        zsl->tail = x;
+    zsl->length++;
+    return x;
+}
+```
+
+首先我们在搜索合适插入点的过程中将「搜索路径」摸出来了，然后就可以开始创建新节点了，创建的时候需要给这个节点随机分配一个层数，再将搜索路径上的节点和这个新节点通过前向后向指针串起来。如果分配的新节点的高度高于当前跳跃列表的最大高度，就需要更新一下跳跃列表的最大高度。
+
+## 删除过程
+
+删除过程和插入过程类似，都需先把这个「搜索路径」找出来。然后对于每个层的相关节点都重排一下前向后向指针就可以了。同时还要注意更新一下最高层数`maxLevel`。
+
+## 更新过程
+
+当我们调用 zadd 方法时，如果对应的 value 不存在，那就是插入过程。如果这个 value 已经存在了，只是调整一下 score 的值，那就需要走一个更新的流程。假设这个新的 score 值不会带来排序位置上的改变，那么就不需要调整位置，直接修改元素的 score 值就可以了。但是如果排序位置改变了，那就要调整位置。那该如何调整位置呢？
+
+```
+/* Remove and re-insert when score changes. */
+    if (score != curscore) {
+        zskiplistNode *node;
+        serverAssert(zslDelete(zs->zsl,curscore,ele,&node));
+        znode = zslInsert(zs->zsl,score,node->ele);
+        /* We reused the node->ele SDS string, free the node now
+        * since zslInsert created a new one. */
+        node->ele = NULL;
+        zslFreeNode(node);
+        /* Note that we did not removed the original element from
+        * the hash table representing the sorted set, so we just
+        * update the score. */
+        dictGetVal(de) = &znode->score; /* Update score ptr. */
+        *flags |= ZADD_UPDATED;
+        }
+    return 1;
+```
+
+一个简单的策略就是先删除这个元素，再插入这个元素，需要经过两次路径搜索。Redis 就是这么干的。 不过 Redis 遇到 score 值改变了就直接删除再插入，不会去判断位置是否需要调整，从这点看，Redis 的 zadd 的代码似乎还有优化空间。关于这一点，读者们可以继续讨论。
+
+## 如果 score 值都一样呢？
+
+在一个极端的情况下，zset 中所有的 score 值都是一样的，zset 的查找性能会退化为 O(n) 么？Redis 作者自然考虑到了这一点，所以 zset 的排序元素不只看 score 值，如果 score 值相同还需要再比较 value 值 (字符串比较)。
+
+
+
+## 元素排名是怎么算出来的？
+
+前面我们啰嗦了一堆，但是有一个重要的属性没有提到，那就是 zset 可以获取元素的排名 rank。那这个 rank 是如何算出来的？如果仅仅使用上面的结构，rank 是不能算出来的。Redis 在 skiplist 的 forward 指针上进行了优化，给每一个 forward 指针都增加了 span 属性，span 是「跨度」的意思，表示从当前层的当前节点沿着 forward 指针跳到下一个节点中间跳过多少个节点。Redis 在插入删除操作时会小心翼翼地更新 span 值的大小。
+
+```
+struct zslforward {
+  zslnode* item;
+  long span;  // 跨度
+}
+
+struct zslnode {
+  String value;
+  double score;
+  zslforward*[] forwards;  // 多层连接指针
+  zslnode* backward;  // 回溯指针
+}
+```
+
+这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。
+
+
+
+
+
+还见过面试问：MySQL 的 Innodb ，为什么不用 skiplist，而用 B+ Tree ？
+
+如果是磁盘文件，b+Tree 会比 skiplist 好很多。磁盘查询性能比内存差很多，所以尽量减少查询的次数。
+b+ tree 每个节点有好多数据，每次查询可以查询一批数据到内存中。b+ 树的层数低，可以减少访问磁盘的次数
 
 
 
