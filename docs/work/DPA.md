@@ -88,7 +88,7 @@
 
 #### 展现优势
 
-![](/Users/apple/Downloads/dpa-动态商品广告优势.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/works/dpa-%E5%8A%A8%E6%80%81%E5%95%86%E5%93%81%E5%B9%BF%E5%91%8A%E4%BC%98%E5%8A%BF.png)
 
 
 
@@ -121,7 +121,7 @@ DPA 的动态分为三个层次：
 
 以搜索动态商品广告为例——用户搜索和商品的匹配
 
-![](/Users/apple/Downloads/dpa流程.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/works/dpa%E6%B5%81%E7%A8%8B.jpg)
 
 
 
