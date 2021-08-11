@@ -2,7 +2,7 @@
 
 # Nginx 学习一路向西
 
->  Java大猿帅成长手册，**GitHub** [JavaEgg](https://github.com/Jstarfish/JavaEgg) ，N线互联网开发必备技能兵器谱
+>  Java大猿帅成长手册，**GitHub** [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
 ## 1. Nginx简介 
 
@@ -98,7 +98,7 @@ TODO: 留一个负载均衡详细介绍传送门
 
 #### 地址重定向
 
-Nginx 的Rewrite主要的功能就是实现URL重写
+Nginx 的 Rewrite 主要的功能就是实现 URL 重写
 
 比如输入360.com  跳转到了360.cn，baidu.cn跳转到了baidu.com
 
@@ -140,7 +140,7 @@ Nginx 的Rewrite主要的功能就是实现URL重写
 3. 解压、配置（Nginx支持各种配置选项,文末一一列出 [Nginx配置选项](#Nginx配置选项) ）、编译、安装nginx
 
    ```sh
-   tar -zxvf nginx-1.15.tar.gz cd nginx-1.16.1
+   tar -zxvf nginx-1.15.tar.gz
    cd nginx-1.16.1
    ./configure
    make && sudo make install 

@@ -49,7 +49,7 @@ public void add(int i, int j) {
 
 代理设计模式的原理：**使用一个代理将对象包装起来**，然后用该代理对象取代原始对象。任何对原始对象的调用都要通过代理。代理对象决定是否以及何时将方法调用转到原始对象上。
 
-![](/Users/apple/Desktop/screenshot/clipboard.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/spring/Untitled%20Diagram-%E7%AC%AC%204%20%E9%A1%B5.svg)
 
 
 
@@ -173,9 +173,7 @@ public static void main(String[] args) {
   - 业务模块更简洁，只包含核心业务代
 
 
-![](/Users/apple/Desktop/screenshot/clipboard1.png)
-
-
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/spring/aop-demo.svg)
 
 ### AOP 核心概念
 
@@ -225,7 +223,7 @@ public static void main(String[] args) {
 
 ## 三、Spring AOP
 
-- **AspectJ：**Java 社区里最完整最流行的 AOP 框架
+- **AspectJ**：Java 社区里最完整最流行的 AOP 框架
 - 在 Spring2.0 以上版本中，可以使用基于 AspectJ 注解或基于 XML 配置的 AOP
 
 
@@ -496,16 +494,12 @@ public void afterReturningAdvice(JoinPoint joinPoint, Object res){
 
 - 引入通知是一种特殊的通知类型。它通过为接口提供实现类，允许对象动态地实现接口，就像对象已经在运行时扩展了实现类一样
 
-![](/Users/apple/Desktop/screenshot/clipboard2.png)
-
-
-
 - 引入通知可以使用两个实现类 MaxCalculatorImpl 和 MinCalculatorImpl，让 ArithmeticCalculatorImpl 动态地实现 MaxCalculator和 MinCalculator接口。而这与从 MaxCalculatorImpl 和 MinCalculatorImpl 中实现多继承的效果相同。但却不需要修改 ArithmeticCalculatorImpl 的源代码
 - 引入通知也必须在切面中声明
 - 在切面中，通过为**任意字段**添加**@DeclareParents**注解来引入声明
 - 注解类型的 **value** 属性表示哪些类是当前引入通知的目标。value 属性值也可以是一个 AspectJ 类型的表达式，可以将一个接口引入到多个类中。**defaultImpl**属性中指定这个接口使用的实现类
 
-> 代码可以去 starfish-learn-spring 上找
+> 代码在 starfish-learn-spring 上
 
 
 
