@@ -123,6 +123,7 @@ function genJavaSidebar() {
       title: "JUC",
       collapsable: true,
       children: [
+        ["JUC/readJUC","开篇——聊聊并发编程"],
         "JUC/Java-Memory-Model",
         "JUC/volatile","JUC/synchronized","JUC/CAS",
         ['JUC/Concurrent-Container','Collection 大局观'],
@@ -224,7 +225,10 @@ function genDataManagementSidebar(){
         ['Big-Data/Bloom-Filter', '布隆过滤器'],
         ['Big-Data/Kylin', 'Kylin']
       ]
-    }
+    },
+    
+      'Redis/Cache-Design'
+    
   ];
 }
 

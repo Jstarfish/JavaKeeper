@@ -1,22 +1,20 @@
 # Kylin
 
-> Apache Kylin™是一个开源的、分布式的分析型数据仓库，提供Hadoop/Spark 之上的 SQL 查询接口及多维分析（OLAP）能力以支持超大规模数据，最初由 eBay 开发并贡献至开源社区。它能在亚秒内查询巨大的表。
+> Apache Kylin™是一个开源的、分布式的分析型数据仓库，提供 Hadoop/Spark 之上的 SQL 查询接口及多维分析（OLAP）能力以支持超大规模数据，最初由 eBay 开发并贡献至开源社区。它能在亚秒内查询巨大的表。
 >
 > 有完善的中文文档：http://kylin.apache.org/cn/docs/
 
 
 
-![](https:////upload-images.jianshu.io/upload_images/5141839-b39d48a340efc0be.png?imageMogr2/auto-orient/strip|imageView2/2/w/629/format/webp)
-
 ## 前言
 
 随着移动互联网、物联网等技术的发展，近些年人类所积累的数据正在呈爆炸式的增长，大数据时代已经来临。但是海量数据的收集只是大数据技术的第一步，如何让数据产生价值才是大数据领域的终极目标。Hadoop 的出现解决了数据存储问题，但如何对海量数据进行OLAP 查询，却一直令人十分头疼。
 
-企业中的查询大致可分为即席查询和定制查询两种。之前出现的很多 OLAP 引擎，包括 Hive、Presto、SparkSQL 等，虽然在很大程度上降低了数据分析的难度，但它们都只适用于即席查询的场景。它们的优点是查询灵活，但是随着数据量和计算复杂度的增长，响应时间不能得到保证。而定制查询多数情况下是对用户的操作做出实时反应，Hive等查询引擎动辄数分钟甚至数十分钟的响应时间显然是不能满足需求的。在很长一段时间里，企业只能对数据仓库中的数据进行提前计算，再将算好后的结果存储在MySQL等关系型数据库中，再提供给用户进行查询。但是当业务复杂度和数据量逐渐升高后，使用这套方案的开发成本和维护成本都显著上升。因此，如何对已经固化下来的查询进行亚秒级返回一直是企业应用中的一个痛点。
+企业中的查询大致可分为**即席查询**和**定制查询**两种。之前出现的很多 OLAP 引擎，包括 Hive、Presto、SparkSQL 等，虽然在很大程度上降低了数据分析的难度，但它们都只适用于即席查询的场景。它们的优点是查询灵活，但是随着数据量和计算复杂度的增长，响应时间不能得到保证。而定制查询多数情况下是对用户的操作做出实时反应，Hive 等查询引擎动辄数分钟甚至数十分钟的响应时间显然是不能满足需求的。在很长一段时间里，企业只能对数据仓库中的数据进行提前计算，再将算好后的结果存储在 MySQL 等关系型数据库中，再提供给用户进行查询。但是当业务复杂度和数据量逐渐升高后，使用这套方案的开发成本和维护成本都显著上升。因此，如何对已经固化下来的查询进行亚秒级返回一直是企业应用中的一个痛点。
 
 在这种情况下，Apache Kylin 应运而生。不同于“大规模并行处理”（Massive Parallel Processing，MPP）架构的 Hive、Presto 等，Apache Kylin 采用“**预计算**”的模式，用户只需要提前定义好查询维度，Kylin 将帮助我们进行计算，并将结果存储到 **HBase** 中，为海量数据的查询和分析提供亚秒级返回，是一种典型的“**空间换时间**”的解决方案。Apache Kylin 的出现不仅很好地解决了海量数据快速查询的问题，也避免了手动开发和维护提前计算程序带来的一系列麻烦。
 
-Apache Kylin 最初由 eBay 公司开发，并贡献给 Apache 基金会，但是目前 Apache Kylin 的核心开发团队已经自立门户，创建了Kyligence 公司。值得一提的是，Apache Kylin 是第一个由中国人主导的Apache顶级项目（2017年4月19日，华为的 CarbonData 成为Apache 顶级项目，因此 Apache Kylin 不再是唯一由国人贡献的 Apache 顶级项目）。由于互联网技术和开源思想进入我国的时间较晚，开源软件的世界一直是由西方国家主导，在数据领域也不例外。从 Hadoop 到 Spark，再到最近大热的机器学习平台 TenserFlow 等，均是如此。但近些年来，我们很欣喜地看到以 Apache Kylin 为首的各种以国人主导的开源项目不断地涌现出来，这些技术不断缩小着我国与西方开源技术强国之间的差距，提升我国技术人员在国际开源社区的影响力。
+Apache Kylin 最初由 eBay 公司开发，并贡献给 Apache 基金会，但是目前 Apache Kylin 的核心开发团队已经自立门户，创建了Kyligence 公司。值得一提的是，Apache Kylin 是第一个由中国人主导的Apache顶级项目（2017 年 4 月 19 日，华为的 CarbonData 成为 Apache 顶级项目，因此 Apache Kylin 不再是唯一由国人贡献的 Apache 顶级项目）。由于互联网技术和开源思想进入我国的时间较晚，开源软件的世界一直是由西方国家主导，在数据领域也不例外。从 Hadoop 到 Spark，再到最近大热的机器学习平台 TenserFlow 等，均是如此。但近些年来，我们很欣喜地看到以 Apache Kylin 为首的各种以国人主导的开源项目不断地涌现出来，这些技术不断缩小着我国与西方开源技术强国之间的差距，提升我国技术人员在国际开源社区的影响力。
 
 ## 一、核心概念
 
@@ -28,7 +26,7 @@ Data Warehouse，简称 DW，中文名数据仓库，是商业智能（BI）中�
 
 简而言之，用途不同。数据库面向事务，而数据仓库面向分析。数据库一般存储在线的业务数据，需要对上层业务的改变做出实时反应，涉及到增删查改等操作，所以需要遵循三大范式，需要 ACID。而数据仓库中存储的则主要是历史数据，主要目的是为企业决策提供支持，所以可能存在大量数据冗余，但利于多个维度查询，为决策者提供更多观察视角。
 
-在传统BI领域中，数据仓库的数据同样存储在 Oracle、MySQL 等数据库中，而在大数据领域中最常用的数据仓库就是 Apache Hive，Hive 也是 Apache Kylin  默认的数据源。
+在传统 BI 领域中，数据仓库的数据同样存储在 Oracle、MySQL 等数据库中，而在大数据领域中最常用的数据仓库就是 Apache Hive，Hive 也是 Apache Kylin  默认的数据源。
 
 ### OLAP
 
@@ -42,31 +40,33 @@ OLAP（Online Analytical Process），联机分析处理，以多维度的方式
 
 简单地说，维度就是观察数据的角度。比如传感器的采集数据，可以从时间的维度来观察：
 
-![](https:////upload-images.jianshu.io/upload_images/5141839-5f4dd1c670d785aa.png?imageMogr2/auto-orient/strip|imageView2/2/w/352/format/webp)
+![](https://tva1.sinaimg.cn/large/008i3skNly1guipiqog3pj609s06n74b02.jpg)
 
 也可以进一步细化，从时间和设备两个角度观察：
 
-![](https:////upload-images.jianshu.io/upload_images/5141839-732989790042d6fd.png?imageMogr2/auto-orient/strip|imageView2/2/w/369/format/webp)
+![](https://tva1.sinaimg.cn/large/008i3skNly1guipj9ykhqj60a90eot9602.jpg)
 
-维度一般是离散的值，比如时间维度上的每一个独立的日期，或者设备维度上的每一个独立的设备。因此统计时可以把维度相同的记录聚合在一起，然后应用聚合函数做累加、均值、最大值、最小值等聚合计算。
+**维度**一般是离散的值，比如时间维度上的每一个独立的日期，或者设备维度上的每一个独立的设备。因此统计时可以把维度相同的记录聚合在一起，然后应用聚合函数做累加、均值、最大值、最小值等聚合计算。
 
-度量就是被聚合的统计值，也就是聚合运算的结果，它一般是连续的值，如以上两个图中的温度值，或是其他测量点，比如湿度等等。通过对度量的比较和分析，我们就可以对数据做出评估，比如这个月设备运行是否稳定，某个设备的平均温度是否明显高于其他同类设备等等。
+**度量**就是被聚合的统计值，也就是聚合运算的结果，它一般是连续的值，如以上两个图中的温度值，或是其他测量点，比如湿度等等。通过对度量的比较和分析，我们就可以对数据做出评估，比如这个月设备运行是否稳定，某个设备的平均温度是否明显高于其他同类设备等等。
 
-### Cube和Cuboid
+### Cube 和 Cuboid
 
 了解了维度和度量之后，我们可以将数据模型上的所有字段进行分类：它们要么是维度，要么是度量。根据定义好的维度和度量，我们就可以构建 Cube 了。
 
-对于一个给定的数据模型，我们可以对其上的所有维度进行组合。对于N个维度来说，组合所有可能性共有2的N次方种。对于每一种维度的组合，将度量做聚合计算，然后将运算的结果保存为一个物化视图，称为Cuboid。所有维度组合的Cuboid作为一个整体，被称为Cube。
+对于一个给定的数据模型，我们可以对其上的所有维度进行组合。对于 N 个维度来说，组合所有可能性共有 2 的 N 次方种。对于每一种维度的组合，将度量做聚合计算，然后将运算的结果保存为一个物化视图，称为 Cuboid。所有维度组合的 Cuboid 作为一个整体，被称为 Cube。
 
-举个例子。假设有一个电商的销售数据集，其中维度包括时间（Time）、商品（Item）、地点（Location）和供应商（Supplier），度量为销售额（GMV）。那么所有维度的组合就有2的4次方，即16种，比如一维度（1D）的组合有[Time]、[Item]、[Location]、[Supplier]4种；二维度（2D）的组合有[Time Item]、[Time Location]、[Time Supplier]、[Item Location]、[Item Supplier]、[Location Supplier]6种；三维度（3D）的组合也有4种；最后零维度（0D）和四维度（4D）的组合各有1种，总共16种。
+举个例子。假设有一个电商的销售数据集，其中维度包括时间（Time）、商品（Item）、地点（Location）和供应商（Supplier），度量为销售额（GMV）。那么所有维度的组合就有 2 的 4 次方，即 16 种，比如一维度（1D）的组合有[Time]、[Item]、[Location]、[Supplier] 4 种；二维度（2D）的组合有[Time Item]、[Time Location]、[Time Supplier]、[Item Location]、[Item Supplier]、[Location Supplier]  6种；三维度（3D）的组合也有 4 种；最后零维度（0D）和四维度（4D）的组合各有 1 种，总共 16 种。
 
-计算Cubiod，即按维度来聚合销售额。如果用SQL语句来表达计算Cuboid [Time, Location]，那么SQL语句如下：
+计算 Cubiod，即按维度来聚合销售额。如果用 SQL 语句来表达计算 Cuboid [Time, Location]，那么 SQL 语句如下：
 
 ```sql
 select Time, Location, Sum(GMV) as GMV from Sales group by Time, Location
 ```
 
 将计算的结果保存为物化视图，所有 Cuboid 物化视图的总称就是 Cube。
+
+> Cube 中只包含聚合数据，所以用户的所有查询都应该是聚合查询 (包含 “group by”)，不能出现 select * 这种
 
 ### 事实表和维度表
 
@@ -86,37 +86,19 @@ select Time, Location, Sum(GMV) as GMV from Sales group by Time, Location
 
 还有一种更为复杂的模型，具有多个事实表，维表可以在不同事实表之间公用，这种模型被称为**星座模型**。
 
-不过，Kylin目前只支持星形模型和雪花模型。
+不过，Kylin 目前只支持星形模型和雪花模型。
 
 
 
-
-
-### 执行 “select *” 报错
-
-Cube 中只包含聚合数据，所以用户的所有查询都应该是聚合查询 (包含 “group by”)。
-
-
-
-## 概览
-
-Apache Kylin™是一个开源的、分布式的分析型数据仓库，提供Hadoop/Spark 之上的 SQL 查询接口及多维分析（OLAP）能力以支持超大规模数据，最初由 eBay 开发并贡献至开源社区。它能在亚秒内查询巨大的表。
-
-Apache Kylin™ 令使用者仅需三步，即可实现超大数据集上的亚秒级查询。
-
-1. 定义数据集上的一个星形或雪花形模型
-2. 在定义的数据表上构建cube
-3. 使用标准 SQL 通过 ODBC、JDBC 或 RESTFUL API 进行查询，仅需亚秒级响应时间即可获得查询结果
-
-Kylin 提供与多种数据可视化工具的整合能力，如 Tableau，PowerBI 等，令用户可以使用 BI 工具对 Hadoop 数据进行分析。
-
-![](http://kylin.apache.org/assets/images/kylin_diagram.png)
-
-
+## 二、技术架构
 
 Apache Kylin 系统主要可以分为**离线构建**和**在线查询**两部分。
 
-上图左侧为数据源，目前 Kylin 默认的数据源是 Apache Hive，保存着待分析的用户数据。根据元数据的定义，构建引擎从数据源抽取数据，并构建 Cube。数据以关系表的形式输入，并且必须符合星形模型。构建技术主要为 MapReduce（Spark目前在beta版本）。构建后的 Cube 保存在右侧存储引擎中，目前 Kylin 默认的存储为 Apache HBase。
+![](http://kylin.apache.org/assets/images/kylin_diagram.png)
+
+上图左侧为数据源，目前 Kylin 默认的数据源是 Apache Hive，保存着待分析的用户数据。
+
+根据元数据的定义，构建引擎从数据源抽取数据，并构建 Cube。数据以关系表的形式输入，并且必须符合星形模型。构建技术主要为 MapReduce（Spark目前在beta版本）。构建后的 Cube 保存在右侧存储引擎中，目前 Kylin 默认的存储为 Apache HBase。
 
 完成离线构建后，用户可以从上方的查询系统发送 SQL 进行查询分析。Kylin 提供了 RESTful API、JDBC/ODBC 接口供用户调用。无论从哪个接口进入，SQL 最终都会来到 REST 服务层，再转交给查询引擎进行处理。查询引擎解析 SQL，生成基于关系表的逻辑执行计划，然后将其转译为基于 Cube 的物理执行计划，最后查询预计算生成的 Cube 并产生结果。整个过程不会访问原始数据源。如果用户提交的查询语句未在 Kylin 中预先定义，Kylin 会返回一个错误。
 
@@ -150,34 +132,13 @@ Apache Kylin 的这种架构使得它拥有许多非常棒的特性：
 
 
 
-## Kylin 生态圈
-
-###### Kylin 核心:
-
-Kylin 基础框架，包括元数据（Metadata）引擎，查询引擎，Job 引擎及存储引擎等，同时包括 REST 服务器以响应客户端请求
-
-###### 扩展:
-
-支持额外功能和特性的插件
-
-###### 整合:
-
-与调度系统，ETL，监控等生命周期管理系统的整合
-
-###### 用户界面:
-
-在 Kylin 核心之上扩展的第三方用户界面
-
-###### 驱动:
-
-ODBC 和 JDBC 驱动以支持不同的工具和产品，比如 Tableau
-
-![](http://kylin.apache.org/assets/images/core.png)
 
 
+### 参考与感谢：
 
+原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 
 
+[《Apache Kylin 在百度地图的实践》](https://www.infoq.cn/article/practis-of-apache-kylin-in-baidu-map/)
 
-### 参考与来源：
+美团技术团队：[Apache Kylin的实践与优化](https://tech.meituan.com/2020/11/19/apache-kylin-practice-in-meituan.html)
 
-[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 特别好的入门文章

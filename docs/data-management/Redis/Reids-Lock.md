@@ -9,12 +9,13 @@
 > - 什么是分布式锁
 > - 分布式锁的实现要求
 > - 基于 Redisson 实现的 Redis 分布式锁
+> - 再简单说下 RedLock
 
 ## 一、什么是分布式锁	 
 
 **分布式~~锁**，要这么念，首先得是『分布式』，然后才是『锁』
 
-- 分布式：这里的分布式指的是分布式系统，涉及到好多技术和理论，包括CAP 理论、分布式存储、分布式事务、分布式锁...
+- 分布式：这里的分布式指的是分布式系统，涉及到好多技术和理论，包括 CAP 理论、分布式存储、分布式事务、分布式锁...
 
   > 分布式系统是由一组通过网络进行通信、为了完成共同的任务而协调工作的计算机节点组成的系统。
   >
@@ -38,7 +39,7 @@
 
 知道了什么是分布式锁，接下来就到了技术选型环节
 
-
+![](http://img.doutula.com/production/uploads/image/2018/01/03/20180103987632_tEBevG.jpg)
 
 ## 二、分布式锁要怎么搞
 
@@ -106,7 +107,7 @@ SET resource_name my_random_value NX PX 30000
 > - `NX` ：只在键不存在时，才对键进行设置操作。 `SET key value NX` 效果等同于 `SETNX key value` 。
 > - `XX` ：只在键已经存在时，才对键进行设置操作。
 
-这条指令的意思：当 key——resource_name 不存在时创建这样的key，设值为 my_random_value，并设置过期时间 30000 毫秒。
+这条指令的意思：当 key——resource_name 不存在时创建这样的 key，设值为 my_random_value，并设置过期时间 30000 毫秒。
 
 别看这干了两件事，因为 Redis 是单线程的，这一条指令不会被打断，所以是原子性的操作。
 
@@ -139,7 +140,7 @@ end
 
 1. 获取锁时，过期时间要设置多少合适呢？
 
-   预估一个合适的时间，其实没那么容易，比如操作资源的时间最慢可能要 10 s，而我们只设置了 5 s  就过期，那就存在锁提前过期的风险。这个问题先记下，我们先看下 Javaer 要怎么在代码中用 Redis 锁。
+   预估一个合适的时间，其实没那么容易，比如操作资源的时间最慢可能要 10 s，而我们只设置了 5 s  就过期，那就存在锁提前过期的风险。这个问题先记下，我们一会看下 Javaer 要怎么在代码中用 Redis 锁。
 
 2. 容错性如何保证呢？
 
@@ -151,13 +152,13 @@ end
 
 ### Redisson 实现代码
 
-redisson 是 Redis 官方的分布式锁组件。GitHub 地址：[https://github.com/redisson/redisson](https://zhuanlan.zhihu.com/write)
+Redisson 是 Redis 官方的分布式锁组件。GitHub 地址：[https://github.com/redisson/redisson](https://zhuanlan.zhihu.com/write)
 
 > Redisson 是一个在 Redis 的基础上实现的 Java 驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的 Java 常用对象，还实现了可重入锁（Reentrant Lock）、公平锁（Fair Lock、联锁（MultiLock）、 红锁（RedLock）、 读写锁（ReadWriteLock）等，还提供了许多分布式服务。Redisson 提供了使用 Redis 的最简单和最便捷的方法。Redisson 的宗旨是促进使用者对 Redis 的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。
 
 redisson 现在已经很强大了，github 的 wiki 也很详细，分布式锁的介绍直接戳 [Distributed locks and synchronizers](https://github.com/redisson/redisson/wiki/8.-Distributed-locks-and-synchronizers)
 
-Redisson 支持单点模式、主从模式、哨兵模式、集群模式，只是配置的不同，我们以单点模式来看下怎么使用，代码很简单，都已经为我们封装好了，直接拿来用就好，详细的demo，我放在了 github: starfish-learn-redisson 上，这里就不一步步来了
+Redisson 支持单点模式、主从模式、哨兵模式、集群模式，只是配置的不同，我们以单点模式来看下怎么使用，代码很简单，都已经为我们封装好了，直接拿来用就好，详细的 demo，我放在了 github: starfish-learn-redisson 上，这里就不一步步来了
 
 ```java
 RLock lock = redisson.getLock("myLock");

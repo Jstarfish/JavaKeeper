@@ -2,18 +2,13 @@
 
 
 
-- [JMM](java/JUC/Java-Memory-Model.md)
-- [阻塞队列](java/JUC/BlockingQueue.md)
-- [volatile](java/JUC/volatile.md)
-- [阻塞队列](java/JUC/BlockingQueue.md)
-- [ThreadLocal](java/JUC/ThreadLocal.md)
-- [线程池](java/JUC/Thread-Pool.md)
-- [CAS](java/JUC/CAS.md)
-- [synchronized](java/JUC/synchronized.md)
-- [各种锁](java/JUC/各种锁.md)
-- [CountDownLatch、CyclicBarrier、Semaphore](java/JUC/CountDownLatch、CyclicBarrier、Semaphore.md)
-- [AQS](java/JUC/AQS.md)
+其实并发编程可以总结为三个核心问题：分工、同步、互斥。
 
-![J.U.C 类分类](https://img-blog.csdn.net/20170126201206425?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDg1MzI2MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+所谓分工指的是如何高效地拆解任务并分配给线程，而同步指的是线程之间如何协作，互斥则是保证同一时刻只允许一个线程访问共享资源。
+
+Java SDK 并发包很大部分内容都是按照这三个维度组织的，例如 Fork/Join 框架就是一种分工模式，CountDownLatch 就是一种典型的同步方式，而可重入锁则是一种互斥手段。
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/juc/SouthEast.jpeg)
 
 ![](https://tva1.sinaimg.cn/large/0081Kckwly1gkc498bgkkj310r0u0dhr.jpg)
+

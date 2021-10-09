@@ -1,3 +1,15 @@
+---
+title: Redis 集群
+date: 2021-10-11
+tags: 
+ - Redis
+categories: Redis
+---
+
+![](https://tva1.sinaimg.cn/large/008i3skNly1gv7y6sjivij60v60kumz402.jpg)
+
+
+
 ## 一、Redis 集群是啥
 
 我们先回顾下前边介绍的几种 Redis 高可用方案：持久化、主从同步和哨兵机制。但这些方案仍有痛点，其中最主要的问题就是存储能力受单机限制，以及没办法实现写操作的负载均衡。
@@ -10,7 +22,7 @@ Redis 集群刚好解决了上述问题，实现了较为完善的高可用方�
 
 集群，即 Redis Cluster，是 Redis 3.0 开始引入的分布式存储方案。
 
-集群由多个节点(Node)组成，Redis的数据分布在这些节点中。集群中的节点分为主节点和从节点：只有主节点负责读写请求和集群信息的维护；从节点只进行主节点数据和状态信息的复制。
+集群由多个节点(Node)组成，Redis 的数据分布在这些节点中。集群中的节点分为主节点和从节点：只有主节点负责读写请求和集群信息的维护；从节点只进行主节点数据和状态信息的复制。
 
 
 
@@ -147,7 +159,7 @@ Redis 集群最核心的功能就是数据分区，数据分区之后又伴随�
 
 不过该方案最大的问题是，**当新增或删减节点时**，节点数量发生变化，系统中所有的数据都需要 **重新计算映射关系**，引发大规模数据迁移。
 
-这种方式的突出优点是简单性，常用于数据库的分库分表规则，一般采 用预分区的方式，提前根据数据量规划好分区数，比如划分为 512  或1024 张表，保证可支撑未来一段时间的数据量，再根据负载情况将表迁移到其他数 据库中。扩容时通常采用翻倍扩容，避免数据映射全部被打乱导致全量迁移的情况
+这种方式的突出优点是简单性，常用于数据库的分库分表规则，一般采用预分区的方式，提前根据数据量规划好分区数，比如划分为 512  或 1024 张表，保证可支撑未来一段时间的数据量，再根据负载情况将表迁移到其他数据库中。扩容时通常采用翻倍扩容，避免数据映射全部被打乱导致全量迁移的情况
 
 #### 方案二：一致性哈希分区
 
@@ -155,9 +167,9 @@ Redis 集群最核心的功能就是数据分区，数据分区之后又伴随�
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-consistency.png)
 
-与哈希取余分区相比，一致性哈希分区将 **增减节点的影响限制在相邻节点**。以上图为例，如果在 `node1` 和 `node2` 之间增加 `node5`，则只有 `node2` 中的一部分数据会迁移到 `node5`；如果去掉 `node2`，则原 `node2` 中的数据只会迁移到 `node4` 中，只有 `node4` 会受影响。
+与哈希取余分区相比，一致性哈希分区将 **增减节点的影响限制在相邻节点**。以上图为例，如果在 `node1` 和 `node2` 之间增加 `node5`，则只有 `node2` 中的一部分数据会迁移到 `node5`；如果去掉 `node2`，则原 `node2` 中的数据只会迁移到 `node3` 中，只有 `node3` 会受影响。
 
-一致性哈希分区的主要问题在于，当 **节点数量较少** 时，增加或删减节点，**对单个节点的影响可能很大**，造成数据的严重不平衡。还是以上图为例，如果去掉 `node2`，`node4` 中的数据由总数据的 `1/4` 左右变为 `1/2` 左右，与其他节点相比负载过高。
+一致性哈希分区的主要问题在于，当 **节点数量较少** 时，增加或删减节点，**对单个节点的影响可能很大**，造成数据的严重不平衡。还是以上图为例，如果去掉 `node2`，`node3` 中的数据由总数据的 `1/4` 左右变为 `1/2` 左右，与其他节点相比负载过高。
 
 #### 方案三：带有虚拟节点的一致性哈希分区
 
@@ -221,7 +233,7 @@ Redis 集群相对单机在功能上存在一些限制，需要开发人员提�
 2. 每个节点在固定周期内通过特定规则选择几个节点发送 ping 消息
 3. 接收到 ping 消息的节点用 pong 消息作为响应
 
-集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全部节点，也可能仅知道部分节点，只要这些节点彼此可以正常通信，最终它们会达到一致的状态。当节点出故障、新节点加入、主从角色变化、槽信息 变更等事件发生时，通过不断的 `ping/pong` 消息通信，经过一段时间后所有的 节点都会知道整个集群全部节点的最新状态，从而达到集群状态同步的目 的。
+集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全部节点，也可能仅知道部分节点，只要这些节点彼此可以正常通信，最终它们会达到一致的状态。当节点出故障、新节点加入、主从角色变化、槽信息 变更等事件发生时，通过不断的 `ping/pong` 消息通信，经过一段时间后所有的节点都会知道整个集群全部节点的最新状态，从而达到集群状态同步的目的。
 
 #### 两个端口
 
@@ -233,6 +245,10 @@ Redis 集群相对单机在功能上存在一些限制，需要开发人员提�
 
 
 #### Gossip 协议
+
+> 对于一个分布式集群来说，它的良好运行离不开集群节点信息和节点状态的正常维护。为了实现这一目标，通常我们可以选择**中心化**的方法，使用一个第三方系统，比如 Zookeeper 或 etcd，来维护集群节点的信息、状态等。同时，我们也可以选择**去中心化**的方法，让每个节点都维护彼此的信息、状态，并且使用集群通信协议 Gossip 在节点间传播更新的信息，从而实现每个节点都能拥有一致的信息。下图就展示了这两种集群节点信息维护的方法，你可以看下。
+>
+> ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-gossip.png)
 
 节点间通信，按照通信协议可以分为几种类型：单对单、广播、Gossip 协议等。重点是广播和 Gossip 的对比。
 
@@ -299,32 +315,32 @@ typedef struct {
 
 集群内所有的消息都采用相同的**消息头**结构 `clusterMsg`，它包含了发送节点关键信息，如节点 id、槽映射、节点标识(主从角色，是否下线)等。
 
-**消息体**在 Redis 内部采用 `clusterMsgData` 结构声明，结构如下:
+**消息体** 在 Redis 内部采用 `clusterMsgData` 结构声明，结构如下:
 
 ```c
 union clusterMsgData {
-    /* PING, MEET and PONG */
+    //Ping、Pong和Meet消息类型对应的数据结构
     struct {
         /* Array of N clusterMsgDataGossip structures */
         clusterMsgDataGossip gossip[1];
     } ping;
 
-    /* FAIL */
+    //Fail消息类型对应的数据结构
     struct {
         clusterMsgDataFail about;
     } fail;
 
-    /* PUBLISH */
+    //Publish消息类型对应的数据结构
     struct {
         clusterMsgDataPublish msg;
     } publish;
 
-    /* UPDATE */
+    //Update消息类型对应的数据结构
     struct {
         clusterMsgDataUpdate nodecfg;
     } update;
 
-    /* MODULE */
+    //Module消息类型对应的数据结构
     struct {
         clusterMsgModule msg;
     } module;
@@ -335,18 +351,18 @@ union clusterMsgData {
 
 ```c
 typedef struct {
-    char nodename[CLUSTER_NAMELEN];
-    uint32_t ping_sent;       /* 最后一次向该节点发送ping消息时间 */
-    uint32_t pong_received;		/* 最后一次接收该节点pong消息时间 */
-    char ip[NET_IP_STR_LEN];  /* IP address last time it was seen */
-    uint16_t port;              /* base port last time it was seen */
-    uint16_t cport;             /* cluster port last time it was seen */
-    uint16_t flags;             /* node->flags copy */
-    uint32_t notused1;
+    char nodename[CLUSTER_NAMELEN]; //节点名称
+    uint32_t ping_sent;  //节点发送Ping的时间
+    uint32_t pong_received; //节点收到Pong的时间
+    char ip[NET_IP_STR_LEN];  //节点IP
+    uint16_t port;              //节点和客户端的通信端口
+    uint16_t cport;             //节点用于集群通信的端口
+    uint16_t flags;             //节点的标记
+    uint32_t notused1;    //未用字段
 } clusterMsgDataGossip;
 ```
 
-
+从 clusterMsgDataGossip 数据结构中，我们可以看到，它里面包含了节点的基本信息，比如节点名称、IP 和通信端口，以及使用 Ping、Pong 消息发送和接收时间来表示的节点运行状态。
 
 消息交互的过程就是解析消息头和消息体的过程
 
