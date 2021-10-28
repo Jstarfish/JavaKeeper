@@ -61,13 +61,13 @@
 
 | 类别                    | 作用                                                         |
 | :---------------------- | :----------------------------------------------------------- |
-| .index                  | 基于偏移量的索引文件，存放着消息的offset和其对应的物理位置，是**<mark>稀松索引</mark>** |
+| .index                  | 基于偏移量的索引文件，存放着消息的offset和其对应的物理位置，是<mark>**稀松索引**</mark> |
 | .timestamp              | 时间戳索引文件                                               |
 | .log                    | 它是segment文件的数据文件，用于存储实际的消息。该文件是二进制格式的。log文件是存储在 ConcurrentSkipListMap 里的，是一个map结构，key是文件名（offset），value是内容，这样在查找指定偏移量的消息时，用二分查找法就能快速定位到消息所在的数据文件和索引文件 |
 | .snaphot                | 快照文件                                                     |
 | leader-epoch-checkpoint | 保存了每一任leader开始写入消息时的offset，会定时更新。 follower被选为leader时会根据这个确定哪些消息可用 |
 
-index 和 log 文件以当前 segment 的第一条消息的 offset 命名。偏移量 offset 是一个 64 位的长整形数，固定是20 位数字，长度未达到，用 0 进行填补，索引文件和日志文件都由此作为文件名命名规则。所以从上图可以看出，我们的偏移量是从 0 开始的，`.index` 和 `.log` 文件名称都为 `00000000000000000000`。
+index 和 log 文件以当前 segment 的第一条消息的 offset 命名。偏移量 offset 是一个 64 位的长整形数，固定是     20 位数字，长度未达到，用 0 进行填补，索引文件和日志文件都由此作为文件名命名规则。所以从上图可以看出，我们的偏移量是从 0 开始的，`.index` 和 `.log` 文件名称都为 `00000000000000000000`。
 
 接着往 topic 中发送一些消息，并启动消费者消费
 
@@ -229,9 +229,9 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 ##### c) ack应答机制
 
-对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等 ISR 中的follower全部接收成功。
+对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等 ISR 中的 follower 全部接收成功。
 
-所以Kafka为用户提供了**三种可靠性级别**，用户根据对可靠性和延迟的要求进行权衡，选择以下的acks 参数配置
+所以 Kafka 为用户提供了**三种可靠性级别**，用户根据对可靠性和延迟的要求进行权衡，选择以下的 acks 参数配置
 
 - 0：producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟，broker 一接收到还没有写入磁盘就已经返回，当 broker 故障时有可能**丢失数据**；
 
@@ -241,7 +241,7 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 ##### d) 故障处理
 
-由于我们并不能保证 Kafka 集群中每时每刻 follower 的长度都和 leader 一致（即数据同步是有时延的），那么当leader 挂掉选举某个 follower 为新的 leader 的时候（原先挂掉的 leader 恢复了成为了 follower），可能会出现leader 的数据比 follower 还少的情况。为了解决这种数据量不一致带来的混乱情况，Kafka 提出了以下概念：
+由于我们并不能保证 Kafka 集群中每时每刻 follower 的长度都和 leader 一致（即数据同步是有时延的），那么当           leader 挂掉选举某个 follower 为新的 leader 的时候（原先挂掉的 leader 恢复了成为了 follower），可能会出现  leader 的数据比 follower 还少的情况。为了解决这种数据量不一致带来的混乱情况，Kafka 提出了以下概念：
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh46fmpty5j31eq0hudfw.jpg)
 
@@ -341,7 +341,7 @@ RoundRobin 即轮询的意思，比如现在有一个三个消费者 ConsumerA�
 
 这种情况下，采用 RoundRobin 算法分配，多个主题会被当做一个整体来看，这个整体包含了各自的 Partition，比如在 Kafka-clients 依赖中，与之对应的对象为 `TopicPartition`。接着将这些 `TopicPartition` 根据其哈希值进行排序，排序后采用轮询的方式分配给消费者。
 
-但这会带来一个问题：假如上图中的消费者组中，ConsumerA 只订阅了 TopicA 主题，ConsumerB 只订阅了TopicB 主题，采用 RoundRobin 轮询算法后，可能会出现 ConsumerA 消费了 TopicB 主题分区里的消息，ConsumerB 消费了 TopicA 主题分区里的消息。
+但这会带来一个问题：假如上图中的消费者组中，ConsumerA 只订阅了 TopicA 主题，ConsumerB 只订阅了 TopicB 主题，采用 RoundRobin 轮询算法后，可能会出现 ConsumerA 消费了 TopicB 主题分区里的消息，ConsumerB 消费了 TopicA 主题分区里的消息。
 
 综上所述，RoundRobin 算法只适用于消费者组中消费者订阅的主题相同的情况。同时会发现，采用 RoundRobin 算法，消费者组里的消费者之间消费的消息个数最多相差 1 个。
 
@@ -395,10 +395,10 @@ Math.abs(groupID.hashCode()) % numPartitions
 Kafka 提供的再平衡策略主要有三种：`Round Robin`，`Range` 和 `Sticky`，默认使用的是 `Range`。这三种分配策略的主要区别在于：
 
 - `Round Robin`：会采用轮询的方式将当前所有的分区依次分配给所有的 consumer；
-- `Range`：首先会计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer；
+- `Range`：首先会计算每个 consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer；
 - `Sticky`：这种分区策略是最新版本中新增的一种策略，其主要实现了两个目的：
-  - 将现有的分区尽可能均衡的分配给各个consumer，存在此目的的原因在于`Round Robin`和`Range`分配策略实际上都会导致某几个consumer承载过多的分区，从而导致消费压力不均衡；
-  - 如果发生再平衡，那么重新分配之后在前一点的基础上会尽力保证当前未宕机的consumer所消费的分区不会被分配给其他的consumer上；
+  - 将现有的分区尽可能均衡的分配给各个 consumer，存在此目的的原因在于`Round Robin`和`Range`分配策略实际上都会导致某几个 consumer 承载过多的分区，从而导致消费压力不均衡；
+  - 如果发生再平衡，那么重新分配之后在前一点的基础上会尽力保证当前未宕机的 consumer 所消费的分区不会被分配给其他的 consumer 上；
 
 ### 五、Kafka事务
 
@@ -416,10 +416,10 @@ Kafka 从 0.11 版本开始引入了事务支持。事务可以保证 Kafka 在 
 
 
 
-**参考：**
+## 参考与来源：
 
-尚硅谷Kafka教学
+- 尚硅谷Kafka教学
 
-部分图片来源：mrbird.cc
+- 部分图片来源：mrbird.cc
 
-https://gitbook.cn/books/5ae1e77197c22f130e67ec4e/index.html
+- https://gitbook.cn/books/5ae1e77197c22f130e67ec4e/index.html

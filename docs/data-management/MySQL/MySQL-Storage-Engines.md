@@ -161,7 +161,7 @@ SET default_storage_engine=NDBCLUSTER;
 
  同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为 16KB，当然也可以通过改变 `innodb_page_size` 选项对默认大小进行修改，需要注意的是不同的页大小最终也会导致区大小的不同 
 
-![Relation Between Page Size - Extent Size](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/Relation%20Between%20Page%20Size%20-%20Extent%20Size.png)
+![img](https://oss-emcsprod-public.modb.pro/wechatSpider/modb_20210809_11aefc96-f8bc-11eb-b9b6-00163e068ecd.png)
 
 从图中可以看出，在 InnoDB 存储引擎中，一个区的大小最小为 1MB，页的数量最少为 64 个。
 
@@ -207,7 +207,7 @@ Antelope 是 InnoDB 最开始支持的文件格式，它包含两种行格式 Co
 
 ![COMPACT-And-REDUNDANT-Row-Format](../../_images/mysql/COMPACT-And-REDUNDANT-Row-Format.jpg)
 
-Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上上看，Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
+Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上看，Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
 
 #### 行溢出数据
 

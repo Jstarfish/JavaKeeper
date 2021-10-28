@@ -10,9 +10,9 @@ Kafka，作为目前在大数据领域应用最为广泛的消息队列，其内
 
 ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjmk1gaprjj30i906uwg3.jpg)
 
-大体上来说，用户首先构建待发送的消息对象ProducerRecord，然后调用KafkaProducer#send方法进行发送。KafkaProducer接收到消息后首先对其进行序列化，然后通过分区器（partitioner）确定该数据需要发送的 Topic 的分区，kafka 提供了一个默认的分区器，如果消息指定了 key，那么 partitioner 会根据 key 的 hash 值来确定目标分区，如果没有指定 key，那么将使用轮询的方式确定目标分区，这样可以最大程度的均衡每个分区的消息，确定分区之后，将会进一步确认该分区的 leader 节点(处理该分区消息读写的主节点)，，最后追加写入到内存中的消息缓冲池(accumulator)。此时KafkaProducer#send方法成功返回。
+大体上来说，用户首先构建待发送的消息对象 ProducerRecord，然后调用 `KafkaProducer#send` 方法进行发送。KafkaProducer 接收到消息后首先对其进行序列化，然后通过分区器（partitioner）确定该数据需要发送的 Topic 的分区，kafka 提供了一个默认的分区器，如果消息指定了 key，那么 partitioner 会根据 key 的 hash 值来确定目标分区，如果没有指定 key，那么将使用轮询的方式确定目标分区，这样可以最大程度的均衡每个分区的消息，确定分区之后，将会进一步确认该分区的 leader 节点(处理该分区消息读写的主节点)，最后追加写入到内存中的消息缓冲池(accumulator)。此时 `KafkaProducer#send` 方法成功返回。
 
-KafkaProducer 中还有一个专门的Sender IO线程负责将缓冲池中的消息分批次发送给对应的broker，完成真正的消息发送逻辑。
+KafkaProducer 中还有一个专门的 Sender IO 线程负责将缓冲池中的消息分批次发送给对应的 broker，完成真正的消息发送逻辑。
 
 
 
@@ -57,10 +57,12 @@ public static void main(String[] args) {
 }
 ```
 
-> 如果发送失败，也可能 server.properties 配置的问题，不允许远程访问
+> 如果发送失败，也可能是 server.properties 配置的问题，不允许远程访问
 >
 > - 去掉注释，listeners=PLAINTEXT://:9092
-> - 把advertised.listeners值改为PLAINTEXT://host_ip:9092
+> - 把 advertised.listeners 值改为 PLAINTEXT://host_ip:9092
+
+
 
 ### 同步提交
 
@@ -75,7 +77,7 @@ get 方法将阻塞，直到返回结果 RecordMetadata，所以可以看成是�
 
 ### 异步待回调函数
 
-上边的异步提交方式，可以称为发送并忘记（不关心消息是否正常到达，对返回结果不做任何判断处理），所以 kafak 提供了一个带回调函数的 send 方法
+上边的异步提交方式，可以称为**发送并忘记**（不关心消息是否正常到达，对返回结果不做任何判断处理），所以 kafak 提供了一个带回调函数的 send 方法
 
 ```java
 Future<RecordMetadata> send(ProducerRecord<K, V> producer, Callback callback);
@@ -138,7 +140,7 @@ TODO
 
 - **bootstrap.servers**：Kafka 集群信息列表，用于建立到 Kafka 集群的初始连接，如果集群中机器数很多，只需要指定部分的机器主机的信息即可，不管指定多少台，producer 都会通过其中一台机器发现集群中所有的 broker，格式为 `hostname1:port,hostname2:port,hostname3:port`
 
-- **key.serializer**：任何消息发送到 broker 格式都是字节数组，因此在发送到 broker 之前需要进行序列化，该参数用于对 ProducerRecord 中的 key进行序列化
+- **key.serializer**：任何消息发送到 broker 格式都是字节数组，因此在发送到 broker 之前需要进行序列化，该参数用于对 ProducerRecord 中的 key 进行序列化
 
 - **value.serializer**：该参数用于对 ProducerRecord 中的 value 进行序列化
 
@@ -146,7 +148,7 @@ TODO
   >
   > ![](https://static01.imgkr.com/temp/0997ff0db5a04501bc3438ed3b7402c9.png)
 
-- **acks：**ack 具有3个取值 0、1 和 -1(all)
+- **acks：**ack 具有 3 个取值 0、1 和 -1(all)
 
   - acks=0：producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟，broker 一接收到还没有写入磁盘就已经返回，吞吐量最高，当 broker 故障时有可能**丢失数据**；
   - ack=1：producer 等待 broker 的 ack，partition 的 leader 落盘成功后返回 ack，如果在 follower 同步成功之前 leader 故障，那么将会**丢失数据**
@@ -221,42 +223,42 @@ public class MyPartitioner implements Partitioner {
 
 ## 内部原理
 
-Java producer(区别于Scala producer)是双线程的设计，分为KafkaProducer用户主线程和Sender线程
+Java producer(区别于Scala producer)是双线程的设计，分为 KafkaProducer 用户主线程和 Sender 线程
 
-producer 总共创建两个线程：执行KafkaPrducer#send逻辑的线程——我们称之为“用户主线程”；执行发送逻辑的IO线程——我们称之为“Sender线程”
+producer 总共创建两个线程：执行 `KafkaPrducer#send` 逻辑的线程——我们称之为“用户主线程”；执行发送逻辑的 IO 线程——我们称之为“Sender线程”
 
 ### 1. 序列化+计算目标分区
 
-这是KafkaProducer#send逻辑的第一步，即为待发送消息进行序列化并计算目标分区，如下图所示：
+这是 `KafkaProducer#send` 逻辑的第一步，即为待发送消息进行序列化并计算目标分区，如下图所示：
 
 ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjmp7vf31tj30k103uq3n.jpg)
 
-如上图所示，一条所属topic是"test"，消息体是"message"的消息被序列化之后结合KafkaProducer缓存的元数据(比如该topic分区数信息等)共同传给后面的Partitioner实现类进行目标分区的计算。
+如上图所示，一条所属 topic 是"test"，消息体是"message"的消息被序列化之后结合 KafkaProducer 缓存的元数据(比如该 topic 分区数信息等)共同传给后面的 Partitioner 实现类进行目标分区的计算。
 
 ### 2. 追加写入消息缓冲区(accumulator)
 
-producer 创建时会创建一个默认32MB(由buffer.memory参数指定)的accumulator缓冲区，专门保存待发送的消息。除了之前在“关键参数”段落中提到的linger.ms和batch.size等参数之外，该数据结构中还包含了一个特别重要的集合信息：消息批次信息(batches)。该集合本质上是一个HashMap，里面分别保存了每个topic分区下的batch队列，即前面说的批次是按照topic分区进行分组的。这样发往不同分区的消息保存在对应分区下的batch队列中。举个简单的例子，假设消息M1, M2被发送到test的0分区但属于不同的batch，M3分送到test的1分区，那么batches中包含的信息就是：{"test-0" -> [batch1, batch2], "test-1" -> [batch3]}
+producer 创建时会创建一个默认 32MB(由buffer.memory参数指定)的 accumulator 缓冲区，专门保存待发送的消息。除了之前在“关键参数”段落中提到的 linger.ms 和 batch.size 等参数之外，该数据结构中还包含了一个特别重要的集合信息：消息批次信息(batches)。该集合本质上是一个 HashMap，里面分别保存了每个 topic 分区下的batch 队列，即前面说的批次是按照 topic 分区进行分组的。这样发往不同分区的消息保存在对应分区下的 batch队列中。举个简单的例子，假设消息 M1, M2 被发送到 test 的 0 分区但属于不同的 batch，M3 分送到 test 的 1分区，那么 batches 中包含的信息就是：{"test-0" -> [batch1, batch2], "test-1" -> [batch3]}
 
-单个topic分区下的batch队列中保存的是若干个消息批次。每个batch中最重要的3个组件包括：
+单个 topic 分区下的 batch 队列中保存的是若干个消息批次。每个 batch 中最重要的 3 个组件包括：
 
 - compressor: 负责执行追加写入操作
-- batch缓冲区：由batch.size参数控制，消息被真正追加写入到的地方
+- batch缓冲区：由 batch.size 参数控制，消息被真正追加写入到的地方
 - thunks：保存消息回调逻辑的集合
 
  这一步的目的就是将待发送的消息写入消息缓冲池中，具体流程如下图所示：
 
 ![](https://images2015.cnblogs.com/blog/735367/201702/735367-20170204164910854-2033381282.png)
 
-okay！这一步执行完毕之后理论上讲KafkaProducer.send方法就执行完毕了，用户主线程所做的事情就是等待Sender线程发送消息并执行返回结果了。
+okay！这一步执行完毕之后理论上讲 `KafkaProducer.send` 方法就执行完毕了，用户主线程所做的事情就是等待 Sender 线程发送消息并执行返回结果了。
 
 ### 3. Sender线程预处理及消息发送
 
-此时，该Sender线程登场了。严格来说，Sender线程自KafkaProducer创建后就一直都在运行着 。它的工作流程基本上是这样的：
+此时，该 Sender 线程登场了。严格来说，Sender 线程自 KafkaProducer 创建后就一直都在运行着 。它的工作流程基本上是这样的：
 
 1. 不断轮询缓冲区寻找已做好发送准备的分区 
-2. 将轮询获得的各个batch按照目标分区所在的leader broker进行分组
-3. 将分组后的batch通过底层创建的Socket连接发送给各个broker
-4. 等待服务器端发送response回来
+2. 将轮询获得的各个 batch 按照目标分区所在的 leader broker 进行分组
+3. 将分组后的 batch 通过底层创建的 Socket 连接发送给各个 broker
+4. 等待服务器端发送 response 回来
 
 为了说明上的方便，我还是基于图的方式来解释Sender线程的工作原理：
 
@@ -364,7 +366,7 @@ private Future<RecordMetadata> doSend(ProducerRecord<K, V> record, Callback call
 }
 ```
 
-doSend() 方法主要分为10步完成：
+`doSend()` 方法主要分为 10 步完成：
 
 1. 检查producer实例是否已关闭,如果关闭则抛出异常
 

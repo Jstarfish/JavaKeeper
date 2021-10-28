@@ -223,7 +223,9 @@ function genDataManagementSidebar(){
         ['Big-Data/Hello-BigData', '大数据'],
         ['Big-Data/Hive', 'Hive'],
         ['Big-Data/Bloom-Filter', '布隆过滤器'],
-        ['Big-Data/Kylin', 'Kylin']
+        ['Big-Data/Kylin', 'Kylin'],
+        ['Big-Data/HBase', 'HBase'],
+        ['Big-Data/Phoenix', 'Phoneix']
       ]
     },
     

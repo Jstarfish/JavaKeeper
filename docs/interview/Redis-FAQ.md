@@ -1208,7 +1208,16 @@ Redis 官方站提出了一种权威的基于 Redis 实现分布式锁的方式�
 
 
 
+### Redis—大key问题
 
+所谓的bigkey就是存储本身的key值空间太大，或者hash，list，set等存储中value值过多。
+
+bigkey会带来一些问题，如：
+
+1. 读写bigkey会导致超时严重，甚至阻塞服务。
+2. 大key相关的删除或者自动过期时，会出现qps突降或者突升的情况，极端情况下，会造成主从复制异常，Redis服务阻塞无法响应请求
+
+redis-cli --bigkeys命令可以统计bigkey的分布情况
 
 
 

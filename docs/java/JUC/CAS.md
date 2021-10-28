@@ -1,7 +1,7 @@
 # 从 Atomic 到 CAS ，竟然衍生出这么多 20k+ 面试题
 
 > CAS 知道吗，如何实现？
-> 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
+> 讲一讲 AtomicInteger，为什么要用 CAS 而不是 synchronized？
 > CAS 底层原理，谈谈你对 UnSafe 的理解？
 > AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
 > CAS 有什么缺点吗？ 如何规避 ABA 问题？
@@ -31,10 +31,10 @@ Atomic 原子类可以保证多线程环境下，当某个线程在执行 atomic
 Atomic 包中的类可以分成 4 组：
 
 1. 基本类型：AtomicBoolean，AtomicInteger，AtomicLong
-2.  数组类型：tomicIntegerArray，AtomicLongArray，AtomicReferenceArray
+2.  数组类型：AtomicIntegerArray，AtomicLongArray，AtomicReferenceArray
 3.  引用类型：AtomicReference，AtomicMarkableReference，AtomicStampedReference
-4.  对象的属性修改类型 ：AtomicIntegerFieldUpdater，AtomicLongFieldUpdater，AtomicReferenceFieldUpdater
-5.  JDK1.8 新增：DoubleAccumulator、LongAccumulator、DoubleAdder、LongAdder、Striped64
+4.  对象的属性修改类型（原子化对象属性更新器） ：AtomicIntegerFieldUpdater，AtomicLongFieldUpdater，AtomicReferenceFieldUpdater
+5.  JDK1.8 新增（原子化的累加器）：DoubleAccumulator、LongAccumulator、DoubleAdder、LongAdder、Striped64
 
 
 
@@ -83,7 +83,7 @@ false	 current num:7
 ### 2.1 CAS 算法
 
 - CAS：全称 `Compare and swap`，即**比较并交换**，它是一条 **CPU 同步原语**。 是一种硬件对并发的支持，针对多处理器操作而设计的一种特殊指令，用于管理对共享数据的并发访问。 
-- CAS 是一种无锁的非阻塞算法的实现。 
+- CAS 是一种**无锁的非阻塞算法**的实现。 
 - CAS 包含了 3 个操作数：
   - 需要读写的内存值 V 
   - 旧的预期值 A 

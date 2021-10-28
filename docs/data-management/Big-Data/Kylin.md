@@ -1,5 +1,9 @@
 # Kylin
 
+![](https://siteprod-cdn.kyligence.io/wp-content/uploads/2019/02/apache-kylin896512.png)
+
+> 之前总觉得 Javaer 对数据层面的掌握，在 MySQL、缓存、MQ 这些就行了，可是现如今这个行业是真“卷”啊，这不，大数据相关知识也得了解了解。这玩意一般是用来做大数据的固化查询的，也早就应用在了各个互联网公司，后续还有篇实际使用。
+>
 > Apache Kylin™是一个开源的、分布式的分析型数据仓库，提供 Hadoop/Spark 之上的 SQL 查询接口及多维分析（OLAP）能力以支持超大规模数据，最初由 eBay 开发并贡献至开源社区。它能在亚秒内查询巨大的表。
 >
 > 有完善的中文文档：http://kylin.apache.org/cn/docs/
@@ -136,9 +140,9 @@ Apache Kylin 的这种架构使得它拥有许多非常棒的特性：
 
 ### 参考与感谢：
 
-原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 
+- 原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 
 
-[《Apache Kylin 在百度地图的实践》](https://www.infoq.cn/article/practis-of-apache-kylin-in-baidu-map/)
+- [《Apache Kylin 在百度地图的实践》](https://www.infoq.cn/article/practis-of-apache-kylin-in-baidu-map/)
 
-美团技术团队：[Apache Kylin的实践与优化](https://tech.meituan.com/2020/11/19/apache-kylin-practice-in-meituan.html)
+- 美团技术团队：[Apache Kylin的实践与优化](https://tech.meituan.com/2020/11/19/apache-kylin-practice-in-meituan.html)
 

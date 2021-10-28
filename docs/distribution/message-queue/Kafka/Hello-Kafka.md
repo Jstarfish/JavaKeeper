@@ -33,19 +33,19 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
   消息生产者生产消息发送到 Queue 中，然后消息消费者从 Queue 中取出并且消费消息。 消息被消费以后，queue 中不再有存储，所以消息消费者不可能消费到已经被消费的消息。 Queue 支持存在多个消费者，但是对一个消息而言，只会有一个消费者可以消费。
 
-  ![图片：mrbird.cc](https://tva1.sinaimg.cn/large/007S8ZIlly1gh18nit3iwj31fo0amjre.jpg)
+  ![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/007S8ZIlly1gh18nit3iwj31fo0amjre.jpg)
 
 - **发布/订阅模式**（一对多，数据生产后，推送给所有订阅者） 
 
-  消息生产者（发布）将消息发布到 topic 中，同时有多个消息消费者（订阅）消费该消 息。和点对点方式不同，发布到 topic 的消息会被所有订阅者消费。
+  消息生产者（发布）将消息发布到 topic 中，同时有多个消息消费者（订阅）消费该消息。和点对点方式不同，发布到 topic 的消息会被所有订阅者消费。
 
-  ![图片：mrbird.cc](https://tva1.sinaimg.cn/large/007S8ZIlly1gh18nn09vuj31fg0d0glq.jpg)
+  ![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/007S8ZIlly1gh18nn09vuj31fg0d0glq.jpg)
 
 
 
 ### 1.3 Kafka 基础架构图
 
-![图片：mrbird.cc](https://mrbird.cc/img/QQ20200324-210522@2x.png)
+![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/QQ20200324-210522@2x.png)
 
 - Producer ：消息生产者，就是向 kafka broker 发消息的客户端；
 - Consumer ：消息消费者，向 kafka broker 取消息的客户端；
@@ -139,7 +139,7 @@ Kafka 集群保留所有发布的记录，不管这个记录有没有被消费�
 
 如果所有的消费者实例有不同的消费群，那么每个消息将被广播到所有的消费者进程。
 
-**这是 kafka 用来实现一个 topic 消息的广播（发给所有的 consumer） 和单播（发给任意一个 consumer）的手段**。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需 要多次发送消息到不同的 topic； 
+**这是 kafka 用来实现一个 topic 消息的广播（发给所有的 consumer） 和单播（发给任意一个 consumer）的手段**。一个 topic 可以有多个 CG。 topic 的消息会复制 （不是真的复制，是概念上的）到所有的 CG，但每个 partion 只会把消息发给该 CG 中的一 个 consumer。如果需要实现广播，只要每个 consumer 有一个独立的 CG 就可以了。要实现单播只要所有的 consumer 在同一个 CG。用 CG 还可以将 consumer 进行自由的分组而不需要多次发送消息到不同的 topic； 
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3htbkk8uj30d607074q.jpg)
 
@@ -191,4 +191,4 @@ Kafka 的流数据管道在处理数据的时候包含多个阶段，其中原�
 
 #### 提交日志
 
-Kafka 可以为分布式系统提供一种外部提交日志(commit-log)服务。日志有助于节点之间复制数据，并作为一种数据重新同步机制用来恢复故障节点的数据。Kafka 的 log compaction 功能有助于支持这种用法。Kafka 在这种用法中类似于Apache BookKeeper 项目。
+Kafka 可以为分布式系统提供一种外部提交日志(commit-log)服务。日志有助于节点之间复制数据，并作为一种数据重新同步机制用来恢复故障节点的数据。Kafka 的 log compaction 功能有助于支持这种用法。Kafka 在这种用法中类似于 Apache BookKeeper 项目。
