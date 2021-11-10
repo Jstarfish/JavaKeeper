@@ -156,12 +156,20 @@ function genDSASidebar() {
     },
     {
       title: "算法",
-      collapsable: false,
+      collapsable: true,
       children: [
         "complexity",
         "sort",
       	['Recursion', '递归'],
-      	['Dynamic-Programming', '动态规划']
+      	['Dynamic-Programming', '动态规划'],
+        ['DFS', 'DFS']
+      ]
+    },
+    {
+      title: "刷题",
+      collapsable: true,
+      children: [
+      	['soultion/binary-tree', '二叉树']
       ]
     }
   ];
