@@ -1,5 +1,47 @@
 ## 齐头并进的广度优先遍历
 
+> DFS（深度优先搜索）和 BFS（广度优先搜索）就像孪生兄弟，提到一个总是想起另一个。然而在实际使用中，我们用 DFS 的时候远远多于 BFS。那么，是不是 BFS 就没有什么用呢？
+>
+> 如果我们使用 DFS/BFS 只是为了遍历一棵树、一张图上的所有结点的话，那么 DFS 和 BFS 的能力没什么差别，我们当然更倾向于更方便写、空间复杂度更低的 DFS 遍历。不过，某些使用场景是 DFS 做不到的，只能使用 BFS 遍历。
+>
+> DFS 遍历使用递归：
+>
+> ```java
+> void dfs(TreeNode root) {
+>     if (root == null) {
+>         return;
+>     }
+>     dfs(root.left);
+>     dfs(root.right);
+> }
+> ```
+>
+> BFS 遍历使用队列数据结构：
+>
+> ```jaava
+> void bfs(TreeNode root) {
+>     Queue<TreeNode> queue = new ArrayDeque<>();
+>     queue.add(root);
+>     while (!queue.isEmpty()) {
+>         TreeNode node = queue.poll(); // Java 的 pop 写作 poll()
+>         if (node.left != null) {
+>             queue.add(node.left);
+>         }
+>         if (node.right != null) {
+>             queue.add(node.right);
+>         }
+>     }
+> }
+> ```
+>
+> 只是比较两段代码的话，最直观的感受就是：DFS 遍历的代码比 BFS 简洁太多了！这是因为递归的方式隐含地使用了系统的 栈，我们不需要自己维护一个数据结构。如果只是简单地将二叉树遍历一遍，那么 DFS 显然是更方便的选择。
+>
+> 虽然 DFS 与 BFS 都是将二叉树的所有结点遍历了一遍，但它们遍历结点的顺序不同。
+>
+> ![DFS 与 BFS 对比](https://pic.leetcode-cn.com/fdcd3bd27f4008948084f6ec86b58535e71f66862bd89a34bd6fe4cc42d68e89.gif)
+
+
+
 ![image.png](https://pic.leetcode-cn.com/1611483686-FJqdzm-image.png)
 
 「广度优先遍历」的思想在生活中随处可见：
@@ -18,6 +60,8 @@
 >
 
 我们先介绍「树」的广度优先遍历，再介绍「图」的广度优先遍历。事实上，它们是非常像的。
+
+
 
 
 
@@ -64,12 +108,9 @@
 
 大家在做题的过程中需要多加练习，融汇贯通，不须要死记硬背。
 
-```java
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+![img](https://pic.leetcode-cn.com/94cd1fa999df0276f1dae77a9cca83f4cabda9e2e0b8571cd9550a8ee3545f56.gif)
 
+```java
 public class Solution {
 
     public List<List<Integer>> levelOrder(TreeNode root) {
@@ -109,7 +150,23 @@ public class Solution {
 
 在 无权图 中，由于广度优先遍历本身的特点，假设源点为 source，只有在遍历到 所有 距离源点 source 的距离为 d 的所有结点以后，才能遍历到所有 距离源点 source 的距离为 d + 1 的所有结点。也可以使用「两点之间、线段最短」这条经验来辅助理解如下结论：从源点 source 到目标结点 target 走直线走过的路径一定是最短的。
 
-
+> 在一棵树中，一个结点到另一个结点的路径是唯一的，但在图中，结点之间可能有多条路径，其中哪条路最近呢？这一类问题称为最短路径问题。最短路径问题也是 BFS 的典型应用，而且其方法与层序遍历关系密切。
+>
+> 在二叉树中，BFS 可以实现一层一层的遍历。在图中同样如此。从源点出发，BFS 首先遍历到第一层结点，到源点的距离为 1，然后遍历到第二层结点，到源点的距离为 2…… 可以看到，用 BFS 的话，距离源点更近的点会先被遍历到，这样就能找到到某个点的最短路径了。
+>
+> ![层序遍历与最短路径](https://pic.leetcode-cn.com/01a3617511b1070216582ae59136888072116ccba360ab7c2aa60fc273351b85.jpg)
+>
+> 小贴士：
+>
+> 很多同学一看到「最短路径」，就条件反射地想到「Dijkstra 算法」。为什么 BFS 遍历也能找到最短路径呢？
+>
+> 这是因为，Dijkstra 算法解决的是带权最短路径问题，而我们这里关注的是无权最短路径问题。也可以看成每条边的权重都是 1。这样的最短路径问题，用 BFS 求解就行了。
+>
+> 在面试中，你可能更希望写 BFS 而不是 Dijkstra。毕竟，敢保证自己能写对 Dijkstra 算法的人不多。
+>
+> 最短路径问题属于图算法。由于图的表示和描述比较复杂，本文用比较简单的网格结构代替。网格结构是一种特殊的图，它的表示和遍历都比较简单，适合作为练习题。在 LeetCode 中，最短路径问题也以网格结构为主。
+>
+> 
 
 ### 图论中的最短路径问题概述
 

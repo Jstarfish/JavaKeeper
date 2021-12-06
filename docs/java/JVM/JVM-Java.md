@@ -186,7 +186,7 @@ Java 虚拟机的启动是通过引导类加载器（Bootstrap Class Loader）�
 - 一个运行中的 Java 虚拟机有着一个清晰的任务：执行 Java 程序
 - 程序开始执行时它才运行，程序结束时它就停止
 - 执行一个所谓的 Java 程序的时候，真正执行的是一个叫做 Java 虚拟机的进程
-- 你在同一台机器上运行三个程序，就会有三个运行中的 Java 虚拟机。 Java 虚拟机总是开始于一个**main()**方法，这个方法必须是公有、返回 void、只接受一个字符串数组。在程序执行时，你必须给 Java 虚拟机指明这个包含 main() 方法的类名。 
+- 你在同一台机器上运行三个程序，就会有三个运行中的 Java 虚拟机。 Java 虚拟机总是开始于一个 **main()** 方法，这个方法必须是公有、返回 void、只接受一个字符串数组。在程序执行时，你必须给 Java 虚拟机指明这个包含 main() 方法的类名。 
 
 #### 虚拟机的退出
 
@@ -210,21 +210,21 @@ Java 虚拟机的启动是通过引导类加载器（Bootstrap Class Loader）�
 
 JDK 版本升级不仅仅体现在语言和功能特性上，还包括了其编译和执行的 Java 虚拟机的升级。
 
-- 1990年，在 Sun 计算机公司中，由 Patrick Naughton、MikeSheridan 及 James Gosling 领导的小组 Green Team，开发出的新的程序语言，命名为 Oak，后期命名为 Java
-- 1995年，Sun 正式发布 Java 和 HotJava 产品，Java 首次公开亮相
+- 1990 年，在 Sun 计算机公司中，由 Patrick Naughton、MikeSheridan 及 James Gosling 领导的小组 Green Team，开发出的新的程序语言，命名为 Oak，后期命名为 Java
+- 1995 年，Sun 正式发布 Java 和 HotJava 产品，Java 首次公开亮相
 - 1996 年，JDK 1.0 发布时，提供了纯解释执行的 Java 虚拟机实现：Sun Classic VM。
 - 1997 年，JDK 1.1 发布时，虚拟机没有做变更，依然使用 Sun Classic VM 作为默认的虚拟机
 - 1998 年，JDK 1.2 发布时，提供了运行在 Solaris 平台的 Exact VM 虚拟机，但此时还是用 Sun Classic VM 作为默认的 Java 虚拟机，同时发布了JSP/Servlet、EJB规范，以及将Java分成J2EE、J2SE、J2ME
 - 2000 年，JDK1.3 发布，默认的 Java 虚拟机由 Sun Classic VM 改为 Sun HotSopt VM，而 Sun Classic VM 则作为备用虚拟机
 - 2002 年，JDK 1.4 发布，Sun Classic VM 退出商用虚拟机舞台，直接使用 Sun HotSpot VM 作为默认虚拟机一直到现在
-- 2003年，Java 平台的 Scala 正式发布，同年 Groovy 也加入了 Java 阵营
-- 2004年，JDK1.5 发布，同时 JDK1.5 改名为 JDK5.0
-- 2006年，JDK6 发布，同年，Java 开源并建立了 OpenJDK。顺理成章，Hotspot 虚拟机也成为了 OpenJDK 默认虚拟机
-- 2008年，Oracle 收购 BEA，得到了 JRockit 虚拟机
-- 2010年，Oracle 收购了 Sun，获得 Java 商标和 HotSpot 虚拟机
-- 2011年，JDK7 发布，在 JDK1.7u4 中，正式启用了新的垃圾回收器 G1
-- 2014年，JDK8 发布，用元空间 MetaSpace 取代了 PermGen
-- 2017年，JDK9 发布，将 G1设置为默认GC，替代CMS
+- 2003 年，Java 平台的 Scala 正式发布，同年 Groovy 也加入了 Java 阵营
+- 2004 年，JDK1.5 发布，同时 JDK1.5 改名为 JDK5.0
+- 2006 年，JDK6 发布，同年，Java 开源并建立了 OpenJDK。顺理成章，Hotspot 虚拟机也成为了 OpenJDK 默认虚拟机
+- 2008 年，Oracle 收购 BEA，得到了 JRockit 虚拟机
+- 2010 年，Oracle 收购了 Sun，获得 Java 商标和 HotSpot 虚拟机
+- 2011 年，JDK7 发布，在 JDK1.7u4 中，正式启用了新的垃圾回收器 G1
+- 2014 年，JDK8 发布，用元空间 MetaSpace 取代了 PermGen
+- 2017 年，JDK9 发布，将 G1 设置为默认 GC，替代 CMS
 
   
 
@@ -232,8 +232,8 @@ JDK 版本升级不仅仅体现在语言和功能特性上，还包括了其编�
 
 - 世界上第一款商用 Java 虚拟机。1996年随着Java1.0的发布而发布，JDK1.4时完全被淘汰；
 - 这款虚拟机内部只提供解释器；
-- 如果使用JIT编译器，就需要进行外挂。但是一旦使用了JIT编译器，JIT就会接管虚拟机的执行系统，解释器就不再工作，解释器和编译器不能配合工作；
-- 现在hotspot内置了此虚拟机
+- 如果使用 JIT 编译器，就需要进行外挂。但是一旦使用了 JIT 编译器，JIT 就会接管虚拟机的执行系统，解释器就不再工作，解释器和编译器不能配合工作；
+- 现在 hotspot 内置了此虚拟机
 
 ### Exact VM
 

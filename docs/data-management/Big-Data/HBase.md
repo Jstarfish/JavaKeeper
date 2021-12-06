@@ -8,13 +8,13 @@ HBase 是一种分布式、可扩展、支持海量数据存储的 NoSQL 数据�
 
 ### 1.2 HBase 的起源
 
-HBase是一个基于HDFS的分布式、面向列的开源数据库，是一个结构化数据的分布式存储系统，利用HBase技术可在廉价PC Server上搭建起大规模结构化存储集群。
+HBase 是一个基于 HDFS 的分布式、面向列的开源数据库，是一个结构化数据的分布式存储系统，利用 HBase 技术可在廉价 PC Server上搭建起大规模结构化存储集群。
 
 HBase 的原型是 Google 的 BigTable 论文，受到了该论文思想的启发，目前作为 Hadoop 的子项目来开发维护，用于支持结构化的数据存储。
 
-[Apache](http://www.apache.org/) HBase™是[Hadoop](http://hadoop.apache.org/)数据库，这是一个分布式，可扩展的大数据存储。
+[Apache](http://www.apache.org/) HBase™是 [Hadoop](http://hadoop.apache.org/) 数据库，这是一个分布式，可扩展的大数据存储。
 
-当您需要随机，实时读取/写入您的大数据时使用Apache HBase™。该项目的目标是托管非常大的表 - 数十亿行×数百万列 - 在商品硬件集群上。Apache HBase是一个开源的，分布式的，版本化的非关系数据库，其模型是由Chang等人在Google的[Bigtable：一种用于结构化数据](http://research.google.com/archive/bigtable.html)的[分布式存储系统](http://research.google.com/archive/bigtable.html)之后建模的。就像Bigtable利用Google文件系统提供的分布式数据存储一样，Apache HBase在Hadoop和HDFS之上提供了类似Bigtable的功能。
+当您需要随机，实时读取/写入您的大数据时使用Apache HBase™。该项目的目标是托管非常大的表 - 数十亿行×数百万列 - 在商品硬件集群上。Apache HBase是一个开源的，分布式的，版本化的非关系数据库，其模型是由 Chang 等人在 Google 的 [Bigtable：一种用于结构化数据](http://research.google.com/archive/bigtable.html)的[分布式存储系统](http://research.google.com/archive/bigtable.html)之后建模的。就像Bigtable利用Google文件系统提供的分布式数据存储一样，Apache HBase 在 Hadoop 和HDFS 之上提供了类似 Bigtable 的功能。
 
 
 

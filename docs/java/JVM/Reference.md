@@ -52,7 +52,7 @@ Java 中引入四种引用的目的是让程序自己决定对象的生命周期
 
 
 
-### JDK 8中的 UML关系图
+### JDK8 中的 UML关系图
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1genmesm4hej30lw08lmx1.jpg)
 
@@ -66,7 +66,7 @@ FinalReference 类是包内可见，其他三种引用类型均为 public，可�
 
 当一个对象被强引用变量引用时，它处于可达状态，是不可能被垃圾回收器回收的，即使该对象永远不会被用到也不会被回收。
 
-当内存不足，JVM 开始垃圾回收，对于强引用的对象，**就算是出现了 OOM 也不会对该对象进行回收，打死都不收。**因此强引用有时也是造成 Java 内存泄露的原因之一。
+当内存不足，JVM 开始垃圾回收，对于强引用的对象，**就算是出现了 OOM 也不会对该对象进行回收，打死都不收**。因此强引用有时也是造成 Java 内存泄露的原因之一。
 
 对于一个普通的对象，如果没有其他的引用关系，只要超过了引用的作用域或者显示地将相应（强）引用赋值为 null，一般认为就是可以被垃圾收集器回收。（具体回收时机还要要看垃圾收集策略）。
 
@@ -86,7 +86,7 @@ public class StrongRefenenceDemo {
 }
 ```
 
-demo 中尽管 o1已经被回收，但是 o2 强引用 o1，一直存在，所以不会被 GC 回收。
+demo 中尽管 o1 已经被回收，但是 o2 强引用 o1，一直存在，所以不会被 GC 回收。
 
 
 
@@ -338,7 +338,7 @@ null
 
 ### 引用队列
 
-ReferenceQueue 是用来配合引用工作的，没有ReferenceQueue 一样可以运行。
+ReferenceQueue 是用来配合引用工作的，没有 ReferenceQueue 一样可以运行。
 
 SoftReference、WeakReference、PhantomReference 都有一个可以传递 ReferenceQueue 的构造器。
 
@@ -369,7 +369,7 @@ JDK 官方文档是这么说的，`Reference` 是所有引用对象的基类。�
 - Enqueued：在ReferenceQueue队列中的Reference的状态，如果Reference从队列中移除，会进入`Inactive`状态
 - Inactive：一旦某个引用实例处于Inactive状态，它的状态将不再会发生改变，同时说明该引用实例所指向的实际对象一定会被GC所回收
 
-![img](http://imushan.com/img/image-20180820230137796.png)
+![img](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/5/22/1723a44a630c8f3c~tplv-t2oaga2asx-watermark.awebp)
 
 
 

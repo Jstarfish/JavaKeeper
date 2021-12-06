@@ -93,111 +93,37 @@ public class Test {
 
    
 
-```
+```java
 /**
-
-
-
  * VM Args:-Xss160k
-
-
-
  */
 
-
-
 public class Test {
-
-
-
     private void dontStop() {
-
-
-
         while(true) {
-
-
-
         }
-
-
-
     }
-
-
-
- 
-
-
 
     public void stackLeakByThread() {
-
-
-
         while (true) {
-
-
-
             Thread thread = new Thread(new Runnable() {
-
-
-
                 @Override
-
-
-
                 public void run() {
-
-
-
                     dontStop();
-
-
-
                 }
-
-
-
             });
-
-
-
             thread.start();
-
-
-
         }
-
-
-
     }
-
-
-
- 
-
-
 
     public static  void main(String[] args) {
-
-
-
         Test oom = new Test();
-
-
-
         oom.stackLeakByThread();
-
-
-
     }
-
-
-
 }
 ```
 
-运行以上代码会抛出「**java.lang.OutOfMemoryError: unable to create new native thread**」的异常，原因不难理解，操作系统给每个进程分配的内存是有限制的，比如 32 位的 Windows 限制为 2G,虚拟机提供了参数来控制 Java 堆和方法的这两部内存的最大值，剩余的内存为 「2G - Xmx（最大堆容量）= 线程数 * 每个线程分配的虚拟机栈（-Xss)+本地方法栈 」（程序计数器消耗内存很少，可忽略）,每个线程都会被分配对应的虚拟机栈大小，所以总可创建的线程数肯定是固定的， 像以上代码这样不断地创建线程当然会造成最终无法分配，不过这也给我们提供了一个新思路，如果是因为建立过多的线程导致的内存溢出，而我们又想多创建线程，可以通过减少最大堆（-Xms）和减少虚拟机栈大小（-Xss）来实现。
+运行以上代码会抛出「**java.lang.OutOfMemoryError: unable to create new native thread**」的异常，原因不难理解，操作系统给每个进程分配的内存是有限制的，比如 32 位的 Windows 限制为 2G，虚拟机提供了参数来控制 Java 堆和方法的这两部内存的最大值，剩余的内存为 「2G - Xmx（最大堆容量）= 线程数 * 每个线程分配的虚拟机栈（-Xss)+本地方法栈 」（程序计数器消耗内存很少，可忽略）,每个线程都会被分配对应的虚拟机栈大小，所以总可创建的线程数肯定是固定的， 像以上代码这样不断地创建线程当然会造成最终无法分配，不过这也给我们提供了一个新思路，如果是因为建立过多的线程导致的内存溢出，而我们又想多创建线程，可以通过减少最大堆（-Xms）和减少虚拟机栈大小（-Xss）来实现。
 
 **2、堆溢出 （java.lang.OutOfMemoryError:Java heap space**）
 
@@ -207,39 +133,16 @@ public class Test {
 
 示例如下：
 
-```
+```java
 /**
-
-
-
 * VM Args:-Xmx12m
-
-
-
  */
 
-
-
 class OOM {
-
-
-
     static final int SIZE=2*1024*1024;
-
-
-
     public static void main(String[] a) {
-
-
-
         int[] i = new int[SIZE];
-
-
-
     }
-
-
-
 }
 ```
 
@@ -250,140 +153,49 @@ class OOM {
 - 2.内存泄漏
   我们知道在 Java 中，开发者创建和销毁对象是不需要自己开辟空间的，JVM 会自动帮我们完成，在应用程序整个生命周期中，JVM 会定时检查哪些对象可用，哪些不再使用，如果对象不再使用的话理论上这块内存会被回收再利用（即GC），如果无法回收就会发生内存泄漏
 
-```
+```java
 /**
-
-
-
 * VM Args:-Xmx4m
-
-
-
  */
-
-
 
 public class KeylessEntry {
 
-
-
     static class Key {
-
-
-
-        Integer id; 
-
-
-
+       Integer id; 
         Key(Integer id) {
-
-
-
             this.id = id;
-
-
-
         }  
-
-
 
         @Override
 
-
-
         public int hashCode() {
-
-
-
             return id.hashCode();
-
-
-
         }
-
-
-
     }
-
-
-
- 
-
-
 
     public static void main(String[] args) {
-
-
-
         Map<Key,String> m = new HashMap<Key,String>();
-
-
-
         while(true) {
-
-
-
             for(int i=0;i<10000;i++) {
-
-
-
                 if(!m.containsKey(new Key(i))) {
-
-
-
-                    m.put(new Key(i), "Number:" + i);
-
-
-
+                  m.put(new Key(i), "Number:" + i);
                 }
-
-
-
             }
-
-
-
         }
-
-
-
     }
-
-
-
 }
 ```
 
 执行以上代码就会发生内存泄漏，第一次循环，map 里存有 10000 个 key value,但之后的每次循环都会**新增** 10000 个元素，因为 Key 这个 class 漏写了 equals 方法，导致对于每一个新创建的 new Key(i) 对象，即使 i 相同也会被认定为属于两个不同的对象，这样 **m.containsKey(new Key(i))** 结果均为 false,结果就是 HashMap 中的元素将一直增加，解决方式也很简单，为 Key 添加 equals 方法即可，如下
 
-```
+```java
 @Override
-
-
-
 public boolean equals(Object o) {
-
-
-
    boolean response = false;
-
-
-
    if (o instanceof Key) {
-
-
-
       response = (((Key)o).id).equals(this.id);
-
-
-
    }
-
-
-
    return response;
-
-
 
 }
 ```
@@ -452,55 +264,22 @@ Java 应用启动的时候分被分配一定的内存空间(通过 -Xmx 及其�
 
 接下来我们就来看看如何用以上的工具查看如下内存泄漏案例
 
-```
+```java
 /**
-
-
-
 * VM Args:-Xmx10m
-
-
-
  */
 
-
-
 import java.util.ArrayList;
-
-
-
 import java.util.List;
-
-
 
 public class Main {
 
-
-
     public static void main(String[] args) {
-
-
-
         List<String> list = new ArrayList<String>();
-
-
-
         while (true) {
-
-
-
             list.add("OutOfMemoryError soon");
-
-
-
         }
-
-
-
     }
-
-
-
 }
 ```
 
@@ -515,107 +294,33 @@ public class Main {
 
 用第一种方式必须等 OOM 后才能 dump 出 hprof 文件，但如果我们想在运行中观察堆的使用情况以便查出可能的内存泄漏代码就无能为力了，这时我们可以借助 **jvisualvm** 这款工具, jvisualvm 的功能强大，除了可以实时监控堆内存的使用情况，还可以跟踪垃圾回收，运行中 dump 中堆内存使用情况、cpu分析，线程分析等，是查找分析问题的利器，更骚的是它不光能分析本地的 Java 程序，还可以分析线上的 Java 程序运行情况, 本身这款工具也是随 JDK 发布的，是官方力推的一款运行监视，故障处理的神器。我们来看看如何用 jvisualvm 来分析上文所述的存在内存泄漏的如下代码
 
-```
+```java
 import java.util.Map;
-
-
-
 import java.util.HashMap;
 
-
-
- 
-
-
-
 public class KeylessEntry {
-
-
-
     static class Key {
-
-
-
         Integer id; 
-
-
-
         Key(Integer id) {
-
-
-
             this.id = id;
-
-
-
         }  
-
-
-
+        
         @Override
-
-
-
         public int hashCode() {
-
-
-
             return id.hashCode();
-
-
-
         }
-
-
-
     }
-
-
-
- 
-
-
 
     public static void main(String[] args) {
-
-
-
         Map<Key,String> m = new HashMap<Key,String>();
-
-
-
         while(true) {
-
-
-
             for(int i=0;i<10000;i++) {
-
-
-
                 if(!m.containsKey(new Key(i))) {
-
-
-
                     m.put(new Key(i), "Number:" + i);
-
-
-
                 }
-
-
-
             }
-
-
-
         }
-
-
-
     }
-
-
-
 }
 ```
 
@@ -660,55 +365,21 @@ jmap -dump:format=b,file=heapdump.phrof pid
 
 接下来我们看看 GC 日志怎么看，日志可以有效地帮助我们定位问题，所以搞清楚 GC 日志的格式非常重要，来看下如下例子
 
-```
+```java
 /**
-
-
-
  *  VM Args:-verbose:gc -Xms20M -Xmx20M -Xmn10M -XX:+PrintGCDetails -XX:+PrintGCTimeStamps  -XX:+UseSerialGC -XX:SurvivorRatio=8
-
-
-
  */
-
-
-
 public class TestGC {
-
-
-
     private static final int _1MB = 1024 * 1024;
 
-
-
     public static void main(String[] args) {
-
-
-
         byte[] allocation1, allocation2, allocation3, allocation4;
-
-
-
         allocation1 = new byte[2 * _1MB];
-
-
-
         allocation2 = new byte[2 * _1MB];
-
-
-
         allocation3 = new byte[2 * _1MB];
-
-
-
         allocation4 = new byte[4 * _1MB];    // 这里会出现一次 Minor GC
 
-
-
     }
-
-
-
 }
 ```
 
