@@ -57,22 +57,25 @@ SET default_storage_engine=NDBCLUSTER;
 **InnoDB是MySQL5.7 默认的存储引擎，主要特性有**
 
 - InnoDB存储引擎维护自己的缓冲池，在访问数据时将表和索引数据缓存在主内存中 
-
 - 支持事务
-
 - 支持外键
-
 - B-Tree索引
-
 - 不支持集群
-
 - 聚簇索引
-
 - 行锁
-
 - 支持地理位置的数据类型和索引
 
-  
+
+
+
+##### MySQL之Innodb引擎的4大特性
+
+1. 插入缓冲 （Insert Buffer/Change Buffer）
+2. 双写机制（Double Write）
+3. 自适应哈希索引（Adaptive Hash Index，AHI）
+4. 预读 （Read Ahead）
+
+
 
 #### MyISAM
 

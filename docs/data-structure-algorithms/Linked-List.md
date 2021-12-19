@@ -155,8 +155,6 @@ p.getNext().setPre(p.getPre());
 
 >反转一个单链表。
 >
->**示例:**
->
 >```
 >输入: 1->2->3->4->5->NULL
 >输出: 5->4->3->2->1->NULL
@@ -166,34 +164,32 @@ p.getNext().setPre(p.getPre());
 
 **题目解析**
 
-设置三个节点`pre`、`cur`、`next`
-
-1. 每次查看`cur`节点是否为`NULL`，如果是，则结束循环，获得结果
-2. 如果`cur`节点不是为`NULL`，则先设置临时变量`next`为`cur`的下一个节点
-3. 让`cur`的下一个节点变成指向`pre`，而后`pre`移动`cur`，`cur`移动到`next`
-4. 重复（1）（2）（3）
+1. 定义两个指针： prepre 和 curcur ；prepre 在前 curcur 在后。
+2. 每次让 prepre 的 nextnext 指向 curcur ，实现一次局部反转
+3. 局部反转完成之后，prepre 和 curcur 同时往前移动一个位置
+4. 循环上述过程，直至 prepre 到达链表尾部
 
 **动画描述**
 
-![](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0206-Reverse-Linked-List/Animation/Animation.gif)
+![img](https://pic.leetcode-cn.com/9ce26a709147ad9ce6152d604efc1cc19a33dc5d467ed2aae5bc68463fdd2888.gif)
+
+两个指针，最开始就把指针位置倒着放，然后遍历替换数字，最后返回 pre 就行
 
 ```java
-    public ListNode reverseList(ListNode head) {
-        if (head == null || head.next == null) {
-            return head;
-        }
-
-        ListNode prev = null;
-        ListNode next = null;
-        while (head.next != null) {
-            next = head.next;   //保存下一个节点
-            head.next = prev;   //重置next
-            prev = head;    //保存当前节点
-            head = next;
-        }
-        head.next = prev;
-        return head;
-    }
+public ListNode reverseList_1(ListNode head){
+  if(head == null || head.next == null){
+    return head;
+  }
+  ListNode cur = head;
+  ListNode pre = null;
+  while(cur != null) {
+    ListNode tmp = cur.next;
+    cur.next = pre;
+    pre = cur;
+    cur = tmp;
+  }
+  return pre;
+}
 ```
 
 
@@ -224,28 +220,24 @@ p.getNext().setPre(p.getPre());
 ![img](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0141-Linked-List-Cycle/Animation/Animation.gif)
 
 ```java
-public class linkedlistcycle_141 {
+public boolean hasCycle(ListNode head) {
+  if (head == null || head.next == null) {
+    return false;
+  }
+  // 龟兔起跑
+  ListNode fast = head;
+  ListNode slow = head;
 
-    public boolean hasCycle(ListNode head) {
-
-        if (head == null || head.next == null) {
-            return false;
-        }
-        // 龟兔起跑
-        ListNode fast = head;
-        ListNode slow = head;
-
-        while (fast != null && fast.next != null) {
-            // 龟走一步
-            slow = slow.next;
-            // 兔走两步
-            fast = fast.next.next;
-            if (slow == fast) {
-                return true;
-            }
-        }
-        return false;
+  while (fast != null && fast.next != null) {
+    // 龟走一步
+    slow = slow.next;
+    // 兔走两步
+    fast = fast.next.next;
+    if (slow == fast) {
+      return true;
     }
+  }
+  return false;
 }
 ```
 
@@ -322,19 +314,15 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 
 > 请判断一个链表是否为回文链表。
 >
-> **示例 1:**
->
 > ```
-> 输入: 1->2
+>输入: 1->2
 > 输出: false
 > ```
->
-> **示例 2:**
->
+> 
 > ```
-> 输入: 1->2->2->1
+>输入: 1->2->2->1
 > 输出: true
-> ```
+>```
 
 **解法1：**
 
@@ -365,20 +353,25 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 
 
 
+
+
+
+
+
+
 ### 删除链表的倒数第N个节点(19)
 
 > 给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
 >
-> 示例：
->
-> 给定一个链表: 1->2->3->4->5, 和 n = 2.
->
-> 当删除了倒数第二个节点后，链表变为 1->2->3->5.
->
+> ```
+>给定一个链表: 1->2->3->4->5, 和 n = 2.
+> 
+>当删除了倒数第二个节点后，链表变为 1->2->3->5.
+> ```
 
 **方法一：两次遍历算法**
 
-我们注意到这个问题可以容易地简化成另一个问题：删除从列表开头数起的第 (L - n + 1)(L−n+1) 个结点，其中 LL 是列表的长度。只要我们找到列表的长度 LL，这个问题就很容易解决。
+我们注意到这个问题可以容易地简化成另一个问题：删除从列表开头数起的第 (L - n + 1)个结点，其中 L 是列表的长度。只要我们找到列表的长度 L，这个问题就很容易解决。
 
 首先我们将添加一个哑结点作为辅助，该结点位于列表头部。哑结点用来简化某些极端情况，例如列表中只含有一个结点，或需要删除列表的头部。在第一次遍历中，我们找出列表的长度 L。然后设置一个指向哑结点的指针，并移动它遍历列表，直至它到达第 (L - n)(L−n) 个结点那里。我们把第 (L - n)(L−n) 个结点的 next 指针重新链接至第 (L - n + 2)(L−n+2) 个结点，完成这个算法。
 

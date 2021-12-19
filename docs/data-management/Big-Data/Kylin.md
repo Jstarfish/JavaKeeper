@@ -141,8 +141,7 @@ Apache Kylin 的这种架构使得它拥有许多非常棒的特性：
 ### 参考与感谢：
 
 - 原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 
-
 - [《Apache Kylin 在百度地图的实践》](https://www.infoq.cn/article/practis-of-apache-kylin-in-baidu-map/)
-
 - 美团技术团队：[Apache Kylin的实践与优化](https://tech.meituan.com/2020/11/19/apache-kylin-practice-in-meituan.html)
+- [【硬刚Kylin】Kylin入门/原理/调优/OLAP解决方案和行业典型应用](https://www.modb.pro/db/79232)
 

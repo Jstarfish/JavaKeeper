@@ -2,7 +2,7 @@
 
 设计一个分布式系统必定会遇到一个问题—— **因为分区容忍性（partition tolerance）的存在，就必定要求我们需要在系统可用性（availability）和数据一致性（consistency）中做出权衡** 。这就是著名的 `CAP` 定理。
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gevqnrlzg6j30b60as3ys.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/007S8ZIlly1gevqnrlzg6j30b60as3ys.jpg)
 
 ## 一致性模型
 
@@ -28,7 +28,7 @@
 
 分布式事务处理的关键是必须有一种方法可以知道事务在任何地方所做的所有动作，提交或回滚事务的决定必须产生统一的结果（全部提交或全部回滚）
 
-在分布式系统中，各个节点之间在物理上相互独立，通过网络进行沟通和协调。由于存在事务机制，可以保证每个独立节点上的数据操作可以满足ACID。但是，相互独立的节点之间无法准确的知道其他节点中的事务执行情况。所以从理论上讲，两台机器理论上无法达到一致的状态。如果想让分布式部署的多台机器中的数据保持一致性，那么就要保证在所有节点的数据写操作，要不全部都执行，要么全部的都不执行。但是，一台机器在执行本地事务的时候无法知道其他机器中的本地事务的执行结果。所以他也就不知道本次事务到底应该 commit 还是 roolback。所以，常规的解决办法就是引入一个“协调者”的组件来统一调度所有分布式节点的执行。
+在分布式系统中，各个节点之间在物理上相互独立，通过网络进行沟通和协调。由于存在事务机制，可以保证每个独立节点上的数据操作可以满足 ACID。但是，相互独立的节点之间无法准确的知道其他节点中的事务执行情况。所以从理论上讲，两台机器理论上无法达到一致的状态。如果想让分布式部署的多台机器中的数据保持一致性，那么就要保证在所有节点的数据写操作，要不全部都执行，要么全部的都不执行。但是，一台机器在执行本地事务的时候无法知道其他机器中的本地事务的执行结果。所以他也就不知道本次事务到底应该 commit 还是 roolback。所以，常规的解决办法就是引入一个“协调者”的组件来统一调度所有分布式节点的执行。
 
 ### XA规范
 
@@ -61,9 +61,9 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 
 #### 阶段二：执行事务提交
 
-协调者根据各参与者的反馈情况决定最终是否可以提交事务，如果反馈都是Yes，发送提交`commit`请求，参与者提交成功后返回 `Ack` 消息，协调者接收后就完成了。如果反馈是No 或者超时未反馈，发送 `Rollback` 请求，利用阶段一记录表的 `Undo` 信息执行回滚，并反馈给协调者`Ack` ，中断消息
+协调者根据各参与者的反馈情况决定最终是否可以提交事务，如果反馈都是Yes，发送提交 `commit` 请求，参与者提交成功后返回  `Ack`  消息，协调者接收后就完成了。如果反馈是 No 或者超时未反馈，发送 `Rollback` 请求，利用阶段一记录表的 `Undo` 信息执行回滚，并反馈给协调者 `Ack` ，中断消息
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gclosfvncqj30hs09j0td.jpg)
+![2PC](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/00831rSTly1gclosfvncqj30hs09j0td.jpg)
 
 #### 优缺点
 
@@ -93,7 +93,7 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 
 这个阶段其实和 `2PC` 的第二阶段差不多，如果协调者收到了所有参与者在 `PreCommit` 阶段的 YES 响应，那么协调者将会给所有参与者发送 `DoCommit` 请求，**参与者收到 DoCommit 请求后则会进行事务的提交工作**，完成后则会给协调者返回响应，协调者收到所有参与者返回的事务提交成功的响应之后则完成事务。若协调者在 `PreCommit` 阶段 **收到了任何一个 NO 或者在一定时间内没有收到所有参与者的响应** ，那么就会进行中断请求的发送，参与者收到中断请求后则会 **通过上面记录的回滚日志** 来进行事务的回滚操作，并向协调者反馈回滚状况，协调者收到参与者返回的消息后，中断事务。
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gclot2rul3j30j60cpgmo.jpg)
+![3PC](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/3pc.png)
 
 #### 优缺点
 
@@ -129,7 +129,7 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 2. 如果 Acceptor 收到一个针对编号为N的提案的Accept请求，只要该 Acceptor 没有对编号大于 N 的 Prepare 请求做出过响应，它就通过该提案。如果N小于 Acceptor 以及响应的 prepare 请求，则拒绝，不回应或回复error（当proposer没有收到过半的回应，那么他会重新进入第一阶段，递增提案号，重新提出prepare请求）
 3. 最后是 Learner 获取通过的提案（有多种方式）
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gcloyv70qsj30sg0lc0ve.jpg)
+![Paxos](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/paxos.png)
 
 #### `paxos` 算法的死循环问题
 
@@ -167,7 +167,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 
 #### 消息广播模式
 
-![ZAB广播](https://tva1.sinaimg.cn/large/007S8ZIlly1gevsrfdpizj30h50al74m.jpg)
+![ZAB](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/zab.png)
 
 1. Leader从客户端收到一个事务请求（如果是集群中其他机器接收到客户端的事务请求，会直接转发给 Leader 服务器）
 2. Leader 服务器生成一个对应的事务 Proposal，并为这个事务生成一个全局递增的唯一的ZXID（通过其 ZXID 来进行排序保证顺序性）
@@ -176,7 +176,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 5. 当 Leader 收到超过半数 Follower 的 ack 消息，Leader会广播一个 commit 消息
 6. 当 Follower 收到 commit 请求时，会判断该事务的 ZXID 是不是比历史队列中的任何事务的 ZXID 都小，如果是则提交，如果不是则等待比它更小的事务的 commit
 
-![zab commit流程](http://file.sunwaiting.com/zab_commit_1.png)
+![zab-commit](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/zab-commit.png)
 
 #### 崩溃恢复模式
 
@@ -221,7 +221,7 @@ ZAB 的原子广播协议在正常情况下运行良好，但天有不测风云�
 
 ZXID 是一个 64 位的数字，其中低 32 位可看作是计数器，Leader 服务器每产生一个新的事务 Proposal 的时候，都会该计数器进行加 1 操作。而高 32 位表示 Leader 周期 epoch 的编号，每当选举一个新的 Leader 服务器，就会从该服务器本地的事务日志中最大 Proposal 的 ZXID 中解析出对应的 epoch 值，然后对其加 1 操作，这个值就作为新的 epoch 值，并将低 32 位初始化为 0 来开始生成新的 ZXID。
 
-![image.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gevrq7ao81j30ej073jrg.jpg)
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1gevrq7ao81j30ej073jrg.jpg)
 
 基于这样的策略，当一个包含上一个 Leader 周期中尚未提交的事务 Proposal 的服务器启动时，以 Follower 角色加入集群中之后，Leader 服务器会根据自己服务器上最后被提交的 Proposal 来和 Follower 服务器的 Proposal 进行比对，比对结果就是 Leader 会要求 Follower 进行一个回退操作——回退到一个确实已经被集群中过半机器提交的最新的事务 Proposal。
 
