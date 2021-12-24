@@ -2,14 +2,14 @@
 
 排序算法可以分为内部排序和外部排序，内部排序是数据记录在内存中进行排序，而外部排序是因排序的数据很大，一次不能容纳全部的排序记录，在排序过程中需要访问外存。常见的内部排序算法有：**插入排序、希尔排序、选择排序、冒泡排序、归并排序、快速排序、堆排序、基数排序**等。用一张图概括：
 
-[![十大经典排序算法 概览截图](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/sort.png)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/sort.png)
+![十大经典排序算法 概览截图](http://qiniu.ikeguang.com/image/sortAlgo/sort.png)
 
 **关于时间复杂度**：
 
-1. 平方阶 (O(n2)) 排序 各类简单排序：直接插入、直接选择和冒泡排序。
-2. 线性对数阶 (O(nlog2n)) 排序 快速排序、堆排序和归并排序；
-3. O(n1+§)) 排序，§ 是介于 0 和 1 之间的常数。 希尔排序
-4. 线性阶 (O(n)) 排序 基数排序，此外还有桶、箱排序。
+1. 平方阶 ($O(n2)$) 排序 各类简单排序：直接插入、直接选择和冒泡排序。
+2. 线性对数阶 (O(nlog2n)) 排序： 快速排序、堆排序和归并排序；
+3. O(n1+§) 排序，§ 是介于 0 和 1 之间的常数。 希尔排序
+4. 线性阶 (O(n)) 排序： 基数排序，此外还有桶、箱排序。
 
 **关于稳定性**：
 
@@ -33,7 +33,7 @@
 
 十种常见排序算法可以分为两大类：
 
-**非线性时间比较类排序**：通过比较来决定元素间的相对次序，由于其时间复杂度不能突破O(nlogn)，因此称为非线性时间比较类排序。
+**非线性时间比较类排序**：通过比较来决定元素间的相对次序，由于其时间复杂度不能突破$O(nlogn)$，因此称为非线性时间比较类排序。
 
 **线性时间非比较类排序**：不通过比较来决定元素间的相对次序，它可以突破基于比较排序的时间下界，以线性时间运行，因此称为线性时间非比较类排序。
 
@@ -56,7 +56,7 @@
 
 ![img](https://miro.medium.com/max/300/1*LllBj5cbV91URiuzAB-xzw.gif)
 
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/bubbleSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/bubbleSort.gif)
+
 
 ### 3. 什么时候最快
 
@@ -89,7 +89,7 @@ public class BubbleSort {
 }
 ```
 
-嵌套循环，应该立马就可以得出这个算法的时间复杂度为 O(n²)。
+嵌套循环，应该立马就可以得出这个算法的时间复杂度为 $O(n²)$。
 
 
 
@@ -97,7 +97,7 @@ public class BubbleSort {
 
 选择排序的思路是这样的：首先，找到数组中最小的元素，拎出来，将它和数组的第一个元素交换位置，第二步，在剩下的元素中继续寻找最小的元素，拎出来，和数组的第二个元素交换位置，如此循环，直到整个数组排序完成。
 
-选择排序是一种简单直观的排序算法，无论什么数据进去都是 O(n²) 的时间复杂度。所以用到它的时候，数据规模越小越好。唯一的好处可能就是不占用额外的内存空间了吧。
+选择排序是一种简单直观的排序算法，无论什么数据进去都是 $O(n²)$ 的时间复杂度。所以用到它的时候，数据规模越小越好。唯一的好处可能就是不占用额外的内存空间了吧。
 
 ### 1. 算法步骤
 
@@ -108,8 +108,6 @@ public class BubbleSort {
 ### 2. 动图演示
 
 ![img](https://miro.medium.com/max/551/1*OA7a3OGWmGMRJQmwkGIwAw.gif)
-
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/selectionSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/selectionSort.gif)
 
 ```java
 public class SelectionSort {
@@ -156,9 +154,7 @@ public class SelectionSort {
 
 ### 2. 动图演示
 
-![img](https://miro.medium.com/max/500/1*onU9OmVftR5WeoLWh14iZw.gif)
-
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/insertionSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/insertionSort.gif)
+![](https://miro.medium.com/max/500/1*onU9OmVftR5WeoLWh14iZw.gif)
 
 ```java
 public static void main(String[] args) {
@@ -211,8 +207,6 @@ public static void main(String[] args) {
 
 ![img](https://miro.medium.com/max/300/1*hk2TL8m8Kn1TVvewAbAclQ.gif)
 
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/quickSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/quickSort.gif)
-
 ### 单边扫描
 
 快速排序的关键之处在于切分，切分的同时要进行比较和移动，这里介绍一种叫做单边扫描的做法。
@@ -220,37 +214,30 @@ public static void main(String[] args) {
 我们随意抽取一个数作为基准值，同时设定一个标记 mark 代表左边序列最右侧的下标位置，当然初始为 0 ，接下来遍历数组，如果元素大于基准值，无操作，继续遍历，如果元素小于基准值，则把 mark + 1 ，再将 mark 所在位置的元素和遍历到的元素交换位置，mark 这个位置存储的是比基准值小的数据，当遍历结束后，将基准值与 mark 所在元素交换位置即可。
 
 ```java
-public static void sort(int[] arr) {
-    sort(arr， 0， arr.length - 1);
+public static void sort(int[] arrs, int startIndex, int endIndex) {
+  if (startIndex > endIndex) {
+    return;
+  }
+  int pivotIndex = partion(arrs, startIndex, endIndex);
+  sort(arrs, startIndex, pivotIndex - 1);
+  sort(arrs, pivotIndex + 1, endIndex);
 }
 
-private static void sort(int[] arr， int startIndex， int endIndex) {
-    if (endIndex <= startIndex) {
-        return;
-    }
-    //切分
-    int pivotIndex = partitionV2(arr， startIndex， endIndex);
-    sort(arr， startIndex， pivotIndex-1);
-    sort(arr， pivotIndex+1， endIndex);
-}
+public static int partion(int[] arrs, int startIndex, int endIndex) {
+  int pivot = arrs[startIndex];
+  int mark = startIndex;
 
-private static int partition(int[] arr， int startIndex， int endIndex) {
-    int pivot = arr[startIndex];//取基准值
-    int mark = startIndex;//Mark初始化为起始下标
-
-    for(int i=startIndex+1; i<=endIndex; i++){
-        if(arr[i]<pivot){
-            //小于基准值 则mark+1，并交换位置。
-            mark ++;
-            int p = arr[mark];
-            arr[mark] = arr[i];
-            arr[i] = p;
-        }
+  for (int i = startIndex + 1; i < arrs.length; i++) {
+    if (arrs[i] < pivot) {
+      mark++;
+      int tmp = arrs[mark];
+      arrs[mark] = arrs[i];
+      arrs[i] = tmp;
     }
-    //基准值与mark对应元素调换位置
-    arr[startIndex] = arr[mark];
-    arr[mark] = pivot;
-    return mark;
+  }
+  arrs[startIndex] = arrs[mark];
+  arrs[mark] = pivot;
+  return mark;
 }
 ```
 
@@ -374,10 +361,6 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 ### 3. 动图演示
 
 ![img](https://miro.medium.com/max/300/1*fE7yGW2WPaltJWo6OnZ8LQ.gif)
-
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/mergeSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/mergeSort.gif)
-
-
 
 
 

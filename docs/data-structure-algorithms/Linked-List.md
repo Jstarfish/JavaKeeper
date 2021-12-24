@@ -164,14 +164,14 @@ p.getNext().setPre(p.getPre());
 
 **题目解析**
 
-1. 定义两个指针： prepre 和 curcur ；prepre 在前 curcur 在后。
-2. 每次让 prepre 的 nextnext 指向 curcur ，实现一次局部反转
-3. 局部反转完成之后，prepre 和 curcur 同时往前移动一个位置
-4. 循环上述过程，直至 prepre 到达链表尾部
+1. 定义两个指针： pre 和 cur ；pre 在前 cur 在后。
+2. 每次让 pre 的 next 指向 cur ，实现一次局部反转
+3. 局部反转完成之后，pre 和 cur 同时往前移动一个位置
+4. 循环上述过程，直至 pre 到达链表尾部
 
 **动画描述**
 
-![img](https://pic.leetcode-cn.com/9ce26a709147ad9ce6152d604efc1cc19a33dc5d467ed2aae5bc68463fdd2888.gif)
+![迭代.gif](https://pic.leetcode-cn.com/7d8712af4fbb870537607b1dd95d66c248eb178db4319919c32d9304ee85b602-%E8%BF%AD%E4%BB%A3.gif)
 
 两个指针，最开始就把指针位置倒着放，然后遍历替换数字，最后返回 pre 就行
 
@@ -180,11 +180,15 @@ public ListNode reverseList_1(ListNode head){
   if(head == null || head.next == null){
     return head;
   }
+  //申请节点，pre和 cur，pre指向null
   ListNode cur = head;
   ListNode pre = null;
   while(cur != null) {
+    //记录当前节点的下一个节点
     ListNode tmp = cur.next;
+    //然后将当前节点指向pre
     cur.next = pre;
+    //pre和cur节点都前进一位
     pre = cur;
     cur = tmp;
   }
@@ -194,7 +198,7 @@ public ListNode reverseList_1(ListNode head){
 
 
 
-### 环形链表(141)
+### [环形链表(141)](https://leetcode-cn.com/problems/linked-list-cycle/)
 
 > 给定一个链表，判断链表中是否有环。
 >
@@ -292,6 +296,8 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 
 如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。
 
+![img](https://pic.leetcode-cn.com/fe5eca7edea29a76316f7e8529f73a90ae4990fd66fea093c6ee91567788e482-%E5%B9%BB%E7%81%AF%E7%89%874.JPG)
+
 ```java
 public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
     if (l1 == null) {
@@ -331,11 +337,40 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 
 ![01](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0234-isPalindrome/Animation/solved01.gif)
 
+```java
+public static boolean isPalindrome_me(ListNode head){
+  if(head == null || head.next == null){
+    return false;
+  }
+  List<Integer> list = new ArrayList<>();
+  while(head != null){
+    list.add(head.val);
+    head = head.next;
+  }
+  Integer[] arrs = list.toArray(new Integer[list.size()]);
+
+  int tmp = 0;
+  for(int i=0;i<arrs.length/2;i++){ //注意这里只遍历到一半就可以了
+    if(arrs[i]== arrs[arrs.length-i-1]){
+      tmp++;
+    }
+  }
+  // 双指针，tmp 一直往前走，都相等的话肯定等于数据的一半
+  return tmp == arrs.length / 2;
+}
+```
+
 **解法2：**
 
 我们先找到链表的中间结点，然后将中间结点后面的链表进行反转，反转之后再和前半部分链表进行比较，如果相同则表示该链表属于回文链表，返回true；否则，否则返回false
 
 ![02](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0234-isPalindrome/Animation/solved02.gif)
+
+
+
+
+
+
 
 ### 两数相加(2)
 
@@ -345,21 +380,120 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 >
 > 您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
 >
-> 示例：
->
+> ```
 > 输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
 > 输出：7 -> 0 -> 8
 > 原因：342 + 465 = 807
+> ```
+
+```java
+public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode pre = new ListNode(0);
+        ListNode cur = pre;
+        //进位
+        int carry = 0;
+        while(l1 != null || l2 != null) {
+            int x = l1 == null ? 0 : l1.val;
+            int y = l2 == null ? 0 : l2.val;
+            int sum = x + y + carry;
+
+            //如果大于10了，就进位
+            carry = sum / 10;
+            //进位后剩下的余数
+            sum = sum % 10;
+            //进位后的数据
+            cur.next = new ListNode(sum);
+            cur = cur.next;
+            //往后移动
+            if(l1 != null) {
+                l1 = l1.next;
+            }
+            if(l2 != null) {
+                l2 = l2.next;
+            }
+        }
+        //如果最后一位还有进位的话，再往后增加一个节点
+        if(carry == 1) {
+            cur.next = new ListNode(carry);
+        }
+        return pre.next;
+    }
+```
+
+
+
+### [LRU 缓存机制(146)](https://leetcode-cn.com/problems/lru-cache/)
+
+> 运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制 。实现 LRUCache 类：
+>
+> - LRUCache(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存
+> - int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1 。
+> - void put(int key, int value) 如果关键字已经存在，则变更其数据值；如果关键字不存在，则插入该组「关键字-值」。当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。
+>
+> ```
+> 输入
+> ["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+> [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+> 输出
+> [null, null, null, 1, null, -1, null, -1, 3, 4]
+> 
+> 解释
+> LRUCache lRUCache = new LRUCache(2);
+> lRUCache.put(1, 1); // 缓存是 {1=1}
+> lRUCache.put(2, 2); // 缓存是 {1=1, 2=2}
+> lRUCache.get(1);    // 返回 1
+> lRUCache.put(3, 3); // 该操作会使得关键字 2 作废，缓存是 {1=1, 3=3}
+> lRUCache.get(2);    // 返回 -1 (未找到)
+> lRUCache.put(4, 4); // 该操作会使得关键字 1 作废，缓存是 {4=4, 3=3}
+> lRUCache.get(1);    // 返回 -1 (未找到)
+> lRUCache.get(3);    // 返回 3
+> lRUCache.get(4);    // 返回 4
+> ```
+
+分析上面的操作过程，要让 put 和 get 方法的时间复杂度为 O(1)，我们可以总结出 cache 这个数据结构必要的条件：查找快，插入快，删除快，有顺序之分。
+
+因为显然 cache 必须有顺序之分，以区分最近使用的和久未使用的数据；而且我们要在 cache 中查找键是否已存在；如果容量满了要删除最后一个数据；每次访问还要把数据插入到队头。
+
+那么，什么数据结构同时符合上述条件呢？哈希表查找快，但是数据无固定顺序；链表有顺序之分，插入删除快，但是查找慢。所以结合一下，形成一种新的数据结构：**哈希链表**。
+
+![HashLinkedList](https://pic.leetcode-cn.com/b84cf65debb43b28bd212787ca63d34c9962696ed427f638763be71a3cb8f89d.jpg)
+
+```java
+// key 映射到 Node(key, val)
+HashMap<Integer, Node> map;
+// Node(k1, v1) <-> Node(k2, v2)...
+DoubleList cache;
+
+int get(int key) {
+    if (key 不存在) {
+        return -1;
+    } else {        
+        将数据 (key, val) 提到开头；
+        return val;
+    }
+}
+
+void put(int key, int val) {
+    Node x = new Node(key, val);
+    if (key 已存在) {
+        把旧的数据删除；
+        将新节点 x 插入到开头；
+    } else {
+        if (cache 已满) {
+            删除链表的最后一个数据腾位置；
+            删除 map 中映射到该数据的键；
+        } 
+        将新节点 x 插入到开头；
+        map 中新建 key 对新节点 x 的映射；
+    }
+}
+```
 
 
 
 
 
-
-
-
-
-### 删除链表的倒数第N个节点(19)
+### [删除链表的倒数第 N 个结点（19）](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
 
 > 给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
 >
@@ -369,24 +503,37 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 >当删除了倒数第二个节点后，链表变为 1->2->3->5.
 > ```
 
-**方法一：两次遍历算法**
+```java
+public ListNode removeNthFromEnd_1(ListNode head, int n) {
+        ListNode pre = new ListNode(0,head);
+        int length = getLength(head);
+        ListNode cur = pre;
+        //遍历到需要删除的位置的前一个，比如1，2，3，4，5 遍历到第 < 4 就可以了
+        for (int i=1;i<length-n+1;i++){
+            cur = cur.next;
+        }
+        // 删除节点，返回哑结点后的结果即可
+        cur.next = cur.next.next;
+        ListNode ans = pre.next;
+        return ans;
+    }
 
-我们注意到这个问题可以容易地简化成另一个问题：删除从列表开头数起的第 (L - n + 1)个结点，其中 L 是列表的长度。只要我们找到列表的长度 L，这个问题就很容易解决。
-
-首先我们将添加一个哑结点作为辅助，该结点位于列表头部。哑结点用来简化某些极端情况，例如列表中只含有一个结点，或需要删除列表的头部。在第一次遍历中，我们找出列表的长度 L。然后设置一个指向哑结点的指针，并移动它遍历列表，直至它到达第 (L - n)(L−n) 个结点那里。我们把第 (L - n)(L−n) 个结点的 next 指针重新链接至第 (L - n + 2)(L−n+2) 个结点，完成这个算法。
-
-![Remove the nth element from a list](https://pic.leetcode-cn.com/a476f4e932fa4499e22902dcb18edba41feaf9cfe4f17869a90874fbb1fd17f5-file_1555694537876)
-
-**方法二：一次遍历算法**
-
-上述算法可以优化为只使用一次遍历。我们可以使用两个指针而不是一个指针。第一个指针从列表的开头向前移动 n+1n+1 步，而第二个指针将从列表的开头出发。现在，这两个指针被 nn 个结点分开。我们通过同时移动两个指针向前来保持这个恒定的间隔，直到第一个指针到达最后一个结点。此时第二个指针将指向从最后一个结点数起的第 nn 个结点。我们重新链接第二个指针所引用的结点的 next 指针指向该结点的下下个结点。
-
-![Remove the nth element from a list](https://pic.leetcode-cn.com/4e134986ba59f69042b2769b84e3f2682f6745033af7bcabcab42922a58091ba-file_1555694482088)
+    public int getLength(ListNode head){
+        int length = 0;
+        while (head != null){
+            ++length;
+            head=head.next;
+        }
+        return length;
+    }
+```
 
 
 
-### 排序链表()
+### [排序链表（148）](https://leetcode-cn.com/problems/sort-list/)
 
+> 给你链表的头结点 `head` ，请将其按 **升序** 排列并返回 **排序后的链表** 。
+>
 > 在 *O*(*n* log *n*) 时间复杂度和常数级空间复杂度下，对链表进行排序。
 >
 > **示例 1:**
@@ -399,6 +546,10 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 **解答一：归并排序（递归法）**
 
 **解答二：归并排序（从底至顶直接合并）**
+
+
+
+
 
 
 
