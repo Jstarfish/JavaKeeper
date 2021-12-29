@@ -333,6 +333,8 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 
 ## 归并排序
 
+> https://www.cnblogs.com/chengxiao/p/6194356.html
+
 归并排序（Merge sort）是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。
 
 作为一种典型的分而治之思想的算法应用，归并排序的实现由两种方法：

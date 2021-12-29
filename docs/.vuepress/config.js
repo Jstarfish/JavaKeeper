@@ -159,7 +159,7 @@ function genDSASidebar() {
       collapsable: true,
       children: [
         "complexity",
-        "sort",
+        "Sort",
       	['Recursion', '递归'],
       	['Dynamic-Programming', '动态规划'],
         ['DFS', 'DFS']
@@ -169,7 +169,9 @@ function genDSASidebar() {
       title: "刷题",
       collapsable: true,
       children: [
-      	['soultion/binary-tree', '二叉树']
+      	['soultion/binary-tree', '二叉树'],
+      	['soultion/Array-Solution', '数组'],
+      	['soultion/LinkedList-Soultion', '链表']
       ]
     }
   ];
