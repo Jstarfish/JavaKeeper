@@ -26,6 +26,10 @@ public static int[] twoSum(int[] nums,int target){
 }
 ```
 
+时间复杂度：$O(N)$，其中 N 是数组中的元素数量。对于每一个元素 x，我们可以 $O(1)$ 地寻找 target - x。
+
+空间复杂度：$O(N)$，其中 N 是数组中的元素数量。主要为哈希表的开销。
+
 
 
 ### [217. 存在重复元素](https://leetcode-cn.com/problems/contains-duplicate/)
@@ -268,9 +272,44 @@ public int maxArea(int[] height){
 > 输出：[[-1,-1,2],[-1,0,1]]
 > ```
 
-**思路**：
+**思路**：排序后双指针
 
+```java
+public static List<List<Integer>> threeSum(int[] nums) {
+  //存放结果list
+  List<List<Integer>> result = new ArrayList<>();
+  int length = nums.length;
+  //特例判断
+  if (length < 3) {
+    return result;
+  }
+  Arrays.sort(nums);
+  for (int i = 0; i < length; i++) {
+    //排序后的第一个数字就大于0，就说明没有符合要求的结果
+    if (nums[i] > 0) break;
 
+    //去重
+    if (i > 0 && nums[i] == nums[i - 1]) continue;
+    //左右指针
+    int l = i + 1;
+    int r = length - 1;
+    while (l < r) {
+      int sum = nums[i] + nums[l] + nums[r];
+      if (sum == 0) {
+        result.add(Arrays.asList(nums[i], nums[l], nums[r]));
+        //去重（相同数字的话就移动指针）
+        while (nums[l] == nums[l + 1]) l++;
+        while (nums[r] == nums[r - 1]) r--;
+        //移动指针
+        l++;
+        r--;
+      } else if (sum < 0) l++;
+ 			else if (sum > 0) r--;
+    }
+  }
+  return result;
+}
+```
 
 
 
