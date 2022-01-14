@@ -523,6 +523,8 @@ public int findLengthOfLCIS(int[] nums) {
 
 ## 三、滑动窗口
 
+有一类数组上的问题，需要使用两个指针变量（我们称为左指针和右指针），同向、交替向右移动完成任务。这样的过程像极了一个窗口在平面上滑动的过程，因此我们将解决这一类问题的算法称为「滑动窗口」问题
+
 
 
 ![img](http://img.pkdoutu.com/production/uploads/image/2017/04/04/20170404308618_ZzXJwE.gif)
@@ -533,11 +535,15 @@ public int findLengthOfLCIS(int[] nums) {
 
 > [643. 子数组最大平均数 I](https://leetcode-cn.com/problems/maximum-average-subarray-i/)
 >
+> [1052. 爱生气的书店老板](https://leetcode-cn.com/problems/grumpy-bookstore-owner/)
+>
+> [3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
+>
 > [76. 最小覆盖子串](https://leetcode-cn.com/problems/minimum-window-substring/)
 >
-> 
+> [424. 替换后的最长重复字符](https://leetcode-cn.com/problems/longest-repeating-character-replacement/)
 >
-> 爱生气的书店老板
+> 
 
 ```java
 int left = 0, right = 0;
@@ -559,7 +565,7 @@ while (right < s.size()) {
 
 ### 3.1 同向交替移动的两个变量
 
-有一类数组上的问题，问我们固定长度的滑动窗口的性质，这一类问题在思维层面上相对简单。我们通过两道简单的例题向大家展示这一类问题的写法。
+有一类数组上的问题，问我们固定长度的滑动窗口的性质，这类问题还算相对简单。
 
 #### 子数组最大平均数 I
 
@@ -584,34 +590,58 @@ public static double getMaxAverage(int[] nums, int k) {
   for (int i = 0; i < nums.length; i++) {
     sum += nums[i];
   }
-  int maxSum = sum;
+  //目前最大的数是前k个数
+  int result = sum;
   //然后从第 K 个数开始移动，保存移动中的和值，返回最大的
   for (int i = k; i < nums.length; i++) {
     sum = sum - nums[i - k] + nums[i];
-    maxSum = Math.max(maxSum, sum);
+    result = Math.max(result, sum);
   }
   //返回的是double
-  return 1.0 * maxSum / k;
+  return 1.0 * result / k;
 }
 ```
 
 
 
-
-
-#### 爱生气的书店老板
-
-
-
-
-
-
-
 ### 3.2 不定长度的滑动窗口
 
-有一类数组上的问题，需要使用两个指针变量（我们称为左指针和右指针），同向、交替向右移动完成任务。这样的过程像极了一个窗口在平面上滑动的过程，因此我们将解决这一类问题的算法称为「滑动窗口」问题
+#### 无重复字符的最长子串
 
+> 给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长子串** 的长度。
+>
+> ```
+> 输入: s = "abcabcbb"
+> 输出: 3 
+> 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+> ```
 
+思路：
+
+- 滑动窗口，其实就是一个队列，比如例题中的 abcabcbb，进入这个队列（窗口）为 abc 满足题目要求，当再进入 a，队列变成了 abca，这时候不满足要求。所以，我们要移动这个队列
+- 如何移动？我们只要把队列的左边的元素移出就行了，直到满足题目要求！
+- 一直维持这样的队列，找出队列出现最长的长度时候，求出解！
+
+```java
+public static int lengthOfLongestSubstring(String s){
+  HashMap<Character, Integer> map = new HashMap<>();
+  int result = 0;
+  int left = 0;
+  //为了有左右指针的思想，我把我们常用的 i 写成了 right
+  for (int right = 0; right < s.length(); right++) {
+    //当前字符包含在当前有效的子段中，如：abca，当我们遍历到第二个a，当前有效最长子段是 abc，我们又遍历到a，
+    //那么此时更新 left 为 map.get(a)+1=1，当前有效子段更新为 bca；
+    //相当于左指针往前移动了一位
+    if (map.containsKey(s.charAt(right))) {
+      left = Math.max(left, map.get(s.charAt(right)) + 1);
+    }
+    //右指针一直往前移动
+    map.put(s.charAt(right), right);
+    result = Math.max(result, right - left + 1);
+  }
+  return result;
+}
+```
 
 
 
@@ -638,6 +668,12 @@ public static double getMaxAverage(int[] nums, int k) {
 > 输入：s = "ABAB", k = 2
 > 输出：4
 > 解释：用两个'A'替换为两个'B',反之亦然。
+> ```
+>
+> ```
+> 输入：s = "AABABBA", k = 1
+> 输出：4
+> 解释：将中间的一个'A'替换为'B',字符串变为 "AABBBBA"。子串 "BBBB" 有最长重复字母, 答案为 4。
 > ```
 
 思路：
@@ -773,7 +809,6 @@ public int characterReplacement(String s, int k) {
 - 移除元素
 - 删除排序数组中的重复项 II
 - 移动零
-
 
 
 
