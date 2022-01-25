@@ -161,6 +161,7 @@ function genDSASidebar() {
         "complexity",
         "Sort",
       	['Recursion', '递归'],
+        ['Double-Pointer', '双指针'],
       	['Dynamic-Programming', '动态规划'],
         ['DFS', 'DFS']
       ]
@@ -201,7 +202,7 @@ function genDataManagementSidebar(){
     {
       title: "MySQL",
       collapsable: true,
-      sidebarDepth: 2,    // 可选的, 默认值是 1
+      //sidebarDepth: 1,    // 可选的, 默认值是 1
       children: [
         ['MySQL/MySQL-Framework', 'MySQL 架构介绍'],
         ['MySQL/MySQL-Storage-Engines', 'MySQL 存储引擎'],
@@ -215,6 +216,7 @@ function genDataManagementSidebar(){
     {
       title: "Redis",
       collapsable: true,
+      sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
         ['Redis/ReadRedis', 'Redis 开篇'],
         ['Redis/Redis-Datatype', 'Redis 数据类型'],
