@@ -241,7 +241,7 @@ for 状态1 in 状态1的所有取值：
 
 斐波那契数列上手后，我们用解题套路看下 leetcode_70，据说是道正宗的动态规划问题。
 
-### 1、[爬楼梯](https://leetcode-cn.com/problems/climbing-stairs/)（leetcode_53）
+### 1、[爬楼梯](https://leetcode-cn.com/problems/climbing-stairs/)（leetcode_70）
 
 > 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？注意：给定 n 是一个正整数。
 >
@@ -270,6 +270,12 @@ for 状态1 in 状态1的所有取值：
 爬 5 级楼梯的方式数 = 爬 4 级楼梯的方式数 + 爬 3 级楼梯的方式数，这样往下递归分析
 
 爬 4 级楼梯的方式数 = 爬 3 级楼梯的方式数 + 爬 2 级楼梯的方式数
+
+> 第二次做的时候，我没有用 『自底向上』，而是用『自上向下』的举例，陷入了一种错误
+>
+> 我想的是 f(n) = f(n-1) + 1，从上往下的算，留出一级，肯定只能是爬 1 级这一种，所以
+>
+> f(5) = f(4) + 1 .......
 
 。。。![img](http://img.pkdoutu.com/production/uploads/image/2019/08/21/20190821348574_pZnwku.gif)
 
@@ -672,11 +678,22 @@ public static int coinChange(int[] coins, int amount) {
 
 我们需要找出给定数组中两个数字之间的最大差值（即，最大利润）。此外，第二个数字（卖出价格）必须大于第一个数字（买入价格）
 
-
-
-
-
-
+```java
+public static int dp(int[] prices) {
+  int length = prices.length;
+  if (length == 0) {
+    return 0;
+  }
+  int dp[] = new int[length];
+  //保存一个最小值
+  int minPrice = prices[0];
+  for (int i = 1; i < length; i++) {
+    minPrice = Math.min(minPrice, prices[i]);
+    dp[i] = Math.max(dp[i - 1], prices[i] - minPrice);
+  }
+  return dp[length - 1];
+}
+```
 
 
 
@@ -694,19 +711,15 @@ public static int coinChange(int[] coins, int amount) {
 
 回文的意思是正着念和倒着念一样，如：大波美人美波大
 
-对于一个子串而言，如果它是回文串，并且长度大于 22，那么将它首尾的两个字母去除之后，它仍然是个回文串。例如对于字符串 “ababa”，如果我们已经知道 “bab” 是回文串，那么 “ababa” 一定是回文串，这是因为它的首尾两个字母都是 “a”。
-
-中心扩散法的思路是：遍历每一个索引，以这个索引为中心，利用“回文串”中心对称的特点，往两边扩散，看最多能扩散多远。
-
-
-
 建立二维数组 `dp` ，找出所有的回文子串。
 
-`dp[i][j]` 记录子串 `i..j` 是否为回文串 。
+回文串两边加上两个相同字符，会形成一个新的回文串 。
 
 ![img](https://writings.sh/assets/images/posts/algorithm-longest-palindromic-substring/longest-palindromic-substring-dp-2-1.jpeg)
 
 
+
+我们用`dp[i][j]` 记录子串 `i..j` 是否为回文串 。
 
 ![img](https://writings.sh/assets/images/posts/algorithm-longest-palindromic-substring/longest-palindromic-substring-dp-2-2.jpeg)
 
@@ -724,9 +737,51 @@ public static int coinChange(int[] coins, int amount) {
 
 ![img](https://writings.sh/assets/images/posts/algorithm-longest-palindromic-substring/longest-palindromic-substring-dp-2-4.jpeg)
 
+这是本方法中主要的递推关系。
 
+不过仍要注意边界情况，即 子串 `i+1..j-1` 的有效性 ，当 `i+1 <= j-1` 时，它才有效。
 
+反之，如果不满足，此时 `j <= i+1` ，也就是子串 `i..j` 最多有两个字符， 如果两个字符 `s[i]` 和 `s[j]` 相等，那么是回文串。
 
+```java
+public String longestPalindrome_1(String s) {
+  int length = s.length();
+  if (length < 2) {
+    return s;
+  }
+  boolean dp[][] = new boolean[length][length];
+  for (int i = 0; i < length; i++) {
+    dp[i][i] = true;
+  }
+
+  char[] chars = s.toCharArray();
+
+  //通过最大长度定位回文串位置，或者也可以用个数组记录int[] res = new int[2];
+  int maxLen = 1;
+  int begin = 0;
+  for (int r = 1; r < length; r++) {
+    for (int l = 0; l < r; l++) {
+      if (chars[l] != chars[r]) {
+        dp[l][r] = false;
+      } else {
+        // 特例，如果 是 abaa 这种，需要最后一个和第一个也相等，但是他们距离大于等于了3，所以还需要往里判断
+        if (r - l < 3) {
+          dp[l][r] = true;
+        } else {
+          dp[l][r] = dp[l + 1][r - 1];
+        }
+      }
+
+      //只要 dp[l][r] == true 成立，就表示子串 s[i..j] 是回文，此时记录回文长度和起始位置
+      if (dp[l][r] && r - l + 1 > maxLen) {
+        maxLen = r - l + 1;
+        begin = l;
+      }
+    }
+  }
+  return s.substring(begin, begin + maxLen);
+}
+```
 
 
 

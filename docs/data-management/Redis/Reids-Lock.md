@@ -1,4 +1,10 @@
-# 分布式锁
+---
+title: 分布式锁
+date: 2021-10-09
+tags: 
+ - Redis
+categories: Redis
+---
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/locks-505878_1280.jpg)
 

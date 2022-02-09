@@ -1,6 +1,10 @@
-
-
-# Redis 消息队列的三种方案（List、Streams、Pub/Sub）
+---
+title: Redis 消息队列的三种方案（List、Streams、Pub/Sub）
+date: 2022-2-9
+tags: 
+ - Redis
+categories: Redis
+---
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/008eGmZEly1gmjoestg8dj31eu0ixtam.jpg)
 
