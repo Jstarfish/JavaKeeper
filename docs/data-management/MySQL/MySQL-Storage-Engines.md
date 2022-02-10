@@ -1,6 +1,6 @@
 # Mysql Storage Engines
 
-存储引擎是MySQL的组件，用于处理不同表类型的SQL操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
+存储引擎是 MySQL 的组件，用于处理不同表类型的 SQL 操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
 
 使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
 
@@ -25,9 +25,7 @@ show table status like 'tablename'
 show table status from database where name="tablename"
 ```
 
-
-
-![mysql-engines](../../_images/mysql/mysql-engines.png)
+![mysql-engines](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/mysql-engines.png)
 
 
 
@@ -54,7 +52,7 @@ SET default_storage_engine=NDBCLUSTER;
 
 #### InnoDB
 
-**InnoDB是MySQL5.7 默认的存储引擎，主要特性有**
+**InnoDB 是 MySQL5.7 默认的存储引擎，主要特性有**
 
 - InnoDB存储引擎维护自己的缓冲池，在访问数据时将表和索引数据缓存在主内存中 
 - 支持事务
