@@ -18,6 +18,8 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 
 这种题目看懂需要看动图
 
+![img](https://labuladong.gitee.io/algo/images/%e6%9c%80%e9%95%bf%e9%80%92%e5%a2%9e%e5%ad%90%e5%ba%8f%e5%88%97/gif1.gif)
+
 ```java
  public static int getLengthOfLIS(int[] nums) {
 
@@ -33,6 +35,7 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
      for (int j = 0; j < i; j++) {
   //当 nums[i] <= nums[j]nums[i]<=nums[j] 时： nums[i]nums[i] 无法接在 nums[j]nums[j] 之后，此情况上升子序列不成立，跳过
        if (nums[i] > nums[j]) {
+         //这里要注意是 nums[i] 还是 dp[i]
          dp[i] = Math.max(dp[i], dp[j] + 1);
        }
      }
@@ -46,6 +49,14 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 ```
 
 > 类似问题还有，最长递增子序列的个数、俄罗斯套娃信封问题
+
+
+
+
+
+
+
+
 
 
 
