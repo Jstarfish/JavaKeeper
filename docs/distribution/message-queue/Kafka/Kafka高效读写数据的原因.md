@@ -185,6 +185,29 @@ Kafka 在这里采用的方案是通过 NIO 的 `transferTo/transferFrom` 调用
 
 Producer 可将数据压缩后发送给 broker，从而减少网络传输代价，目前支持的压缩算法有：Snappy、Gzip、LZ4。数据压缩一般都是和批处理配套使用来作为优化手段的。
 
+在 Kafka 中，压缩可能发生在两个地方：生产者端和 Broker 端。
+
+> 生产者程序中配置 compression.type 参数即表示启用指定类型的压缩算法。比如下面这段程序代码展示了如何构建一个开启 GZIP 的 Producer 对象：
+>
+> ```java
+> Properties props = new Properties();
+> props.put("bootstrap.servers", "localhost:9092");
+> props.put("acks", "all");
+> props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+> props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+> // 开启 GZIP 压缩
+> props.put("compression.type", "gzip");
+> 
+> Producer<String, String> producer = new KafkaProducer<>(props);
+> ```
+>
+> 这里比较关键的代码行是 `props.put(“compression.type”, “gzip”)`，它表明该 Producer 的压缩算法使用的是 GZIP。这样 Producer 启动后生产的每个消息集合都是经 GZIP 压缩过的，故而能很好地节省网络传输带宽以及 Kafka Broker 端的磁盘占用。
+>
+> 大部分情况下 Broker 从 Producer 端接收到消息后仅仅是原封不动地保存而不会对其进行任何修改，但在以下两种情况，可能会让 Broker 重新压缩消息
+>
+> - Broker 端指定了和 Producer 端不同的压缩算法，这样 Broker 收到消息，就需要先解压再用自己的压缩算法进行压缩
+> - Broker 端发生了消息格式转换
+
 
 
 ### 小总结 | 下次面试官问我 kafka 为什么快，我就这么说
@@ -202,8 +225,6 @@ Producer 可将数据压缩后发送给 broker，从而减少网络传输代价�
 
 
 
-
-
-参考：
+## References
 
 - https://www.infoq.cn/article/kafka-analysis-part-6

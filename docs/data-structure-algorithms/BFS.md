@@ -196,3 +196,10 @@ public class Solution {
 5. 完成「力扣」第 429 题：N 叉树的层序遍历（中等）；
 6. 完成「力扣」第 993 题：二叉树的堂兄弟节点（中等）；
 
+
+
+
+
+## Reference
+
+- https://leetcode-cn.com/problems/binary-tree-level-order-traversal/solution/bfs-de-shi-yong-chang-jing-zong-jie-ceng-xu-bian-l/

@@ -97,3 +97,8 @@ Kafka 的网络通信模型是基于 NIO 的 Reactor 多线程模型来设计的
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/FbXJ7UCc6O0dHyDpzdia8xZ2nS1IzIMSoF5xwBbjgrd3nDVXyaMl7SqDbiaib6ej4sGYCwehEunqHeOaUFWRrpHcQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
+
+
+
+
+首先 ZooKeeper 是做什么的呢？它是一个分布式协调框架，负责协调管理并保存 Kafka 集群的所有元数据信息，比如集群都有哪些 Broker 在运行、创建了哪些 Topic，每个 Topic 都有多少分区以及这些分区的 Leader 副本都在哪些机器上等信息。

@@ -3,6 +3,7 @@ title: MySQL索引——妈妈再也不用担心我不会索引了
 date: 2022-2-8
 tags: 
  - MySQL
+categories: MySQL
 ---
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/pexels-nothing-ahead-4494642.jpg)
@@ -243,7 +244,13 @@ MyISAM 引擎的索引文件和数据文件是分离的。**MyISAM 引擎索引�
 
 在 Innodb 中，索引分叶子节点和非叶子节点，非叶子节点就像新华字典的目录，单独存放在索引段中，叶子节点则是顺序排列的，在数据段中。
 
-InnoDB 的数据文件可以按照表来切分（只需要开启`innodb_file_per_table)`，切分后存放在`xxx.ibd`中，默认不切分，存放在 `xxx.ibdata`中。
+InnoDB 的数据文件可以按照表来切分（只需要开启`innodb_file_per_table)`，切分后存放在`xxx.ibd`中，不切分存放在 `xxx.ibdata`中。
+
+从 MySQL 5.6.6 版本开始，它的默认值就是 ON 了。
+
+> 扩展点：建议将这个值设置为 ON。因为，一个表单独存储为一个文件更容易管理，而且在你不需要这个表的时候，通过 drop table 命令，系统就会直接删除这个文件。而如果是放在共享表空间中，即使表删掉了，空间也是不会回收的。
+>
+> 所以会碰到这种情况，数据库占用空间太大后，把一个最大的表删掉了一半的数据，表文件的大小还是没变~
 
 #### 辅助（非主键）索引：
 
