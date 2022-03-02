@@ -10,11 +10,11 @@
 
 ### 使用 jstack 分析 cpu 问题
 
-我们先用ps命令找到对应进程的pid(如果你有好几个目标进程，可以先用top看一下哪个占用比较高)。
-接着用`top -H -p pid`来找到cpu使用率比较高的一些线程
+我们先用 ps 命令找到对应进程的 pid(如果你有好几个目标进程，可以先用 top 看一下哪个占用比较高)。
+接着用`top -H -p pid`来找到 cpu 使用率比较高的一些线程
 ![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083804.png)
 
-然后将占用最高的pid转换为16进制`printf '%x\n' pid`得到nid
+然后将占用最高的 pid 转换为16进制`printf '%x\n' pid`得到 nid
 
 ![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083806.png)
 

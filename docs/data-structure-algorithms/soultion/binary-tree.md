@@ -408,3 +408,41 @@ private TreeNode bulid(int[] nums, int lo, int hi) {
 > 输入: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
 > 输出: [3,9,20,null,null,15,7]
 > ```
+
+
+
+### [从中序与后序遍历序列构造二叉树（106）](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
+
+> 给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。
+>
+> ```
+> 输入：inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
+> 输出：[3,9,20,null,null,15,7]
+> ```
+
+
+
+
+
+### [根据前序和后序遍历构造二叉树（889）](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/)
+
+> 给定两个整数数组，preorder 和 postorder ，其中 preorder 是一个具有 无重复 值的二叉树的前序遍历，postorder 是同一棵树的后序遍历，重构并返回二叉树。
+>
+> 如果存在多个答案，您可以返回其中 任何 一个。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/07/24/lc-prepost.jpg)
+>
+> ```
+> 输入：preorder = [1,2,4,5,3,6,7], postorder = [4,5,2,6,7,3,1]
+> 输出：[1,2,3,4,5,6,7]
+> ```
+
+思路：这个的区别就是无法确定原始二叉树，可能有不同形式，所以我们可以通过控制左右子树的索引来构建
+
+1. 首先把前序遍历结果的第一个元素或者后序遍历结果的最后一个元素确定为根节点的值。
+
+2. 然后把前序遍历结果的第二个元素作为左子树的根节点的值。
+
+3. 在后序遍历结果中寻找左子树根节点的值，从而确定了左子树的索引边界，进而确定右子树的索引边界，递归构造左右子树即可。
+
+这样就和前两道解法相似了

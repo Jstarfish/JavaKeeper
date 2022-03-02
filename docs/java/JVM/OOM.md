@@ -1,8 +1,14 @@
-# 谈谈你对 OOM 的认识
+---
+title: 谈谈你对 OOM 的认识
+date: 2022-3-1
+tags: 
+ - JVM
+categories: JVM Java
+---
 
 > 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱，笔记自取
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggcqh5gsdj324d0ol0y7.jpg)
+![oom](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/oom.png)
 
 在《Java虚拟机规范》的规定里，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生 OutOfMemoryError 异常的可能。
 
@@ -21,7 +27,7 @@
 
 > 我们常说的 OOM 异常，其实是 Error
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggbu55wwgj30sy0ku3z0.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/error-oom.png)
 
 
 
@@ -118,7 +124,7 @@ Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 
 加送个知识点，三连的终将成为大神~~
 
-## 内存泄露和内存溢出
+### 内存泄露和内存溢出
 
 内存溢出(out of memory)，是指程序在申请内存时，没有足够的内存空间供其使用，出现out of memory；比如申请了一个 Integer，但给它存了 Long 才能存下的数，那就是内存溢出。
 
@@ -401,14 +407,10 @@ JVM 在为数组分配内存前，会检查要分配的数据结构在系统中�
 
 ## 参考与感谢
 
-《深入理解 Java 虚拟机 第 3 版》
+- 《深入理解 Java 虚拟机 第 3 版》
 
-https://plumbr.io/outofmemoryerror
+- https://plumbr.io/outofmemoryerror
 
-https://yq.aliyun.com/articles/711191
+- https://yq.aliyun.com/articles/711191
 
-https://github.com/StabilityMan/StabilityGuide/blob/master/docs/diagnosis/jvm/exception
-
-
-
-![](https://imgkr.cn-bj.ufileos.com/6e7c80a9-48e6-4a2a-b920-682d8f0bab5c.png)
+- https://github.com/StabilityMan/StabilityGuide/blob/master/docs/diagnosis/jvm/exception

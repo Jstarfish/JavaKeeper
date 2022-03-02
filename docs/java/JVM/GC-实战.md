@@ -33,7 +33,7 @@ public class Test {
 
 1、 标准参数（-），所有的 JVM 实现都必须实现这些参数的功能，而且向后兼容；例如 **-verbose:gc**（输出每次GC的相关情况)
 
-2、 非标准参数（-X），默认 JVM 实现这些参数的功能，但是并不保证所有 JVM 实现都满足，且不保证向后兼容，栈，堆大小的设置都是通过这个参数来配置的,用得最多的如下
+2、 非标准参数（-X），默认 JVM 实现这些参数的功能，但是并不保证所有 JVM 实现都满足，且不保证向后兼容，栈，堆大小的设置都是通过这个参数来配置的，用得最多的如下
 
 | 参数示例 | 表示意义                          |
 | :------- | :-------------------------------- |
@@ -42,7 +42,7 @@ public class Test {
 | -Xmn200m | 设置的年轻代大小为 200M           |
 | -Xss128k | 设置每个线程的栈大小为 128k       |
 
-3、非Stable参数（-XX），此类参数各个 jvm 实现会有所不同，将来可能会随时取消，需要慎重使用, -XX:-option 代表关闭 option 参数，-XX:+option 代表要关闭 option 参数,例如要启用串行 GC，对应的 JVM 参数即为 -XX:+UseSerialGC。非 Stable 参数主要有三大类
+3、非Stable参数（-XX），此类参数各个 jvm 实现会有所不同，将来可能会随时取消，需要慎重使用， `-XX:-option` 代表关闭 option 参数，`-XX:+option` 代表要启用 option 参数，例如要启用串行 GC，对应的 JVM 参数即为 `-XX:+UseSerialGC`。非 Stable 参数主要有三大类
 
 - 行为参数（Behavioral Options）：用于改变 JVM 的一些基础行为，如启用串行/并行 GC
 
@@ -75,7 +75,7 @@ public class Test {
 
 *画外音：以上只是列出了比较常用的 JVM 参数，更多的 JVM 参数介绍请查看文末的参考资料*
 
-明白了 JVM 参数是干啥用的，接下来我们进入实战演练,下文中所有程序运行时对应的 JVM 参数都以 VM Args 的形式写在开头的注释里，读者如果在执行程序时记得要把这些 JVM 参数给带上哦
+明白了 JVM 参数是干啥用的，接下来我们进入实战演练，下文中所有程序运行时对应的 JVM 参数都以 VM Args 的形式写在开头的注释里，读者如果在执行程序时记得要把这些 JVM 参数给带上哦
 
 ## 发生 OOM 的主要几种场景及相应解决方案
 
@@ -84,14 +84,11 @@ public class Test {
 **1、Java 虚拟机规范中描述在栈上主要会发生以下两种异常**
 
 - StackOverflowError 异常
+  
   这种情况主要是因为**单个线程**请求栈深度大于虚拟机所允许的最大深度（如常用的递归调用层级过深等），再比如单个线程定义了大量的本地变量，导致方法帧中本地变量表长度过大等也会导致 StackOverflowError 异常， 一句话：**在单线程下**，当栈桢太大或虚拟机容量太小导致内存无法分配时，都会发生 StackOverflowError 异常。
-
-   
-
+  
 - 虚拟机在扩展栈时无法申请到足够的内存空间，会抛出 OOM 异常
   在[刨根问底---一次 OOM 试验造成的电脑雪崩引发的思考](https://mp.weixin.qq.com/s?__biz=MzI5MTU1MzM3MQ==&mid=2247483922&idx=1&sn=8bafd48fb09e1badf8f513e5a4cd5916&scene=21#wechat_redirect) 一文中我们已经详细地剖析了此例子，再来看看
-
-   
 
 ```java
 /**
@@ -253,7 +250,7 @@ Java 应用启动的时候分被分配一定的内存空间(通过 -Xmx 及其�
 
 ## OOM 问题排查的一些常用工具
 
-接下来我们来看下如何排查造成 OOM 的原因，内存泄漏是最常见的造成 OOM 的一种原因，所以接下来我们以来看看怎么使用工具来排查这种问题,使用到的工具主要有两大类
+接下来我们来看下如何排查造成 OOM 的原因，内存泄漏是最常见的造成 OOM 的一种原因，所以接下来我们以来看看怎么使用工具来排查这种问题，使用到的工具主要有两大类
 
 **1、使用 mat（Eclipse Memory Analyzer） 来分析 dump（堆转储快照） 文件**
 
@@ -283,16 +280,15 @@ public class Main {
 }
 ```
 
-为了让以上程序快速产生 OOM, 我把堆大小设置成了 10M, 这样执行 「java -Xmx10m -XX:+HeapDumpOnOutOfMemoryError Main」后很快就发生了 OOM，此时我们就拿到了 hrof 文件，下载 MAT 工具，打开 hrof,进行分析，打开之后选择 「Leak Suspects Report」进行分析，可以看到发生 OOM 的线程的堆栈信息，明确定位到是哪一行造成的
+为了让以上程序快速产生 OOM， 我把堆大小设置成了 10M，这样执行 「java -Xmx10m -XX:+HeapDumpOnOutOfMemoryError Main」后很快就发生了 OOM，此时我们就拿到了 hrof 文件，下载 MAT 工具，打开 hrof，进行分析，打开之后选择 「Leak Suspects Report」进行分析，可以看到发生 OOM 的线程的堆栈信息，明确定位到是哪一行造成的
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVklvWE5xaWN5V3hpYmViQXZUdUp4azQ0UVdlcjhUTEFobnkxdE9aY1MwZ1lWSThDRWxua3dvSHhReHF4ZFZNaWM0aFFCWW9tcFRLTzZhZy82NDA?x-oss-process=image/format,png)
-
 
 *如图示，可以看到 Main.java 文件的第 12 行导致了这次的 OOM*
 
 **2、使用 jvisualvm 来分析**
 
-用第一种方式必须等 OOM 后才能 dump 出 hprof 文件，但如果我们想在运行中观察堆的使用情况以便查出可能的内存泄漏代码就无能为力了，这时我们可以借助 **jvisualvm** 这款工具, jvisualvm 的功能强大，除了可以实时监控堆内存的使用情况，还可以跟踪垃圾回收，运行中 dump 中堆内存使用情况、cpu分析，线程分析等，是查找分析问题的利器，更骚的是它不光能分析本地的 Java 程序，还可以分析线上的 Java 程序运行情况, 本身这款工具也是随 JDK 发布的，是官方力推的一款运行监视，故障处理的神器。我们来看看如何用 jvisualvm 来分析上文所述的存在内存泄漏的如下代码
+用第一种方式必须等 OOM 后才能 dump 出 hprof 文件，但如果我们想在运行中观察堆的使用情况以便查出可能的内存泄漏代码就无能为力了，这时我们可以借助 **jvisualvm** 这款工具，jvisualvm 的功能强大，除了可以实时监控堆内存的使用情况，还可以跟踪垃圾回收，运行中 dump 中堆内存使用情况、cpu分析，线程分析等，是查找分析问题的利器，更骚的是它不光能分析本地的 Java 程序，还可以分析线上的 Java 程序运行情况，本身这款工具也是随 JDK 发布的，是官方力推的一款运行监视，故障处理的神器。我们来看看如何用 jvisualvm 来分析上文所述的存在内存泄漏的如下代码
 
 ```java
 import java.util.Map;
