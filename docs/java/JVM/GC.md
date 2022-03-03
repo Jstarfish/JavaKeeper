@@ -517,3 +517,4 @@ public class TestGC {
 - java调用本地方法--jni简介 https://blog.csdn.net/w1992wishes/article/details/80283403 
 - 咱们从头到尾说一次 Java 垃圾回收 https://mp.weixin.qq.com/s/pR7U1OTwsNSg5fRyWafucA 
 - Java Hotspot G1 GC的一些关键技术 https://tech.meituan.com/2016/09/23/g1.html
+- [Java中9种常见的CMS GC问题分析与解决](https://tech.meituan.com/2020/11/12/java-9-cms-gc.html)

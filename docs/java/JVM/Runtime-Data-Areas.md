@@ -491,6 +491,8 @@ JVM 在进行 GC 时，并非每次都对堆内存（新生代、老年代；方
 
 ### 4.6 TLAB
 
+Thread Local Allocation Buffer 的简写，基于 CAS 的独享线程（Mutator Threads）可以优先将对象分配在 Eden 中的一块内存，因为是 Java 线程独享的内存区没有锁竞争，所以分配速度更快，每个 TLAB 都是一个线程独享的。
+
 #### 什么是 TLAB （Thread Local Allocation Buffer）?
 
 - 从内存模型而不是垃圾回收的角度，对 Eden 区域继续进行划分，JVM 为每个线程分配了一个私有缓存区域，它包含在 Eden 空间内
