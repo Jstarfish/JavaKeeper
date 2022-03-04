@@ -1,24 +1,26 @@
-JUC 面试题总共围绕的就这么几部分
+> JUC 面试题总共围绕的就这么几部分
+>
+> - 多线程的一些概念（进程、线程、并行、并发啥的，谈谈你对高并发的认识）
+> - 同步机制（locks、synchronzied、atomic）
+> - 并发容器类
+>   - ConcurrentHashMap、CopyOnWriteArrayList、CopyOnWriteArraySet
+>   - 阻塞队列（顺着就会问到线程池）
+> - 线程池（Executor、Callable 、Future、ExecutorService等等，底层原理）
+> - AQS
+>   - AQS 原理
+>   - 工具类：CountDownLatch、ReentrantLock、Semaphore、Exchanger
+> - atomic 类（atomic常用类，方法，到 CAS，或者 ABA问题）
+> - Fork/Join并行计算框架
+>
+> ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200927155707.png)
 
-- 多线程的一些概念（进程、线程、并行、并发啥的，谈谈你对高并发的认识）
-- 同步机制（locks、synchronzied、atomic）
-- 并发容器类
-  - ConcurrentHashMap、CopyOnWriteArrayList、CopyOnWriteArraySet
-  - 阻塞队列（顺着就会问到线程池）
-- 线程池（Executor、Callable 、Future、ExecutorService等等，底层原理）
-- AQS
-  - AQS 原理
-  - 工具类：CountDownLatch、ReentrantLock、Semaphore、Exchanger
-- atomic 类（atomic常用类，方法，到 CAS，或者 ABA问题）
-- Fork/Join并行计算框架
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200927155707.png)
 
 
 
 ## 一、多线程开篇
 
-### 进程和线程
+### 进程和线程？
 
 进程是程序的一次执行过程，是系统运行程序的基本单位，因此进程是动态的。系统运行一个程序即是一个进程从创建，运行到消亡的过程。
 
@@ -39,7 +41,7 @@ JUC 面试题总共围绕的就这么几部分
 
 ### 说下同步、异步、阻塞和非阻塞
 
-## 同步与异步
+#### 同步与异步
 
 首先来解释同步和异步的概念，这两个概念与消息的通知机制有关。也就是**同步与异步主要是从消息通知机制角度来说的**。
 
@@ -47,9 +49,9 @@ JUC 面试题总共围绕的就这么几部分
 
 所谓异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。
 
-异步的概念和同步相对。当一个同步调用发出后，调用者要一直等待返回消息（结果）通知后，才能进行后续的执行；当一个异步过程调用发出后，调用者不能立刻得到返回消息（结果）。`实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者
+异步的概念和同步相对。当一个同步调用发出后，调用者要一直等待返回消息（结果）通知后，才能进行后续的执行；当一个异步过程调用发出后，调用者不能立刻得到返回消息（结果）。实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者
 
-
+#### 阻塞和非阻塞
 
 阻塞和非阻塞这两个概念与程序（线程）等待消息通知(无所谓同步或者异步)时的状态有关。也就是说**阻塞与非阻塞主要是程序（线程）等待消息通知时的状态角度来说的**
 
@@ -575,15 +577,15 @@ RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤�
 
 **② synchronized 依赖于 JVM 而 ReentrantLock 依赖于 API**
 
-synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。
+synchronized 是依赖于 JVM 实现的，虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。
 
 **③ ReentrantLock 比 synchronized 增加了一些高级功能**
 
-相比synchronized，ReentrantLock增加了一些高级功能。主要来说主要有三点：**①等待可中断；②可实现公平锁；③可实现选择性通知（锁可以绑定多个条件）**
+相比 synchronized，ReentrantLock 增加了一些高级功能。主要来说主要有三点：**①等待可中断；②可实现公平锁；③可实现选择性通知（锁可以绑定多个条件）**
 
-- **ReentrantLock提供了一种能够中断等待锁的线程的机制**，通过lock.lockInterruptibly()来实现这个机制。也就是说正在等待的线程可以选择放弃等待，改为处理其他事情。
-- **ReentrantLock可以指定是公平锁还是非公平锁。而synchronized只能是非公平锁。所谓的公平锁就是先等待的线程先获得锁。** ReentrantLock默认情况是非公平的，可以通过 ReentrantLock类的`ReentrantLock(boolean fair)`构造方法来制定是否是公平的。
-- synchronized关键字与wait()和notify()/notifyAll()方法相结合可以实现等待/通知机制，ReentrantLock类当然也可以实现，但是需要借助于Condition接口与newCondition() 方法。Condition是JDK1.5之后才有的，它具有很好的灵活性，比如可以实现多路通知功能也就是在一个Lock对象中可以创建多个Condition实例（即对象监视器），**线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知”** ，这个功能非常重要，而且是Condition接口默认提供的。而synchronized关键字就相当于整个Lock对象中只有一个Condition实例，所有的线程都注册在它一个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程这样会造成很大的效率问题，而Condition实例的signalAll()方法 只会唤醒注册在该Condition实例中的所有等待线程。
+- **ReentrantLock提供了一种能够中断等待锁的线程的机制**，通过 `lock.lockInterruptibly()` 来实现这个机制。也就是说正在等待的线程可以选择放弃等待，改为处理其他事情。
+- **ReentrantLock可以指定是公平锁还是非公平锁。而synchronized只能是非公平锁。所谓的公平锁就是先等待的线程先获得锁。** ReentrantLock 默认情况是非公平的，可以通过 ReentrantLock 类的 `ReentrantLock(boolean fair)` 构造方法来制定是否是公平的。
+- synchronized 关键字与 `wait()` 和 `notify()/notifyAll()` 方法相结合可以实现等待/通知机制，ReentrantLock 类当然也可以实现，但是需要借助于 Condition 接口与 `newCondition()` 方法。Condition 是 JDK1.5 之后才有的，它具有很好的灵活性，比如可以实现多路通知功能也就是在一个Lock对象中可以创建多个Condition实例（即对象监视器），**线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知”** ，这个功能非常重要，而且是Condition接口默认提供的。而synchronized关键字就相当于整个Lock对象中只有一个Condition实例，所有的线程都注册在它一个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程这样会造成很大的效率问题，而Condition实例的signalAll()方法 只会唤醒注册在该Condition实例中的所有等待线程。
 
 如果你想使用上述功能，那么选择ReentrantLock是一个不错的选择。
 
@@ -639,11 +641,25 @@ JMM是不区分JVM到底是运行在单核处理器、多核处理器的，Java�
 
 
 
+### Java 内存模型中的 happen-before 是什么？
+
 happens-before 先行发生，是 Java 内存模型中定义的两项操作之间的偏序关系，**如果操作A 先行发生于操作B，那么A的结果对B可见**。
 
 内存屏障是被插入两个 CPU 指令之间的一种指令，用来禁止处理器指令发生重排序（像屏障一样），从而保障**有序性**的。
 
+Happen-before 关系，是 Java 内存模型中保证多线程操作可见性的机制，也是对早期语言规范中含糊的可见性概念的一个精确定义。
 
+它的具体表现形式，包括但远不止是我们直觉中的 synchronized、volatile、lock 操作顺序等方面，例如：
+
+- 线程内执行的每个操作，都保证 happen-before 后面的操作，这就保证了基本的程序顺序规则，这是开发者在书写程序时的基本约定。
+- 对于 volatile 变量，对它的写操作，保证 happen-before 在随后对该变量的读取操作。
+- 对于一个锁的解锁操作，保证 happen-before 加锁操作。
+- 对象构建完成，保证 happen-before 于 finalizer 的开始动作。
+- 甚至是类似线程内部操作的完成，保证 happen-before 其他 Thread.join() 的线程等。
+
+这些 happen-before 关系是存在着传递性的，如果满足 a happen-before b 和 b happen-before c，那么 a happen-before c 也成立。
+
+前面我一直用 happen-before，而不是简单说前后，是因为它不仅仅是对执行时间的保证，也包括对内存读、写操作顺序的保证。仅仅是时钟顺序上的先后，并不能保证线程交互的可见性。
 
 
 
