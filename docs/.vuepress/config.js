@@ -160,6 +160,7 @@ function genDSASidebar() {
       children: [
         "complexity",
         "Sort",
+        ['Binary-Search', '二分查找'],
       	['Recursion', '递归'],
         ['Double-Pointer', '双指针'],
       	['Dynamic-Programming', '动态规划'],
@@ -172,7 +173,8 @@ function genDSASidebar() {
       children: [
       	['soultion/binary-tree', '二叉树'],
       	['soultion/Array-Solution', '数组'],
-      	['soultion/LinkedList-Soultion', '链表']
+      	['soultion/LinkedList-Soultion', '链表'],
+        ['soultion/stock-problems', '股票问题']
       ]
     }
   ];
@@ -301,6 +303,7 @@ function genDistributionSidebar(){
       sidebarDepth: 2,    // 可选的, 默认值是 1
       children: [
         ['message-queue/Kafka/Hello-Kafka', 'Hello-Kafka'],
+        ['message-queue/Kafka/Kafka-Version', 'Kafka版本问题'],
         ['message-queue/Kafka/Kafka-Workflow','Kafka-Workflow'],
         ['message-queue/Kafka/Kafka-Producer','Kafka-Producer'],
         ['message-queue/Kafka/Kafka-Consumer','Kafka-Consumer'],

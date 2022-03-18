@@ -459,6 +459,10 @@ MinorGC 采用复制算法。 （复制->清空->互换）
 
 
 
+### Minor GC  和 Full GC 触发条件
+
+
+
 ### System.gc() 和 Runtime.gc() 会做什么事情
 
 `java.lang.System.gc()` 只是 `java.lang.Runtime.getRuntime().gc()` 的简写，两者的行为没有任何不同

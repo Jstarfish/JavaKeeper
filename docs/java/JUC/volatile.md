@@ -287,7 +287,7 @@ volatile 操作不会像锁一样造成阻塞，因此，在能够安全使用 v
 
 ## 参考
 
-《深入理解Java虚拟机》
- http://tutorials.jenkov.com/java-concurrency/java-memory-model.html 
- https://juejin.im/post/5dbfa0aa51882538ce1a4ebc 
-《正确使用 Volatile 变量》https://www.ibm.com/developerworks/cn/java/j-jtp06197.html
+- 《深入理解Java虚拟机》
+-  http://tutorials.jenkov.com/java-concurrency/java-memory-model.html 
+-  https://juejin.im/post/5dbfa0aa51882538ce1a4ebc 
+- 《正确使用 Volatile 变量》https://www.ibm.com/developerworks/cn/java/j-jtp06197.html

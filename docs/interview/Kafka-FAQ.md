@@ -161,9 +161,9 @@ Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition �
 
 ![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/interview/20210407180101.png)
 
-所谓副本，本质上就是一个只能追加写消息的提交日志。这些日志被相同的分散保存在不同的Broker上。
+所谓副本，本质上就是一个只能追加写消息的提交日志。这些日志被相同的分散保存在不同的 Broker 上。
 
-在实际生产上，每台Broker都可能保存有各个主题下不同分区的不同副本。因此单个Broker上存有成百上千个副本现象是非常正常的。
+在实际生产上，每台 Broker 都可能保存有各个主题下不同分区的不同副本。因此单个Broker上存有成百上千个副本现象是非常正常的。
 
 既然多个Broker中保存分区下的多个副本，那么是如何保证副本当中的数据都是一致的呢？
 
@@ -172,8 +172,8 @@ Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition �
 ![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/interview/20210407191337.png)
 
 - 在kafka中，副本分成两类：领导者副本和追随者副本。每个分区在创建时都要选举一个副本，成为领导者副本，其余的副本自动称为追随者副本。
-- kafka中，**追随者副本是不会对外提供服务的**，所有的请求都必须由领导者副本来处理。它唯一的任务就是从领导者副本异步拉去消息，并写入到自己提交日志中，从而实现与领导者副本的同步。
-- 当领导者副本挂掉了，或者说所在Broker宕机了，kafka可以通过Zookeeper提供的监控功能能够实时感知到，并开启新一轮领导者选举，从追随者副本中选一个作为新的领导者。老Leader副本重启回来后，只能作为追随者副本加入到集群中。
+- kafka中，**追随者副本是不会对外提供服务的**，所有的请求都必须由领导者副本来处理。它唯一的任务就是从领导者副本异步拉取消息，并写入到自己提交日志中，从而实现与领导者副本的同步。
+- 当领导者副本挂掉了，或者说所在 Broker 宕机了，kafka 可以通过 Zookeeper 提供的监控功能能够实时感知到，并开启新一轮领导者选举，从追随者副本中选一个作为新的领导者。老 Leader 副本重启回来后，只能作为追随者副本加入到集群中。
 
 
 
@@ -221,7 +221,7 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 - 0：producer 不等待 broker 的 ack，这一操作提供了一个最低的延迟，broker 一接收到还没有写入磁盘就已经返回，当 broker 故障时有可能**丢失数据**；
 - 1：producer 等待 broker 的 ack，partition 的 leader 落盘成功后返回 ack，如果在 follower 同步成功之前 leader 故障，那么将会**丢失数据**；
-- -1（all）：producer 等待 broker 的 ack，partition 的 leader 和 follower 全部落盘成功后才返回 ack。但是 如果在 follower 同步完成后，broker 发送 ack 之前，leader 发生故障，那么就会造成**数据重复**。
+- -1（all）：producer 等待 broker 的 ack，partition 的 leader 和 follower 全部落盘成功后才返回 ack。但是如果在 follower 同步完成后，broker 发送 ack 之前，leader 发生故障，那么就会造成**数据重复**。
 
 #### 故障处理
 
@@ -251,7 +251,7 @@ OSR：Out-of-Sync Replicas
 
 AR：Assigned Replicas 所有副本
 
-ISR 是由 leader 维护，follower 从 leader 同步数据有一些延迟，超过相应的阈值会把 follower 剔除出 ISR, 存入 OSR（Out-of-Sync Replicas ）列表，新加入的 follower 也会先存放在 OSR 中。AR=ISR+OSR。
+ISR 是由 leader 维护，follower 从 leader 同步数据有一些延迟，超过相应的阈值会把 follower 剔除出 ISR，存入 OSR（Out-of-Sync Replicas ）列表，新加入的 follower 也会先存放在 OSR 中。AR=ISR+OSR。
 
 
 
@@ -313,7 +313,7 @@ producer 将消息推送到 broker，consumer 从 broker 拉取消息。
 
 
 
-### 7、请谈一谈 Kafka 数据一致性原理
+### 请谈一谈 Kafka 数据一致性原理
 
 一致性就是说不论是老的 Leader 还是新选举的 Leader，Consumer 都能读到一样的数据。
 
@@ -338,6 +338,8 @@ producer 将消息推送到 broker，consumer 从 broker 拉取消息。
 - 最多一次: 消息不会被重复发送，最多被传输一次，但也有可能一次不传输
 - 最少一次: 消息不会被漏发送，最少被传输一次，但也有可能被重复传输.
 - 精确的一次（Exactly once）: 不会漏传输也不会重复传输,每个消息都传输被
+
+
 
 ### 15、Kafka 消费者是否可以消费指定分区消息？
 
@@ -396,8 +398,6 @@ request.required.acks 有三个值 0、1、-1
 
 解决此问题的方法非常简单：**Producer 永远要使用带有回调通知的发送 API，也就是说不要使用 producer.send(msg)，而要使用 producer.send(msg, callback)**。不要小瞧这里的 callback（回调），它能准确地告诉你消息是否真的提交成功了。一旦出现消息提交失败的情况，你就可以有针对性地进行处理。
 
-
-
 #### Broker 丢数据
 
 在存储阶段正常情况下，只要 Broker 在正常运行，就不会出现丢失消息的问题，但是如果 Broker 出现了故障，比如进程死掉了或者服务器宕机了，还是可能会丢失消息的。
@@ -406,7 +406,7 @@ request.required.acks 有三个值 0、1、-1
 
 #### 消费者丢数据
 
-Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了。Consumer 程序有个“位移”的概念，表示的是这个 Consumer 当前消费到的 Topic 分区的位置。下面这张图来自于官网，它清晰地展示了 Consumer 端的位移数据。
+Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了。Consumer 程序有个“位移”的概念，表示的是这个 Consumer 当前消费到的 Topic 分区的位置。下面这张图清晰地展示了 Consumer 端的位移数据。
 
 ![](https://static001.geekbang.org/resource/image/0c/37/0c97bed3b6350d73a9403d9448290d37.png)
 
@@ -418,7 +418,7 @@ Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了�
 
 同理，Kafka 中 Consumer 端的消息丢失就是这么一回事。要对抗这种消息丢失，办法很简单：**维持先消费消息（阅读），再更新位移（书签）的顺序**即可。这样就能最大限度地保证消息不丢失。
 
-当然，这种处理方式可能带来的问题是消息的重复处理，类似于同一页书被读了很多遍，但这不属于消息丢失的情形。在专栏后面的内容中，我会跟你分享如何应对重复消费的问题。
+当然，这种处理方式可能带来的问题是消息的重复处理，类似于同一页书被读了很多遍，但这不属于消息丢失的情形。
 
 **如果是多线程异步处理消费消息，Consumer 程序不要开启自动提交位移，而是要应用程序手动提交位移**。
 
@@ -441,14 +441,14 @@ Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了�
 
 ### Kafka 如何保证消息的顺序消费
 
-- Kafka分布式的单位是partition，同一个partition用一个write ahead log组织，所以可以保证FIFO的顺序。
+- Kafka 分布式的单位是 partition，同一个 partition 用一个 write ahead log 组织，所以可以保证 FIFO 的顺序。
 
-- 不同partition之间不能保证顺序。
+- 不同 partition 之间不能保证顺序。
 
-- 但是绝大多数用户都可以通过message key来定义，因为同一个key的message可以保证只发送到同一个partition，比如说key是user id，table row id等等，所以同一个user或者同一个record的消息永远只会发送到同一个partition上，保证了同一个user或record的顺序。
-- Kafka 中发送 1 条消息的时候，可以指定(topic, partition, key) 3 个参数。partiton 和 key 是可选的。如果你指定了 partition，那就是所有消息发往同 1个 partition，就是有序的。并且在消费端，Kafka 保证，1 个 partition 只能被1 个 consumer 消费。或者你指定 key（ 比如 order id），具有同 1 个 key 的所有消息，会发往同 1 个 partition。但是消费者内部如果多线程就有问题，此时的解决方案是【使用内存队列处理，将key hash后分发到内存队列中，然后每个线程处理一个内存队列的数据。】
+- 但是绝大多数用户都可以通过 message key 来定义，因为同一个 key 的 message 可以保证只发送到同一个 partition，比如说 key 是 user id，table row id 等等，所以同一个 user 或者同一个 record 的消息永远只会发送到同一个 partition 上，保证了同一个 user或 record 的顺序。
+- Kafka 中发送 1 条消息的时候，可以指定(topic, partition, key) 3 个参数。partiton 和 key 是可选的。如果你指定了 partition，那就是所有消息发往同 1个 partition，就是有序的。并且在消费端，Kafka 保证，1 个 partition 只能被1 个 consumer 消费。或者你指定 key（ 比如 order id），具有同 1 个 key 的所有消息，会发往同 1 个 partition。但是消费者内部如果多线程就有问题，此时的解决方案是【使用内存队列处理，将 key hash 后分发到内存队列中，然后每个线程处理一个内存队列的数据。】
 
-> Apache Kafka官方保证了partition内部的数据有效性（追加写、offset读）；为了提高Topic的并发吞吐能力，可以提高Topic的partition数，并通过设置partition的replica来保证数据高可靠；
+> Apache Kafka 官方保证了partition内部的数据有效性（追加写、offset读）；为了提高Topic的并发吞吐能力，可以提高Topic的partition数，并通过设置partition的replica来保证数据高可靠；
 >
 > 但是在多个Partition时，不能保证Topic级别的数据有序性。
 >
@@ -462,13 +462,13 @@ Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了�
 
 ### 如何保证消息不被重复消费？
 
-生产者在向Kafka写数据时，每条消息会有一个offset，表示消息写入顺序的序号。当消费者消费后，**每隔一段时间会把自己已消费消息的offset通过Zookeeper提交给Kafka**，告知Kafka自己offset的位置。这样一来，如果消费者重启，则会从Kafka记录的offset之后的数据开始消费，从而避免重复消费。
+生产者在向 Kafka 写数据时，每条消息会有一个 offset，表示消息写入顺序的序号。当消费者消费后，**每隔一段时间会把自己已消费消息的 offset 通过 Zookeeper 提交给 Kafka**，告知 Kafka 自己 offset 的位置。这样一来，如果消费者重启，则会从 Kafka 记录的 offset 之后的数据开始消费，从而避免重复消费。
 
-但是，可能出现一种意外情况。由于消费者提交offset是定期的，**当消费者处理了某些消息，但还未来得及提交offset时，此时如果重启消费者，则会出现消息的重复消费**。
+但是，可能出现一种意外情况。由于消费者提交 offset 是定期的，**当消费者处理了某些消息，但还未来得及提交 offset 时，此时如果重启消费者，则会出现消息的重复消费**。
 
 
 
-例：数据 1/2/3 依次进入 Kafka，Kafka 会给这三条数据每条分配一个 offset，代表这条数据的序号，假设分配的 offset 依次是 152/153/154。消费者从 Kafka 消费时，也是按照这个顺序去消费。假如**当消费者消费了 offset=153 的这条数据，刚准备去提交 offset 到 Zookeeper，此时消费者进程被重启了**。那么此时消费过的数据1和数据2的 offset 并没有提交，Kafka 也就不知道你已经消费了 `offset=153` 这条数据。此时当消费者重启后，消费者会找 Kafka 说，嘿，哥儿们，你给我接着把上次我消费到的那个地方后面的数据继续给我传递过来。由于之前的 offset 没有提交成功，那么数据1和数据2会再次传过来，如果此时消费者没有去重的话，那么就会导致重复消费。
+> 例：数据 1/2/3 依次进入 Kafka，Kafka 会给这三条数据每条分配一个 offset，代表这条数据的序号，假设分配的 offset 依次是 152/153/154。消费者从 Kafka 消费时，也是按照这个顺序去消费。假如**当消费者消费了 offset=153 的这条数据，刚准备去提交 offset 到 Zookeeper，此时消费者进程被重启了**。那么此时消费过的数据1和数据2的 offset 并没有提交，Kafka 也就不知道你已经消费了 `offset=153` 这条数据。此时当消费者重启后，消费者会找 Kafka 说，嘿，哥儿们，你给我接着把上次我消费到的那个地方后面的数据继续给我传递过来。由于之前的 offset 没有提交成功，那么数据1和数据2会再次传过来，如果此时消费者没有去重的话，那么就会导致重复消费。
 
 ![图片](http://prchen.com/2019/06/24/%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/1.png)
 
@@ -527,12 +527,33 @@ Consumer 端丢失数据主要体现在 Consumer 端要消费的消息不见了�
 
 ### 22、谈一谈 Kafka 的再均衡
 
-在Kafka中，当有新消费者加入或者订阅的topic数发生变化时，会触发Rebalance(再均衡：在同一个消费者组当中，分区的所有权从一个消费者转移到另外一个消费者)机制，Rebalance顾名思义就是重新均衡消费者消费。
+在 Kafka 中，当有新消费者加入或者订阅的 topic 数发生变化时，会触发 Rebalance(再均衡：在同一个消费者组当中，分区的所有权从一个消费者转移到另外一个消费者)机制，Rebalance顾名思义就是重新均衡消费者消费。
 
 Rebalance的过程如下：
 
-第一步：所有成员都向 coordinator 发送请求，请求入组。一旦所有成员都发送了请求，coordinator 会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
-第二步：leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内
+1. 所有成员都向coordinator发送请求，请求入组。一旦所有成员都发送了请求，coordinator会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
+
+2. leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内的所有成员就都知道自己应该消费哪些分区了。
+
+所以对于 Rebalance 来说，Coordinator起着至关重要的作用，那么怎么查看消费者对应的Coordinator呢，我们知道某个消费者组对应__consumer_offsets 中的哪个Partation是通过hash计算出来的：partation=hash("test_group_1")%50=28，表示test_group_1这个消费者组属于28号partation，通过命令:
+
+```
+./kafka-topics.sh --zookeeper 192.168.33.11:2181 --describe --topic __consumer_offsets
+```
+
+可以找到28号Partation所对应的信息：
+
+从而可以知道coordinator对应的broker为1
+
+在Rebalance期间，消费者会出现无法读取消息，造成整个消费者群组一段时间内不可用
+
+再均衡发生的场景有以下几种：
+
+1. 组成员发生变更(新consumer加入组、已有consumer主动离开组或已有consumer崩溃了)
+2. 订阅主题数发生变更，如果你使用了正则表达式的方式进行订阅，那么新建匹配正则表达式的topic就会触发rebalance
+3. 订阅主题的分区数发生变更
+
+鉴于触发再均衡后会造成资源浪费的问题，所以我们尽量不要触发再均衡
 
 
 

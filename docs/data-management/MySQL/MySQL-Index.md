@@ -8,13 +8,11 @@ categories: MySQL
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/pexels-nothing-ahead-4494642.jpg)
 
->现在的技术交流太卷了，看文章的比写文章的都没耐心，太长了不想看，图太少也不想看
+>先来一道经典的服务端面试题，看下你会吗
 >
->索引问题，在面试中是肯定会出现的，把索引知识点串了一下，点很多，第一篇是各种点，第二篇是各种问题（可以当成面试题来看），
+>“如果有这样一个查询 `select * from table where a=1 group by b order by c;` 如果每个字段都有一个单列索引，索引会生效吗？如果是复合索引，能说下几种情况吗？“
 >
->先来一道经典的服务端面试题
->
->“如果有这样一个查询 `select * from table where a=1 group by b order by c;` 如果每个字段都有一个单列索引，索引会生效吗？如果是复合索引，能说下几种情况吗？
+>这篇文章算是一个 MySQL 索引的知识梳理，包括索引的一些概念、B 树的结构、和索引的原理以及一些索引策略的知识，祝好
 
 
 
@@ -48,7 +46,7 @@ categories: MySQL
 - 索引可以帮助服务器避免排序和临时表（降低数据排序的成本，降低 CPU 的消耗）
 - 索引可以将随机 I/O 变为顺序 I/O（降低数据库 IO 成本）
 
-![](https://www.guru99.com/images/Index.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/Index-advantage.png)
 
 ### 劣势
 
@@ -130,7 +128,7 @@ categories: MySQL
 
 那是不应该有一种数据结构，可以在每次查找数据时把磁盘 IO 次数控制在一个很小的数量级， B+ 树就这样应用而生。
 
-### 心里先有点 B 树
+### 心里有点 B 树
 
 有一点面试经验的同学，可能都碰到过这么一道面试题：MySQL InnoDB  索引为什么用 B+ 树，不用 B 树
 
@@ -238,7 +236,7 @@ MyISAM 引擎的索引文件和数据文件是分离的。**MyISAM 引擎索引�
 
 #### 主键索引：
 
-我们知道 InnoDB 索引是聚集索引，它的索引和数据是存入同一个 `.idb` 文件中的，因此它的索引结构是在同一个树节点中同时存放索引和数据，如下图中最底层的叶子节点有三行数据，对应于数据表中的 id、stu_id、name 数据项。
+我们知道 InnoDB 索引是聚集索引，它的索引和数据是存入同一个 `.idb` 文件中的，因此它的索引结构是在同一个树节点中同时存放索引和数据，如下图中最底层的叶子节点有三行数据，对应于数据表中的 id、name、score 数据项。
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/MySQL-InnoDB-Index-primary.png)
 
@@ -453,7 +451,7 @@ MySQL 5.0 和后续版本引入了一种叫做“**索引合并**”的策略，
 
 我们还是以联合索引（name,age,sex）为例。如果现在有一个需求：检索出表中“名字第一个字是 B，而且年龄是 19 岁的所有男孩”。那么，SQL 语句是这么写的：
 
-```
+```mysql
 mysql> select * from tuser where name like 'B %' and age=19 and sex=F;
 ```
 
@@ -465,7 +463,7 @@ mysql> select * from tuser where name like 'B %' and age=19 and sex=F;
 
 在 MySQL 5.6 之前，只能从 ID = 2 开始一个个回表。到主键索引上找出数据行，再对比字段值。
 
-而 MySQL 5.6 引入的索引下推优化（index condition pushdown)， 可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。
+而 MySQL 5.6 引入的**索引下推优化**（index condition pushdown)， 可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/index-ICP.png)
 
@@ -527,7 +525,7 @@ MySQL 允许在相同列上创建多个索引，无论是有意的还是无意�
 
 ### 导致 SQL 执行慢的原因
 
-1. 硬件问题。如网络速度慢，内存不足，I/O吞吐量小，磁盘空间满了等 
+1. 硬件问题。如网络速度慢，内存不足，I/O 吞吐量小，磁盘空间满了等 
 
 2. 没有索引或者索引失效
 
@@ -540,29 +538,35 @@ MySQL 允许在相同列上创建多个索引，无论是有意的还是无意�
 ### 索引优化
 
 1. 全值匹配我最爱
-2. 最佳左前缀法则，比如建立了一个联合索引(a,b,c)，那么其实我们可利用的索引就有(a), (a,b), (a,b,c)
+2. 最佳左前缀法则，比如建立了一个联合索引(a,b,c)，那么其实我们可利用的索引就有(a)  (a,b)（a,c）(a,b,c)
 3. 不在索引列上做任何操作（计算、函数、(自动or手动)类型转换），会导致索引失效而转向全表扫描
 4. 存储引擎不能使用索引中范围条件右边的列
-5. 尽量使用覆盖索引(只访问索引的查询(索引列和查询列一致))，减少select
+5. 尽量使用覆盖索引(只访问索引的查询(索引列和查询列一致))，减少 select *
 6. is null ,is not null 也无法使用索引
 7. `like "xxxx%"` 是可以用到索引的，`like "%xxxx"` 则不行(like "%xxx%" 同理)。like 以通配符开头('%abc...')索引失效会变成全表扫描的操作，
 8. 字符串不加单引号索引失效
-9. 少用or，用它来连接时会索引失效
+9. 少用or，用它来连接时会索引失效（这个其实不是绝对的，or 走索引与否，还和优化器的**预估**有关，5.0 之后出现的 index merge 技术就是优化这个的）
 10. <，<=，=，>，>=，BETWEEN，IN 可用到索引，<>，not in ，!= 则不行，会导致全表扫描
 
 
 
 ### [建索引的几大原则](https://tech.meituan.com/2014/06/30/mysql-index.html "MySQL索引原理及慢查询优化")
 
-1. 最左前缀匹配原则，非常重要的原则，MySQL 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d 的顺序可以任意调整。
+1. 最左前缀匹配原则，非常重要的原则，MySQL 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如 `a = 1 and b = 2 and c > 3 and d = 4` 如果建立(a,b,c,d)顺序的索引，d 是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d 的顺序可以任意调整。
 
 2. = 和 in 可以乱序，比如 `a = 1 and b = 2 and c = 3` 建立(a,b,c)索引可以任意顺序，MySQL 的查询优化器会帮你优化成索引可以识别的形式。
 
-3. 尽量选择区分度高的列作为索引，区分度的公式是 `count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是 0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要 join 的字段我们都要求是 0.1 以上，即平均 1 条扫描 10 条记录。
+3. 尽量选择区分度高的列作为索引，区分度的公式是 `count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是 1，而一些状态、性别字段可能在大数据面前区分度就是 0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要 join 的字段我们都要求是 0.1 以上，即平均 1 条扫描 10 条记录。
 
 4. 索引列不能参与计算，保持列“干净”，比如 `from_unixtime(create_time) = ’2014-05-29’` 就不能使用到索引，原因很简单，b+ 树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成 `create_time = unix_timestamp(’2014-05-29’)`。
 
 5. 尽量的扩展索引，不要新建索引。比如表中已经有 a 的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可。
+
+
+
+> 我有一个公众号「 **JavaKeeper** 」
+>
+> 我还有一个 **GitBook** [github.com/JavaKeeper](https://github.com/Jstarfish/JavaKeeper) 
 
 
 
@@ -571,5 +575,6 @@ MySQL 允许在相同列上创建多个索引，无论是有意的还是无意�
 - https://zh.wikipedia.org/wiki/B%E6%A0%91
 - https://medium.com/@mena.meseha/what-is-the-difference-between-mysql-innodb-b-tree-index-and-hash-index-ed8f2ce66d69
 - https://www.javatpoint.com/b-tree
+- https://blog.csdn.net/Abysscarry/article/details/80792876
 - 《MySQL 实战 45 讲》
 - 《高性能 MySQL》

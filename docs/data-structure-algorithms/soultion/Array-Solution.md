@@ -32,6 +32,58 @@ public static int[] twoSum(int[] nums,int target){
 
 
 
+### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+> 给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
+>
+> 注意：答案中不可以包含重复的三元组。
+>
+> ```java
+> 输入：nums = [-1,0,1,2,-1,-4]
+> 输出：[[-1,-1,2],[-1,0,1]]
+> ```
+
+**思路**：排序后双指针
+
+```java
+public static List<List<Integer>> threeSum(int[] nums) {
+  //存放结果list
+  List<List<Integer>> result = new ArrayList<>();
+  int length = nums.length;
+  //特例判断
+  if (length < 3) {
+    return result;
+  }
+  Arrays.sort(nums);
+  for (int i = 0; i < length; i++) {
+    //排序后的第一个数字就大于0，就说明没有符合要求的结果
+    if (nums[i] > 0) break;
+
+    //去重
+    if (i > 0 && nums[i] == nums[i - 1]) continue;
+    //左右指针
+    int l = i + 1;
+    int r = length - 1;
+    while (l < r) {
+      int sum = nums[i] + nums[l] + nums[r];
+      if (sum == 0) {
+        result.add(Arrays.asList(nums[i], nums[l], nums[r]));
+        //去重（相同数字的话就移动指针）
+        while (nums[l] == nums[l + 1]) l++;
+        while (nums[r] == nums[r - 1]) r--;
+        //移动指针
+        l++;
+        r--;
+      } else if (sum < 0) l++;
+ 			else if (sum > 0) r--;
+    }
+  }
+  return result;
+}
+```
+
+
+
 ### [217. 存在重复元素](https://leetcode-cn.com/problems/contains-duplicate/)
 
 > 给定一个整数数组，判断是否存在重复元素。如果存在一值在数组中出现至少两次，函数返回 `true` 。如果数组中每个元素都不相同，则返回 `false` 。
@@ -256,58 +308,6 @@ public int maxArea(int[] height){
     }
   }
   return ans;
-}
-```
-
-
-
-### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
-
-> 给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
->
-> 注意：答案中不可以包含重复的三元组。
->
-> ```java
-> 输入：nums = [-1,0,1,2,-1,-4]
-> 输出：[[-1,-1,2],[-1,0,1]]
-> ```
-
-**思路**：排序后双指针
-
-```java
-public static List<List<Integer>> threeSum(int[] nums) {
-  //存放结果list
-  List<List<Integer>> result = new ArrayList<>();
-  int length = nums.length;
-  //特例判断
-  if (length < 3) {
-    return result;
-  }
-  Arrays.sort(nums);
-  for (int i = 0; i < length; i++) {
-    //排序后的第一个数字就大于0，就说明没有符合要求的结果
-    if (nums[i] > 0) break;
-
-    //去重
-    if (i > 0 && nums[i] == nums[i - 1]) continue;
-    //左右指针
-    int l = i + 1;
-    int r = length - 1;
-    while (l < r) {
-      int sum = nums[i] + nums[l] + nums[r];
-      if (sum == 0) {
-        result.add(Arrays.asList(nums[i], nums[l], nums[r]));
-        //去重（相同数字的话就移动指针）
-        while (nums[l] == nums[l + 1]) l++;
-        while (nums[r] == nums[r - 1]) r--;
-        //移动指针
-        l++;
-        r--;
-      } else if (sum < 0) l++;
- 			else if (sum > 0) r--;
-    }
-  }
-  return result;
 }
 ```
 

@@ -52,7 +52,7 @@ synchronized 概括来说其实总共有三种用法：
 
 **实例数据**：存放类的属性数据信息，包括父类的属性信息
 
-**对齐填充**：填充数据不是必须存在的，它仅仅起着占位符的作用。由于虚拟机要求对象起始地址必须是8字节的整数倍，因此，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全
+**对齐填充**：填充数据不是必须存在的，它仅仅起着占位符的作用。由于虚拟机要求对象起始地址必须是 8 字节的整数倍，因此，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全
 
 **对象头**：包含两部分信息：
 
@@ -95,10 +95,10 @@ Java 对象头一般占有 2 个机器码（在 32 位虚拟机中，1 个机器
 >
 > 简单来说，监视器用来监视线程进入这个特别房间，他确保同一时间只能有一个线程可以访问特殊房间中的数据和代码。
 
-任何一个对象都有一个 Monitor 与之关联，当且一个 Monitor 被持有后，它将处于锁定状态。synchronized 在JVM 里的实现都是基于进入和退出 Monitor 对象来实现方法同步和代码块同步，虽然具体实现细节不一样，但是都可以通过成对的 MonitorEnter 和 MonitorExit 指令来实现。 
+任何一个对象都有一个 Monitor 与之关联，当且一个 Monitor 被持有后，它将处于锁定状态。synchronized 在 JVM 里的实现都是基于进入和退出 Monitor 对象来实现方法同步和代码块同步，虽然具体实现细节不一样，但是都可以通过成对的 MonitorEnter 和 MonitorExit 指令来实现。 
 
-1. **MonitorEnter 指令：插入在同步代码块的开始位置，当代码执行到该指令时，将会尝试获取该对象Monitor 的所有权，即尝试获得该对象的锁；**
-2. **MonitorExit 指令：插入在方法结束处和异常处，JVM 保证每个MonitorEnter 必须有对应的MonitorExit；**
+1. **MonitorEnter 指令：插入在同步代码块的开始位置，当代码执行到该指令时，将会尝试获取该对象 Monitor 的所有权，即尝试获得该对象的锁；**
+2. **MonitorExit 指令：插入在方法结束处和异常处，JVM 保证每个 MonitorEnter 必须有对应的MonitorExit；**
 
 那什么是 Monitor？可以把它理解为 一个同步工具，也可以描述为一种同步机制，它通常被描述为一个对象。
 
@@ -106,7 +106,7 @@ Java 对象头一般占有 2 个机器码（在 32 位虚拟机中，1 个机器
 
 #### 监视器的实现
 
-在 Java虚拟机(HotSpot)中，Monitor是基于C++实现的，由 [ObjectMonitor ](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.cpp)实现的，其主要数据结构如下：
+在 Java虚拟机(HotSpot)中，Monitor 是基于 C++ 实现的，由 [ObjectMonitor ](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.cpp)实现的，其主要数据结构如下：
 
 ```c
   ObjectMonitor() {
@@ -131,7 +131,7 @@ Java 对象头一般占有 2 个机器码（在 32 位虚拟机中，1 个机器
 
 源码地址：[objectMonitor.hpp](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.hpp#L193)
 
-ObjectMonitor中有几个关键属性（每个等待锁的线程都会被封装成 ObjectWaiter 对象）：
+ObjectMonitor 中有几个关键属性（每个等待锁的线程都会被封装成 ObjectWaiter 对象）：
 
 > _owner：指向持有 ObjectMonitor 对象的线程
 >
@@ -171,7 +171,7 @@ ObjectMonitor中有几个关键属性（每个等待锁的线程都会被封装�
 
 在 Java 中，为了保证原子性，提供了两个高级的字节码指令 `monitorenter` 和 `monitorexit`。前面中，介绍过，这两个字节码指令，在 Java 中对应的关键字就是 `synchronized`。
 
-通过 `monitorenter` 和 `monitorexit` 指令，可以保证被 `synchronized` 修饰的代码在同一时间只能被一个线程访问，在锁未释放之前，无法被其他线程访问到。因此，在Java中可以使用 `synchronized` 来保证方法和代码块内的操作是原子性的。
+通过 `monitorenter` 和 `monitorexit` 指令，可以保证被 `synchronized` 修饰的代码在同一时间只能被一个线程访问，在锁未释放之前，无法被其他线程访问到。因此，在 Java 中可以使用 `synchronized` 来保证方法和代码块内的操作是原子性的。
 
 > 线程 1 在执行 `monitorenter` 指令的时候，会对 Monitor 进行加锁，加锁后其他线程无法获得锁，除非线程1 主动解锁。即使在执行过程中，由于某种原因，比如 CPU 时间片用完，线程 1 放弃了 CPU，但是，他并没有进行解锁。而由于 `synchronized` 的锁是可重入的，下一个时间片还是只能被他自己获取到，还是会继续执行代码。直到所有代码执行完。这就保证了原子性。
 
@@ -330,7 +330,7 @@ public class SynchronizedMethod {
 
 ## 五、锁优化
 
-从 JDK5 引入了现代操作系统新增加的 CAS 原子操作（ JDK5 中并没有对 synchronized关键字做优化，而是体现在 J.U.C 中，所以在该版本 concurrent 包有更好的性能 ），从 JDK6 开始，就对 synchronized 的实现机制进行了较大调整，包括使用 JDK5 引进的 CAS 自旋之外，还增加了自适应的 CAS 自旋、锁消除、锁粗化、偏向锁、轻量级锁这些优化策略。由于此关键字的优化使得性能极大提高，同时语义清晰、操作简单、无需手动关闭，所以推荐在允许的情况下尽量使用此关键字，同时在性能上此关键字还有优化的空间。 
+从 JDK5 引入了现代操作系统新增加的 CAS 原子操作（ JDK5 中并没有对 synchronized 关键字做优化，而是体现在 J.U.C 中，所以在该版本 concurrent 包有更好的性能 ），从 JDK6 开始，就对 synchronized 的实现机制进行了较大调整，包括使用 JDK5 引进的 CAS 自旋之外，还增加了自适应的 CAS 自旋、锁消除、锁粗化、偏向锁、轻量级锁这些优化策略。由于此关键字的优化使得性能极大提高，同时语义清晰、操作简单、无需手动关闭，所以推荐在允许的情况下尽量使用此关键字，同时在性能上此关键字还有优化的空间。 
 
 锁主要存在四种状态，依次是：**无锁状态、偏向锁状态、轻量级锁状态、重量级锁状态**，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁。但是锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级。
 
@@ -377,7 +377,7 @@ public void vectorTest(){
 }
 ```
 
-在运行这段代码时，JVM 可以明显检测到变量 vector 没有逃逸出方法 vectorTest() 之外，所以 JVM可以大胆地将vector 内部的加锁操作消除。 
+在运行这段代码时，JVM 可以明显检测到变量 vector 没有逃逸出方法 vectorTest() 之外，所以 JVM可以大胆地将 vector 内部的加锁操作消除。 
 
 ### 锁粗化
 

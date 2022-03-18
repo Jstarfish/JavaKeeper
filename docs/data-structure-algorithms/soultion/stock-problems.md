@@ -1,76 +1,94 @@
-> 股票问题
+---
+title: 股票买卖问题-套路解题
+date: 2022-3-09
+tags: 
+ - DP
+categories: leetcode
+---
+
+![Stock Exchange Board](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/pexels-photo-210607.jpeg)
+
+> 刷 labuladong-东哥 的文章时，发现这么宝藏的一篇，真是一个套路解决所有股票问题（文章主要来自英文版 leetcode 的题解翻译）
 >
-> https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/discuss/108870/Most-consistent-ways-of-dealing-with-the-series-of-stock-problems
+> - https://labuladong.gitee.io/algo/1/12/
 >
-> https://labuladong.gitee.io/algo/1/12/
+> - https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/discuss/108870/Most-consistent-ways-of-dealing-with-the-series-of-stock-problems
 
 
 
-[121. 买卖股票的最佳时机（简单）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+leetcode 的股票问题目前总共有这么 6 题
 
-[122. 买卖股票的最佳时机 II（简单）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
+- [121. 买卖股票的最佳时机（简单）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
 
-[123. 买卖股票的最佳时机 III（困难）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
+- [122. 买卖股票的最佳时机 II（简单）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
 
-[188. 买卖股票的最佳时机 IV（困难）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
+- [123. 买卖股票的最佳时机 III（困难）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
 
-[309. 最佳买卖股票时机含冷冻期（中等）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+- [188. 买卖股票的最佳时机 IV（困难）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
 
-[714. 买卖股票的最佳时机含手续费（中等）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+- [309. 最佳买卖股票时机含冷冻期（中等）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+- [714. 买卖股票的最佳时机含手续费（中等）](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
 
 
 
-其实这几道题在刷动态规划的时候，都会遇到过，翻译自leetcode 高赞文章
+不管是按热题去刷还是按 DP 分类去刷，这几道题都是避不开的，本文介绍的方法算是一个极其通用的“公式”，我们只需要搞清楚每个题目的“特例”后，套“公式”真的可以闭眼写出来，废话不多话了，直接解释
 
-prices[i] 存储股票第 i 天的价格，长度为 `prices.length`
+- prices[i] 存储股票第 i 天的价格，长度为 `prices.length`
 
-k 表示最大交易次数
+- k 表示最大交易次数
 
-`dp[i][k]` 表示第 i 天，k 次交易的最大利润
+- `dp[i][k]` 表示第 i 天，k 次交易的最大利润
 
-特例：`dp[-1][k] = dp[i][0] = 0 `（没有股票或没有交易，就没有利润）
+- 特例：`dp[-1][k] = dp[i][0] = 0 `（没有股票或没有交易，就没有利润）
 
-我们可以有多少种操作呢？ 答案是三种：buy, sell, rest，分别表示买入、卖出、不操作
+我们可以有多少种操作呢？ 答案是三种：buy, sell, rest，分别表示买入、卖出、不操作（休息）
 
-穷举思想，
+那今天到底是哪个操作会是最大利润呢，求最值问题，想到用动态规划、max 函数
 
-有一个隐藏的条件是，就是这三种操作有个先后顺序：
+这里有一个隐藏的条件是，就是这三种操作有个先后顺序：
 
 - buy 必须是在没有持仓的情况下
 - sell 必须是在手里持仓为 1 的情况
 
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/stock-problems.png)
+
 所以 `dp[i][k]` 可以拆成两部分，用三维数组来表示：`dp[i][k][0]` 和 `dp[i][k][1]` ，意思是手里没有股票和手里有股票的最大利润
 
-可以写出下边的公式
+先考虑特例：
 
 ```java
 dp[-1][k][0] = 0, dp[-1][k][1] = -Infinity
 dp[i][0][0] = 0, dp[i][0][1] = -Infinity
 ```
 
-> `dp[-1][k][0] = dp[i][0][0] = 0` 还是代表没有股票或者没有交易，又不持仓，肯定是没有利润
+> `dp[-1][k][0] = dp[i][0][0] = 0` 代表没有股票或者没有交易，又不持仓，肯定是没有利润
 >
-> `dp[-1][k][1] = dp[i][0][1] = 0`  没有股票或者没有交易，不可能持仓吧?
+> `dp[-1][k][1] = dp[i][0][1] = -Infinity`  没有股票或者没有交易，不可能持仓吧?
 
-递推关系
+递推关系（也就是 DP 中的状态转移方程）
 
 ```java
 dp[i][k][0] = max(dp[i-1][k][0],dp[i-1][k][1] + prices[i]);
 dp[i][k][1] = max(dp[i-1][k][1],dp[i-1][k-1][0] - prices[i]);
 ```
 
-`dp[i][k][0`]，由于持仓是 0 ，所以在这个第 i 天只能是 rest，或者是 sell，这样才符合没有持仓的条件，
-
-`dp[i-1][k][0]` 表示当天不操作的最大利润，
-
-`dp[i][k][01]`，由于持仓是 1 ，所以在这个第 i 天只能是 rest，或者是 sell，这样才符合没有持仓的条件
-
-
-
-## Case 1，k = 1
-
->  [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+> `dp[i][k][0]`，今天的持仓是 0 ，所以今天不能是买入，只能是卖出或者不操作 取最大值：
 >
+> - 昨天就不持有了，也就是 `dp[i-1][k][0]`，我今天才可能持仓为 0
+>   - 不管是昨天卖了还是昨天没动都是不持有，如果昨天是卖了的话，为什么不是 k-1 呢，因为一次交易对应的是一对操作，买入 + 卖出，只有买入算是开启一次新交易，才会改变最大交易次数
+>
+> - 今天卖出的话，昨天就必须持有才行，`dp[i-1][k][1]`，为什么还有个 `+ prices[i]`呢，最开始我有点迷糊，这怎么利润还算上股价了，这里是这么算的，我们第一天买入的话，利润就是 `-prices[i]` 了，所以最后如果卖出的话，要加上今日股价
+>
+> `dp[i][k][1]`，今天的持仓是 1 ，所以今天不能卖出，只能是买入或者昨天就持有 取最大值：
+>
+> - 昨天就持有，最大交易次数 k，也就是 `dp[i-1][k][1]`
+> - 今天买入的话，昨天就不能持有，而且要满足今日最大交易次数是 k 的限制，所以昨天是 k-1 次交易，也就是 `dp[i-1][k-1][0]`，再减去今日股价
+
+
+
+###  [121. 买卖股票的最佳时机 | k = 1](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+
 > 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
 >
 > 你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
@@ -84,21 +102,7 @@ dp[i][k][1] = max(dp[i-1][k][1],dp[i-1][k-1][0] - prices[i]);
 >   注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
 > ```
 
-```java
-public int maxProfit(int[] prices) {
-  int length = prices.length;
-  if (length == 0) {
-    return 0;
-  }
-  int dp[] = new int[length];
-  int minPrice = prices[0];
-  for (int i = 1; i < length; i++) {
-    minPrice = Math.min(minPrice, prices[i]);
-    dp[i] = Math.max(dp[i - 1], prices[i] - minPrice);
-  }
-  return dp[length - 1];
-}
-```
+Case 1，k = 1
 
 ```
 dp[i][1][0] = max(dp[i-1][1][0], dp[i-1][1][1] + prices[i])
@@ -114,34 +118,20 @@ dp[i][1] = max(dp[i-1][1], -prices[i])
 
 套用公式，写出代码：
 
-```
-int n = prices.length;
-int[][] dp = new int[n][2];
-for (int i = 0; i < n; i++) {
-    dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
-    dp[i][1] = Math.max(dp[i-1][1], -prices[i]);
-}
-return dp[n - 1][0];
-```
-
-显然 `i = 0` 时 `i - 1` 是不合法的索引，这是因为我们没有对 `i` 的 base case 进行处理，可以这样给一个特化处理：
-
 ```java
 // 原始版本
 int maxProfit_k_1(int[] prices) {
-    int n = prices.length;
-    int[][] dp = new int[n][2];
-    for (int i = 0; i < n; i++) {
-        if (i - 1 == -1) {
-            // base case
-            dp[i][0] = 0;
-            dp[i][1] = -prices[i];
-            continue;
-        }
-        dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
-        dp[i][1] = Math.max(dp[i-1][1], -prices[i]);
-    }
-    return dp[n - 1][0];
+  int n = prices.length;
+  int[][] dp = new int[n][2];
+  //特例
+  dp[0][0] = 0;
+  dp[0][1] = -prices[0];
+
+  for(int i = 1;i<n;i++){
+    dp[i][0] = Math.max(dp[i-1][0],dp[i-1][1] + prices[i]);
+    dp[i][1] = Math.max(dp[i-1][1],-prices[i]);
+  }
+  return dp[n-1][0];
 }
 ```
 
@@ -177,12 +167,8 @@ public int maxProfit(int[] prices) {
 
 
 
+### [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/) | k 不限制
 
-
-## Case 2: k = + Infinity
-
-> [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
->
 > 给定一个数组 prices ，其中 prices[i] 表示股票第 i 天的价格。
 >
 > 在每一天，你可能会决定购买和/或出售股票。你在任何时候 最多 只能持有 一股 股票。你也可以购买它，然后在 同一天 出售。
@@ -195,7 +181,7 @@ public int maxProfit(int[] prices) {
 >      随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
 > ```
 
-题目中说可以随便交易，也就是 k 不限制了，假设 k 无穷大，那就可以认为 k 和 k-1 是一样的，套公式
+题目中说可以随便交易，也就是 k 不限制了，当天买了当天就能卖（T+0），假设 k 无穷大，那就可以认为 k 和 k-1 是一样的，套公式
 
 ```java
 dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i])
@@ -213,13 +199,9 @@ dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
 int maxProfit_k_inf(int[] prices) {
     int n = prices.length;
     int[][] dp = new int[n][2];
+    dp[0][0] = 0;
+    dp[0][1] = -prices[0];
     for (int i = 0; i < n; i++) {
-        if (i - 1 == -1) {
-            // base case
-            dp[i][0] = 0;
-            dp[i][1] = -prices[i];
-            continue;
-        }
         dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
         dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] - prices[i]);
     }
@@ -227,6 +209,8 @@ int maxProfit_k_inf(int[] prices) {
 }
 
 // 空间复杂度优化版本
+//每一天的状态只与前一天的状态有关，而与更早的状态都无关，因此我们不必存储这些无关的状态，
+//只需要将 dp[i-1][0] 和 dp[i−1][1] 存放在两个变量中
 int maxProfit_k_inf(int[] prices) {
     int n = prices.length;
     int dp_i_0 = 0, dp_i_1 = Integer.MIN_VALUE;
@@ -241,9 +225,7 @@ int maxProfit_k_inf(int[] prices) {
 
 
 
-
-
-## [123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
+### [123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/) | k = 2
 
 > 给定一个数组，它的第 i 个元素是一支给定的股票在第 i 天的价格。
 >
@@ -258,9 +240,42 @@ int maxProfit_k_inf(int[] prices) {
 >      随后，在第 7 天（股票价格 = 1）的时候买入，在第 8 天 （股票价格 = 4）的时候卖出，这笔交易所能获得利润 = 4-1 = 3 。
 > ```
 
+这道题是 k = 2，前两道我们都消除了 k ，换成了二维数组
+
+这道题，我们不能消除 k，而且题目说最多两次交易，那我们要穷举出 1 次交易 和 2 次交易的结果，才能知道哪种收益最高
+
+```java
+public static int getMaxProfit(int[] prices){
+  int max_k = 2;
+  int n = prices.length;
+  int dp[][][] = new int[n][3][2];
+
+  //特例
+  // dp[0][1][0] = 0;
+  // dp[0][1][1] = - prices[0];
+  // dp[0][2][0] = 0;
+  // dp[0][2][1] = - prices[0];
+
+  for (int i = 0; i < prices.length; i++) {
+    for (int k = 1; k <= max_k; k++) {
+      //特例
+      if (i == 0) {
+        dp[0][k][0] = 0;
+        dp[0][k][1] = -prices[i];
+        continue;
+      }
+      
+      dp[i][k][0] = Math.max(dp[i - 1][k][0], dp[i - 1][k][1] + prices[i]);
+      dp[i][k][1] = Math.max(dp[i - 1][k][1], dp[i - 1][k - 1][0] - prices[i]);
+    }
+  }
+  return dp[n - 1][max_k][0];
+}
+```
 
 
-## [188. 买卖股票的最佳时机 IV](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
+
+### [188. 买卖股票的最佳时机 IV](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/) | k 不限制
 
 > 给定一个整数数组 prices ，它的第 i 个元素 prices[i] 是一支给定的股票在第 i 天的价格。
 >
@@ -272,14 +287,45 @@ int maxProfit_k_inf(int[] prices) {
 > 输入：k = 2, prices = [3,2,6,5,0,3]
 > 输出：7
 > 解释：在第 2 天 (股票价格 = 2) 的时候买入，在第 3 天 (股票价格 = 6) 的时候卖出, 这笔交易所能获得利润 = 6-2 = 4 。
->      随后，在第 5 天 (股票价格 = 0) 的时候买入，在第 6 天 (股票价格 = 3) 的时候卖出, 这笔交易所能获得利润 = 3-0 = 3 。
+>   随后，在第 5 天 (股票价格 = 0) 的时候买入，在第 6 天 (股票价格 = 3) 的时候卖出, 这笔交易所能获得利润 = 3-0 = 3 。
 > ```
 
+这个题目的 k 看似也是不限制，和 122 有点像，我们处理 122 的时候，把 k 看做无穷大，直接过滤了，我们看作是 T+0 交易，这道题是有限制的，不能同时参与多笔交易，其实就是 T+1
+
+一次交易由买入和卖出构成，至少需要两天。如果 prices 数组长度 n，那其实买卖最多 n/2 次，也就是 k <= n/2
+
+```java
+public static int getMaxProfit(int max_k, int[] prices) {
+  int n = prices.length;
+
+  if (n <= 1) {
+    return 0;
+  }
+
+  //因为一次交易至少涉及两天，所以如果k大于总天数的一半，就直接取天数一半即可，多余的交易次数是无意义的
+  max_k = Math.min(max_k, n / 2);
+
+  int[][][] dp = new int[n][max_k + 1][2];
+  //特例:第1天，不持有随便交易 0，持有的话就是 -prices[0]
+  for (int k = 0; k <= max_k; k++) {
+    dp[0][k][0] = 0;
+    dp[0][k][1] = -prices[0];
+  }
+
+  for (int i = 1; i < n; i++) {
+    for (int k = 1; k <= max_k; k++) {
+      dp[i][k][0] = Math.max(dp[i - 1][k][0], dp[i - 1][k][1] + prices[i]);
+      dp[i][k][1] = Math.max(dp[i - 1][k][1], dp[i - 1][k - 1][0] - prices[i]);
+    }
+  }
+  return dp[n - 1][max_k][0];
+}
+
+```
 
 
 
-
-## [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+### [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
 
 > 给定一个整数数组prices，其中第  prices[i] 表示第 i 天的股票价格 。
 >
@@ -294,11 +340,54 @@ int maxProfit_k_inf(int[] prices) {
 > 解释: 对应的交易状态为: [买入, 卖出, 冷冻期, 买入, 卖出]
 > ```
 
+这里加了一个冷冻期的概念，sell 后不能 直接 buy，需要冷静冷静，也是不限次数 k，思路和 122 一样，加一个冷冻期的状态
+
+拿出我们的万能公式再看一眼
+
+```
+dp[i][k][0] = max(dp[i-1][k][0],dp[i-1][k][1] + prices[i]);
+dp[i][k][1] = max(dp[i-1][k][1],dp[i-1][k-1][0] - prices[i]);
+```
+
+ 因为有冷冻期的存在，如果我们不能在 i-1 天买入，要 buy 的话，必须等 1 天，也就是持仓公式中 `dp[i-1][k-1][0]` 买入的话，需要再往前1 天才能买入，即 `dp[i-2][k-1][0]`
+
+```
+dp[i][k][1] = max(dp[i-1][k][1],dp[i-2][k-1][0] - prices[i]);
+```
+
+剩下得就是套公式，和 122 一样了
+
+```java
+public static int maxProfit(int[] prices) {
+  int len = prices.length;
+  if (len < 2) {
+    return 0;
+  }
+  //特例
+  int[][] dp = new int[len][2];
+  dp[0][0] = 0;
+  dp[0][1] = -prices[0];
+  for (int i = 1; i < len; i++) {
+    // 卖出状态
+    dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+    // 买入状态，比122 多加了一个if-else
+    if (i < 2) {
+      // 前三天不用考虑冷冻期的问题，因为不可能出现冷冻期
+      dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+    } else {
+      // 从第4天开始，买入考虑一天的冷冻期
+      dp[i][1] = Math.max(dp[i - 1][1], dp[i - 2][0] - prices[i]);
+    }
+  }
+  return dp[len - 1][0];
+}
+```
 
 
-## [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
 
-> 给定一个整数数组 prices，其中 prices[i]表示第 i 天的股票价格 ；整数 fee 代表了交易股票的手续费用。
+### [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+
+> 给定一个整数数组 prices，其中 prices[i] 表示第 i 天的股票价格 ；整数 fee 代表了交易股票的手续费用。
 >
 > 你可以无限次地完成交易，但是你每笔交易都需要付手续费。如果你已经购买了一个股票，在卖出它之前你就不能再继续购买股票了。
 >
@@ -316,3 +405,36 @@ int maxProfit_k_inf(int[] prices) {
 > 在此处卖出 prices[5] = 9
 > 总利润: ((8 - 1) - 2) + ((9 - 4) - 2) = 8
 > ```
+
+这个题，其实又是和 122 类似，k 不限制，只是多了一个手续费，这个手续费我们可以选择在买入时候交，也可以选择再卖出时候交，那通用公式就可以变成
+
+```
+dp[i][k][0] = max(dp[i-1][k][0],dp[i-1][k][1] + prices[i]);
+dp[i][k][1] = max(dp[i-1][k][1],dp[i-1][k-1][0] - prices[i] - free);   //买入时候交
+```
+
+或者卖出时候交
+
+```
+dp[i][k][0] = max(dp[i-1][k][0],dp[i-1][k][1] + prices[i] - free);
+dp[i][k][1] = max(dp[i-1][k][1],dp[i-1][k-1][0] - prices[i]);   //买入时候交
+```
+
+直接上代码吧
+
+```java
+public static int getMaxProfit(int[] prices, int fee) {
+  int n = prices.length;
+  int[][] dp = new int[n][2];
+
+  dp[0][0] = 0;
+  dp[0][1] = -prices[0];
+
+  for (int i = 1; i < n; i++) {
+    dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i] - fee);
+    dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+  }
+  return dp[n - 1][0];
+}
+```
+
