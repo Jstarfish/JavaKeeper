@@ -247,12 +247,12 @@ int right_bound(int[] nums, int target) {
 
 升序数组+旋转，仍然是部分有序，考虑用二分查找。
 
-> 这种二分查找难就难在，arr[mid]跟谁比。
+> 这种二分查找难就难在，arr[mid] 跟谁比。
 >
-> 我们的目的是：当进行一次比较时，一定能够确定答案在mid的某一侧。一次比较为 arr[mid]跟谁比的问题。
+> 我们的目的是：当进行一次比较时，一定能够确定答案在 mid 的某一侧。一次比较为 arr[mid] 跟谁比的问题。
 > 一般的比较原则有：
 >
-> - 如果有目标值target，那么直接让arr[mid] 和 target 比较即可。
+> - 如果有目标值 target，那么直接让 arr[mid] 和 target 比较即可。
 > - 如果没有目标值，一般可以考虑 **端点**
 
 
@@ -331,8 +331,8 @@ public static int findMax(int[] nums) {
 
 旋转数组后，依然是局部有序，从数组中间分成左右两部分后，一定有一部分是有序的
 
-- 如果 [l, mid - 1] 是有序数组，且 target 的大小满足 [\textit{nums}[l],\textit{nums}[mid])[nums[l],nums[mid])，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
-- 如果 [mid, r] 是有序数组，且 target 的大小满足 (\textit{nums}[mid+1],\textit{nums}[r]](nums[mid+1],nums[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
+- 如果 [l, mid - 1] 是有序数组，且 target 的大小满足 [{nums}[l],{nums}[mid]))，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
+- 如果 [mid, r] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
 
 ```java
 public static int search(int[] nums,int target) {

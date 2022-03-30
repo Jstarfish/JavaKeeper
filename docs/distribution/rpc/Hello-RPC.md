@@ -2,7 +2,7 @@
 
 ## RPC是个啥玩意
 
-**远程过程调用**（英语：Remote Procedure Call，缩写为 RPC）是一个计算机通信[协议](https://zh.wikipedia.org/wiki/%E7%B6%B2%E7%B5%A1%E5%82%B3%E8%BC%B8%E5%8D%94%E8%AD%B0)。该协议允许运行于一台计算机的[程序](https://zh.wikipedia.org/wiki/%E7%A8%8B%E5%BA%8F)调用另一台计算机的[子程序](https://zh.wikipedia.org/wiki/%E5%AD%90%E7%A8%8B%E5%BA%8F)，而程序员无需额外地为这个交互作用编程,区别于本地过程调用。
+**远程过程调用**（英语：Remote Procedure Call，缩写为 RPC）是一个计算机通信协议。该协议允许运行于一台计算机的程序调用另一台计算机的子程序，而程序员无需额外地为这个交互作用编程,区别于本地过程调用。
 
 
 
@@ -16,8 +16,6 @@
 
 
 更通俗的解释：[如何给老婆解释什么是RPC](<https://www.jianshu.com/p/2accc2840a1b> )
-
-
 
 
 
@@ -97,7 +95,7 @@ rpc是远端过程调用，其调用协议通常包含传输协议和序列化�
 
 
 
-# RPC vs Restful
+### RPC vs Restful
 
 其实这两者并不是一个维度的概念，总得来说RPC涉及的维度更广。
 
@@ -120,13 +118,13 @@ Get
 
 REST是一种架构风格，指的是一组架构约束条件和原则。满足这些约束条件和原则的应用程序或设计就是 RESTful。REST规范把所有内容都视为资源，网络上一切皆资源。 
 
-# RPC vs RMI
+### RPC vs RMI
 
 严格来说这两者也不是一个维度的。
 
-RMI是Java提供的一种访问远程对象的协议，是已经实现好了的，可以直接用了。
+RMI 是 Java 提供的一种访问远程对象的协议，是已经实现好了的，可以直接用了。
 
-而RPC呢？人家只是一种编程模型，并没有规定你具体要怎样实现，**你甚至都可以在你的RPC框架里面使用RMI来实现数据的传输**，比如Dubbo：[Dubbo - rmi协议](https://link.jianshu.com?t=http%3A%2F%2Fdubbo.apache.org%2Fbooks%2Fdubbo-user-book%2Freferences%2Fprotocol%2Frmi.html)
+而 RPC 呢？人家只是一种编程模型，并没有规定你具体要怎样实现，**你甚至都可以在你的RPC框架里面使用RMI来实现数据的传输**，比如Dubbo：[Dubbo - rmi协议](https://link.jianshu.com?t=http%3A%2F%2Fdubbo.apache.org%2Fbooks%2Fdubbo-user-book%2Freferences%2Fprotocol%2Frmi.html)
 
 
 
