@@ -51,6 +51,8 @@ calculator.add(1,2);
 
 ![img](https:////upload-images.jianshu.io/upload_images/7143349-9e00bb104b9e3867.png?imageMogr2/auto-orient/strip|imageView2/2/w/263/format/webp)
 
+![](https://static001.geekbang.org/resource/image/82/59/826a6da653c4093f3dc3f0a833915259.jpg)
+
 以左边的Client端为例，Application就是rpc的调用方，Client Stub就是我们上面说到的代理对象，也就是那个看起来像是Calculator的实现类，其实内部是通过rpc方式来进行远程调用的代理对象，至于Client Run-time Library，则是实现远程调用的工具包，比如jdk的Socket，最后通过底层网络实现实现数据的传输。
 
 这个过程中最重要的就是**序列化**和**反序列化**了，因为数据传输的数据包必须是二进制的，你直接丢一个Java对象过去，人家可不认识，你必须把Java对象序列化为二进制格式，传给Server端，Server端接收到之后，再反序列化为Java对象。
@@ -174,6 +176,14 @@ RPC仅仅是微服务中的一部分。
 
 
 
+
+
+
+
+
+
+
+
 维度	RPC	REST
 耦合性	强耦合	松散耦合
 消息协议	二进制thrift、protobuf、avro	文本型XML、JSON
@@ -205,23 +215,271 @@ RPC框架的调用原理图如下：
 
  
 
-## **三：RPC框架核心技术点**
+## RPC框架核心技术点
 
 RPC框架实现的几个核心技术点总结如下：
 
 1)远程服务提供者需要以某种形式提供服务调用相关的信息，包括但不限于服务接口定义、数据结构，或者中间态的服务定义文件，例如 Thrift的IDL文件， WS-RPC的WSDL文件定义，甚至也可以是服务端的接口说明文档;服务调用者需要通过一定的途径获取远程服务调用相关信息，例如服务端接口定义Jar包导入，获取服务端1DL文件等。
 
-2)远程代理对象:服务调用者调用的服务实际是远程服务的本地代理，对于Java语言，它的实现就是JDK的动态代理，通过动态代理的拦截机制，将本地调用封装成远程服务调用. 
+### 远程代理
 
-3)通信:RPC框架与具体的协议无关，例如Spring的远程调用支持 HTTP Invoke、RMI Invoke， MessagePack使用的是私有的二进制压缩协议。
+动态代理，用 Spring AOP 的同学就不陌生了，他就是远程调用的魔法
 
-4)序列化:远程通信，需要将对象转换成二进制码流进行网络传输，不同的序列化框架，支持的数据类型、数据包大小、异常类型及性能等都不同。不同的RPC框架应用场景不同，因此技术选择也会存在很大差异。一些做得比较好的RPC框架可以支持多种序列化方式，有的甚至支持用户自定义序列化框架( Hadoop Avro)。
+当我们作为调用方使用接口时，RPC 会自动给接口生成一个代理类，我们在项目中注入接口的时候，运行过程中实际绑定的是这个接口生成的代理类。这样在接口方法被调用的时候，它实际上是被生成代理类拦截到了，这样我们就可以在生成的代理类里 面，加入远程调用逻辑。
 
+通过这种“偷梁换柱”的手法，就可以帮用户屏蔽远程调用的细节，实现像调用本地一样地调用远程的体验，整体流程如下图所示:
+
+![](https://static001.geekbang.org/resource/image/05/53/05cd18e7e33c5937c7c39bf8872c5753.jpg)
+
+远程代理对象:服务调用者调用的服务实际是远程服务的本地代理，对于Java语言，它的实现就是JDK的动态代理，通过动态代理的拦截机制，将本地调用封装成远程服务调用. 
+
+
+
+### 通信
+
+一次 RPC 调用，本质就是服务消费者与服务提供者间的一次网络信息交换的过程。
+
+服务调用者通过网络 IO 发送一条 请求消息，服务提供者接收并解析，处理完相关的业务逻辑之后，再发送一条响应消息给服务调用者，服务调用者接收并解析响应消息，处理完相关的响应逻辑，一次 RPC 调用便结 束了。可以说，网络通信是整个 RPC 调用流程的基础。
+
+#### 常见网络 IO 模型
+
+那说到网络通信，就不得不提一下网络 IO 模型。为什么要讲网络 IO 模型呢?因为所谓的
+
+两台 PC 机之间的网络通信，实际上就是两台 PC 机对网络 IO 的操作。
+
+常见的网络 IO 模型分为四种:同步阻塞 IO(BIO)、同步非阻塞 IO(NIO)、IO 多路复 用和异步非阻塞 IO(AIO)。在这四种 IO 模型中，只有 AIO 为异步 IO，其他都是同步 IO。
+
+其中，最常用的就是同步阻塞 IO 和 IO 多路复用，这一点通过了解它们的机制，你会 get 到。至于其他两种 IO 模型，因为不常用，则不作为本讲的重点，有兴趣的话我们可以在留 言区中讨论。
+
+
+
+##### 阻塞 IO(blocking IO)
+
+同步阻塞 IO 是最简单、最常见的 IO 模型，在 Linux 中，默认情况下所有的 socket 都是blocking 的，先看下操作流程。
+
+首先，应用进程发起 IO 系统调用后，应用进程被阻塞，转到内核空间处理。之后，内核开 始等待数据，等待到数据之后，再将内核中的数据拷贝到用户内存中，整个 IO 处理完毕后 返回进程。最后应用的进程解除阻塞状态，运行业务逻辑。
+
+这里我们可以看到，系统内核处理 IO 操作分为两个阶段——等待数据和拷贝数据。而在这 两个阶段中，应用进程中 IO 操作的线程会一直都处于阻塞状态，如果是基于 Java 多线程 开发，那么每一个 IO 操作都要占用线程，直至 IO 操作结束。
+
+这个流程就好比我们去餐厅吃饭，我们到达餐厅，向服务员点餐，之后要一直在餐厅等待后
+厨将菜做好，然后服务员会将菜端给我们，我们才能享用。
+
+
+
+##### IO 多路复用(IO multiplexing)
+
+多路复用 IO 是在高并发场景中使用最为广泛的一种 IO 模型，如 Java 的 NIO、Redis、 Nginx 的底层实现就是此类 IO 模型的应用，经典的 Reactor 模式也是基于此类 IO 模型。
+
+那么什么是 IO 多路复用呢? 通过字面上的理解，多路就是指多个通道，也就是多个网络连接的 IO，而复用就是指多个通道复用在一个复用器上。
+
+多个网络连接的 IO 可以注册到一个复用器(select)上，当用户进程调用了 select，那么 整个进程会被阻塞。同时，内核会“监视”所有 select 负责的 socket，当任何一个 socket 中的数据准备好了，select 就会返回。这个时候用户进程再调用 read 操作，将数据从内核中拷贝到用户进程。
+
+这里我们可以看到，当用户进程发起了 select 调用，进程会被阻塞，当发现该 select 负责 的 socket 有准备好的数据时才返回，之后才发起一次 read，整个流程要比阻塞 IO 要复杂，似乎也更浪费性能。但它最大的优势在于，用户可以在一个线程内同时处理多个 socket 的 IO 请求。用户可以注册多个 socket，然后不断地调用 select 读取被激活的 socket，即可达到在同一个线程内同时处理多个 IO 请求的目的。而在同步阻塞模型中，必须通过多线程的方式才能达到这个目的。
+
+
+
+### 序列化
+
+网络传输的数据必须是二进制数据，远程通信时需要将对象转换成二进制码流进行网络传输，不同的序列化框架，支持的数据类型、数据包大小、异常类型及性能等都不同
+
+> 序列化就是将对象转换成二进制数据的过程，而反序列就是反过来将二进制转换为对象的过程。
+
+不同的RPC框架应用场景不同，因此技术选择也会存在很大差异。一些做得比较好的RPC框架可以支持多种序列化方式，有的甚至支持用户自定义序列化框架( Hadoop Avro)
+
+![](https://static001.geekbang.org/resource/image/d2/04/d215d279ef8bfbe84286e81174b4e704.jpg)
+
+ **有哪些常用的序列化?**
+
+#### JDK 原生序列化
+
+Javer 肯定对这种原生的序列化方式最熟悉不过了
+
+```java
+
+import java.io.*;
+
+public class Student implements Serializable {
+    //学号
+    private int no;
+    //姓名
+    private String name;
+
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "no=" + no +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        String home = System.getProperty("user.home");
+        String basePath = home + "/Desktop";
+        FileOutputStream fos = new FileOutputStream(basePath + "student.dat");
+        Student student = new Student();
+        student.setNo(100);
+        student.setName("TEST_STUDENT");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(student);
+        oos.flush();
+        oos.close();
+
+        FileInputStream fis = new FileInputStream(basePath + "student.dat");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        Student deStudent = (Student) ois.readObject();
+        ois.close();
+
+        System.out.println(deStudent);
+
+    }
+}
+```
+
+ 我们可以看到，JDK 自带的序列化机制对使用者而言是非常简单的。
+
+序列化具体的实现是由 ObjectOutputStream 完成的，而反序列化的具体实现是由 ObjectInputStream 完成的。
+
+那么 JDK 的序列化过程是怎样完成的呢？我们看下下面这张图：
+
+![](https://static001.geekbang.org/resource/image/7e/9f/7e2616937e3bc5323faf3ba4c09d739f.jpg)
+
+序列化过程就是在读取对象数据的时候，不断加入一些特殊分隔符，这些特殊分隔符用于在反序列化过程中截断用。
+
+- 头部数据用来声明序列化协议、序列化版本，用于高低版本向后兼容
+- 对象数据主要包括类名、签名、属性名、属性类型及属性值，当然还有开头结尾等数据，除了属性值属于真正的对象值，其他都是为了反序列化用的元数据
+- 存在对象引用、继承的情况下，就是递归遍历“写对象”逻辑
+
+实际上任何一种序列化框架，核心思想就是设计一种序列化协议，将对象的类型、属性类型、属性值一一按照固定的格式写到二进制字节流中来完成序列化，再按照固定的格式一一读出对象的类型、属性类型、属性值，通过这些信息重新创建出一个新的对象，来完成反序列化。
+
+
+
+#### JSON
+
+JSON 是典型的 Key-Value 方式，没有数据类型，是一种文本型序列化框架
+
+但用 JSON 进行序列化有这样两个问题，你需要格外注意：
+
+- JSON 进行序列化的额外空间开销比较大，对于大数据量服务这意味着需要巨大的内存和磁盘开销；
+- JSON 没有类型，但像 Java 这种强类型语言，需要通过反射统一解决，所以性能不会太好。
+
+所以如果 RPC 框架选用 JSON 序列化，服务提供者与服务调用者之间传输的数据量要相对较小，否则将严重影响性能。
+
+
+
+#### Hessian
+
+Hessian 是动态类型、二进制、紧凑的，并且可跨语言移植的一种序列化框架。Hessian 协议要比 JDK、JSON 更加紧凑，性能上要比 JDK、JSON 序列化高效很多，而且生成的字节数也更小。
+
+```java
+
+Student student = new Student();
+student.setNo(101);
+student.setName("HESSIAN");
+
+//把student对象转化为byte数组
+ByteArrayOutputStream bos = new ByteArrayOutputStream();
+Hessian2Output output = new Hessian2Output(bos);
+output.writeObject(student);
+output.flushBuffer();
+byte[] data = bos.toByteArray();
+bos.close();
+
+//把刚才序列化出来的byte数组转化为student对象
+ByteArrayInputStream bis = new ByteArrayInputStream(data);
+Hessian2Input input = new Hessian2Input(bis);
+Student deStudent = (Student) input.readObject();
+input.close();
+
+System.out.println(deStudent);
+```
+
+相对于 JDK、JSON，由于 Hessian 更加高效，生成的字节数更小，有非常好的兼容性和稳定性，所以 Hessian 更加适合作为 RPC 框架远程通信的序列化协议。
+
+但 Hessian 本身也有问题，官方版本对 Java 里面一些常见对象的类型不支持，比如：
+
+- Linked 系列，LinkedHashMap、LinkedHashSet 等，但是可以通过扩展 CollectionDeserializer 类修复；
+- Locale 类，可以通过扩展 ContextSerializerFactory 类修复；
+- Byte/Short 反序列化的时候变成 Integer。
+
+
+
+#### Protobuf
+
+Protobuf 是 Google 公司内部的混合语言数据标准，是一种轻便、高效的结构化数据存储格式，可以用于结构化数据序列化，支持 Java、Python、C++、Go 等语言。
+
+Protobuf 使用的时候需要定义 IDL（Interface description language），然后使用不同语言的 IDL 编译器，生成序列化工具类，它的优点是：
+
+- 序列化后体积相比 JSON、Hessian 小很多；
+- IDL 能清晰地描述语义，所以足以帮助并保证应用程序之间的类型不会丢失，无需类似 XML 解析器；
+- 序列化反序列化速度很快，不需要通过反射获取类型；
+- 消息格式升级和兼容性不错，可以做到向后兼容。
+
+```protobuf
+
+/**
+ *
+ * // IDl 文件格式
+ * synax = "proto3";
+ * option java_package = "com.test";
+ * option java_outer_classname = "StudentProtobuf";
+ *
+ * message StudentMsg {
+ * //序号
+ * int32 no = 1;
+ * //姓名
+ * string name = 2;
+ * }
+ * 
+ */
  
+StudentProtobuf.StudentMsg.Builder builder = StudentProtobuf.StudentMsg.newBuilder();
+builder.setNo(103);
+builder.setName("protobuf");
 
- 
+//把student对象转化为byte数组
+StudentProtobuf.StudentMsg msg = builder.build();
+byte[] data = msg.toByteArray();
 
-## **四、业界主流的RPC框架**
+//把刚才序列化出来的byte数组转化为student对象
+StudentProtobuf.StudentMsg deStudent = StudentProtobuf.StudentMsg.parseFrom(data);
+
+System.out.println(deStudent);
+```
+
+
+
+以上只是些常见的序列化协议，还有 Message pack、kryo 等
+
+
+
+RPC 框架如何选择序列化？需要考虑的因素
+
+- 传输性能和效率
+- 空间开销（序列化后的二进制数据体积不能太大）
+- 通用性和兼容性
+- 安全性（别动不动就安全漏洞）
+
+
+
+
+
+## 四、业界主流的RPC框架
 
 业界主流的RPC框架很多，比较出名的RPC主要有以下4种：
 
