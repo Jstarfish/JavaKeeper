@@ -349,6 +349,7 @@ function genInterviewSidebar(){
     ['Network-FAQ', '计算机网络部分'],
     ['Kafka-FAQ', 'Kafka 部分'],
     ['ZooKeeper-FAQ', 'Zookeeper 部分'],
+    ['RPC-FAQ', 'RPC 部分'],
     ['MyBatis-FAQ', 'MyBatis 部分'],
     ['Spring-FAQ', 'Spring 部分'],
     ['SpringBoot-FAQ', 'Spring Boot 部分'],
