@@ -461,7 +461,7 @@ public TreeNode buildTree(int[] preorder, int[] inorder) {
   for (int i = 0; i < n; i++) {
     indexMap.put(inorder[i], i);
   }
-  return build(preorder, n - 1, 0, inorder, 0, n - 1);
+  return build(preorder, 0, n - 1 , inorder, 0, n - 1);
 }
 
 public TreeNode build(int[] preorder, int preStart, int preEnd,
@@ -681,6 +681,8 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 
 
 
+
+
 ### [114. 二叉树展开为链表](https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/)
 
 > 给你二叉树的根结点 root ，请你将它展开为一个单链表：
@@ -721,4 +723,10 @@ private void preorder(TreeNode node, List<TreeNode> res) {
 ```
 
 
+
+技术驱动优化：                                                                                                                         
+
+1. 完成商品库 pipeline 方案优化调整，全流量上线更新保护策略，保障商品物料稳定和提升抓取性能                                                                                                                                 
+2. 完成定制报告服务重构，提升扩展性和可维护性
+3. 聚合服务和原子服务分离，负责完成一个层级服务的领域建模落地和改造
 
