@@ -190,7 +190,40 @@ public static int maxProfit_1(int[] nums){
 > 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
 > ```
 
-[动态规划、分治]
+**思路**：「连续」子数组，题目要求的是返回结果，用 [动态规划、分治]
+
+```java
+public static int maxSubArray3(int[] nums) {
+  //特判
+  if (nums == null || nums.length == 0) {
+    return 0;
+  }
+  //初始化
+  int length = nums.length;
+  int[] dp = new int[length];
+  // 初始值,只有一个元素的时候最大和即它本身
+  dp[0] = nums[0];
+  int ans = nums[0];
+  // 状态转移
+  for (int i = 1; i < length; i++) {
+    // 取当前元素的值 和 当前元素的值加上一次结果的值 中最大数
+    dp[i] = Math.max(nums[i], dp[i - 1] + nums[i]);
+    // 和最大数对比 取大
+    ans = Math.max(ans, dp[i]);
+  }
+  return ans;
+}
+
+//优化版
+public int maxSubArray(int[] nums) {
+  int pre = 0, maxAns = nums[0];
+  for (int x : nums) {
+    pre = Math.max(pre + x, x);
+    maxAns = Math.max(maxAns, pre);
+  }
+  return maxAns;
+}
+```
 
 
 
@@ -315,7 +348,7 @@ public int maxArea(int[] height){
 
 ### [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
 
-> 给定整数数组 `nums` 和整数 `k`，请返回数组中第 `**k**` 个最大的元素。
+> 给定整数数组 `nums` 和整数 `k`，请返回数组中第 `k` 个最大的元素。
 >
 > 请注意，你需要找的是数组排序后的第 `k` 个最大的元素，而不是第 `k` 个不同的元素。
 >
@@ -327,6 +360,39 @@ public int maxArea(int[] height){
 > ```
 > 输入: [3,2,3,1,2,4,5,5,6] 和 k = 4
 > 输出: 4
+> ```
+
+**思路**：
+
+
+
+
+
+### [31. 下一个排列](https://leetcode.cn/problems/next-permutation/)
+
+> 整数数组的一个 排列  就是将其所有成员以序列或线性顺序排列。
+>
+> 例如，arr = [1,2,3] ，以下这些都可以视作 arr 的排列：[1,2,3]、[1,3,2]、[3,1,2]、[2,3,1] 。
+> 整数数组的 下一个排列 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 下一个排列 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
+>
+> - 例如，arr = [1,2,3] 的下一个排列是 [1,3,2] 。
+> - 类似地，arr = [2,3,1] 的下一个排列是 [3,1,2] 。
+> - 而 arr = [3,2,1] 的下一个排列是 [1,2,3] ，因为 [3,2,1] 不存在一个字典序更大的排列。
+>
+> 给你一个整数数组 nums ，找出 nums 的下一个排列。
+>
+> > 题干的意思就是：找出这个数组排序出的所有数中，刚好比当前数大的那个数
+>
+> 必须 原地 修改，只允许使用额外常数空间。
+>
+> ```
+> 输入：nums = [1,2,3]
+> 输出：[1,3,2]
+> ```
+>
+> ```
+> 输入：nums = [3,2,1]
+> 输出：[1,2,3]
 > ```
 
 **思路**：
