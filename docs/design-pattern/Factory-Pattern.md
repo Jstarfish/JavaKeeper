@@ -381,7 +381,7 @@ public class Client {
 
 1. 抽象产品
 
-2. ```java
+   ```java
    public interface Keyboard {
      void input();
    }
@@ -391,7 +391,7 @@ public class Client {
    ```
 
 2. 具体产品
-
+   
    ```java
    //具体产品
    public class MacKeyboard implements Keyboard {
@@ -422,7 +422,7 @@ public class Client {
        }
    }
    ```
-
+   
 3. 抽象工厂
 
    ```java
@@ -544,7 +544,3 @@ https://blog.csdn.net/lovelion/article/details/17517213
 https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
 
 https://blog.csdn.net/lovelion/article/details/17517213                                                                                                                                    
-
-
-
-![](https://i.loli.net/2020/03/19/AkRqgTo6y5crBSx.png)

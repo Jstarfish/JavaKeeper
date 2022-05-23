@@ -427,7 +427,7 @@ public void execute(Runnable command) {
 
 使用不同的队列可以实现不一样的任务存取策略。在这里，我们可以再介绍下阻塞队列的成员：
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdldg06a43j31b20l848n.jpg)
+![img](/Users/apple/picBed/others/blocking-queue.png)
 
 #### 任务申请
 
@@ -493,7 +493,7 @@ public interface RejectedExecutionHandler {
 
 用户可以通过实现这个接口去定制拒绝策略，也可以选择 JDK 提供的四种已有拒绝策略，其特点如下：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200928144438.png)
+![](../../_images/java/juc/thread-pool-reject.png)
 
 ### 5.3 工作线程管理
 

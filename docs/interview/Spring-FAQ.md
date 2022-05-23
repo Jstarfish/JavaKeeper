@@ -12,6 +12,20 @@
 
 
 
+### 使用 **Spring** 框架能带来哪些好处?
+
+下面列举了一些使用 Spring 框架带来的主要好处:
+
+- Dependency Injection(DI) 方法使得构造器和 JavaBean properties 文件中的依赖关系一 目了然。
+- 与 EJB 容器相比较，IoC 容器更加趋向于轻量级。这样一来 IoC 容器在有限的内存和 CPU 资源的情况下进行应用程序的开发和发布就变得十分有利。
+- Spring 并没有闭门造车，Spring 利用了已有的技术比如 ORM 框架、logging 框架、J2EE、Q uartz和JDK Timer，以及其他视图技术。
+- Spring 框架是按照模块的形式来组织的。由包和类的编号就可以看出其所属的模块，开发者仅 仅需要选用他们需要的模块即可。
+-  要测试一项用 Spring 开发的应用程序十分简单，因为测试相关的环境代码都已经囊括在框架中 了。更加简单的是，利用 JavaBean 形式的 POJO 类，可以很方便的利用依赖注入来写入测试 数据。
+- Spring 的 Web 框架亦是一个精心设计的 Web MVC 框架，为开发者们在 web 框架的选择上 提供了一个除了主流框架比如 Struts、过度设计的、不流行 web 框架的以外的有力选项。
+- Spring 提供了一个便捷的事务管理接口，适用于小型的本地事物处理(比如在单 DB 的环境 下)和复杂的共同事物处理(比如利用 JTA 的复杂 DB 环境)。
+
+
+
 ### Spring有哪些优点？
 
 - **轻量级**：Spring在大小和透明性方面绝对属于轻量级的，基础版本的Spring框架大约只有2MB。
@@ -86,6 +100,18 @@ BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；Applicatio
 | 它使用语法显式提供资源对象 | 它自己创建和管理资源对象 |
 | 不支持国际化               | 支持国际化               |
 | 不支持基于依赖的注解       | 支持基于依赖的注解       |
+
+> BeanFactory 可以理解为含有 bean 集合的工厂类。BeanFactory 包含了种 bean 的定义，以便
+>
+> 在接收到客户端请求时将对应的 bean 实例化。
+>
+> BeanFactory 还能在实例化对象的时生成协作类之间的关系。此举将 bean 自身与 bean 客户端的 配置中解放出来。BeanFactory 还包含 了 bean 生命周期的控制，调用客户端的初始化方法 (initialization methods)和销毁方法(destruction methods)。
+>
+> 从表面上看，application context 如同 bean factory 一样具有 bean 定义、bean 关联关系的设 置，根据请求分发 bean 的功能。但 applicationcontext 在此基础上还提供了其他的功能。
+>
+> 1. 提供了支持国际化的文本消息
+> 2. 统一的资源文件读取方式
+> 3. 已在监听器中注册的bean的事件
 
 
 
@@ -163,6 +189,59 @@ class Client {
 
 
 
+### 请举例说明如何在 **Spring** 中注入一个 **Java Collection**?
+
+Spring 提供了以下四种集合类的配置元素:
+
+- `<list>` : 该标签用来装配可重复的 list 值。
+- `<set>` : 该标签用来装配没有重复的 set 值。
+- `<map>`: 该标签可用来注入键和值可以为任何类型的键值对。
+- `<props>` : 该标签支持注入键和值都是字符串类型的键值对。
+
+```xml
+<beans>
+<!-- Definition for javaCollection -->
+<bean id="javaCollection" class="com.howtodoinjava.JavaCollection">
+      <!-- java.util.List -->
+      <property name="customList">
+        <list>
+           <value>INDIA</value>
+           <value>Pakistan</value>
+           <value>USA</value>
+           <value>UK</value>
+        </list>
+      </property>
+     <!-- java.util.Set -->
+     <property name="customSet">
+        <set>
+           <value>INDIA</value>
+           <value>Pakistan</value>
+           <value>USA</value>
+           <value>UK</value>
+        </set>
+      </property>
+     <!-- java.util.Map -->
+     <property name="customMap">
+        <map>
+           <entry key="1" value="INDIA"/>
+           <entry key="2" value="Pakistan"/>
+           <entry key="3" value="USA"/>
+           <entry key="4" value="UK"/>
+</map>
+    </property>
+    <!-- java.util.Properties -->
+    <property name="customProperies">
+        <props>
+            <prop key="admin">admin@nospam.com</prop>
+            <prop key="support">support@nospam.com</prop>
+        </props>
+</property>
+   </bean>
+</beans>
+```
+
+
+
 ## 三、Beans
 
 ### 什么是 Spring Beans？
@@ -205,6 +284,7 @@ class Client {
 
   1. @Bean 注解扮演与 `<bean/>` 元素相同的角色。
   
+
  	2. @Configuration 类允许通过简单地调用同一个类中的其他 @Bean 方法来定义 bean 间依赖关系。
 
 例如：
@@ -236,6 +316,32 @@ Spring 容器中的 bean 可以分为 5 个范围。所有范围的名称都是�
 5. **global-session**：全局session作用域，仅仅在基于portlet的web应用中才有意义，Spring5已经没有了。Portlet是能够生成语义代码(例如：HTML)片段的小型Java Web插件。它们基于portlet容器，可以像servlet一样处理HTTP请求。但是，与 servlet 不同，每个 portlet 都有不同的会话
 
 全局作用域与Servlet中的session作用域效果相同。
+
+
+
+### **Spring** 框架中的单例 **Beans** 是线程安全的么?
+
+> Spring 容器中的Bean是否线程安全，容器本身并没有提供Bean的线程安全策略，因此可以说Spring容器中的Bean本身不具备线程安全的特性，但是具体还是要结合具体scope的Bean去研究。
+>
+> 线程安全这个问题，要从单例与原型Bean分别进行说明。
+>
+> **「原型Bean」**对于原型Bean,每次创建一个新对象，也就是线程之间并不存在Bean共享，自然是不会有线程安全的问题。
+>
+> **「单例Bean」**对于单例Bean,所有线程都共享一个单例实例Bean,因此是存在资源的竞争。
+>
+> ### **spring单例，为什么controller、service和dao确能保证线程安全？**
+>
+> Spring中的Bean默认是单例模式的，框架并没有对bean进行多线程的封装处理。实际上大部分时间Bean是无状态的（比如Dao） 所以说在某种程度上来说Bean其实是安全的。
+>
+> 但是如果Bean是有状态的 那就需要开发人员自己来进行线程安全的保证，最简单的办法就是改变bean的作用域 把  `singleton` 改为 `protopyte`， 这样每次请求Bean就相当于是 new Bean() 这样就可以保证线程的安全了。
+>
+> - 有状态就是有[数据存储](https://cloud.tencent.com/product/cdcs?from=10680)功能 
+> - 无状态就是不会保存数据
+>
+> controller、service和dao层本身并不是线程安全的，只是如果只是调用里面的方法，而且多线程调用一个实例的方法，会在内存中复制变量，这是自己的线程的工作内存，是安全的。
+
+Spring 框架并没有对单例 bean 进行任何多线程的封装处理。关于单例 bean 的线程安全和并发问 题需要开发者自行去搞定。但实际上，大部分的 Spring bean 并没有可变的状态(比如 Serview 类 和 DAO 类)，所以在某种程度上说 Spring 的单例 bean 是线程安全的。如果你的 bean 有多种状 态的话(比如 View Model 对象)，就需要自行保证线程安全。
+ 最浅显的解决办法就是将多态 bean 的作用域由“singleton”变更为“prototype”。
 
 
 
@@ -347,14 +453,14 @@ Spring 容器可以自动配置相互协作 beans 之间的关联关系。这意
 
 特定组件包括:
 
-- **@Component**：基本注解, 标识了一个受 Spring 管理的组件
+- **@Component**：基本注解，标识了一个受 Spring 管理的组件
 - **@Respository**：标识持久层组件
 - **@Service**：标识服务层(业务层)组件
 - **@Controller**： 标识表现层组件
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8nqhucw4j31qq0j2aak.jpg)
 
-对于扫描到的组件,，Spring 有默认的命名策略：使用非限定类名,，第一个字母小写。也可以在注解中通过 value 属性值标识组件的名称。
+对于扫描到的组件,，Spring 有默认的命名策略：使用非限定类名，第一个字母小写。也可以在注解中通过 value 属性值标识组件的名称。
 
 当在组件类上使用了特定的注解之后,，还需要在 Spring 的配置文件中声明 `<context:component-scan>`：
 
@@ -516,7 +622,7 @@ Spring 既支持**编程式事务管理**，也支持**声明式的事务管理*
 
 Spring 并不直接管理事务，而是提供了多种事务管理器，他们将事务管理的职责委托给 Hibernate 或者 JTA 等持久化机制所提供的相关平台框架的事务来实现。
 
-Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTransactionManager`，通过这个接口，Spring为各个平台如 JDBC、Hibernate 等都提供了对应的事务管理器，但是具体的实现就是各个平台自己的事情了。
+Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTransactionManager`，通过这个接口，Spring 为各个平台如 JDBC、Hibernate 等都提供了对应的事务管理器，但是具体的实现就是各个平台自己的事情了。
 
 #### Spring 中的事务管理器的不同实现
 
@@ -612,7 +718,7 @@ Oracle 支持的 2 种事务隔离级别，Mysql支持 4 种事务隔离级别�
 
 ###  超时和只读属性
 
-- 由于事务可以在行和表上获得锁， 因此长事务会占用资源, 并对整体性能产生影响
+- 由于事务可以在行和表上获得锁， 因此长事务会占用资源，并对整体性能产生影响
 - 如果一个事物只读取数据但不做修改，数据库引擎可以对这个事务进行优化
 - 超时事务属性：事务在强制回滚之前可以保持多久，这样可以防止长期运行的事务占用资源
 - 只读事务属性：表示这个事务只读取数据但不更新数据，这样可以帮助数据库引擎优化事务
@@ -658,7 +764,7 @@ Spring Web MVC 框架提供 **模型-视图-控制器** 架构和随时可用的
 
 ### Spring MVC的优点
 
-- 可以支持各种视图技术,而不仅仅局限于JSP
+- 可以支持各种视图技术，而不仅仅局限于JSP
 - 与Spring框架集成（如IoC容器、AOP等）
 - 清晰的角色分配：前端控制器(dispatcherServlet) ，请求到处理器映射（handlerMapping)，处理器适配器（HandlerAdapter)， 视图解析器（ViewResolver）
 - 支持各种请求资源的映射策略

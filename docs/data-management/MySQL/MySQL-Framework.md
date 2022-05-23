@@ -6,7 +6,7 @@
 
 下边是 MySQL 官网中 8.0 版本的一个图，我们展开看一下，对 MySQL 整体架构和可插拔的存储引擎先有个总体回顾。
 
-![https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/mysql-architecture.png)
+![](/Users/apple/picBed/mysql/mysql-architecture.png)
 
 
 

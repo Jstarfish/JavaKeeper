@@ -151,13 +151,13 @@ SQL优化和移植性
 
 ### 模糊查询like语句该怎么写
 
-（1）'%${question}%'  可能引起SQL注入，不推荐
+1. '%${question}%'  可能引起SQL注入，不推荐
 
-（2）"%"#{question}"%"   注意：因为#{...}解析成sql语句时候，会在变量外侧自动加单引号'  '，所以这里 % 需要使用双引号"  "，不能使用单引号 '  '，不然会查不到任何结果。
+2. "%"#{question}"%"   注意：因为#{...}解析成sql语句时候，会在变量外侧自动加单引号'  '，所以这里 % 需要使用双引号"  "，不能使用单引号 '  '，不然会查不到任何结果。
 
-（3）CONCAT('%',#{question},'%')   使用CONCAT()函数，推荐
+3. CONCAT('%',#{question},'%')   使用CONCAT()函数，推荐
 
-（4）使用bind标签
+4. 使用bind标签
 
 ```xml
 <select id="listUserLikeUsername" resultType="com.jourwon.pojo.User">
@@ -168,7 +168,7 @@ SQL优化和移植性
 
 
 
-### @$当实体类中的属性名和表中的字段名不一样 ，怎么办
+### 当实体类中的属性名和表中的字段名不一样 ，怎么办
 
 第1种：通过在查询的SQL语句中定义字段名的别名，让字段名的别名和实体类的属性名一致。
 
@@ -209,7 +209,7 @@ select * from orders where order_id=#{id}
 
 
 
-### @$使用MyBatis的mapper接口调用时有哪些要求？
+### 使用MyBatis的mapper接口调用时有哪些要求？
 
 - Mapper.xml文件中的namespace即是mapper接口的全限定类名。
 - Mapper接口方法名和mapper.xml中定义的sql语句id一一对应。
@@ -252,12 +252,12 @@ Mybatis使用RowBounds对象进行分页，它是针对ResultSet结果集执行�
 >
 > 当开启缓存后，数据的查询执行的流程就是 二级缓存 -> 一级缓存 -> 数据库
 
-1）一级缓存: 基于 PerpetualCache 的 HashMap 本地缓存，其存储作用域为 Session，当 Session flush 或 close 之后，该 Session 中的所有 Cache 就将清空，MyBatis默认打开一级缓存。
+1. 一级缓存: 基于 PerpetualCache 的 HashMap 本地缓存，其存储作用域为 Session，当 Session flush 或 close 之后，该 Session 中的所有 Cache 就将清空，MyBatis默认打开一级缓存。
 
-2）二级缓存与一级缓存机制相同，默认也是采用 PerpetualCache，HashMap 存储，不同之处在于其存储作用域为 Mapper(Namespace)，并且可自定义存储源，如 Ehcache。默认不打开二级缓存，要开启二级缓存，使用二级缓存属性类需要实现Serializable序列化接口(可用来保存对象的状态)，可在它的映射文件中配置`<cache/>`
- 标签；
+2. 二级缓存与一级缓存机制相同，默认也是采用 PerpetualCache，HashMap 存储，不同之处在于其存储作用域为 Mapper(Namespace)，并且可自定义存储源，如 Ehcache。默认不打开二级缓存，要开启二级缓存，使用二级缓存属性类需要实现Serializable序列化接口(可用来保存对象的状态)，可在它的映射文件中配置`<cache/>`
+    标签；
 
-3）对于缓存数据更新机制，当某一个作用域(一级缓存 Session/二级缓存Namespaces)进行了C/U/D 操作后，默认该作用域下所有缓存将被清理掉。
+3. 对于缓存数据更新机制，当某一个作用域(一级缓存 Session/二级缓存Namespaces)进行了C/U/D 操作后，默认该作用域下所有缓存将被清理掉。
 
 
 

@@ -382,6 +382,17 @@ public E get(int index) {
 
 
 
+### Hash冲突及解决办法
+
+解决哈希冲突的方法一般有：开放定址法、链地址法（拉链法）、再哈希法、建立公共溢出区等方法。
+
+> - 开放定址法：从发生冲突的那个单元起，按照一定的次序，从哈希表中找到一个空闲的单元。然后把发生冲突的元素存入到该单元的一种方法。开放定址法需要的表长度要大于等于所需要存放的元素。
+> - 链接地址法（拉链法）：是将哈希值相同的元素构成一个同义词的单链表，并将单链表的头指针存放在哈希表的第i个单元中，查找、插入和删除主要在同义词链表中进行。（链表法适用于经常进行插入和删除的情况）
+> - 再哈希法：就是同时构造多个不同的哈希函数： Hi = RHi(key)   i= 1,2,3 … k; 当H1 = RH1(key)  发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间
+> - 建立公共溢出区：将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区
+
+
+
 ## HashMap的底层实现
 
 > 什么时候会使用HashMap？他有什么特点？
@@ -408,7 +419,7 @@ HashMap 在 JDK 7 和 JDK8 中的实现方式略有不同。分开记录。
 
 3. loadFactor：加载因子。所谓的加载因子就是 HashMap (当前的容量/总容量) 到达一定值的时候，HashMap 会实施扩容。加载因子也可以通过构造方法中指定，默认的值是 0.75 。举个例子，假设有一个 HashMap 的初始容量为 16 ，那么扩容的阀值就是 0.75 * 16 = 12 。也就是说，在你打算存入第 13 个值的时候，HashMap 会先执行扩容。
 
-4. threshold：扩容阀值。即 扩容阀值 = HashMap 总容量 * 加载因子。当前 HashMap 的容量大于或等于扩容阀值的时候就会去执行扩容。扩容的容量为当前 HashMap 总容量的两倍。比如，当前 HashMap 的总容量为 16 ，那么扩容之后为 32 。
+4. threshold：扩容阀值。即 扩容阀值 = HashMap 总容量 * 加载因子（默认是12）。当前 HashMap 的容量大于或等于扩容阀值的时候就会去执行扩容。扩容的容量为当前 HashMap 总容量的两倍。比如，当前 HashMap 的总容量为 16 ，那么扩容之后为 32 。
 
 5. table：Entry 数组。我们都知道 HashMap 内部存储 key/value 是通过 Entry 这个介质来实现的。而 table 就是 Entry 数组。
 
@@ -662,8 +673,8 @@ HashMap 定位数组索引位置，直接决定了 hash 方法的离散性能。
 ![hash](https://tva1.sinaimg.cn/large/007S8ZIlly1gdwv5m4g4sj30ga09cdfy.jpg)
 
 > 为什么要这样呢？
->
-> HashMap 的长度为什么是 2 的幂次方?
+
+### HashMap 的长度为什么是 2 的幂次方?
 
 目的当然是为了减少哈希碰撞，使 table 里的数据分布的更均匀。
 
@@ -793,7 +804,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 ④.判断table[i] 是否为treeNode，即table[i] 是否是红黑树，如果是红黑树，则直接在树中插入键值对，否则转向⑤；
 
-⑤.遍历table[i]，判断链表长度是否大于8，大于8的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作；遍历过程中若发现key已经存在直接覆盖value即可；
+⑤.遍历table[i]，判断链表长度是否大于8（还会判断数组长度是否大于等于64），大于8的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作；遍历过程中若发现key已经存在直接覆盖value即可；
 
 ⑥.插入成功后，判断实际存在的键值对数量size是否超多了最大容量threshold，如果超过，进行扩容。
 
@@ -890,7 +901,7 @@ final Node<K,V>[] resize() {
 }
 ```
 
->  HashMap的扩容操作是怎么实现的？
+### HashMap的扩容操作是怎么实现的？
 
 1. 在 jdk1.8 中，resize 方法是在 HashMap 中的键值对大于阀值时或者初始化时，就调用 resize 方法进行扩容；
 2. 每次扩展的时候，都是扩展 2 倍；
@@ -1118,7 +1129,33 @@ final Node<K,V> untreeify(HashMap<K,V> map) {
 
 
 
-#### HashMap 为什么线程不安全
+### 为什么JDK1.8中HashMap从头插入改成尾插入
+
+JDK1.7中扩容时，每个元素的rehash之后，都会插入到新数组对应索引的链表头，所以这就导致原链表顺序为A->B->C，扩容之后，rehash之后的链表可能为C->B->A，元素的顺序发生了变化。在并发场景下，**扩容时**可能会出现循环链表的情况。而JDK1.8从头插入改成尾插入元素的顺序不变，避免出现循环链表的情况
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/hashmap-1.7-cycle.png)
+
+> 在扩容时，头插法会改变链表中元素原本的顺序，以至于在并发场景下导致链表成环的问题，而尾插法，在扩容时会保持链表元素原本的顺序，就不会出现链表成环的问题
+>
+> ### 死循环执行步骤1
+>
+> 死循环是因为并发 HashMap 扩容导致的，并发扩容的第一步，线程 T1 和线程 T2 要对 HashMap 进行扩容操作，此时 T1 和 T2 指向的是链表的头结点元素 A，而 T1 和 T2 的下一个节点，也就是 T1.next 和 T2.next 指向的是 B 节点，如下图所示：
+>
+> ![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/hashmap-cycle-1.png)
+>
+> ### 死循环执行步骤2
+>
+> 死循环的第二步操作是，线程 T2 时间片用完进入休眠状态，而线程 T1 开始执行扩容操作，一直到线程 T1 扩容完成后，线程 T2 才被唤醒，扩容之后的场景如下图所示：图片从上图可知线程 T1 执行之后，因为是头插法，所以 HashMap 的顺序已经发生了改变，但线程 T2 对于发生的一切是不可知的，所以它的指向元素依然没变，如上图展示的那样，T2 指向的是 A 元素，T2.next 指向的节点是 B 元素。
+>
+> ### 死循环执行步骤3
+>
+> 当线程 T1 执行完，而线程 T2 恢复执行时，死循环就建立了，如下图所示：
+>
+> ![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/hashmap-cycle-2.png)
+>
+> 因为 T1 执行完扩容之后 B 节点的下一个节点是 A，而 T2 线程指向的首节点是 A，第二个节点是 B，这个顺序刚好和 T1 扩完容完之后的节点顺序是相反的。T1 执行完之后的顺序是 B 到 A，而 T2 的顺序是 A 到 B，这样 A 节点和 B 节点就形成死循环了，这就是 HashMap 死循环导致的原因。
+
+### HashMap 为什么线程不安全
 
 1. put 的时候导致的多线程数据不一致。
     这个问题比较好想象，比如有两个线程 A 和 B，首先 A 希望插入一个 key-value 对到 HashMap 中，首先计算记录所要落到的桶的索引坐标，然后获取到该桶里面的链表头结点，此时线程 A 的时间片用完了，而此时线程 B 被调度得以执行，和线程 A 一样执行，只不过线程 B 成功将记录插到了桶里面，假设线程 A 插入的记录计算出来的桶索引和线程 B 要插入的记录计算出来的桶索引是一样的，那么当线程 B 成功插入之后，线程 A 再次被调度运行时，它依然持有过期的链表头但是它对此一无所知，以至于它认为它应该这样做，如此一来就覆盖了线程 B 插入的记录，这样线程 B 插入的记录就凭空消失了，造成了数据不一致的行为。
@@ -1148,20 +1185,18 @@ void transfer(Entry[] newTable, boolean rehash) {
 
 这个方法的功能是将原来的记录重新计算在新桶的位置，然后迁移过去。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201009160422.png)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/mysql-1.7-resize.png)
 
 多线程HashMap的resize
 
 我们假设有两个线程同时需要执行resize操作，我们原来的桶数量为2，记录数为3，需要resize桶到4，原来的记录分别为：[3,A],[7,B],[5,C]，在原来的map里面，我们发现这三个entry都落到了第二个桶里面。
  假设线程thread1执行到了transfer方法的Entry next = e.next这一句，然后时间片用完了，此时的e = [3,A], next = [7,B]。线程thread2被调度执行并且顺利完成了resize操作，需要注意的是，此时的[7,B]的next为[3,A]。此时线程thread1重新被调度运行，此时的thread1持有的引用是已经被thread2 resize之后的结果。线程thread1首先将[3,A]迁移到新的数组上，然后再处理[7,B]，而[7,B]被链接到了[3,A]的后面，处理完[7,B]之后，就需要处理[7,B]的next了啊，而通过thread2的resize之后，[7,B]的next变为了[3,A]，此时，[3,A]和[7,B]形成了环形链表，在get的时候，如果get的key的桶索引和[3,A]和[7,B]一样，那么就会陷入死循环。
 
-如果在取链表的时候从头开始取（现在是从尾部开始取）的话，则可以保证节点之间的顺序，那样就不存在这样的问题了。
 
 
+### HashMap：JDK1.7 VS JDK1.8
 
-#### HashMap：JDK1.7 VS JDK1.8
-
-JDK1.8主要解决或优化了一下问题：
+JDK1.8主要解决或优化了以下问题：
 
 - resize 扩容优化
 - 引入了红黑树，目的是避免单条链表过长而影响查询效率
@@ -1225,9 +1260,9 @@ Hashtable，是线程安全的，它在所有涉及到多线程操作的都加�
 
 Hashtable 容器在竞争激烈的并发环境下表现出效率低下的原因，是因为所有访问 Hashtable 的线程都必须竞争同一把锁，那假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，这就是 ConcurrentHashMap 所使用的锁分段技术。
 
-在 JDK1.7 版本中，ConcurrentHashMap 的数据结构是由一个 Segment 数组和多个 HashEntry 组成。Segment 数组的意义就是将一个大的 table 分割成多个小的 table 来进行加锁。每一个 Segment 元素存储的是 HashEntry数组+链表，这个和 HashMap 的数据存储结构一样。
+在 JDK1.7 版本中，ConcurrentHashMap 的数据结构是由一个 Segment 数组和多个 HashEntry 组成。Segment 数组的意义就是将一个大的 table 分割成多个小的 table 来进行加锁。每一个 Segment 元素存储的是 HashEntry 数组+链表，这个和 HashMap 的数据存储结构一样。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200910104046.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/concurrenthashmap-1.7-segment.jpg)
 
 ConcurrentHashMap 类中包含两个静态内部类 HashEntry 和 Segment。
 HashEntry 用来封装映射表的键值对，Segment 用来充当锁的角色，每个 Segment 对象守护整个散列映射表的若干个桶。每个桶是由若干个 HashEntry 对象链接起来的链表。一个 ConcurrentHashMap 实例中包含由若干个 Segment 对象组成的数组。每个 Segment 守护着一个 HashEntry 数组里的元素，当对 HashEntry 数组的数据进行修改时，必须首先获得它对应的 Segment 锁。
@@ -1413,7 +1448,7 @@ public V get(Object key) {
 
 ### JDK1.8  实现
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200910104629.jpg)
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/concurrenthashmap-1.8.jpg)
 
 ConcurrentHashMap 在 JDK8 中进行了巨大改动，光是代码量就从1000多行增加到6000行！1.8 摒弃了`Segment`(锁段)的概念，采用了 `CAS + synchronized` 来保证并发的安全性。
 

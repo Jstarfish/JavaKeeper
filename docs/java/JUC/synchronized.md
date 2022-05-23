@@ -61,7 +61,7 @@ synchronized 概括来说其实总共有三种用法：
 
 - 如果对象是一个 Java 数组，那在对象头中还必须有一块用于记录数组长度的数据。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200925104122.png) 
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200925104122.png)
 
 
 

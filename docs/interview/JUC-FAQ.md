@@ -56,7 +56,7 @@
 
 #### 阻塞和非阻塞
 
-阻塞和非阻塞这两个概念与程序（线程）等待消息通知(无所谓同步或者异步)时的状态有关。也就是说**阻塞与非阻塞主要是程序（线程）等待消息通知时的状态角度来说的**
+阻塞和非阻塞这两个概念与程序（线程）等待消息通知(无所谓同步或者异步)时的**状态**有关。也就是说**阻塞与非阻塞主要是程序（线程）等待消息通知时的状态角度来说的**
 
 阻塞调用是指调用结果返回之前，当前线程会被挂起，一直处于等待消息通知，不能够执行其他业务。函数只有在得到结果之后才会返回
 
@@ -81,8 +81,6 @@
 一个线程安全的计数器类的同一个实例对象在被多个线程使用的情况下也不会出现计算失误。很显然你可以将**集合类分成两组，线程安全和非线程安全的**。 Vector 是用同步方法来实现线程安全的, 而和它相似的 ArrayList 不是线程安全的。
 
 **线程不安全：就是不提供数据访问保护，有可能出现多个线程先后更改数据造成所得到的数据是脏数据**
-
-如果你的代码所在的进程中有多个线程在同时运行，而这些线程可能会同时运行这段代码。如果每次运行结果和单线程运行的结果是一样的，而且其他的变量的值也和预期的是一样的，就是线程安全的。
 
 线程安全问题都是由全局变量及静态变量引起的。 若每个线程中对全局变量、静态变量只有读操作，而无写操作，一般来说，这个全局变量是线程安全的；若有多个线程同时执行写操作，一般都需要考虑线程同步，否则的话就可能影响线程安全。
 
@@ -148,6 +146,8 @@ Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种
 
 Java 的线程是不允许启动两次的，第二次调用必然会抛出 IllegalThreadStateException，这是一种运行时异常，多次调用 start 被认为是编程错误。
 
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/%E6%88%AA%E5%B1%8F2022-05-19%20%E4%B8%8B%E5%8D%888.48.58.png)
+
 关于线程生命周期的不同状态，在 Java 5 以后，线程状态被明确定义在其公共内部枚举类型 java.lang.Thread.State 中，分别是：
 
 - 新建（NEW），表示线程被创建出来还没真正启动的状态，可以认为它是个 Java 内部状态。
@@ -172,15 +172,13 @@ public final native void wait(long timeout) throws InterruptedException;
 - 两者最主要的区别在于：**sleep 方法没有释放锁，而 wait 方法释放了锁** 。
 - 两者都可以暂停线程的执行。
 - wait 通常被用于线程间交互/通信，sleep 通常被用于暂停执行。
-- wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 notify() 或者 notifyAll() 方法。sleep() 方法执行完成后，线程会自动苏醒。或者可以使用 wait(long timeout)超时后线程会自动苏醒。
+- wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 `notify()` 或者 `notifyAll()` 方法。`sleep()` 方法执行完成后，线程会自动苏醒。或者可以使用 `wait(long timeout)` 超时后线程会自动苏醒。
 
 **yield()**
 yield() 方法和 sleep() 方法类似，也不会释放“锁标志”，区别在于，它没有参数，即 yield() 方法只是使当前线程重新回到可执行状态，所以执行 yield() 的线程有可能在进入到可执行状态后马上又被执行，另外 yield() 方法只能使同优先级或者高优先级的线程得到执行机会，这也和 sleep() 方法不同。
 
 **join()**
 join() 方法会使当前线程等待调用 join() 方法的线程结束后才能继续执行
-
-
 
 
 
@@ -195,23 +193,23 @@ new 一个 Thread，线程进入了新建状态；调用 start() 方法，会启
 ### Java 线程启动的几种方式
 
 ```java
-  public static void main(String[] args) {
-        new MyThread().start();     //第一种  直接通过Thread  MyThread 是继承了Thread对象的类  实现在下面
-　　　　　
-        new Thread(new MyRun()).start();      //第二种 Runnable
-        new Thread(()->{                //第三种  lambda
-            System.out.println("Hello Lambda!");
-        }).start();
+public static void main(String[] args) {
+  new MyThread().start();     //第一种  直接通过Thread  MyThread 是继承了Thread对象的类  实现在下面
 
-        Thread t = new Thread(new FutureTask<String>(new MyCall()));    //第四种
-        t.start();
+  new Thread(new MyRun()).start();      //第二种 Runnable
+  new Thread(()->{                //第三种  lambda
+    System.out.println("Hello Lambda!");
+  }).start();
 
-        ExecutorService service = Executors.newCachedThreadPool();   //第五种  使用Executor
-        service.execute(()->{
-            System.out.println("Hello ThreadPool");
-        });
-        service.shutdown();
-    }
+  Thread t = new Thread(new FutureTask<String>(new MyCall()));    //第四种
+  t.start();
+
+  ExecutorService service = Executors.newCachedThreadPool();   //第五种  使用Executor
+  service.execute(()->{
+    System.out.println("Hello ThreadPool");
+  });
+  service.shutdown();
+}
 }
 ```
 
@@ -219,15 +217,15 @@ new 一个 Thread，线程进入了新建状态；调用 start() 方法，会启
 
 ### Java 多线程之间的通信方式
 
-- 同步，同步是指多个线程通过synchronized关键字这种方式来实现线程间的通信。
+- 同步，同步是指多个线程通过 synchronized 关键字这种方式来实现线程间的通信。
 
-- while轮询的方式
+- while 轮询的方式
 
-- wait/notify机制
+- wait/notify 机制
 
 - 信号量
 
-- 管道通信：就是使用java.io.PipedInputStream 和 java.io.PipedOutputStream进行通信
+- 管道通信：就是使用 java.io.PipedInputStream 和 java.io.PipedOutputStream进行通信
 
 
 
@@ -261,13 +259,17 @@ new 一个 Thread，线程进入了新建状态；调用 start() 方法，会启
 
 
 
-### 15、synchronized 关键字？
+### synchronized 关键字
 
 > synchoronized的底层是怎么实现的？
 >
 > synchronized 使用的几种方式和区别？
 >
 > synchronized说一下，有哪些实用形式？对类加锁时调用方法一定会加锁吗？
+>
+> synrhronized 锁升级
+
+#### 使用
 
 synrhronized 关键字简洁、清晰、语义明确，因此即使有了 Lock 接口，使用的还是非常广泛。其应用层的语义是可以把任何一个非null对象作为"锁"，
 
@@ -275,11 +277,19 @@ synrhronized 关键字简洁、清晰、语义明确，因此即使有了 Lock �
 - 当作用在静态方法时锁住的便是对象对应的 Class 实例，因为 Class数据存在于永久代，因此静态方法锁相当于该类的一个全局锁；
 - 当 synchronized 作用于某一个对象实例时，锁住的便是对应的代码块。
 
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200925184110.png)
+
+
+
+#### 原理
+
 在 HotSpot JVM实现中，锁有个专门的名字：**对象监视器**。 
 
 在 JVM 中，对象在内存中的布局分为三块区域：**对象头、实例数据和对齐填充**
 
 synchronized 用的锁是存在 Java 对象头里的。
+
+![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200925104122.png)
 
 底层实现：
 
@@ -287,10 +297,6 @@ synchronized 用的锁是存在 Java 对象头里的。
 2. 当一个线程判断到计数器为 0 时，则当前锁空闲，可以占用；反之，当前线程进入等待状态。
 
 当执行 monitorenter 指令时，线程试图获取锁也就是获取 monitor(monitor对象存在于每个Java对象的对象头中，synchronized 锁便是通过这种方式获取锁的，也是为什么Java中任意对象可以作为锁的原因) 的持有权。当计数器为0则可以成功获取，获取后将锁计数器设为1也就是加1。相应的在执行 monitorexit 指令后，将锁计数器设为0，表明锁被释放。如果获取对象锁失败，那当前线程就要阻塞等待，直到锁被另外一个线程释放为止。
-
-含义：（monitor 机制）
-
-Synchronized 是在加锁，加对象锁。对象锁是一种重量锁（monitor），synchronized 的锁机制会根据线程竞争情况在运行时会有偏向锁（单一线程）、轻量锁（多个线程访问 synchronized 区域）、对象锁（重量锁，多个线程存在竞争的情况）、自旋锁等。
 
 该关键字是一个几种锁的封装。
 
@@ -346,7 +352,39 @@ synchronized 修饰的方法并没有 monitorenter 指令和 monitorexit 指令�
 
 
 
-### 16、谈谈 synchronized和ReentrantLock 的区别
+#### 锁升级
+
+在JDK 1.6后，Jvm为了提高锁的获取与释放效率对（synchronized ）进行了优化，引入了 偏向锁 和 轻量级锁 ，从此以后锁的状态就有了四种（无锁、偏向锁、轻量级锁、重量级锁）
+
+##### 无锁
+
+无锁是指没有对资源进行锁定，所有的线程都能访问并修改同一个资源，但同时只有一个线程能修改成功。
+
+##### 偏向锁
+
+初次执行到synchronized代码块的时候，锁对象变成偏向锁（通过CAS修改对象头里的锁标志位），字面意思是“偏向于第一个获得它的线程”的锁。执行完同步代码块后，线程并不会主动释放偏向锁。当第二次到达同步代码块时，线程会判断此时持有锁的线程是否就是自己（持有锁的线程ID也在对象头里），如果是则正常往下执行。由于之前没有释放锁，这里也就不需要重新加锁。如果自始至终使用锁的线程只有一个，很明显偏向锁几乎没有额外开销，性能极高。
+
+当一个线程访问同步代码块并获取锁时，会在 Mark Word 里存储锁偏向的线程 ID。在线程进入和退出同步块时不再通过 CAS 操作来加锁和解锁，而是检测 Mark Word 里是否存储着指向当前线程的偏向锁。轻量级锁的获取及释放依赖多次 CAS 原子指令，而偏向锁只需要在置换 ThreadID 的时候依赖一次 CAS 原子指令即可。
+
+##### 轻量级锁（自旋锁）
+
+一旦有第二个线程加入锁竞争，偏向锁就升级为轻量级锁（自旋锁），其他线程会通过自旋的形式尝试获取锁，线程不会阻塞，从而提高性能
+
+没有抢到锁的线程将自旋，即不停地循环判断锁是否能够被成功获取。获取锁的操作，其实就是通过CAS修改对象头里的锁标志位。先比较当前锁标志位是否为“释放”，如果是则将其设置为“锁定”，比较并设置是原子性发生的。这就算抢到锁了，然后线程将当前锁的持有者信息修改为自己。
+
+长时间的自旋操作是非常消耗资源的，一个线程持有锁，其他线程就只能在原地空耗CPU，执行不了任何有效的任务，这种现象叫做忙等（busy-waiting）
+
+##### 重量级锁
+
+重量级锁显然，此忙等是有限度的（有个计数器记录自旋次数，默认允许循环10次，可以通过虚拟机参数更改）。如果锁竞争情况严重，某个达到最大自旋次数的线程，会将轻量级锁升级为重量级锁（依然是CAS修改锁标志位，但不修改持有锁的线程ID）。当后续线程尝试获取锁时，发现被占用的锁是重量级锁，则直接将自己挂起（而不是忙等），等待将来被唤醒。
+
+重量级锁是指当有一个线程获取锁之后，其余所有等待获取该锁的线程都会处于阻塞状态。
+
+简言之，就是所有的控制权都交给了操作系统，由操作系统来负责线程间的调度和线程的状态变更。而这样会出现频繁地对线程运行状态的切换，线程的挂起和唤醒，从而消耗大量的系统资
+
+
+
+### 谈谈 synchronized和 ReentrantLock 的区别
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/412d294ff5535bbcddc0d979b2a339e6102264.png)
 
@@ -627,10 +665,6 @@ volatile 的读性能消耗与普通变量几乎相同，但是写操作稍慢�
 
 
 
-
-
-
-
 ------
 
 
@@ -673,15 +707,13 @@ JMM 就是用来解决如上问题的。 **JMM是围绕着并发过程中如何�
 
   多线程环境中线程交替执行，由于编译器优化重排的存在，两个线程中使用的变量能否保证一致性是无法确定的，结果无法预测
 
-
-
-JMM是不区分JVM到底是运行在单核处理器、多核处理器的，Java内存模型是对CPU内存模型的抽象，这是一个High-Level的概念，与具体的CPU平台没啥关系
+> JMM 是不区分 JVM 到底是运行在单核处理器、多核处理器的，Java 内存模型是对 CPU 内存模型的抽象，这是一个 High-Level 的概念，与具体的 CPU 平台没啥关系
 
 
 
 ### Java 内存模型中的 happen-before 是什么？
 
-happens-before 先行发生，是 Java 内存模型中定义的两项操作之间的偏序关系，**如果操作A 先行发生于操作B，那么A的结果对B可见**。
+happens-before 先行发生，是 Java 内存模型中定义的两项操作之间的偏序关系，**如果操作 A 先行发生于操作 B，那么 A 的结果对 B 可见**。
 
 内存屏障是被插入两个 CPU 指令之间的一种指令，用来禁止处理器指令发生重排序（像屏障一样），从而保障**有序性**的。
 
@@ -1218,7 +1250,7 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 ##### **独占锁与共享锁的区别**
 
 - **独占锁是持有锁的线程释放锁之后才会去唤醒下一个线程。**
-- **共享锁是线程获取到锁后，就会去唤醒下一个线程，所以共享锁在获取锁和释放锁的时候都会调用doReleaseShared方法唤醒下一个线程，当然这会收共享线程数量的限制**。
+- **共享锁是线程获取到锁后，就会去唤醒下一个线程，所以共享锁在获取锁和释放锁的时候都会调用doReleaseShared方法唤醒下一个线程，当然这会受共享线程数量的限制**。
 
 
 
@@ -1366,7 +1398,7 @@ public class SemaphoreDemo {
 >
 > ConcurrentHashMap
 
-#### 什么是 ConcurrentHashMap？
+### 什么是 ConcurrentHashMap？
 
 ConcurrentHashMap 是 Java 中的一个**线程安全且高效的HashMap实现**。平时涉及高并发如果要用map结构，那第一时间想到的就是它。相对于hashmap来说，ConcurrentHashMap就是线程安全的map，其中利用了锁分段的思想提高了并发度。
 
@@ -1425,7 +1457,7 @@ CopyOnWriteArrayList 的设计思想
 
 
 
-### 并发包中的 ConcurrentLinkedQueue 和 LinkedBlockingQueue 有什么区别？
+#### 并发包中的 ConcurrentLinkedQueue 和 LinkedBlockingQueue 有什么区别？
 
 有时候我们把并发包下面的所有容器都习惯叫作并发容器，但是严格来讲，类似 ConcurrentLinkedQueue 这种“Concurrent*”容器，才是真正代表并发。
 
@@ -1444,7 +1476,7 @@ CopyOnWriteArrayList 的设计思想
 
 
 
-### 什么是阻塞队列？阻塞队列的实现原理是什么？如何使用阻塞队列来实现生产者-消费者模型？
+#### 什么是阻塞队列？阻塞队列的实现原理是什么？如何使用阻塞队列来实现生产者-消费者模型？
 
 > - 哪些队列是有界的，哪些是无界的？
 > - 针对特定场景需求，如何选择合适的队列实现？
@@ -1452,7 +1484,10 @@ CopyOnWriteArrayList 的设计思想
 
 阻塞队列（BlockingQueue）是一个支持两个附加操作的队列。
 
-这两个附加的操作是：在队列为空时，获取元素的线程会等待队列变为非空。当队列满时，存储元素的线程会等待队列可用。
+这两个附加的操作是：
+
+- 在队列为空时，获取元素的线程会等待队列变为非空。
+- 当队列满时，存储元素的线程会等待队列可用。
 
 阻塞队列常用于生产者和消费者的场景，生产者是往队列里添加元素的线程，消费者是从队列里拿元素的线程。阻塞队列就是生产者存放元素的容器，而消费者也只从容器里拿元素。
 
@@ -1466,11 +1501,38 @@ JDK7 提供了 7 个阻塞队列。分别是：
 - LinkedTransferQueue：一个由链表结构组成的无界阻塞队列。
 - LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列。
 
-Java 5 之前实现同步存取时，可以使用普通的一个集合，然后在使用线程的协作和线程同步可以实现生产者，消费者模式，主要的技术就是用好，wait,notify,notifyAll,sychronized 这些关键字。而在 java 5 之后，可以使用阻塞队列来实现，此方式大大简少了代码量，使得多线程编程更加容易，安全方面也有保障。
+Java 5 之前实现同步存取时，可以使用普通的一个集合，然后在使用线程的协作和线程同步可以实现生产者，消费者模式，主要的技术就是用好，wait，notify，notifyAll，sychronized 这些关键字。而在 java 5 之后，可以使用阻塞队列来实现，此方式大大简少了代码量，使得多线程编程更加容易，安全方面也有保障。
 
 BlockingQueue 接口是 Queue 的子接口，它的主要用途并不是作为容器，而是作为线程同步的的工具，因此他具有一个很明显的特性，当生产者线程试图向 BlockingQueue 放入元素时，如果队列已满，则线程被阻塞，当消费者线程试图从中取出一个元素时，如果队列为空，则该线程会被阻塞，正是因为它所具有这个特性，所以在程序中多个线程交替向 BlockingQueue 中放入元素，取出元素，它可以很好的控制线程之间的通信。
 
 阻塞队列使用最经典的场景就是 socket 客户端数据的读取和解析，读取数据的线程不断将数据放入队列，然后解析线程不断从队列取数据解析。
+
+
+
+#### 有哪写线程安全的非阻塞队列
+
+ConcurrentLinkedQueue是一个基于链接节点的无界线程安全队列，它采用先进先出的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队列头部的元素。
+
+结构如下：
+
+```java
+public class ConcurrentLinkedQueue<E> extends AbstractQueue<E>  
+        implements Queue<E>, java.io.Serializable {  
+    private transient volatile Node<E> head;//头指针  
+    private transient volatile Node<E> tail;//尾指针  
+    public ConcurrentLinkedQueue() {//初始化，head=tail=（一个空的头结点）  
+        head = tail = new Node<E>(null);  
+    }  
+    private static class Node<E> {  
+        volatile E item;  
+        volatile Node<E> next;//内部是使用单向链表实现  
+        ......  
+    }  
+    ......  
+}  
+```
+
+入队和出队操作均利用CAS（compare and set）更新，这样允许多个线程并发执行，并且不会因为加锁而阻塞线程，使得并发性能更好。
 
 
 

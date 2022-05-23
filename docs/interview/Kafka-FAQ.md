@@ -81,7 +81,7 @@ Kafka 架构分为以下几个部分
 
 ### 7、 Kafka 的设计架构你知道吗？
 
-![mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/interview/QQ20200324-210522@2x.png)
+![](https://mrbird.cc/img/QQ20200324-210522@2x.png)
 
 
 
