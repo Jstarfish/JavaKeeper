@@ -1,12 +1,10 @@
 # MySQL架构介绍
 
-![thegeeksearch.com](https://cdn.thegeeksearch.com/wp-content/uploads/2020/07/mysql-architecture-server-client-model.jpg)
-
 和其它数据库相比，MySQL 有点与众不同，它的架构可以在多种不同场景中应用并发挥良好作用。主要体现在存储引擎的架构上，**插件式的存储引擎架构将查询处理和其它的系统任务以及数据的存储提取相分离**。这种架构可以根据业务的需求和实际需要选择合适的存储引擎。
 
 下边是 MySQL 官网中 8.0 版本的一个图，我们展开看一下，对 MySQL 整体架构和可插拔的存储引擎先有个总体回顾。
 
-![](/Users/apple/picBed/mysql/mysql-architecture.png)
+![](https://picbed-1302638964.cos.ap-beijing.myqcloud.com/mysql/mysql-architecture.png)
 
 
 
@@ -94,12 +92,6 @@ MySQL 拿到一个查询请求后，会先到查询缓存看看，之前是不�
 
 
 
-更符合程序员审美的 MySQL 服务器逻辑架构图
-
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/MySQL-architecture.png)
-
-
-
 ### MySQL 的查询流程大致是？
 
 > 一条 SQL 查询语句是如何执行的？
@@ -107,8 +99,6 @@ MySQL 拿到一个查询请求后，会先到查询缓存看看，之前是不�
 1. MySQL 客户端通过协议与 MySQL 服务器建连接，发送查询语句，先检查查询缓存，如果命中，直接返回结果，否则进行语句解析
 2. 有一系列预处理，比如检查语句是否写正确了，然后是查询优化（比如是否使用索引扫描，如果是一个不可能的条件，则提前终止），生成查询计划，然后查询引擎启动，开始执行查询，从底层存储引擎调用 API 获取数据，最后返回给客户端。怎么存数据、怎么取数据，都与存储引擎有关。
 3. 然后，MySQL 默认使用的 BTREE 索引，并且一个大方向是，无论怎么折腾 sql，至少在目前来说，MySQL 最多只用到表中的一个索引。
-
-
 
 
 
