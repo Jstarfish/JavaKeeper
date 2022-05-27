@@ -8,7 +8,7 @@ Redis 是一个全开源免费（BSD许可）的，内存中的数据结构存�
 
 和 Memcached 类似，它支持存储的 value 类型相对更多，包括**string(字符串)、list(链表)、set(集合)、zset(sorted set --有序集合)和hash（哈希类型）、bitmap、hyperloglog、GeoHash、streams**。这些数据类型都支持push/pop、add/remove及取交集并集和差集及更丰富的操作，而且这些操作都是原子性的。
 
-Redis 内置了复制（Replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU eviction），事务（Transactions） 和不同级别的磁盘持久化（Persistence），并通过 Redis哨兵（Sentinel）和自动分区（Cluster）提供高可用性（High Availability）。
+Redis 内置了复制（Replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU eviction），事务（Transactions） 和不同级别的磁盘持久化（Persistence），并通过 Redis 哨兵（Sentinel）和自动分区（Cluster）提供高可用性（High Availability）。
 
 - 性能优秀，数据在内存中，读写速度非常快，支持并发10W QPS
 - 单进程单线程，是线程安全的，采用IO多路复用机制
@@ -40,15 +40,15 @@ Redis 不是简单的键值存储，它实际上是一个数据结构服务器�
 
 ### 那你能说说这些数据类型的使用指令吗？
 
-String: 就是基本的 SET、GET、MSET、MGET、INCR、DECR
+String：就是基本的 SET、GET、MSET、MGET、INCR、DECR
 
-List: LPUSH、RPUSH、LRANGE、LINDEX
+List：LPUSH、RPUSH、LRANGE、LINDEX
 
-Hash: HSET、HMSET、HSETNX、HKEYS、HVALS
+Hash：HSET、HMSET、HSETNX、HKEYS、HVALS
 
-Set: SADD、SCARD、SDIFF、SREM
+Set：SADD、SCARD、SDIFF、SREM
 
-SortSet: ZADD、ZCARD、ZCOUNT、ZRANGE
+SortSet：ZADD、ZCARD、ZCOUNT、ZRANGE
 
 
 
@@ -107,7 +107,7 @@ SortSet: ZADD、ZCARD、ZCOUNT、ZRANGE
 - **多路 I/O 复用模型，非阻塞 I/O**：采用多路 I/O 复用技术可以让单个线程高效的处理多个网络连接请求（尽量减少网络 IO 的时间消耗）；
 - **高效的数据结构，加上底层做了大量优化**：Redis 对于底层的数据结构和内存占用做了大量的优化，例如不同长度的字符串使用不同的结构体表示，HyperLogLog 的密集型存储结构等等..
 
-> **I/O多路复用，I/O就是指的我们网络I/O,多路指多个TCP连接(或多个Channel)，复用指复用一个或少量线程。串起来理解就是很多个网络I/O复用一个或少量的线程来处理这些连接。**
+> **I/O多路复用，I/O就是指的我们网络I/O，多路指多个TCP连接(或多个Channel)，复用指复用一个或少量线程。串起来理解就是很多个网络I/O复用一个或少量的线程来处理这些连接。**
 
 
 
@@ -350,7 +350,7 @@ Redis 正是通过 score 来为集合中的成员进行从小到大的排序。Z
 
 ### 快速列表 quicklist 了解吗？
 
-Redis 早期版本存储 list 列表数据结构使用的是压缩列表 ziplist 和普通的双向链表 linkedlist，也就是说当元素少时使用 ziplist，当元素多时用 linkedlist。但考虑到链表的附加空间相对较高，`prev` 和 `next` 指针就要占去 `16` 个字节（64 位操作系统占用 `8` 个字节），另外每个节点的内存都是单独分配，会家具内存的碎片化，影响内存管理效率。
+Redis 早期版本存储 list 列表数据结构使用的是压缩列表 ziplist 和普通的双向链表 linkedlist，也就是说当元素少时使用 ziplist，当元素多时用 linkedlist。但考虑到链表的附加空间相对较高，`prev` 和 `next` 指针就要占去 `16` 个字节（64 位操作系统占用 `8` 个字节），另外每个节点的内存都是单独分配，会加剧内存的碎片化，影响内存管理效率。
 
 后来 Redis 新版本（3.2）对列表数据结构进行了改造，使用 `quicklist` 代替了 `ziplist` 和 `linkedlist`。
 
@@ -525,7 +525,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 ### 两种持久化方式如何选择？
 
 - RDB 持久化方式能够在指定的时间间隔能对你的数据进行快照存储
-- AOF 持久化方式记录每次对服务器写的操作,当服务器重启的时候会重新执行这些命令来恢复原始的数据,AOF命令以 redis 协议追加保存每次写的操作到文件末尾。Redis还能对AOF文件进行后台重写（**bgrewriteaof**）,使得 AOF 文件的体积不至于过大
+- AOF 持久化方式记录每次对服务器写的操作,当服务器重启的时候会重新执行这些命令来恢复原始的数据，AOF命令以 redis 协议追加保存每次写的操作到文件末尾。Redis还能对AOF文件进行后台重写（**bgrewriteaof**）,使得 AOF 文件的体积不至于过大
 - 只做缓存：如果你只希望你的数据在服务器运行的时候存在,你也可以不使用任何持久化方式。
 - 同时开启两种持久化方式
   - 在这种情况下,当 redis 重启的时候会优先载入 AOF 文件来恢复原始的数据,因为在通常情况下 AOF 文件保存的数据集要比 RDB 文件保存的数据集要完整。
@@ -730,7 +730,7 @@ Redis 采用方案三。
 
 #### 方案二：一致性哈希分区
 
-一致性哈希算法将 **整个哈希值空间** 组织成一个虚拟的圆环，范围是 *[0 - 232 - 1]*，对于每一个数据，根据 `key` 计算 hash 值，确数据在环上的位置，然后从此位置沿顺时针行走，找到的第一台服务器就是其应该映射到的服务器：
+一致性哈希算法将 **整个哈希值空间** 组织成一个虚拟的圆环，范围是 *[0 - 2^32 - 1]*，对于每一个数据，根据 `key` 计算 hash 值，确数据在环上的位置，然后从此位置沿顺时针行走，找到的第一台服务器就是其应该映射到的服务器：
 
 ![](https://cdn.jsdelivr.net/gh/wmyskxz/img/img/%E5%A6%88%E5%A6%88%E5%86%8D%E4%B9%9F%E4%B8%8D%E6%8B%85%E5%BF%83%E6%88%91%E9%9D%A2%E8%AF%95%E8%A2%ABRedis%E9%97%AE%E5%BE%97%E8%84%B8%E9%83%BD%E7%BB%BF%E4%BA%86/7896890-40e8a2c096c8da92.png)
 
@@ -1132,23 +1132,45 @@ https://zhuanlan.zhihu.com/p/48334686
 
 ### Redis实现分布式锁
 
-Redis为单进程单线程模式，采用队列模式将并发访问变成串行访问，且多客户端对Redis的连接并不存在竞争关系 Redis 中可以使用 SETNX 命令实现分布式锁。
+默认指定大家用的是 Redis 2.6.12 及更高的版本，就不再去讲 `setnx`、`expire` 这种了，直接 `set` 命令加锁
 
-当且仅当 key 不存在，将 key 的值设为 value。 若给定的 key 已经存在，则 SETNX 不做任何动作
+```shell
+set key value[expiration EX seconds|PX milliseconds] [NX|XX]
+```
 
-SETNX 是『SET if Not eXists』(如果不存在，则 SET)的简写。
+> *SET* 命令的行为可以通过一系列参数来修改
+>
+> - `EX second` ：设置键的过期时间为 `second` 秒。 `SET key value EX second` 效果等同于 `SETEX key second value` 。
+> - `PX millisecond` ：设置键的过期时间为 `millisecond` 毫秒。 `SET key value PX millisecond` 效果等同于 `PSETEX key millisecond value` 。
+> - `NX` ：只在键不存在时，才对键进行设置操作。 `SET key value NX` 效果等同于 `SETNX key value` 。
+> - `XX` ：只在键已经存在时，才对键进行设置操作。
 
-返回值：设置成功，返回 1 。设置失败，返回 0 。
+```sh
+SET resource_name my_random_value NX PX 30000
+```
 
-![](https://img-blog.csdnimg.cn/20191213103148681.png)
+这条指令的意思：当 key——resource_name 不存在时创建这样的 key，设值为 my_random_value，并设置过期时间 30000 毫秒。
 
-使用 SETNX 完成同步锁的流程及事项如下：
+别看这干了两件事，因为 Redis 是单线程的，这一条指令不会被打断，所以是原子性的操作。
 
-使用SETNX命令获取锁，若返回0（key已存在，锁已存在）则获取失败，反之获取成功
+Redis 实现分布式锁的主要步骤：
 
-为了防止获取锁后程序出现异常，导致其他线程/进程调用SETNX命令总是返回0而进入死锁状态，需要为该key设置一个“合理”的过期时间
+1. 指定一个 key 作为锁标记，存入 Redis 中，指定一个 **唯一的标识** 作为 value。
+2. 当 key 不存在时才能设置值，确保同一时间只有一个客户端进程获得锁，满足 **互斥性** 特性。
+3. 设置一个过期时间，防止因系统异常导致没能删除这个 key，满足 **防死锁** 特性。
+4. 当处理完业务之后需要清除这个 key 来释放锁，清除 key 时需要校验 value 值，需要满足 **解铃还须系铃人** 。
 
-释放锁，使用DEL命令将锁数据删除
+设置一个随机值的意思是在解锁时候判断 key 的值和我们存储的随机数是不是一样，一样的话，才是自己的锁，直接 `del` 解锁就行。
+
+当然这个两个操作要保证原子性，所以 Redis 给出了一段 lua 脚本（Redis 服务器会单线程原子性执行 lua 脚本，保证 lua 脚本在处理的过程中不会被任意其它请求打断。）：
+
+```lua
+if redis.call("get",KEYS[1]) == ARGV[1] then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
 
 
 
@@ -1208,20 +1230,90 @@ Redis 官方站提出了一种权威的基于 Redis 实现分布式锁的方式�
 
 
 
-### Redis—大key问题
+### Redis 大 key 和 热 Key 问题
 
-所谓的bigkey就是存储本身的key值空间太大，或者hash，list，set等存储中value值过多。
+> https://help.aliyun.com/document_detail/353223.html
 
-bigkey会带来一些问题，如：
+Redis的过程中，如果未能及时发现并处理Big keys（下文称为“大Key”）与Hotkeys（下文称为“热Key”），可能会导致服务性能下降、用户体验变差，甚至引发大面积故障
 
-1. 读写bigkey会导致超时严重，甚至阻塞服务。
-2. 大key相关的删除或者自动过期时，会出现qps突降或者突升的情况，极端情况下，会造成主从复制异常，Redis服务阻塞无法响应请求
+#### 大Key
 
-redis-cli --bigkeys命令可以统计bigkey的分布情况
+通常以Key的大小和Key中成员的数量来综合判定，例如：
+
+- Key本身的数据量过大：一个String类型的Key，它的值为5 MB。
+- Key中的成员数过多：一个ZSET类型的Key，它的成员数量为10,000个。
+- Key中成员的数据量过大：一个Hash类型的Key，它的成员数量虽然只有1,000个但这些成员的Value（值）总大小为100 MB。
+
+##### 引发的问题
+
+- 客户端执行命令的时长变慢。
+- Redis内存达到**maxmemory**参数定义的上限引发操作阻塞或重要的Key被逐出，甚至引发内存溢出（Out Of Memory）。
+- 集群架构下，某个数据分片的内存使用率远超其他数据分片，无法使数据分片的内存资源达到均衡。
+- 对大Key执行读请求，会使Redis实例的带宽使用率被占满，导致自身服务变慢，同时易波及相关的服务。
+- 对大Key执行删除操作，易造成主库较长时间的阻塞，进而可能引发同步中断或主从切换。
+
+##### 原因
+
+- 在不适用的场景下使用Redis，易造成Key的value过大，如使用String类型的Key存放大体积二进制文件型数据；
+- 业务上线前规划设计不足，没有对Key中的成员进行合理的拆分，造成个别Key中的成员数量过多；
+- 未定期清理无效数据，造成如HASH类型Key中的成员持续不断地增加；
+- 使用LIST类型Key的业务消费侧发生代码故障，造成对应Key的成员只增不减。
 
 
 
-## 来源
+#### 热Key
+
+通常以其接收到的Key被请求频率来判定，例如：
+
+- QPS集中在特定的Key：Redis实例的总QPS（每秒查询率）为10,000，而其中一个Key的每秒访问量达到了7,000。
+- 带宽使用率集中在特定的Key：对一个拥有上千个成员且总大小为1 MB的HASH Key每秒发送大量的**HGETALL**操作请求。
+- CPU使用时间占比集中在特定的Key：对一个拥有数万个成员的Key（ZSET类型）每秒发送大量的**ZRANGE**操作请求。
+
+##### 引发的问题
+
+- 占用大量的CPU资源，影响其他请求并导致整体性能降低。
+- 集群架构下，产生访问倾斜，即某个数据分片被大量访问，而其他数据分片处于空闲状态，可能引起该数据分片的连接数被耗尽，新的连接建立请求被拒绝等问题。
+- 在抢购或秒杀场景下，可能因商品对应库存Key的请求量过大，超出Redis处理能力造成超卖。
+- 热Key的请求压力数量超出Redis的承受能力易造成缓存击穿，即大量请求将被直接指向后端的存储层，导致存储访问量激增甚至宕机，从而影响其他业务。
+
+##### 原因
+
+- 预期外的访问量陡增，如突然出现的爆款商品、访问量暴涨的热点新闻、直播间某主播搞活动带来的大量刷屏点赞、游戏中某区域发生多个工会之间的战斗涉及大量玩家等。
+
+
+
+### 找出大 Key 和 热 Key 并解决
+
+Redis提供多种方案帮助您轻松找出大Key与热Key。
+
+- 实时 Top Key 统计
+- 通过 redis-cli 的 bigkeys 和 hotkeys 参数查找
+- 通过内置命令对目标 key 分析（比如 String 类型，通过 STRLEN 查看字节数）
+- 业务层定位 key (对业务层加访问记录并异步汇总分析)
+- 通过 `MONITOR` 命令找出热 Key
+
+
+
+### 优化大 Key 和 热 Key 
+
+#### 大 Key
+
+- 对大Key进行拆分
+
+  例如将含有数万成员的一个HASH Key拆分为多个HASH Key，并确保每个Key的成员数量在合理范围。在Redis集群架构中，拆分大Key能对数据分片间的内存平衡起到显著作用
+
+- 对大Key进行清理
+- 监控Redis的内存水位
+- 对过期数据进行定期清理
+
+#### 热 Key
+
+- 在Redis集群架构中对热Key进行复制
+- 在Redis集群架构中对热Key进行复制
+
+
+
+## References
 
 https://juejin.im/post/6844904017387077640
 
