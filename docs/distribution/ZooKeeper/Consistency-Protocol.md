@@ -1,5 +1,7 @@
 # 「分布式一致性协议」从2PC、3PC、Paxos到 ZAB
 
+## CAP
+
 设计一个分布式系统必定会遇到一个问题—— **因为分区容忍性（partition tolerance）的存在，就必定要求我们需要在系统可用性（availability）和数据一致性（consistency）中做出权衡** 。这就是著名的 `CAP` 定理。
 
 ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/007S8ZIlly1gevqnrlzg6j30b60as3ys.jpg)
@@ -8,7 +10,7 @@
 
 > 大多数分布式系统都分布在多个子网络。每个子网络就叫做一个区（partition）。分区容错的意思是，区间通信可能失败。比如，一台服务器放在中国，另一台服务器放在美国，这就是两个区，它们之间可能无法通信。
 >
-> 一般来说，分区容错无法避免，因此可以认为 CAP 的 P 总是成立。
+> 一般来说，分区容错无法避免，因此可以认为 CAP 的 P 总是成立。(因为我们前提分布式系统，分布的服务都没法通信了，还玩个啥）
 >
 > ![img](https://www.wangbase.com/blogimg/asset/201807/bg2018071602.png)
 >
@@ -17,6 +19,14 @@
 > 如果保证 G2 的一致性，那么 G1 必须在写操作时，锁定 G2 的读操作和写操作。只有数据同步后，才能重新开放读写。锁定期间，G2 不能读写，没有可用性不。
 >
 > 如果保证 G2 的可用性，那么势必不能锁定 G2，所以一致性不成立。
+
+
+
+### 与 BASE 的关系
+
+BASE 是 Basically Available（基本可用）、Soft state（软状态）和 Eventually consistent（最终一致性）三个短语的简写。
+
+BASE是对CAP中一致性和可用性权衡的结果，其来源于对大规模互联网系统分布式实践的结论，是基于CAP定理逐步演化而来的，其核心思想是即使无法做到强一致性（Strong consistency），但每个应用都可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性（Eventual consistency）。
 
 
 
@@ -189,7 +199,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 2. Leader 服务器生成一个对应的事务 Proposal，并为这个事务生成一个全局递增的唯一的ZXID（通过其 ZXID 来进行排序保证顺序性）
 3. Leader 将这个事务发送给所有的 Follows 节点
 4. Follower 节点将收到的事务请求加入到历史队列（Leader 会为每个 Follower 分配一个单独的队列先进先出，顺序保证消息的因果关系）中，并发送 ack 给 Leader
-5. 当 Leader 收到超过半数 Follower 的 ack 消息，Leader会广播一个 commit 消息
+5. 当 Leader 收到超过半数 Follower 的 ack 消息，Leader 会广播一个 commit 消息
 6. 当 Follower 收到 commit 请求时，会判断该事务的 ZXID 是不是比历史队列中的任何事务的 ZXID 都小，如果是则提交，如果不是则等待比它更小的事务的 commit
 
 ![zab-commit](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/zab-commit.png)

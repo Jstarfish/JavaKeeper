@@ -1700,7 +1700,23 @@ long_query_time = 3
 
 #### 查询优化
 
-**永远小标驱动大表（小的数据集驱动大的数据集）**
+##### 为查询缓存优化你的查询
+
+大多数的 MySQL 服务器都开启了查询缓存。这是提高性最有效的方法之 一，而且这是被 MySQL 的数据库引擎处理的。当有很多相同的查询被执行了多 次的时候，这些查询结果会被放到一个缓存中，这样，后续的相同的查询就不 用操作表而直接访问缓存结果了。
+
+这里最主要的问题是，对于程序员来说，这个事情是很容易被忽略的。因 为，我们某些查询语句会让 MySQL 不使用缓存。请看下面的示例:
+
+![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/mysql-cache-demo.png)
+
+上面两条 SQL 语句的差别就是 CURDATE() ，MySQL 的查询缓存对这个函数不起作用。
+
+所以，像 NOW() 和 RAND() 或是其它的诸如此类的 SQL 函数都不会开启查询缓存，因为这些函数的返回是会不定的易变的。所以，你所需要的就是 用一个变量来代替 MySQL 的函数，从而开启缓存。
+
+
+
+
+
+##### 永远小标驱动大表（小的数据集驱动大的数据集）
 
 ```mysql
 slect * from A where id in (select id from B)`等价于
@@ -1724,7 +1740,7 @@ select * from B where B.id = A.id`
 
 
 
-**order by 关键字优化**
+##### order by 关键字优化
 
 - order by子句，尽量使用 Index 方式排序，避免使用 FileSort 方式排序
 
@@ -1749,7 +1765,7 @@ select * from B where B.id = A.id`
 
 
 
-**GROUP BY 关键字优化**
+##### GROUP BY 关键字优化
 
 - group by 实质是先排序后进行分组，遵照索引建的最佳左前缀
 - 当无法使用索引列，增大 `max_length_for_sort_data` 参数的设置，增大 `sort_buffer_size` 参数的设置

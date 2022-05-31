@@ -138,7 +138,7 @@ RPC框架负责屏蔽底层的传输方式(TCP或者UDP)、序列化方式( XML/
 
 由于各个服务部署在不同机器，服务间的调用涉及到网络通信过程，如果服务消费方每调用一个服务都要写一坨网络通信相关的代码，不仅使用复杂而且极易出错。
 
-如果有一种方式能让我们像调用本地服务一样调用远程服务，而让调用者对网络通信这些细节透明，那么将大大提高生产力。这种方式其实就是RPC（Remote Procedure Call Protocol），在各大互联网公司中被广泛使用，如阿里巴巴的hsf、dubbo（开源）、Facebook的thrift（开源）、Google grpc（开源）、Twitter的finagle等。
+如果有一种方式能让我们像调用本地服务一样调用远程服务，而让调用者对网络通信这些细节透明，那么将大大提高生产力。这种方式其实就是RPC（Remote Procedure Call Protocol），在各大互联网公司中被广泛使用，如阿里巴巴的hsf、dubbo（开源）、Facebook的thrift（开源）、Google grpc（开源）、Twitter的 finagle 等。
 
 我们首先看下一个RPC调用的具体流程：
 

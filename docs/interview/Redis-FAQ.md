@@ -303,6 +303,70 @@ Redis 列表是简单的字符串列表，按照插入顺序排序。你可以�
 
 **Redis 的列表结构常用来做异步队列使用**。将需要延后处理的任务结构体序列化成字符串塞进 Redis 的列表，另一个线程从这个列表中轮询数据进行处理。
 
+在版本3.2之前，Redis 列表list使用两种数据结构作为底层实现：
+
+- 压缩列表ziplist
+- 双向链表linkedlist
+  因为双向链表占用的内存比压缩列表要多， 所以当创建新的列表键时， 列表会优先考虑使用压缩列表， 并且在有需要的时候， 才从压缩列表实现转换到双向链表实现。
+
+> 创建新列表时 redis 默认使用 redis_encoding_ziplist 编码， 当以下任意一个条件被满足时， 列表会被转换成 redis_encoding_linkedlist 编码：
+>
+> - 试图往列表新添加一个字符串值，且这个字符串的长度超过 server.list_max_ziplist_value （默认值为 64 ）。
+> - ziplist 包含的节点超过 server.list_max_ziplist_entries （默认值为 512 ）。
+>
+> 注意：这两个条件是可以修改的，在 redis.conf 中：
+>
+> ```text
+> list-max-ziplist-value 64 
+> list-max-ziplist-entries 512 
+> ```
+>
+> ##### **双向链表linkedlist**
+>
+> 当链表entry数据超过512、或单个value 长度超过64，底层就会转化成linkedlist编码；
+> linkedlist是标准的双向链表，Node节点包含prev和next指针，可以进行双向遍历；
+> 还保存了 head 和 tail 两个指针，因此，对链表的表头和表尾进行插入的复杂度都为 (1) —— 这是高效实现 LPUSH 、 RPOP、 RPOPLPUSH 等命令的关键。
+> linkedlist比较简单，我们重点来分析ziplist。
+>
+> ##### 压缩列表ziplist
+>
+> 压缩列表 ziplist 是为 Redis 节约内存而开发的。
+>
+> Redis官方对于ziplist的定义是（出自ziplist.c的文件头部注释）：
+>
+> ```text
+> /* The ziplist is a specially encoded dually linked list that is designed
+>  * to be very memory efficient. It stores both strings and integer values,
+>  * where integers are encoded as actual integers instead of a series of
+>  * characters. It allows push and pop operations on either side of the list
+>  * in O(1) time. However, because every operation requires a reallocation of
+>  * the memory used by the ziplist, the actual complexity is related to the
+>  * amount of memory used by the ziplist.
+>  *
+> ```
+>
+> ziplist 是由一系列特殊编码的内存块构成的列表(像内存连续的数组，但每个元素长度不同)， 一个 ziplist 可以包含多个节点（entry）。
+> ziplist 将表中每一项存放在前后连续的地址空间内，每一项因占用的空间不同，而采用变长编码。
+>
+> **ziplist 是一个特殊的双向链表**
+> 特殊之处在于：没有维护双向指针:prev next；而是存储上一个 entry的长度和 当前entry的长度，通过长度推算下一个元素在什么地方。
+> 牺牲读取的性能，获得高效的存储空间，因为(简短字符串的情况)存储指针比存储entry长度 更费内存。这是典型的“时间换空间”。
+>
+> ##### Redis3.2+ list的新实现quickList
+>
+> 可以认为quickList，是ziplist和linkedlist二者的结合；quickList将二者的优点结合起来。
+>
+> ![img](https://hunter-image.oss-cn-beijing.aliyuncs.com/redis/quicklist/QuickList.png)
+>
+> quickList就是一个标准的双向链表的配置，有head 有tail;
+> 每一个节点是一个quicklistNode，包含prev和next指针。
+> 每一个quicklistNode 包含 一个ziplist，*zp 压缩链表里存储键值。
+> 所以quicklist是对ziplist进行一次封装，使用小块的ziplist来既保证了少使用内存，也保证了性能。
+
+
+
+
+
 
 
 ### 字典Hash是如何实现的？Rehash 了解吗？
@@ -1234,7 +1298,7 @@ Redis 官方站提出了一种权威的基于 Redis 实现分布式锁的方式�
 
 > https://help.aliyun.com/document_detail/353223.html
 
-Redis的过程中，如果未能及时发现并处理Big keys（下文称为“大Key”）与Hotkeys（下文称为“热Key”），可能会导致服务性能下降、用户体验变差，甚至引发大面积故障
+Redis的过程中，如果未能及时发现并处理 Big keys（下文称为“大Key”）与 Hotkeys（下文称为“热Key”），可能会导致服务性能下降、用户体验变差，甚至引发大面积故障
 
 #### 大Key
 

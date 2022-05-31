@@ -2,9 +2,9 @@
 
 > 一说分布式架构，就会看到各种 SOA、RMI、RPC 等等一脸懵逼的词汇，而且还特别容易混淆各种概念，记住这些吧，就不会质疑自己程序员的身份了。
 
-## SOA
+### SOA
 
-SOA(Service Oriented Architecture) ，中文意思就是**面向服务构架**，它其实就是一种软件架构设计思想，不是具体的某种技术实现。
+SOA(Service Oriented Architecture) ，中文意思就是**面向服务架构**，它其实就是一种软件架构设计思想，不是具体的某种技术实现。
 
 为什么会出现这种思想呢？
 
@@ -22,11 +22,11 @@ SOA(Service Oriented Architecture) ，中文意思就是**面向服务构架**�
 
 
 
-SOAP、REST、RPC 就是根据这种设计模式构建出来的规范，其中 SOAP 通俗理解就是 http+xml 的形式，REST 就是 http+json 的形式，RPC 是基于 socket 的形式
+SOAP、REST、RPC 就是根据这种设计模式构建出来的规范，其中 SOAP 通俗理解就是 http+xml 的形式，REST 就是 http+json 的形式，RPC 大都是基于 socket 的形式
 
 
 
-## SOAP
+### SOAP
 
 Simple Object Access Protocol，即简单对象访问协议， 简称 SOAP。
 
@@ -42,7 +42,7 @@ https://segmentfault.com/a/1190000003772529
 
 
 
-## RPC
+### RPC
 
 了解上面的RMI，它的主要的流程就是Client<-->stub<-->[NETWORK]<-->skeleton<-->Server，还有一个比较重要的概念就是RMIRegistry，其实大家网上去查RPC的时候流程其实都差不多，可能叫法和底层东西有点不一样，其实其实现所遵循的模型还是类似的。主要的区别的话是RMI是只适用于java的，而RPC任何语言都可以；第二点就是他们两者的调用方式不一样，最终的目标还是一致
 
@@ -66,7 +66,7 @@ http://blog.jobbole.com/92290/
 
 
 
-## rest
+### rest
 
 比如有个url：http:www.test.com/user/1，这个地址既要表示删除id为1的用户、又要表示修改id为1的用户，还要表达获取id为1的用户，那么，就要用到http1.1的不同的请求方法：get、post、delete、put，
 
@@ -78,12 +78,48 @@ http://www.jianshu.com/p/65ab865a5e9f
 
 
 
-## RMI
+### RMI
 
 SOA思想提出以后，就有很多基于在这个模型上的产物，很多适用于分布式的产物，同时也是越来越庞大系统的产物。Java RMI （Remote Method Invocation 远程方法调用）是用Java在JDK1.1中实现的，它大大增强了Java开发分布式应用的能力。而RMI就是开发百分之百纯Java的网络分布式应用系统的核心解决方案，所以如果不是java的系统就不能使用RMI，这也是其缺点之一。RMI全部的宗旨就是尽可能简化远程接口对象的使用，相当于在服务器端暴露服务，通过bind或者rebind方法注册到RMIRegistry中，注册的信息中包含url，以及相应的类。客户端在在注册中心根据url得到远程对象（stub，存根），然后调用stub远程调用方法。
 
 
 
-参考文章：http://www.jianshu.com/p/2c78554a3f36
 
-http://blog.csdn.net/guyuealian/article/details/51992182
+
+### SOA架构和微服务架构的区别
+
+> 首先SOA和微服务架构是一个层面的东西，而对于ESB和微服务网关是一个层面的东西，一个谈到是架构风格和方法，一个谈的是实现工具或组件。
+>
+>  1.SOA（Service Oriented Architecture）“面向服务的架构”:他是一种设计方法，其中包含多个服务， 服务之间通过相互依赖最终提供一系列的功能。一个服务通常以独立的形式存在与操作系统进程中。各个服务之间通过网络调用。
+>
+>  2.微服务架构:其实和 SOA 架构类似,微服务是在 SOA 上做的升华，微服务架构强调的一个重点是“业务需要彻底的组件化和服务化”，原有的单个业务系统会拆分为多个可以独立开发、设计、运行的小应用。这些小应用之间通过服务完成交互和集成。
+>
+>  微服务架构 = 80%的SOA服务架构思想 + 100%的组件化架构思想 + 80%的领域建模思想
+
+
+
+### API网关
+
+API网关是一个服务器，是系统的唯一入口。
+
+API 网关并不是微服务场景中必须的组件，如下图，不管有没有 API 网关，后端微服务都可以通过 API 很好地支持[客户端](https://www.zhihu.com/search?q=客户端&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A578705309})的访问。
+
+
+
+![img](https://pica.zhimg.com/80/v2-0903a05306217b52effca6ebb80b45ea_1440w.jpg?source=1940ef5c)
+
+但对于服务数量众多、复杂度比较高、规模比较大的业务来说，引入 API 网关也有一系列的好处：
+
+- 聚合接口使得服务对调用者透明，客户端与后端的耦合度降低
+- 聚合后台服务，节省流量，提高性能，提升用户体验
+- 提供安全、流控、过滤、缓存、计费、监控等 API 管理功能
+
+
+
+从面向对象设计的角度看，它与外观模式类似。API网关封装了系统内部架构，为每个客户端提供一个定制的API。它可能还具有其它职责，如身份验证、监控、负载均衡、缓存、请求分片与管理、静态响应处理。API网关方式的核心要点是，所有的客户端和消费端都通过统一的网关接入微服务，在网关层处理所有的非业务功能。通常，网关也是提供REST/HTTP的访问API。服务端通过API-GW注册和管理服务。
+
+### References:
+
+- http://www.jianshu.com/p/2c78554a3f36
+
+- http://blog.csdn.net/guyuealian/article/details/51992182

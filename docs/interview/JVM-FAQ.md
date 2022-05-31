@@ -16,7 +16,13 @@
 
 ### 1、类加载机制？类加载过程
 
-Java 虚拟机把描述类的数据从 Class 文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型，这就是虚拟机的加载机制
+Java 语言是一种具有动态性的解释型语言，类(Class)只有被加载到 JVM 后才能运行。当运行指定程序时，JVM 会将编译生成的 .class 文件按照需求和一定的规则加载到内存中，并组织成为一个完整的 Java 应用程序。这个加载过程是由类加载器完成，具体来说，就是由 ClassLoader 和它的子类来实现的。类加载器本身也是一个类，其实质是把类文件从硬盘读取到内存中。
+
+类的加载方式分为**隐式加载和显示加载**。隐式加载指的是程序在使用 new 等方式创建对象时，会隐式地调用类的加载器把对应的类 加载到 JVM 中。显示加载指的是通过直接调用 `class.forName()` 方法来把所需的类加载到 JVM 中。
+
+任何一个工程项目都是由许多类组成的，当程序启动时，只把需要的类加载到 JVM 中，其他类只有被使用到的时候才会被加载，采用这种方法一方面可以加快加载速度，另一方面可以节约程序运行时对内存的开销。此外，在 Java 语言中，每个类或接口都对应一个 .class 文件，这些文件可以被看成是一个个可以被动态加载的单元，因此当只有部分类被修改时，只需要重新编译变化的类即可， 而不需要重新编译所有文件，因此加快了编译速度。
+
+Java 虚拟机把描述类的数据从 Class 文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型，这就是虚拟机的加载机制。
 
 类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：**加载、验证、准备、解析、初始化、使用和卸载**七个阶段。(验证、准备和解析又统称为连接，为了支持Java语言的**运行时绑定**，所以**解析阶段也可以是在初始化之后进行的**。以上顺序都只是说开始的顺序，实际过程中是交叉的混合式进行的，加载过程中可能就已经开始验证了)
 
@@ -102,6 +108,69 @@ Java 虚拟机对 class 文件采用的是**按需加载**的方式，也就是�
 
 
 
+### 在多线程的情况下，类的加载为什么不会出现重复加载的情况？
+
+**三个类加载器的关系，不是父子关系，是组合关系。**
+
+看看类加载器的加载类的方法loadClass
+
+```java
+protected Class<?> loadClass(String name, boolean resolve)
+  throws ClassNotFoundException
+{
+  //看，这里有锁
+  synchronized (getClassLoadingLock(name)) {
+    // First, check if the class has already been loaded
+    //去看看类是否被加载过，如果被加载过，就立即返回
+    Class<?> c = findLoadedClass(name);
+    if (c == null) {
+      long t0 = System.nanoTime();
+      try {
+        //这里通过是否有parent来区分启动类加载器和其他2个类加载器
+        if (parent != null) {
+          //先尝试请求父类加载器去加载类，父类加载器加载不到，再去尝试自己加载类
+          c = parent.loadClass(name, false);
+        } else {
+          //启动类加载器加载类，本质是调用c++的方法
+          c = findBootstrapClassOrNull(name);
+        }
+      } catch (ClassNotFoundException e) {
+        // ClassNotFoundException thrown if class not found
+        // from the non-null parent class loader
+      }
+      //如果父类加载器加载不到类，子类加载器再尝试自己加载
+      if (c == null) {
+        // If still not found, then invoke findClass in order
+        // to find the class.
+        long t1 = System.nanoTime();
+        //加载类
+        c = findClass(name);
+
+        // this is the defining class loader; record the stats
+        sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+        sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+        sun.misc.PerfCounter.getFindClasses().increment();
+      }
+    }
+    if (resolve) {
+      resolveClass(c);
+    }
+    return c;
+  }
+}
+```
+
+总结一下loadClass方法的大概逻辑：
+
+1. 首先加锁，防止多线程的情况下，重复加载同一个类
+2. 当加载类的时候，先请求其父类加载器去加载类，如果父类加载器无法加载类时，才自己尝试去加载类。
+
+![图片摘自网络](https://uploadfiles.nowcoder.com/files/20210318/9603430_1616033889317/154ad50dc8dd4b109ab5e2100c63fe66.png)
+
+上面的源码解析，可以回答问题：在多线程的情况下，类的加载为什么不会出现重复加载的情况？
+
+
+
 ### 7、可以打破双亲委派机制吗？
 
 - 双亲委派模型并不是一个强制性的约束模型，而是 Java 设计者推荐给开发者的类加载器实现方式，可以“被破坏”，只要我们自定义类加载器，**重写 `loadClass()` 方法**，指定新的加载逻辑就破坏了，重写 `findClass()` 方法不会破坏双亲委派。
@@ -141,12 +210,10 @@ Java 虚拟机对 class 文件采用的是**按需加载**的方式，也就是�
 
 第六，**本地方法栈**（Native Method Stack）。它和 Java 虚拟机栈是非常相似的，支持对本地方法的调用，也是每个线程都会创建一个。在 Oracle Hotspot JVM 中，本地方法栈和 Java 虚拟机栈是在同一块儿区域，这完全取决于技术实现的决定，并未在规范中强制。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/360b8f453e016cb641208a6a8fb589bc.png)
-
 > - 直接内存（Direct Memory）区域， Direct Buffer 所直接分配的内存，也是个容易出现问题的地方。尽管，在 JVM 工程师的眼中，并不认为它是 JVM 内部内存的一部分，也并未体现 JVM 内存模型中。
 > - JVM 本身是个本地程序，还需要其他的内存去完成各种基本任务，比如，JIT Compiler 在运行时对热点方法进行编译，就会将编译后的方法储存在 Code Cache 里面；GC 等功能需要运行在本地线程之中，类似部分都需要占用内存空间。这些是实现 JVM JIT 等功能的需要，但规范中并不涉及。
 
-![java8](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/132ba6ba720f2bfc6c69b1ce490f7c87693987.jpg)
+
 
 
 
@@ -157,6 +224,8 @@ Java 虚拟机对 class 文件采用的是**按需加载**的方式，也就是�
 元空间（Java8）和永久代（Java7）之间最大的区别就是：永久代使用的 JVM 的堆内存，Java8 以后的元空间并不在虚拟机中而是使用本机物理内存。
 
 因此，默认情况下，元空间的大小仅受本地内存限制。类的元数据放入 natice memory，字符串池和类的静态变量放入堆中。
+
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx0a1jqj30ol0ck754.jpg)
 
 
 
@@ -232,7 +301,7 @@ OOM 如果通俗点儿说，就是 JVM 内存不够用了，javadoc 中对[OutOf
 
 
 
-### 14、内存泄漏时，如何定位问题代码
+### 内存泄漏时，如何定位问题代码
 
 Java 的内存泄漏问题比较难以定位，下面针对一些常见的内存泄漏场景做介绍：
 
@@ -243,7 +312,7 @@ Java 的内存泄漏问题比较难以定位，下面针对一些常见的内存
 
 Java 的内存泄漏定位一般是比较困难的，需要使用到很多的实践经验和调试技巧。下面是一些比较通用的方法：
 
-- 可以添加 `-verbose:gc` 启动参数来输出 GC 日志。通过分析这些日志，可以知道每次 GC 后内存是否有增加，如果在缓慢的增加，那就有可能是内存泄漏了（当然也需要结合当前的负载）。如果无法添加这个启动参数，也可以使用jstat来查看实时的gc日志。如果条件运行的化可以考虑使用jvisualvm图形化的观察，不过要是线上的化一般没这个条件。
+- 可以添加 `-verbose:gc` 启动参数来输出 GC 日志。通过分析这些日志，可以知道每次 GC 后内存是否有增加，如果在缓慢的增加，那就有可能是内存泄漏了（当然也需要结合当前的负载）。如果无法添加这个启动参数，也可以使用jstat来查看实时的gc日志。如果有条件运行的化可以考虑使用jvisualvm图形化的观察，不过要是线上的化一般没这个条件。
 - 当通过dump出堆内存，然后使用jvisualvm查看分析，一般能够分析出内存中大量存在的对象以及它的类型等。我们可以通过添加-XX:+HeapDumpOnOutOfMemoryError启动参数来自动保存发生OOM时的内存dump。
 - 当确定出大对象，或者大量存在的实例类型以后，我们就需要去review代码，从实际的代码入手来定位到真正发生泄漏的代码。
 
@@ -275,6 +344,58 @@ Java 的内存泄漏定位一般是比较困难的，需要使用到很多的实
 
 
 
+### java new一个对象的过程中发生了什么
+
+java在new一个对象的时候，会先查看对象所属的类有没有被加载到内存，如果没有的话，就会先通过类的全限定名来加载。加载并初始化类完成后，再进行对象的创建工作。
+
+1. 类加载过程（第一次使用该类） 加载-验证-准备-解析-初始化（为静态变量赋值、执行static 代码块）
+2. 创建对象
+   1. 在堆区间分配对象需要的内存（分配的内存包括本类和父类的所有实例变量，但不包括任何静态变量）
+   2. **对所有实例变量赋默认值**（将方法区内对实例变量的定义拷贝一份到堆区，然后赋默认值）
+   3. **执行实例初始化代码**（初始化顺序是先初始化父类再初始化子类，初始化时先执行实例代码块然后是构造方法）
+   4. **如果有类似于Child c = new Child()形式的c引用的话，在栈区定义Child类型引用变量c，然后将堆区对象的地址赋值给它**
+
+
+
+### String 字符串存放位置（常量池）
+
+在Java中只要是new的信息都会在堆上开辟一个新的空间,为了解决这个问题,JVM中才出现了字符串常量池的概念。但是只有直接用 ""修饰的字符,才会被加入到常量池中,当再次用 ""创建的时候,会首先从常量池中去获取。
+字符串常量池存在于运行时常量池中。也就存在于方法区中。
+
+使用相同的字符序列而不是使用new关键字创建的两个字符串会创建指向Java字符串常量池中的同一个字符串的指针。
+
+```java
+String s = new String("abc"); //创建了几个对象
+```
+
+创建了两个对象；
+
+- 第一个对象是"abc"字符串存储在常量池中；
+- 第二个对象是创建在Heap中的String对象；这里的s是放在栈里面的指向了Heap堆中的String对象。
+
+```java
+String s1 = new String("s1") ;
+String s2 = new String("s1") ; //创建了几个对象
+```
+
+三个；
+
+- 第一个是编译期就已经创建在常量池中创建的"s1"，因为创建一个之后常量池中就会有，不再创建，直接指向；
+
+- 后面两个是运行期使用new创建在堆上的s1和s2；
+
+
+
+### 深拷贝和浅拷贝
+
+简单来讲就是复制、克隆。
+
+```java
+Person p=new Person(“张三”); 
+```
+
+浅拷贝就是对对象中的数据成员进行简单赋值，如果存在动态成员或者指针就会报错。深拷贝就是对对象中存在的动态成员或指针重新开辟内存空间。
+
 ------
 
 
@@ -285,7 +406,7 @@ Java 的内存泄漏定位一般是比较困难的，需要使用到很多的实
 
 程序在运行的时候，为了提高性能，大部分数据都是会加载到内存中进行运算的，有些数据是需要常驻内存中的，但是有些数据，用过之后便不会再需要了，我们称这部分数据为垃圾数据。
 
-为了防止内存被使用完，我们需要将这些垃圾数据进行回收，即需要将这部分内存空间进行释放。不同于 C++ 需要自行释放内存的机制，Java 虚拟机（JVM）提供了一种自动回收内存的机制
+为了防止内存被使用完，我们需要将这些垃圾数据进行回收，即需要将这部分内存空间进行释放。不同于 C++ 需要自行释放内存的机制，Java 虚拟机（JVM）提供了一种自动回收内存的机制，它是低优先级的，在正常情况下是不会执行的，只有在虚拟机空闲或者当 前堆内存不足时，才会触发执行，扫面那些没有被任何引用的对象， 并将它们添加到要回收的集合中，进行回收。
 
 
 
@@ -315,7 +436,7 @@ Java 的内存泄漏定位一般是比较困难的，需要使用到很多的实
 
 可达性算法的原理是以一系列叫做 **GC Root** 的对象为起点出发，引出它们指向的下一个节点，再以下个节点为起点，引出此节点指向的下一个结点。。。（这样通过 GC Root 串成的一条线就叫引用链），直到所有的结点都遍历完毕，如果相关对象不在任意一个以 **GC Root** 为起点的引用链中，则这些对象会被判断为「垃圾」,会被 GC 回收。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/007S8ZIlly1gjl6bl1kifj30jk0b60t0.jpg)
+![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6bl1kifj30jk0b60t0.jpg)
 
 
 
@@ -328,6 +449,23 @@ Java 的内存泄漏定位一般是比较困难的，需要使用到很多的实
 - Java 虚拟机内部的引用，如基本数据类型对应的 Class 对象，一些常驻的异常对象
 - 所有被同步锁（synchronized 关键字）持有的对象
 - 反映 Java 虚拟机内部情况的 JMXBean、JVMTI 中注册的回调、本地代码缓存
+
+
+
+### 对象的死亡过程
+
+1. 第一次标记
+
+​	对象在进行可达性分析后发现没有与 GC Roots 相连接的引用链，那它将会被第一次标记。
+
+2. 第二次标记
+
+   假如对象没有覆盖 finalize 方法，或者 finalize 方法已经被虚拟机调用过，那么不执行 finalize 方法。
+   如果有必要执行 finalize 方法，那么该对象将会被放置在一个名为 F-Queue 的队列之中，并在稍后由一条由虚拟机自动建立的、低调度优先级的 Finalizer 线程去执行它们的 finalize 方法。
+
+   finalize 方法是对象逃脱死亡命运的最后一次机会，稍后收集器将对 F-Queue 中的对象进行第二次小规模的标记，如果对象要在 finalize 中成功拯救自己，只要重新与引用链上的任何一个对象建立关联即可。
+   如果对象这时候还没有逃脱，那基本上它就真的要被回收了。
+
 
 
 
@@ -371,8 +509,6 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
 #### a、几种垃圾收集器：
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/495132b11ec5e023d353d8e964626a01557602.jpg)
-
 - **Serial收集器：** 单线程的收集器，收集垃圾时，必须 stop the world，使用复制算法。无需维护复杂的数据结构，初始化也简单，所以一直是 Client 模式下 JVM 的默认选项
 
 - **ParNew收集器：**  一款多线程的收集器，采用复制算法，主要工作在 Young 区，可以通过 `-XX:ParallelGCThreads` 参数来控制收集的线程数，整个过程都是 STW 的，常与 CMS 组合使用
@@ -395,7 +531,7 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
 目前使用最多的是 CMS 和 G1 收集器，二者都有分代的概念，主要内存结构如下
 
-![美团技术博客](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/3a6dacdd87bfbec847d33d09dbe6226d199915.png)
+![img](https://p1.meituan.net/travelcube/3a6dacdd87bfbec847d33d09dbe6226d199915.png)
 
 - CMS 收集器是老年代的收集器，可以配合新生代的 Serial 和 ParNew 收集器一起使用；
 - G1 收集器收集范围是老年代和新生代，不需要结合其他收集器使用；
@@ -447,15 +583,11 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
 ### MinorGC 的过程
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/minorgc_0.png)
-
 MinorGC 采用复制算法。 （复制->清空->互换）
 
 1. eden、servicorFrom 复制到 ServicorTo，年龄+1 首先，把 Eden 和 ServivorFrom 区域中存活的对象复制到 ServicorTo 区域（如果有对象的年龄以及达到了老年的标准，则赋值到老年代区），同时把这些对象的年龄+1（如果 ServicorTo 不够位置了就放到老年区）； 
 2. 清空 eden、servicorFrom 然后，清空 Eden 和 ServicorFrom 中的对象； 
 3. ServicorTo 和 ServicorFrom 互换最后，ServicorTo 和 ServicorFrom 互换，原 ServicorTo 成为下一次 GC 时的 ServicorFrom 区。
-
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/minorgc_end.png)
 
 
 
@@ -470,6 +602,16 @@ MinorGC 采用复制算法。 （复制->清空->互换）
 其实基本没什么机会用得到这个命令，因为这个命令只是建议 JVM 安排 GC 运行，还有可能完全被拒绝。 GC 本身是会周期性的自动运行的，由 JVM 决定运行的时机，而且现在的版本有多种更智能的模式可以选择，还会根据运行的机器自动去做选择，就算真的有性能上的需求，也应该去对 GC 的运行机制进行微调，而不是通过使用这个命令来实现性能的优化
 
 
+
+### SafePoint 是什么
+
+比如 GC 的时候必须要等到 Java 线程都进入到 safepoint 的时候 VMThread 才能开始 执行 GC，
+
+1. 循环的末尾 (防止大循环的时候一直不进入 safepoint，而其他线程在等待它进入 safepoint)
+
+2. 方法返回前
+3. 调用方法的call之后 
+4. 抛出异常的位置
 
 ------
 
@@ -567,8 +709,6 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
 
   - -Xmixed 混合模式
 
-    ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/00831rSTly1gdeb84yh71j30yq0j6akl.jpeg)
-
 - xx参数
 
   - Boolean 类型
@@ -582,8 +722,6 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
         - -XX:+PrintGCDetails 
         - -XX:- PrintGCDetails 
 
-        ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/00831rSTly1gdebpozfgwj315o0sgtcy.jpg)
-
         添加如下参数后，重新查看，发现是 + 号了
 
         ![](https://tva1.sinaimg.cn/large/00831rSTly1gdebrx25moj31170u042c.jpg)
@@ -591,8 +729,8 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
       - 是否使用串行垃圾回收器
 
         - -XX:-UseSerialGC
-        - -XX:+UseSerialGC
-
+      - -XX:+UseSerialGC
+    
   - KV 设值类型
 
     - 公式 -XX:属性key=属性 value
@@ -607,7 +745,7 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
 
         - -Xms 等价于 -XX:InitialHeapSize
         - -Xmx 等价于 -XX:MaxHeapSize
-
+  
         ![](https://tva1.sinaimg.cn/large/00831rSTly1gdecj9d7z3j310202qdgb.jpg)
 
   - jinfo 举例，如何查看当前运行程序的配置
@@ -639,8 +777,6 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
   - java -XX:+PrintFlagsInitial
 
   - java -XX:+PrintFlagsInitial -version
-
-  - ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/3j31ci0m6k5w.jpeg)
 
     **等号前有冒号** :=  说明 jvm 参数有人为修改过或者 JVM加载修改
 
@@ -768,7 +904,7 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 - java.lang.StackOverflowError
 
-  - ```
+  - ```java
     public class StackOverflowErrorDemo {
     
         public static void main(String[] args) {
@@ -788,19 +924,6 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 - java.lang.OutOfMemoryError: GC overhead limit exceeded  (GC上头，哈哈)
 
   - ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehmrz0dvaj311w0muk0e.jpg)
-
-  - ```java
-    public class StackOverflowErrorDemo {
-    
-        public static void main(String[] args) {
-            stackoverflowError();
-        }
-    
-        private static void stackoverflowError() {
-            stackoverflowError();
-        }
-    }
-    ```
 
 - java.lang.OutOfMemoryError: Direct buffer memory
 
@@ -850,7 +973,7 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 - top -Hp pid 获取本进程中所有线程的CPU耗时性能
 - jstack pid命令查看当前java进程的堆栈状态
 - 或者 jstack -l  > /tmp/output.txt 把堆栈信息打到一个txt文件。
-- 可以使用fastthread 堆栈定位，[fastthread.io/](http://fastthread.io/)
+- 可以使用 fastthread 堆栈定位，[fastthread.io/](http://fastthread.io/)
 
 
 

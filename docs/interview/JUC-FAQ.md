@@ -132,11 +132,11 @@ windows上面用任务管理器看，linux下可以用 top 这个工具看。
 
 Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种不同状态的其中一个状态（图源《Java 并发编程艺术》4.1.4 节）。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png)
+![img](https://ask.qcloudimg.com/http-save/yehe-1104878/o9ndah1viz.png?imageView2/2/w/1620)
 
 线程在生命周期中并不是固定处于某一个状态而是随着代码的执行在不同状态之间切换。Java 线程状态变迁如下图所示（图源《Java 并发编程艺术》4.1.4 节）：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/Java+%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%8F%98%E8%BF%81.png)
+![img](https://ask.qcloudimg.com/http-save/yehe-1104878/f7epdyuln1.png?imageView2/2/w/1620)
 
 由上图可以看出：线程创建之后它将处于 **NEW（新建）** 状态，调用 `start()` 方法后开始运行，线程这时候处于 **READY（可运行）** 状态。可运行状态的线程获得了 CPU 时间片（timeslice）后就处于 **RUNNING（运行）** 状态。
 
@@ -380,13 +380,11 @@ synchronized 修饰的方法并没有 monitorenter 指令和 monitorexit 指令�
 
 重量级锁是指当有一个线程获取锁之后，其余所有等待获取该锁的线程都会处于阻塞状态。
 
-简言之，就是所有的控制权都交给了操作系统，由操作系统来负责线程间的调度和线程的状态变更。而这样会出现频繁地对线程运行状态的切换，线程的挂起和唤醒，从而消耗大量的系统资
+简言之，就是所有的控制权都交给了操作系统，由操作系统来负责线程间的调度和线程的状态变更。而这样会出现频繁地对线程运行状态的切换，线程的挂起和唤醒，从而消耗大量的系统资源
 
 
 
 ### 谈谈 synchronized和 ReentrantLock 的区别
-
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/412d294ff5535bbcddc0d979b2a339e6102264.png)
 
 **① 两者都是可重入锁**
 
@@ -410,43 +408,6 @@ synchronized 是依赖于 JVM 实现的，虚拟机团队在 JDK1.6 为 synchron
 
 
 
-### synchronized 和 Lock 区别
-
-1、原始构成
-
-- synchronized 是关键字属于JVM 层面
-  - monitorenter(底层是通过monitor对象完成，其实 wait/notify等方法也依赖于monitor对象只有在同步代码块或方法中才能调wait/notify等方法)
-  - Lock是具体类（java.util.concurrent.locks.Lock）是api 层面的锁
-
-2、使用方法
-
-synchronized 不需要用户手动释放锁，当 synchronized 代码执行完后系统会自动让线程释放对象锁的占用
-
-RenntrantLock 则需要用户去手动释放锁，若没有手动释放，可能造成死锁
-
-3、等待是否可中断
-
-synchronized 不可中断，除非抛出异常或正常运行结束
-
-RenntrantLock可中断，
-
-- 设置超时时间 tryLock(long timeout,TimeUnit unit)
-- lockIntteruptiby() 放代码块中，调用interrupt() 方法可中断
-
-4、加锁是否公平
-
-synchronized 是非公平锁
-
-RenntrantLock两者都可以，默认是非公平锁
-
-5、锁绑定多个条件Condition
-
-synchronized 没有
-
-RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤醒，而不是像synchronized那样随机唤醒一个线程要么唤醒全部线程。
-
-
-
 ### 说说 synchronized 关键字和 volatile 关键字的区别
 
 `synchronized` 关键字和 `volatile` 关键字是两个互补的存在，而不是对立的存在：
@@ -464,7 +425,7 @@ RenntrantLock用来实现分组唤醒需要唤醒的线程们，可以精准唤�
 
 如下图所示，线程 A 持有资源 2，线程 B 持有资源 1，他们同时都想申请对方的资源，所以这两个线程就会互相等待而进入死锁状态。
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/2019-4%E6%AD%BB%E9%94%811.png)
+![img](https://ask.qcloudimg.com/http-save/yehe-1574013/7fd0fbc0e7b467d9eaf28ad99dd5017f.png?imageView2/2/w/1620)
 
 下面通过一个例子来说明线程死锁,代码模拟了上图的死锁的情况 (代码来源于《并发编程之美》)：
 
@@ -592,6 +553,24 @@ Process finished with exit code 0
 
 
 
+### 何谓悲观锁与乐观锁
+
+#### 悲观锁
+
+总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿 数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁(共享资 源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线 程)。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁
+
+等，读锁，写锁等，都是在做操作之前先上锁。Java 中 synchronized 和 ReentrantLock 等独占锁就是悲观锁思想的实现。
+
+#### 乐观锁
+
+总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和 CAS 算法实现。乐观锁适用于多读的应用类型，这样可以提 高吞吐量，像数据库提供的类似于 **write_condition** 机制，其实都是提供的乐 观锁。在 Java 中 java.util.concurrent.atomic 包下面的原子变量类就是使用了 乐观锁的一种实现方式 **CAS** 实现的。
+
+#### 两种锁的使用场景
+
+从上面对两种锁的介绍，我们知道两种锁各有优缺点，不可认为一种好于另一 种，像**乐观锁适用于写比较少的情况下(多读场景)**，即冲突真的很少发生的 时候，这样可以省去了锁的开销，加大了系统的整个吞吐量。但如果是多写的情况，一般会经常产生冲突，这就会导致上层应用会不断的进行 retry，这样反 倒是降低了性能，所以**一般多写的场景下用悲观锁就比较合适**。
+
+
+
 ### ReentrantLock (可重入锁) 
 
 > 何为可重入
@@ -604,11 +583,11 @@ Process finished with exit code 0
 
 > 为什么要可重入
 
-如果线程A继续再次获得这个锁呢?比如一个方法是synchronized,递归调用自己,那么第一次已经获得了锁,第二次调用的时候还能进入吗? 直观上当然需要能进入.这就要求必须是可重入的.可重入锁又叫做递归锁,不然就死锁了。 
+如果线程A继续再次获得这个锁呢?比如一个方法是synchronized,递归调用自己,那么第一次已经获得了锁,第二次调用的时候还能进入吗? 直观上当然需要能进入.这就要求必须是可重入的.可重入锁又叫做递归锁，不然就死锁了。 
 
  它实现方式是：
 
-为每个锁关联一个获取计数器和一个所有者线程,当计数值为0的时候,这个锁就没有被任何线程持有.当线程请求一个未被持有的锁时,JVM将记下锁的持有者,并且将获取计数值置为1,如果同一个线程再次获取这个锁,技术值将递增,退出一次同步代码块,计算值递减,当计数值为0时,这个锁就被释放.ReentrantLock里面有实现
+为每个锁关联一个获取计数器和一个所有者线程,当计数值为0的时候,这个锁就没有被任何线程持有.当线程请求一个未被持有的锁时,JVM将记下锁的持有者,并且将获取计数值置为1,如果同一个线程再次获取这个锁，计数值将递增，退出一次同步代码块，计算值递减，当计数值为 0 时，这个锁就被释放 ReentrantLock 里面有实现
 
 
 
@@ -1137,8 +1116,6 @@ public interface Callable<V> {
 
 AQS的全称为（AbstractQueuedSynchronizer），这个类在java.util.concurrent.locks包下面。
 
-![AQS类](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f4151532545372542312542422e706e67.png)]7)
-
 AQS是一个用来构建锁和同步器的框架，使用AQS能简单且高效地构造出应用广泛的大量的同步器，比如我们提到的ReentrantLock，Semaphore，其他的诸如ReentrantReadWriteLock，SynchronousQueue，FutureTask 等等皆是基于 AQS 的。当然，我们自己也能利用 AQS 非常轻松容易地构造出符合我们自己需求的同步器。
 
 ### 6.2. AQS 原理分析
@@ -1157,7 +1134,7 @@ AQS 原理这部分参考了部分博客，在5.2节末尾放了链接。
 
 看个 AQS(AbstractQueuedSynchronizer)原理图：
 
-![AQS原理图](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f4151532545352538452539462545372539302538362545352539422542452e706e67.png)
+![image.png](https://blog-1300588375.cos.ap-chengdu.myqcloud.com/image_1624029202628.png)
 
 AQS 使用一个 int 成员变量来表示同步状态，通过内置的 FIFO 队列来完成获取资源线程的排队工作。AQS 使用 CAS 对该同步状态进行原子操作实现对其值的修改。
 
@@ -1476,7 +1453,7 @@ CopyOnWriteArrayList 的设计思想
 
 
 
-#### 什么是阻塞队列？阻塞队列的实现原理是什么？如何使用阻塞队列来实现生产者-消费者模型？
+### 什么是阻塞队列？阻塞队列的实现原理是什么？如何使用阻塞队列来实现生产者-消费者模型？
 
 > - 哪些队列是有界的，哪些是无界的？
 > - 针对特定场景需求，如何选择合适的队列实现？
@@ -1509,7 +1486,7 @@ BlockingQueue 接口是 Queue 的子接口，它的主要用途并不是作为�
 
 
 
-#### 有哪写线程安全的非阻塞队列
+### 有哪些线程安全的非阻塞队列
 
 ConcurrentLinkedQueue是一个基于链接节点的无界线程安全队列，它采用先进先出的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队列头部的元素。
 
@@ -1556,22 +1533,9 @@ ThreadLocal 是一个本地线程副本变量工具类，在每个线程中都�
 
 经典的使用场景是为每个线程分配一个 JDBC 连接 Connection。这样就可以保证每个线程的都在各自的 Connection 上进行数据库的操作，不会出现 A 线程关了 B线程正在使用的 Connection； 还有 Session 管理 等问题。
 
-#### 什么是线程局部变量？
-
-线程局部变量是局限于线程内部的变量，属于线程自身所有，不在多个线程间共享。Java 提供 ThreadLocal 类来支持线程局部变量，是一种实现线程安全的方式。但是在管理环境下（如 web 服务器）使用线程局部变量的时候要特别小心，在这种情况下，工作线程的生命周期比任何应用变量的生命周期都要长。任何线程局部变量一旦在工作完成后没有释放，Java 应用就存在内存泄露的风险。
-
-#### ThreadLocal造成内存泄漏的原因？
-
-`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用，而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
-
-#### ThreadLocal内存泄漏解决方案？
-
-- 每次使用完ThreadLocal，都调用它的remove()方法，清除数据。
-- 在使用线程池的情况下，没有及时清理ThreadLocal，不仅是内存泄漏的问题，更严重的是可能导致业务逻辑出现问题。所以，使用ThreadLocal就跟加锁完要解锁一样，用完就清理。
 
 
-
-### 3.1. ThreadLocal简介
+### ThreadLocal简介
 
 通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？** JDK中提供的`ThreadLocal`类正是为了解决这样的问题。 **ThreadLocal类主要解决的就是让每个线程绑定自己的值，可以将ThreadLocal类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据。**
 
@@ -1581,11 +1545,11 @@ ThreadLocal 是一个本地线程副本变量工具类，在每个线程中都�
 
 比如有两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么ThreadLocal就是用来避免这两个线程竞争的。
 
-### 3.2. ThreadLocal示例
+### ThreadLocal示例
 
 相信看了上面的解释，大家已经搞懂 ThreadLocal 类是个什么东西了。
 
-```
+```java
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
@@ -1659,7 +1623,7 @@ Thread Name= 9 formatter = yy-M-d ah:mm
     };
 ```
 
-### 3.3. ThreadLocal原理
+### ThreadLocal原理
 
 从 `Thread`类源代码入手。
 
@@ -1711,7 +1675,7 @@ ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
 
 ![ThreadLocal内部类](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlp3bpjwyj30k908cq4k.jpg)
 
-### 3.4. ThreadLocal 内存泄露问题
+### ThreadLocal 内存泄露问题
 
 `ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
 
@@ -1726,6 +1690,16 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
   }
 }
 ```
+
+
+
+#### 什么是线程局部变量？
+
+线程局部变量是局限于线程内部的变量，属于线程自身所有，不在多个线程间共享。Java 提供 ThreadLocal 类来支持线程局部变量，是一种实现线程安全的方式。但是在管理环境下（如 web 服务器）使用线程局部变量的时候要特别小心，在这种情况下，工作线程的生命周期比任何应用变量的生命周期都要长。任何线程局部变量一旦在工作完成后没有释放，Java 应用就存在内存泄露的风险。
+
+#### ThreadLocal造成内存泄漏的原因？
+
+`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用，而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
 
 
 
@@ -1808,7 +1782,7 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 无锁化编程的常用方法:硬件**CPU**同步原语CAS(Compare and Swap)，如无锁栈，无锁队列(ConcurrentLinkedQueue)等等。现在 几乎所有的 CPU 指令都支持 CAS 的原子操作，X86 下对应的是 CMPXCHG 汇 编指令，处理器执行 CMPXCHG 指令是一个原子性操作。有了这个原子操作， 我们就可以用其来实现各种无锁(lock free)的数据结构。
 
-CAS 实现了区别于 sychronized 同步锁的一种乐观锁，当多个线程尝试使 用 CAS 同时更新同一个变量时，只有其中一个线程能更新变量的值，而其它线 程都失败，失败的线程并不会被挂起，而是被告知这次竞争中失败，并可以再 次尝试。CAS 有 3 个操作数，内存值 V，旧的预期值 A，要修改后的新值 B。 当且仅当预期值 A 和内存值 V 相同时，将内存值 V 修改为 B，否则什么都不做。 其实 CAS 也算是有锁操作，只不过是由 CPU 来触发，比 synchronized 性能 好的多。CAS 的关键点在于，系统在硬件层面保证了比较并交换操作的原子性， 处理器使用基于对缓存加锁或总线加锁的方式来实现多处理器之间的原子操 作。CAS 是非阻塞算法的一种常见实现。
+CAS 实现了区别于 sychronized 同步锁的一种乐观锁，当多个线程尝试使 用 CAS 同时更新同一个变量时，只有其中一个线程能更新变量的值，而其它线 程都失败，失败的线程并不会被挂起，而是被告知这次竞争中失败，并可以再 次尝试。CAS 有 3 个操作数，内存值 V，旧的预期值 A，要修改后的新值 B。 当且仅当预期值 A 和内存值 V 相同时，将内存值 V 修改为 B，否则什么都不做。 其实 CAS 也算是有锁操作，只不过是由 CPU 来触发，比 synchronized 性能 好的多。CAS 的关键点在于，系统在硬件层面保证了比较并交换操作的原子性， 处理器使用基于对缓存加锁或总线加锁的方式来实现多处理器之间的原子操作。CAS 是非阻塞算法的一种常见实现。
 
 一个线程间共享的变量，首先在主存中会保留一份，然后每个线程的工作 内存也会保留一份副本。这里说的预期值，就是线程保留的副本。当该线程从 主存中获取该变量的值后，主存中该变量可能已经被其他线程刷新了，但是该 线程工作内存中该变量却还是原来的值，这就是所谓的预期值了。当你要用 CAS 刷新该值的时候，如果发现线程工作内存和主存中不一致了，就会失败，如果 一致，就可以更新成功。
 
