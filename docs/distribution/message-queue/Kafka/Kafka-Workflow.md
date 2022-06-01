@@ -133,11 +133,20 @@ log.segment.bytes=1073741824
 
 下图展示了Kafka查找数据的过程：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4aushr80j30n60b4aab.jpg)
+![img](https://tva1.sinaimg.cn/large/e6c9d24ely1h2siwqg97qj20t40iwq5a.jpg)
 
 `.index文件` 存储大量的索引信息，`.log文件` 存储大量的数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址。
 
-比如现在要查找偏移量 offset 为 3 的消息，根据 .index 文件命名我们可以知道，offset 为 3 的索引应该从00000000000000000000.index 里查找。根据上图所示，其对应的索引地址为 756-911，所以 Kafka 将读取00000000000000000000.log 756~911区间的数据。
+> 比如：要查找绝对offffset为7的Message：
+>
+> 1. 首先是用二分查找确定它是在哪个LogSegment中，自然是在第一个Segment中。 
+> 2. 打开这个Segment的index文件，也是用二分查找找到offffset小于或者等于指定offffset的索引条目中最大的那个offset。自然offset为6的那个索引是我们要找的，通过索引文件我们知道offffset为6的Message在数据文件中的位置为9807。
+>
+> 3. 打开数据文件，从位置为9807的那个地方开始顺序扫描直到找到offset为7的那条Message。
+>
+> 这套机制是建立在offset是有序的。索引文件被映射到内存中，所以查找的速度还是很快的。
+>
+> 一句话，Kafka的Message存储采用了分区(partition)，分段(LogSegment)和稀疏索引这几个手段来达到了高效性。
 
 
 
