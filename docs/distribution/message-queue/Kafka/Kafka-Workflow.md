@@ -314,7 +314,7 @@ Kafka 的 ISR 的管理最终都会反馈到 ZooKeeper 节点上，具体位置�
 
 **At Least Once 可以保证数据不丢失，但是不能保证数据不重复。相对的，At Most Once 可以保证数据不重复，但是不能保证数据不丢失**。但是，对于一些非常重要的信息，比如说交易数据，下游数据消费者要求数据既不重复也不丢失，即 Exactly Once 语义。在 0.11 版本以前的 Kafka，对此是无能为力的，只能保证数据不丢失，再在下游消费者对数据做全局去重。对于多个下游应用的情况，每个都需要单独做全局去重，这就对性能造成了很大的影响。
 
-0.11 版本的 Kafka，引入了一项重大特性：**幂等性**。所谓的幂等性就是指 Producer 不论向 Server 发送多少次重复数据。Server 端都会只持久化一条，幂等性结合 At Least Once 语义，就构成了 Kafka 的 Exactily Once 语义，即： **<u>At Least Once + 幂等性 = Exactly Once</u>**
+0.11 版本的 Kafka，引入了一项重大特性：**幂等性**。所谓的幂等性就是指 Producer 不论向 Server 发送多少次重复数据。Server 端都会只持久化一条，幂等性结合 At Least Once 语义，就构成了 Kafka 的 Exactly Once 语义，即： **<u>At Least Once + 幂等性 = Exactly Once</u>**
 
 要启用幂等性，只需要将 Producer 的参数中 `enable.idompotence` 设置为 `true` 即可。Kafka 的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。开启幂等性的 Producer 在初始化的时候会被分配一个 PID，发往同一 Partition 的消息会附带 Sequence Number。而 Broker 端会对 <PID,Partition,SeqNumber> 做缓存，当具有相同主键的消息提交时，Broker 只会持久化一条。
 
@@ -381,7 +381,7 @@ try {
 
 #### 3.1 存储方式 
 
-物理上把 topic 分成一个或多个 patition（对应 server.properties 中的 num.partitions=3 配置），每个 patition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文件）。    
+物理上把 topic 分成一个或多个 partition（对应 server.properties 中的 num.partitions=3 配置），每个 partition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文件）。    
 
 #### 3.2 存储策略 
 
@@ -441,7 +441,7 @@ RoundRobin 即轮询的意思，比如现在有一个三个消费者 ConsumerA�
 
 Kafka 默认采用 Range 分配策略，Range 顾名思义就是按范围划分的意思。
 
-比如现在有一个三个消费者 ConsumerA、ConsumerB 和 ConsumerC 组成的消费者组，同时消费 TopicA 主题消息，TopicA分为 7 个分区，如果采用 Range 分配策略，过程如下所示：
+比如现在有一个三个消费者 ConsumerA、ConsumerB 和 ConsumerC 组成的消费者组，同时消费 TopicA 主题消息，TopicA 分为 7 个分区，如果采用 Range 分配策略，过程如下所示：
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh47xvny6fj31eo0kot93.jpg)
 
@@ -461,7 +461,7 @@ Range 算法并不会把多个主题分区当成一个整体。
 
 看上去该 Offset 就是一个数值而已，其实对于 Consumer Group 而言，它是一组 KV 对，Key 是分区，V 对应 Consumer 消费该分区的最新位移。如果用 Java 来表示的话，你大致可以认为是这样的数据结构，即 Map<TopicPartition, Long>，其中 TopicPartition 表示一个分区，而 Long 表示位移的类型。当然，Kafka 源码中并不是这样简单的数据结构，而是要比这个复杂得多，不过这并不会妨碍我们对 Group 位移的理解。
 
-Kafka 0.9 版本之前，consumer 默认将 offset 保存在 Zookeeper 中，从 0.9 版本开始，consumer 默认将 offset保存在 Kafka 一个内置的 topic 中，该 topic 为 **_consumer_offsets**。
+Kafka 0.9 版本之前，consumer 默认将 offset 保存在 Zookeeper 中，从 0.9 版本开始，consumer 默认将 offset 保存在 Kafka 一个内置的 topic 中，该 topic 为 **_consumer_offsets**。
 
 > 将位移保存在 ZooKeeper 外部系统的做法，最显而易见的好处就是减少了 Kafka Broker 端的状态保存开销。现在比较流行的提法是将服务器节点做成无状态的，这样可以自由地扩缩容，实现超强的伸缩性。Kafka 最开始也是基于这样的考虑，才将 Consumer Group 位移保存在独立于 Kafka 集群之外的框架中。
 >

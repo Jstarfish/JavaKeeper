@@ -706,3 +706,17 @@ Dubbo 的将注册中心进行抽象，它可以外接不同的存储媒介给�
 引入了 ZooKeeper 作为存储媒介，也就把 ZooKeeper 的特性引进来。首先是负载均衡，单注册中心的承载能力是有限的，在流量达到一定程度的时 候就需要分流，负载均衡就是为了分流而存在的，一个 ZooKeeper 群配合相应的 Web 应用就可以很容易达到负载均衡；资源同步，单单有负载均衡还不 够，节点之间的数据和资源需要同步，ZooKeeper 集群就天然具备有这样的功能；命名服务，将树状结构用于维护全局的服务地址列表，服务提供者在启动 的时候，向 ZooKeeper 上的指定节点 /dubbo/${serviceName}/providers 目录下写入自己的 URL 地址，这个操作就完成了服务的发布。 其他特性还有 Mast 选举，分布式锁等。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxOS8xMC8zMS8xNmUyMTliYzc3MDA5OGRm?x-oss-process=image/format,png)
+
+
+
+### zk 是 CP 还是 AP
+
+zk的ap和cp是从不同的角度分析的。
+
+从一个读写请求分析，保证了可用性（不用阻塞等待全部follwer同步完成），保证不了数据的一致性，所以是ap。
+
+但是从zk架构分析，zk在leader选举期间，会暂停对外提供服务（为啥会暂停，因为zk依赖leader来保证数据一致性)，所以丢失了可用性，保证了一致性，即cp。
+
+再细点话，这个c不是强一致性，而是最终一致性。即上面的写案例，数据最终会同步到一致，只是时间问题。
+
+综上，zk广义上来说是cp，狭义上是ap。

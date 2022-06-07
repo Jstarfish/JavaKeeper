@@ -47,6 +47,8 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 ## 说说常用的集合有哪些吧？
 
+> Collection 有什么子接口、有哪些具体的实现
+
 Map 接口和 Collection 接口是所有集合框架的父接口：
 
 1. Collection接口的子接口包括：Set、List、Queue

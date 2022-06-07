@@ -89,7 +89,7 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 
 协调者根据各参与者的反馈情况决定最终是否可以提交事务，如果反馈都是Yes，发送提交 `commit` 请求，参与者提交成功后返回  `Ack`  消息，协调者接收后就完成了。如果反馈是 No 或者超时未反馈，发送 `Rollback` 请求，利用阶段一记录表的 `Undo` 信息执行回滚，并反馈给协调者 `Ack` ，中断消息
 
-![2PC](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/00831rSTly1gclosfvncqj30hs09j0td.jpg)
+![2PC](https://tva1.sinaimg.cn/large/e6c9d24ely1h2sj2ouelxj20q40e0jrz.jpg)
 
 #### 优缺点
 

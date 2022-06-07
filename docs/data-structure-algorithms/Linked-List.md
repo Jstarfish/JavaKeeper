@@ -8,13 +8,13 @@
 
 ## 单链表
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh5uzihd52j30io078wer.jpg)
+![single-linkedlist](https://tva1.sinaimg.cn/large/e6c9d24ely1h2zosh2db8j20io078glu.jpg)
 
 一种最简单的结点结构如上图所示，它是构成单链表的基本结点结构。在结点中数据域用来存储数据元素，指针域用于指向下一个具有相同结构的结点。
 
 单链表中的每个结点不仅包含值，还包含链接到下一个结点的`引用字段`。通过这种方式，单链表将所有结点按顺序组织起来。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915173602.png)
+![single-linkedlist-node](https://tva1.sinaimg.cn/large/e6c9d24ely1h2zovnzeupj20vy0a40t7.jpg)
 
 链表的第一个结点和最后一个结点，分别称为链表的**首结点**和**尾结点**。尾结点的特征是其 next 引用为空（null）。链表中每个结点的 next 引用都相当于一个指针，指向另一个结点，借助这些 next 引用，我们可以从链表的首结点移动到尾结点。如此定义的结点就称为**单链表**（single linked list）。
 
@@ -60,7 +60,7 @@ return false;
 
 单链表中数据元素的插入，是通过在链表中插入数据元素所属的结点来完成的。对于链表的不同位置，插入的过程会有细微的差别。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174050.png)
+![single-linkedlist-add](https://tva1.sinaimg.cn/large/e6c9d24ely1h2zpvqg6e6j21100u0jto.jpg)
 
 除了单链表的首结点由于没有直接前驱结点，所以可以直接在首结点之前插入一个新的结点之外，在单链表中的其他任何位置插入一个新结点时，都只能是在已知某个特定结点引用的基础上在其后面插入一个新结点。并且在已知单链表中某个结点引用的基础上，完成结点的插入操作需要的时间是 $O(1)$。
 
@@ -72,7 +72,7 @@ return false;
 
 类似的，在单链表中数据元素的删除也是通过结点的删除来完成的。在链表的不同位置删除结点，其操作过程也会有一些差别。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174447.png)
+![dingle-linkedlist-del](https://tva1.sinaimg.cn/large/e6c9d24ely1h2zpwggxqzj20u70u076a.jpg)
 
 在单链表中删除一个结点时，除首结点外都必须知道该结点的直接前驱结点的引用。并且在已知单链表中某个结点引用的基础上，完成其后续结点的删除操作需要的时间是 $O(1)$。
 
@@ -80,7 +80,7 @@ return false;
 >
 > 对于任何基于序号的插入、删除，以及任何基于数据元素所在结点的前面或后面的插入、删除，在带头结点的单链表中均可转化为在某个特定结点之后完成结点的插入、删除，而不用考虑插入、删除是在链表的首部、中间、还是尾部等不同情况。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200915174846.png)
+![](../../../picBed/img/20200915174846.png)
 
 ## 双向链表
 
