@@ -1,4 +1,10 @@
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/1639639259353-b422c937-a032-4a41-b66b-f35b273b6278.png)
+---
+title: 链表-热题
+date: 2022-06-08
+tags: 
+ - LikedList
+categories: leetcode
+---
 
 
 
@@ -6,7 +12,7 @@
 >
 > 
 
-### 反转链表(206)
+### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)
 
 >反转一个单链表。
 >
@@ -17,18 +23,17 @@
 
 **进阶:** 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
 
-**题目解析**
-
-1. 定义两个指针： pre 和 cur ；pre 在前 cur 在后。
-2. 每次让 pre 的 next 指向 cur ，实现一次局部反转
-3. 局部反转完成之后，pre 和 cur 同时往前移动一个位置
-4. 循环上述过程，直至 pre 到达链表尾部
-
 **动画描述**
 
 ![迭代.gif](https://pic.leetcode-cn.com/7d8712af4fbb870537607b1dd95d66c248eb178db4319919c32d9304ee85b602-%E8%BF%AD%E4%BB%A3.gif)
 
 两个指针，最开始就把指针位置倒着放，然后遍历替换数字，最后返回 pre 就行
+
+**思路**：迭代
+
+假设链表为 1→2→3→∅，我们想要把它改成  ∅←1←2←3。
+
+在遍历链表时，将当前节点的 next 指针改为指向前一个节点。由于节点没有引用其前一个节点，因此必须事先存储其前一个节点。在更改引用之前，还需要存储后一个节点。最后返回新的头引用。
 
 ```java
 public ListNode reverseList_1(ListNode head){
@@ -41,7 +46,7 @@ public ListNode reverseList_1(ListNode head){
   while(cur != null) {
     //记录当前节点的下一个节点
     ListNode tmp = cur.next;
-    //然后将当前节点指向pre
+    //然后将该节点指向pre
     cur.next = pre;
     //pre和cur节点都前进一位
     pre = cur;
@@ -53,7 +58,7 @@ public ListNode reverseList_1(ListNode head){
 
 
 
-### [环形链表(141)](https://leetcode-cn.com/problems/linked-list-cycle/)
+### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
 
 > 给定一个链表，判断链表中是否有环。
 >
@@ -69,14 +74,12 @@ public ListNode reverseList_1(ListNode head){
 
 **题目解析**
 
-这道题是快慢指针的**经典应用**。
+这道题是快慢指针的**经典应用**。（当然还可以遍历所有节点，用哈希表存储已经访问过的节点，然后判断是否存在哈希表中即可）
 
 设置两个指针，一个每次走一步的**慢指针**和一个每次走两步的**快指针**。
 
 - 如果不含有环，跑得快的那个指针最终会遇到 null，说明链表不含环
 - 如果含有环，快指针会超慢指针一圈，和慢指针相遇，说明链表含有环。
-
-![img](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0141-Linked-List-Cycle/Animation/Animation.gif)
 
 ```java
 public boolean hasCycle(ListNode head) {
@@ -100,11 +103,7 @@ public boolean hasCycle(ListNode head) {
 }
 ```
 
-
-
 如果存在环，如何判断环的长度呢？方法是，快慢指针相遇后继续移动，直到第二次相遇。两次相遇间的移动次数即为环的长度。
-
-
 
 
 
@@ -179,19 +178,16 @@ public ListNode detectCycle_me(ListNode head) {
 
 - 创建两个指针 pA 和 pB 分别指向链表的头结点 headA 和 headB。
 
-- 当 pA 到达链表的尾部时，将它重新定位到链表B的头结点 headB，同理，当 pB 到达链表的尾部时，将它重新定位到链表 A 的头结点 headA。
+- 当 pA 到达链表的尾部时，将它重新定位到链表 B 的头结点 headB，同理，当 pB 到达链表的尾部时，将它重新定位到链表 A 的头结点 headA。
 
 - 当 pA 与 pB 相等时便是两个链表第一个相交的结点。 这里其实就是相当于把两个链表拼在一起了。pA 指针是按 B 链表拼在 A 链表后面组成的新链表遍历，而 pB 指针是按A链表拼在B链表后面组成的新链表遍历。
 
   举个简单的例子： A链表：{1,2,3,4}  B链表：{6,3,4} pA按新拼接的链表{1,2,3,4,6,3,4}遍历 pB按新拼接的链表{6,3,4,1,2,3,4}遍历
 
-![](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0160-Intersection-of-Two-Linked-Lists/Animation/Animation.gif)
-
 > 力扣有这么两个评论：
 >
-> - 走到尽头见不到你，于是走过你来时的路，等到相遇时才发现，你也走过我来时的路
->
 > - 这道题记住一句歌词就成了：我吹过你吹过的晚风
+>- 走到尽头见不到你，于是走过你来时的路，等到相遇时才发现，你也走过我来时的路
 
 ```java
 public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
@@ -200,6 +196,7 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
     }
     ListNode pA = headA, pB = headB;
     while (pA != pB) {
+      	//这里注意 如果pA 到了尾结点后要转向headB，而不是 pB
         pA = pA == null ? headB : pA.next;
         pB = pB == null ? headA : pB.next;
     }
@@ -218,7 +215,9 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 > 输出：1->1->2->3->4->4
 > ```
 
-思路：如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。
+**思路**：如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。
+
+
 
 ![img](https://pic.leetcode-cn.com/fe5eca7edea29a76316f7e8529f73a90ae4990fd66fea093c6ee91567788e482-%E5%B9%BB%E7%81%AF%E7%89%874.JPG)
 
@@ -238,6 +237,12 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 }
 ```
 
+**复杂度分析**
+
+- 时间复杂度：$O(n+m)$，其中 n 和 m 分别为两个链表的长度。因为每次调用递归都会去掉 l1 或者 l2 的头节点（直到至少有一个链表为空），函数 mergeTwoList 至多只会递归调用每个节点一次。因此，时间复杂度取决于合并后的链表长度，即 $O(n+m)$。
+
+- 空间复杂度：$O(n + m)$，其中 n 和 m 分别为两个链表的长度。递归调用 mergeTwoLists 函数时需要消耗栈空间，栈空间的大小取决于递归调用的深度。结束递归调用时 mergeTwoLists 函数最多调用 n+m 次，因此空间复杂度为 $O(n+m)$。
+
 
 
 ### [234. 回文链表](https://leetcode-cn.com/problems/palindrome-linked-list/)
@@ -253,13 +258,15 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 > 输入: 1->2->2->1
 > 输出: true
 > ```
+>
+> ![img](http://img.starfish.ink/data-structure/pal1linked-list.jpg)
+
+
 
 **解法1：**
 
 1. 复制链表值到数组列表中。
 2. 使用双指针法判断是否为回文。
-
-![01](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0234-isPalindrome/Animation/solved01.gif)
 
 ```java
 public static boolean isPalindrome_me(ListNode head){
@@ -288,12 +295,6 @@ public static boolean isPalindrome_me(ListNode head){
 
 我们先找到链表的中间结点，然后将中间结点后面的链表进行反转（206），反转之后再和前半部分链表进行比较，如果相同则表示该链表属于回文链表，返回true；否则，否则返回false
 
-![02](https://github.com/MisterBooo/LeetCodeAnimation/raw/master/0234-isPalindrome/Animation/solved02.gif)
-
-
-
-
-
 
 
 ### [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
@@ -311,6 +312,11 @@ public static boolean isPalindrome_me(ListNode head){
 > ```
 
 **思路**：看例子中的原因就会很迷糊，直接从各自第一位相加，正常进位就行，然后按顺序返回链表
+
+- 将两个链表看成是相同长度的进行遍历，如果一个链表较短则在前面补 00，比如 987 + 23 = 987 + 023 = 1010
+- 每一位计算的同时需要考虑上一位的进位问题，而当前位计算结束后同样需要更新进位值
+- 如果两个链表全部遍历完毕后，进位值为 11，则在新链表最前方添加节点 11
+- 小技巧：对于链表问题，返回结果为头结点时，通常需要先初始化一个预先指针 pre，该指针的下一个节点指向真正的头结点head。使用预先指针的目的在于链表初始化时无可用节点值，而且链表构造过程需要指针移动，进而会导致头指针丢失，无法返回结果。
 
 ```java
 public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
@@ -352,7 +358,7 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 
 
 
-### [LRU 缓存机制(146)](https://leetcode-cn.com/problems/lru-cache/)
+### [146.LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/)
 
 > 运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制 。实现 LRUCache 类：
 >
