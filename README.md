@@ -14,7 +14,7 @@
 
 ------
 
-通过 gitbook 的形式整理了自己的工作和学习经验，[JavaKeeper](https://Jstarfish.github.io) 直接访问即可，也推荐大家采用这种形式创建属于自己的“笔记本”，让成长看的见。
+通过 gitbook 的形式整理了自己的工作和学习经验，[JavaKeeper](http://Jstarfish.github.io) 直接访问即可，也推荐大家采用这种形式创建属于自己的“笔记本”，让成长看的见。
 
 > 欢迎关注公众号 [JavaKeeper](#公众号) ，有 500+ 本电子书，大佬云集的微信群，等你来撩~
 
