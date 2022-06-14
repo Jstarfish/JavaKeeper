@@ -52,7 +52,7 @@
 
 ### 1. 加载（Loading）：
 
-1. 通过一个类的全限定名获取定义此类的二进制字节流
+1. 通过一个类的全限定名获取定义此类的二进制字节流（简单点说就是找到文件系统中/jar 包中/或存在于任何地方的“`class 文件`”。 如果找不到二进制表示形式，则会抛出 `NoClassDefFound` 错误。）
 2. 将这个字节流所代表的的静态存储结构转化为方法区的运行时数据结构
 3. **在内存中生成一个代表这个类的 `java.lang.Class` 对象**，作为方法区这个类的各种数据的访问入口
 
@@ -71,10 +71,17 @@
 #### 验证（Verify）
 
 - 目的在于确保 Class 文件的字节流中包含信息符合当前虚拟机要求，保证被加载类的正确性，不会危害虚拟机自身安全
-
 - 主要包括四种验证，**文件格式验证，元数据验证，字节码验证，符号引用验证**
 
+> 校验过程检查 classfile 的语义，判断常量池中的符号，并执行类型检查， 主要目的是判断字节码的合法性，比如 magic number, 对版本号进行验证。 这些检查过程中可能会抛出 `VerifyError`， `ClassFormatError` 或 `UnsupportedClassVersionError`。
+>
+> 因为 classfile 的验证属是链接阶段的一部分，所以这个过程中可能需要加载其他类，在某个类的加载过程中，JVM 必须加载其所有的超类和接口。
+>
+> 如果类层次结构有问题（例如，该类是自己的超类或接口,死循环了），则 JVM 将抛出 `ClassCircularityError`。 而如果实现的接口并不是一个 interface，或者声明的超类是一个 interface，也会抛出 `IncompatibleClassChangeError`。
+
 #### 准备（Prepare）
+
+然后进入准备阶段，这个阶段将会创建静态字段, 并将其初始化为标准默认值(比如`null`或者`0 值`)，并分配方法表，即在方法区中分配这些变量所使用的内存空间。
 
 - 为**类变量**分配内存并且设置该类变量的默认初始值，即**零值**
   | 数据类型  | 零值     |
@@ -98,19 +105,33 @@
 
 #### 解析（Resolve）
 
+然后进入可选的解析符号引用阶段。 也就是解析常量池，主要有以下四种：类或接口的解析、字段解析、类方法解析、接口方法解析。
+
 - 将常量池内的符号引用转换为直接引用的过程
 - 事实上，解析操作往往会伴随着 JVM 在执行完初始化之后再执行
-- 符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《Java虚拟机规范》的 Class文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄
+- 符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《Java虚拟机规范》的 Class文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄（如果有了直接引用，那引用的目标必定在堆中存在）
 - 解析动作主要针对类或接口、字段、类方法、接口方法、方法类型等。对应常量池中的`CONSTANT_Class_info`、`CONSTANT_Fieldref_info`、`CONSTANT_Methodref_info`等
+
+> [《JVM里的符号引用如何存储？》](https://www.zhihu.com/question/30300585)
 
 ### 3. 初始化（Initialization）
 
-- 初始化阶段就是执行**类构造器方法** `<clinit>()` 的过程
-- 此方法不需要定义，是 javac 编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来
-- 构造器方法中指令按语句在源文件中出现的顺序执行
-- `<clinit>()` 不同于类的构造器（构造器是虚拟机视角下的 `<init>()`）
-- 若该类具有父类，JVM 会保证子类的 `<clinit>()` 执行前，父类的 `<clinit>()` 已经执行完毕
-- 虚拟机必须保证一个类的 `<clinit>()` 方法在多线程下被同步加锁
+JVM 规范明确规定, 必须在类的首次“主动使用”时才能执行类初始化。
+
+初始化的过程包括执行：
+
+- 类构造器方法
+- static 静态变量赋值语句
+- static 静态代码块
+
+如果是一个子类进行初始化会先对其父类进行初始化，保证其父类在子类之前进行初始化。所以其实在 java 中初始化一个类，那么必然先初始化过 `java.lang.Object` 类，因为所有的 java 类都继承自 java.lang.Object。
+
+> - 初始化阶段就是执行**类构造器方法** `<clinit>()` 的过程
+> - 此方法不需要定义，是 javac 编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来
+> - 构造器方法中指令按语句在源文件中出现的顺序执行
+> - `<clinit>()` 不同于类的构造器（构造器是虚拟机视角下的 `<init>()`）
+> - 若该类具有父类，JVM 会保证子类的 `<clinit>()` 执行前，父类的 `<clinit>()` 已经执行完毕
+> - 虚拟机必须保证一个类的 `<clinit>()` 方法在多线程下被同步加锁
 
 ```java
 public class ClassInitTest{
@@ -130,7 +151,7 @@ public class ClassInitTest{
 
 
 
-## 类的主动使用和被动使用
+## 类加载时机
 
 #### Java类何时会被加载
 
@@ -143,6 +164,28 @@ Java 程序对类的使用方式分为：主动使用和被动使用。虚拟机
 - JDK7 开始提供的动态语言支持：`java.lang.invoke.MethodHandle` 实例的解析结果，`REF_getStatic`、`REF_putStatic`、`REF_invokeStatic` 句柄对应的类没有初始化，则初始化
 
 除以上五种情况，其他使用 Java 类的方式被看作是对**类的被动使用**，都不**会导致类的初始化**。
+
+> JVM 规范枚举了下述多种触发情况：
+>
+> - 当虚拟机启动时，初始化用户指定的主类，就是启动执行的 main 方法所在的类；
+> - 当遇到用以新建目标类实例的 new 指令时，初始化 new 指令的目标类，就是 new 一个类的时候要初始化；
+> - 当遇到调用静态方法的指令时，初始化该静态方法所在的类；
+> - 当遇到访问静态字段的指令时，初始化该静态字段所在的类；
+> - 子类的初始化会触发父类的初始化；
+> - 如果一个接口定义了 default 方法，那么直接实现或者间接实现该接口的类的初始化，会触发该接口的初始化；
+> - 使用反射 API 对某个类进行反射调用时，初始化这个类，其实跟前面一样，反射调用要么是已经有实例了，要么是静态方法，都需要初始化；
+> - 当初次调用 MethodHandle 实例时，初始化该 MethodHandle 指向的方法所在的类。
+>
+> 同时以下几种情况不会执行类初始化：
+>
+> - 通过子类引用父类的静态字段，只会触发父类的初始化，而不会触发子类的初始化。
+> - 定义对象数组，不会触发该类的初始化。
+> - 常量在编译期间会存入调用类的常量池中，本质上并没有直接引用定义常量的类，不会触发定义常量所在的类。
+> - 通过类名获取 Class 对象，不会触发类的初始化，Hello.class 不会让 Hello 类初始化。
+> - 通过 Class.forName 加载指定类时，如果指定参数 initialize 为 false 时，也不会触发类初始化，其实这个参数是告诉虚拟机，是否要对类进行初始化。Class.forName(“jvm.Hello”)默认会加载 Hello 类。
+> - 通过 ClassLoader 默认的 loadClass 方法，也不会触发初始化动作（加载了，但是不初始化）。
+>
+> 示例: 诸如 Class.forName(), classLoader.loadClass() 等 Java API, 反射API, 以及 JNI_FindClass 都可以启动类加载。 JVM 本身也会进行类加载。 比如在 JVM 启动时加载核心类，java.lang.Object, java.lang.Thread 等等。
 
 #### eg:
 
@@ -178,6 +221,18 @@ class SubClass extends SuperClass {
 - JVM 支持两种类型的类加载器，分别为**引导类加载器**（Bootstrap ClassLoader）和**自定义类加载器**（User-Defined ClassLoader）
 
 - 从概念上来讲，自定义类加载器一般指的是程序中由开发人员自定义的一类类加载器，但是 Java 虚拟机规范却没有这么定义，而是将所有派生于抽象类 ClassLoader 的类加载器都划分为自定义类加载器
+
+系统自带的类加载器分为三种：
+
+- 启动类加载器（BootstrapClassLoader）
+- 扩展类加载器（ExtClassLoader）
+- 应用类加载器（AppClassLoader）
+
+一般启动类加载器是由 JVM 内部实现的，在 Java 的 API 里无法拿到，但是我们可以侧面看到和影响它。后 2 种类加载器在 Oracle Hotspot JVM 里，都是在中`sun.misc.Launcher`定义的，扩展类加载器和应用类加载器一般都继承自`URLClassLoader`类，这个类也默认实现了从各种不同来源加载 class 字节码转换成 Class 的方法。
+
+![classloader](https://tva1.sinaimg.cn/large/e6c9d24ely1h35g2zl2pdj223y0u042i.jpg)
+
+> 不同类加载器看似是继承(Inheritance)关系，实际是采用组合关系来复用父类加载器的相关代码
 
 
 
@@ -243,6 +298,8 @@ public class ClassLoaderTest {
 
 在 Java 的日常应用程序开发中，类的加载几乎是由 3 种类加载器相互配合执行的，在必要时，我们还可以自定义类加载器，来定制类的加载方式
 
+> 如果用户自定义了类加载器，则自定义类加载器都以应用类加载器作为父加载器。应用类加载器的父类加载器为扩展类加载器。这些类加载器是有层次关系的，启动加载器又叫根加载器，是扩展加载器的父加载器，但是直接从 ExClassLoader 里拿不到它的引用，同样会返回 null。
+
 ##### 为什么要自定义类加载器？
 
 - 隔离加载类
@@ -255,6 +312,58 @@ public class ClassLoaderTest {
 1. 开发人员可以通过继承抽象类 `java.lang.ClassLoader` 类的方式，实现自己的类加载器，以满足一些特殊的需求
 2. 在 JDK1.2 之前，在自定义类加载器时，总会去继承 ClassLoader 类并重写 loadClass() 方法，从而实现自定义的类加载类，但是 JDK1.2 之后已经不建议用户去覆盖 `loadClass()` 方式，而是建议把自定义的类加载逻辑写在 `findClass()` 方法中
 3. 编写自定义类加载器时，如果没有太过于复杂的需求，可以直接继承 URLClassLoader 类，这样就可以避免自己去编写 findClass() 方法及其获取字节码流的方式，使自定义类加载器编写更加简洁
+
+**eg**:
+
+> 比如我们试着实现一个可以用来处理简单加密的字节码的类加载器，用来保护我们的 class 字节码文件不被使用者直接拿来破解
+>
+> ```java
+> public class Hello {
+>     static {
+>         System.out.println("Hello Class Initialized!");
+>     }
+> }
+> ```
+>
+> 这个 Hello 类非常简单，就是在自己被初始化的时候，打印出来一句“Hello Class Initialized!”。假设这个类的内容非常重要，我们不想把编译到得到的 Hello.class 给别人，但是我们还是想别人可以调用或执行这个类，应该怎么办呢？一个简单的思路是，我们把这个类的 class 文件二进制作为字节流先加密一下，然后尝试通过自定义的类加载器来加载加密后的数据。为了演示简单，我们使用 jdk 自带的 Base64 算法，把字节码加密成一个文本。在下面这个例子里，我们实现一个 HelloClassLoader，它继承自 ClassLoader 类，但是我们希望它通过我们提供的一段 Base64 字符串，来还原出来，并执行我们的 Hello 类里的打印一串字符串的逻辑。
+>
+> ```java
+> public class HelloClassLoader extends ClassLoader {
+> 
+>     public static void main(String[] args) {
+>         try {
+>             new HelloClassLoader().findClass("jvm.Hello").newInstance(); // 加载并初始化Hello类
+>         } catch (ClassNotFoundException e) {
+>             e.printStackTrace();
+>         } catch (IllegalAccessException e) {
+>             e.printStackTrace();
+>         } catch (InstantiationException e) {
+>             e.printStackTrace();
+>         }
+>     }
+> 
+>     @Override
+>     protected Class<?> findClass(String name) throws ClassNotFoundException {
+> 
+>         String helloBase64 = "yv66vgAAADQAHwoABgARCQASABMIABQKABUAFgcAFwcAGAEABjxpbml0PgEAAygpVgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAR0aGlzAQALTGp2bS9IZWxsbzsBAAg8Y2xpbml0PgEAClNvdXJjZUZpbGUBAApIZWxsby5qYXZhDAAHAAgHABkMABoAGwEAGEhlbGxvIENsYXNzIEluaXRpYWxpemVkIQcAHAwAHQAeAQAJanZtL0hlbGxvAQAQamF2YS9sYW5nL09iamVjdAEAEGphdmEvbGFuZy9TeXN0ZW0BAANvdXQBABVMamF2YS9pby9QcmludFN0cmVhbTsBABNqYXZhL2lvL1ByaW50U3RyZWFtAQAHcHJpbnRsbgEAFShMamF2YS9sYW5nL1N0cmluZzspVgAhAAUABgAAAAAAAgABAAcACAABAAkAAAAvAAEAAQAAAAUqtwABsQAAAAIACgAAAAYAAQAAAAMACwAAAAwAAQAAAAUADAANAAAACAAOAAgAAQAJAAAAJQACAAAAAAAJsgACEgO2AASxAAAAAQAKAAAACgACAAAABgAIAAcAAQAPAAAAAgAQ";
+> 
+>         byte[] bytes = decode(helloBase64);
+>         return defineClass(name,bytes,0,bytes.length);
+>     }
+> 
+>     public byte[] decode(String base64){
+>         return Base64.getDecoder().decode(base64);
+>     }
+> }
+> ```
+>
+> 直接执行这个类：
+>
+> ```shell
+> $ java jvm.HelloClassLoader Hello Class Initialized!
+> ```
+
+
 
 ### ClassLoader 常用方法
 
@@ -310,11 +419,24 @@ Java 虚拟机对 class 文件采用的是<mark>**按需加载**</mark>的方式
 ### 破坏双亲委派模型
 
 - 双亲委派模型并不是一个强制性的约束模型，而是 Java 设计者推荐给开发者的类加载器实现方式，可以“被破坏”，只要我们自定义类加载器，**重写 `loadClass()` 方法**，指定新的加载逻辑就破坏了，重写 `findClass()` 方法不会破坏双亲委派。
+
 - 双亲委派模型有一个问题：顶层 ClassLoader，无法加载底层 ClassLoader 的类。典型例子 JNDI、JDBC，所以加入了线程上下文类加载器（Thread Context ClassLoader），可以通过 `Thread.setContextClassLoaser()`设置该类加载器，然后顶层 ClassLoader 再使用 `Thread.getContextClassLoader()` 获得底层的 ClassLoader 进行加载。
+
 - Tomcat 中使用了自定 ClassLoader，并且也破坏了双亲委托机制。每个应用使用 WebAppClassloader 进行单独加载，他首先使用 WebAppClassloader 进行类加载，如果加载不了再委托父加载器去加载，这样可以保证每个应用中的类不冲突。每个 tomcat 中可以部署多个项目，每个项目中存在很多相同的 class 文件（很多相同的jar包），他们加载到 jvm 中可以做到互不干扰。
+
+  ![](https://tva1.sinaimg.cn/large/e6c9d24ely1h35ghbt9uej20ib0g4abi.jpg)
+
 - 利用破坏双亲委派来实现**代码热替换**（每次修改类文件，不需要重启服务）。因为一个 Class 只能被一个 ClassLoader 加载一次，否则会报 `java.lang.LinkageError`。当我们想要实现代码热部署时，可以每次都 new 一个自定义的 ClassLoader 来加载新的 Class文件。JSP 的实现动态修改就是使用此特性实现。
 
 
+
+## 如何替换 JDK 的类
+
+如何替换 JDK 中的类？比如，我们现在就拿 HashMap为例。
+
+当 Java 的原生 API 不能满足需求时，比如我们要修改 HashMap 类，就必须要使用到 Java 的 endorsed 技术。我们需要将自己的 HashMap 类，打包成一个 jar 包，然后放到 -Djava.endorsed.dirs 指定的目录中。注意类名和包名，应该和 JDK 自带的是一样的。但是，java.lang 包下面的类除外，因为这些都是特殊保护的。
+
+因为我们上面提到的双亲委派机制，是无法直接在应用中替换 JDK 的原生类的。但是，有时候又不得不进行一下增强、替换，比如你想要调试一段代码，或者比 Java 团队早发现了一个 Bug。所以，Java 提供了 endorsed 技术，用于替换这些类。这个目录下的 jar 包，会比 rt.jar 中的文件，优先级更高，可以被最先加载到。
 
 
 

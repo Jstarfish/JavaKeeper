@@ -113,10 +113,10 @@ SQL优化和移植性
 
 ### MyBatis的工作原理
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/modb_20210809_ccc32e82-f90f-11eb-8882-00163e068ecd.png)
+![MyBatis框架的执行流程图](https://tva1.sinaimg.cn/large/e6c9d24ely1h31snxsuxbj20kd0n3abk.jpg)
 
-1. 读取 MyBatis 配置文件：mybatis-config.xml 为 MyBatis 的全局配置文件，包含了 MyBatis 行为的设置和属性信息，例如数据库连接信息和映射文件。
-2. 加载映射文件mapper.xml。映射文件即 SQL 映射文件，该文件中配置了操作数据库的 SQL 语句，需要在 MyBatis 配置文件 mybatis-config.xml 中加载。mybatis-config.xml 文件可以加载多个映射文件，每个文件对应数据库中的一张表。
+1. 读取 MyBatis 配置文件：mybatis-config.xml 为 MyBatis 的全局配置文件，包含了 MyBatis 行为的设置和属性信息，例如数据库连接信息和映射文件。（我们一般是通过Spring 整合，用 SqlSessionFactoryBean 配置 dataSource 和 mapper 地址等，其实现了InitializingBean 、FactoryBean、ApplicationListener 三个接口 ）
+2. 加载映射文件mapper.xml。映射文件即 SQL 映射文件，该文件中配置了操作数据库的 SQL 语句，需要在 MyBatis 配置文件 mybatis-config.xml 中加载。mybatis-config.xml 文件可以加载多个映射文件，每个文件对应数据库中的一张表（MyBatis 会将 Mapper 映射文件中定义的 SQL 语句解析成 SqlSource 对象，其中的动态标签、SQL 语句文本等，会解析成对应类型的 SqlNode 对象）。
 3. 构造会话工厂：通过 MyBatis 的环境等配置信息构建会话工厂 SqlSessionFactory。 
 4. 创建会话对象：由会话工厂创建 SqlSession 对象，该对象中包含了执行 SQL 语句的所有方法。
 5. Executor 执行器：MyBatis 底层定义了一个 Executor 接口来操作数据库，它将根据 SqlSession 传递的参数动态地生成需要执行的 SQL 语句，同时负责查询缓存的维护。
@@ -250,6 +250,8 @@ Mybatis使用RowBounds对象进行分页，它是针对ResultSet结果集执行�
 >
 > 二级缓存开启后，同一个namespace下的所有操作语句，都影响着同一个Cache，即二级缓存被多个SqlSession共享，是一个全局的变量。
 >
+> ![img](https://tva1.sinaimg.cn/large/e6c9d24ely1h322koh4wxj20qu0dx750.jpg)
+>
 > 当开启缓存后，数据的查询执行的流程就是 二级缓存 -> 一级缓存 -> 数据库
 
 1. 一级缓存: 基于 PerpetualCache 的 HashMap 本地缓存，其存储作用域为 Session，当 Session flush 或 close 之后，该 Session 中的所有 Cache 就将清空，MyBatis默认打开一级缓存。
@@ -261,11 +263,9 @@ Mybatis使用RowBounds对象进行分页，它是针对ResultSet结果集执行�
 
 
 
-
-
 ### 通常一个 Xml 映射文件，都会写一个 Dao 接口与之对应, Dao 的工作原理，是否可以重 载?
 
-不能重载，因为通过 Dao 寻找 Xml 对应的 sql 的时候全限名+方法名的保存和寻找策 略。接口工作原理为 jdk 动态代理原理，运行时会为 dao 生成 proxy，代理对象会拦截接口 方法，去执行对应的 sql 返回数据。
+不能重载，因为通过 Dao 寻找 Xml 对应的 sql 的时候全限名+方法名的保存和寻找策略。接口工作原理为 jdk 动态代理原理，运行时会为 dao 生成 proxy，代理对象会拦截接口 方法，去执行对应的 sql 返回数据。
 
 
 
@@ -277,7 +277,11 @@ Mybatis使用RowBounds对象进行分页，它是针对ResultSet结果集执行�
 
 ### Mybatis 都有哪些 Executor 执行器?它们之间的区别是什么?
 
-Mybatis 有三种基本的 Executor 执行器，SimpleExecutor、ReuseExecutor、 BatchExecutor。1)SimpleExecutor:每执行一次 update 或 select，就开启一个 Statement 对 象，用完立刻关闭 Statement 对象。2)ReuseExecutor:执行 update 或 select，以 sql 作为 key 查找 Statement 对象，存在就使用，不存在就创建，用完后，不关闭 Statement 对象， 而是放置于 Map3)BatchExecutor:完成批处理。
+Mybatis 有三种基本的 Executor 执行器，SimpleExecutor、ReuseExecutor、 BatchExecutor。
+
+1. SimpleExecutor:每执行一次 update 或 select，就开启一个 Statement 对 象，用完立刻关闭 Statement 对象。
+2. ReuseExecutor:执行 update 或 select，以 sql 作为 key 查找 Statement 对象，存在就使用，不存在就创建，用完后，不关闭 Statement 对象， 而是放置于 Map
+3. BatchExecutor:完成批处理。
 
 
 

@@ -184,9 +184,11 @@ protected Class<?> loadClass(String name, boolean resolve)
 
 
 
-## 二、内存管理
+## 二、内存结构
 
 ### 8、Java 内存结构？| JVM 内存区域的划分
+
+![1.png](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xbsrx0bj20ku09474n.jpg)
 
 通常可以把 JVM 内存区域分为下面几个方面，其中，有的区域是以线程为单位，而有的区域则是整个 JVM 进程唯一的。
 
@@ -270,6 +272,32 @@ protected Class<?> loadClass(String name, boolean resolve)
 我注意到有一些观点，认为通过[逃逸分析](https://en.wikipedia.org/wiki/Escape_analysis)，JVM 会在栈上分配那些不会逃逸的对象，这在理论上是可行的，但是取决于 JVM 设计者的选择。据我所知，Oracle Hotspot JVM 中并未这么做，这一点在逃逸分析相关的[文档](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/performance-enhancements-7.html#escapeAnalysis)里已经说明，所以可以明确所有的对象实例都是创建在堆上。
 
 - 目前很多书籍还是基于 JDK 7 以前的版本，JDK 已经发生了很大变化，Intern 字符串的缓存和静态变量曾经都被分配在永久代上，而永久代已经被元数据区取代。但是，Intern 字符串缓存和静态变量并不是被转移到元数据区，而是直接在堆上分配，所以这一点同样符合前面一点的结论：对象实例都是分配在堆上。
+
+
+
+### Java new 一个对象的过程发生了什么
+
+java在new一个对象的时候，会先查看对象所属的类有没有被加载到内存，如果没有的话，就会先通过类的全限定名来加载。加载并初始化类完成后，再进行对象的创建工作。
+
+我们先假设是第一次使用该类，这样的话new一个对象就可以分为两个过程：加载并初始化类和创建对象
+
+加载过程就是 ClassLoader 那一套：加载-验证-准备-解析-初始化
+
+然后创建对象
+
+1. 在堆区分配对象需要的内存
+
+   分配的内存包括本类和父类的所有实例变量，但不包括任何静态变量
+
+2. 对所有实例变量赋默认值
+
+   将方法区内对实例变量的定义拷贝一份到堆区，然后赋默认值
+
+3. 执行实例初始化代码
+
+   初始化顺序是先初始化父类再初始化子类，初始化时先执行实例代码块然后是构造方法
+
+4. 如果有类似于Child c = new Child()形式的c引用的话，在栈区定义Child类型引用变量c，然后将堆区对象的地址赋值给它
 
 
 
@@ -402,6 +430,16 @@ Person p=new Person(“张三”);
 
 ## 三、GC
 
+### 谈下 Java 的内存管理和垃圾回收
+
+内存管理就是内存的生命周期管理，包括内存的申请、压缩、回收等操作。 Java 的内存管理就是 GC，JVM 的 GC 模块不仅管理内存的回收，也负责内存的分配和压缩整理。
+
+Java 程序的指令都运行在 JVM 上，而且我们的程序代码并不需要去分配内存和释放内存（例如 C/C++ 里需要使用的 malloc/free），那么这些操作自然是由JVM帮我们搞定的。
+
+JVM 在我们创建 Java 对象的时候去分配新内存，并使用 GC 算法，根据对象的存活时间，在对象不使用之后，自动执行对象的内存回收操作。
+
+
+
 ### 17、简述垃圾回收机制
 
 程序在运行的时候，为了提高性能，大部分数据都是会加载到内存中进行运算的，有些数据是需要常驻内存中的，但是有些数据，用过之后便不会再需要了，我们称这部分数据为垃圾数据。
@@ -418,7 +456,11 @@ Person p=new Person(“张三”);
 
 - 引用计数法：引用计数算法，顾名思义，就是为对象添加一个引用计数，用于记录对象被引用的情况，如果计数为 0，即表示对象可回收。有循环引用问题
 
+  ![6.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xlnrayhj20ev07ymxn.jpg)
+
 - 可达性分析：将对象及其引用关系看作一个图，选定活动的对象作为 GC Roots，然后跟踪引用链条，如果一个对象和 GC Roots 之间不可达，也就是不存在引用链条，那么即可认为是可回收对象
+
+  ![7.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xlswkv6j20hj084mxs.jpg)
 
 
 
@@ -452,6 +494,14 @@ Person p=new Person(“张三”);
 
 
 
+### 哪些内存区域需要 GC ?
+
+![9.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xon2wplj20m80ccjs9.jpg)
+
+ thread 独享的区域：PC Regiester、JVM Stack、Native Method Stack，其生命周期都与线程相同（即与线程共生死），所以无需 GC。而线程共享的 Heap 区、Method Area 则是 GC 关注的重点对象
+
+
+
 ### 对象的死亡过程
 
 1. 第一次标记
@@ -468,6 +518,62 @@ Person p=new Person(“张三”);
 
 
 
+### 说一说常用的 GC 算法及其优缺点
+
+1. mark-sweep 标记清除法
+
+![10.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xqqbokzj20iu0ad0sy.jpg)
+
+​	如上图，黑色区域表示待清理的垃圾对象，标记出来后直接清空。
+
+​	优：简单快速；
+
+​	缺：产生很多内存碎片。
+
+2. mark-copy 标记复制法
+
+   ![11.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xr30rtbj20j90ao0sz.jpg)
+
+   思路也很简单，将内存对半分，总是保留一块空着（上图中的右侧），将左侧存活的对象（浅灰色区域）复制到右侧，然后左侧全部清空。
+
+   优：避免了内存碎片问题；
+
+   缺：内存浪费很严重，相当于只能使用 50% 的内存。
+
+3. mark-compact 标记-整理（也称标记-压缩）法
+
+   ![12.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xrqf5wrj20j30ak74i.jpg)
+
+   将垃圾对象清理掉后，同时将剩下的存活对象进行整理挪动（类似于 windows 的磁盘碎片整理），保证它们占用的空间连续。
+
+   优：节约了内存，并避免了内存碎片问题。
+
+   缺：整理过程会降低 GC 的效率。
+
+   上述三种算法，每种都有各自的优缺点，都不完美；在现代 JVM 中，往往是综合使用的。经过大量实际分析，发现内存中的对象，大致可以分为两类：
+
+   - 有些生命周期很短，比如一些局部变量/临时对象；
+
+   - 而另一些则会存活很久，典型的比如 websocket 长连接中的 connection 对象。如下图，纵向 y 轴可以理解分配内存的字节数，横向 x 轴理解为随着时间流逝（伴随着 GC）。	
+
+     ![13.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xsg6a9mj20km0e9mxm.jpg)
+
+     可以发现大部分对象其实相当短命，很少有对象能在 GC 后活下来，因此诞生了分代的思想。
+
+   4. generation-collect 分代收集算法
+
+      以 Hotspot 为例（JDK 7）进行讲解，如下图所示，可以将内存分成了三大块：年青代（Young Genaration）、老年代（Old Generation）、永久代（Permanent Generation）。其中 Young Genaration 更是又细为分 eden、S0、S1 三个区。
+
+      ![14.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xttbmrgj20ns072dg9.jpg)
+
+      结合我们经常使用的一些 jvm 调优参数后，一些参数能影响的各区域内存大小值，示意图如下：
+
+      ![15.jpg](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xtyg6xyj20u00jnq43.jpg)
+
+      注：jdk8 开始，用 MetaSpace 区取代了 Perm 区（永久代），所以相应的 jvm 参数变成-XX:MetaspaceSize 及 -XX:MaxMetaspaceSize。
+
+   
+
 
 ### 21、JVM中一次完整的GC流程是怎样的，对象如何晋升到老年代
 
@@ -480,6 +586,8 @@ Person p=new Person(“张三”);
 - 如果对象在 Eden 出生，并经过第一次 Minor GC 后仍然存活，并且被 Survivor 容纳的话，年龄设为 1，每熬过一次 Minor GC，年龄+1，**若年龄超过一定限制（15），则被晋升到老年态**。即**长期存活的对象进入老年态**。
 - 老年代满了而**无法容纳更多的对象**，Minor GC 之后通常就会进行Full GC，Full GC  清理整个内存堆 – **包括年轻代和年老代**。
 - Major GC **发生在老年代的GC**，**清理老年区**，经常会伴随至少一次Minor GC，**比Minor GC慢10倍以上**。
+
+![阿里出品的《码出高效-Java开发手册》一书，梳理了 GC 的主要过程](https://tva1.sinaimg.cn/large/e6c9d24ely1h32xxpdtbnj20j90hg756.jpg)
 
 
 
@@ -527,6 +635,8 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
   标记整理算法实现，**运作流程主要包括以下：初始标记，并发标记，最终标记，筛选标记**。不会产生空间碎片，可以精确地控制停顿。
 
+
+
 #### b、CMS 收集器和 G1 收集器的区别：
 
 目前使用最多的是 CMS 和 G1 收集器，二者都有分代的概念，主要内存结构如下
@@ -549,21 +659,19 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
 ### 详细说⼀下CMS垃圾回收算法回收过程？4个阶段
 
-> https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89/14%20%E5%B8%B8%E8%A7%81%E7%9A%84%20GC%20%E7%AE%97%E6%B3%95%EF%BC%88ParallelCMSG1%EF%BC%89.md
-
 ![截屏2020-10-08 下午4.23.52](http://berrywong.com/group1/M00/00/01/wKgABF9-5X-EZjhuAAAAAD18VMY902.png)
 
 **1）初始化标记**
 
 这个阶段只会标记GC Root对象，会产生短暂的STW，初始化标记后其他用户线程可以恢复运行（初始标记的目标是标记所有的根对象，包括根对象直接引用的对象，以及被年轻代中所有存活对象所引用的对象（老年代单独回收））
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/caf715d0-32ed-11ea-8c11-e7b43c5f4201.png)
+![54201932.png](https://tva1.sinaimg.cn/large/e6c9d24ely1h32y0qzi0mj21eg0u00vk.jpg)
 
 **2）并发标记**
 
 在此阶段，CMS GC 遍历老年代，标记所有的存活对象，从前一阶段“Initial Mark”找到的根对象开始算起。“并发标记”阶段，就是与应用程序同时运行，不用暂停的阶段。请注意，并非所有老年代中存活的对象都在此阶段被标记，因为在标记过程中对象的引用关系还在发生变化。
 
-![80365661.png](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/f30d6240-32ed-11ea-aa6e-a7e7fcb8af6c.png)
+![80365661.png](https://tva1.sinaimg.cn/large/e6c9d24ely1h32y0yz2spj21f30u0goy.jpg)
 
 在上面的示意图中，“当前处理的对象”的一个引用就被应用线程给断开了，即这个部分的对象关系发生了变化
 
@@ -577,21 +685,46 @@ HotSpot虚拟机对象的对象头部包含两类信息
 
 **5）并发重置**
 
-并发重置阶段是最后一个过程了，在图中没有画出，这个阶段会重置所有的GC线程，为下一次GC做准备。
+此阶段与应用程序并发执行，重置 CMS 算法相关的内部数据，为下一次 GC 循环做准备。
 
 
 
-### MinorGC 的过程
+### **Minor GC（小型 GC）**
 
-MinorGC 采用复制算法。 （复制->清空->互换）
+收集年轻代内存的 GC 事件称为 Minor GC。关于 Minor GC 事件，我们需要了解一些相关的内容：
 
-1. eden、servicorFrom 复制到 ServicorTo，年龄+1 首先，把 Eden 和 ServivorFrom 区域中存活的对象复制到 ServicorTo 区域（如果有对象的年龄以及达到了老年的标准，则赋值到老年代区），同时把这些对象的年龄+1（如果 ServicorTo 不够位置了就放到老年区）； 
-2. 清空 eden、servicorFrom 然后，清空 Eden 和 ServicorFrom 中的对象； 
-3. ServicorTo 和 ServicorFrom 互换最后，ServicorTo 和 ServicorFrom 互换，原 ServicorTo 成为下一次 GC 时的 ServicorFrom 区。
+1. 当 JVM 无法为新对象分配内存空间时就会触发 Minor GC（ 一般就是 Eden 区用满了）。如果对象的分配速率很快，那么 Minor GC 的次数也就会很多，频率也就会很快。
 
+2. Minor GC 事件不处理老年代，所以会把所有从老年代指向年轻代的引用都当做 GC Root。从年轻代指向老年代的引用则在标记阶段被忽略。
 
+3. 与我们一般的认知相反，Minor GC 每次都会引起 STW 停顿（stop-the-world），挂起所有的应用线程。对大部分应用程序来说，Minor GC 的暂停时间可以忽略不计，因为 Eden 区里面的对象大部分都是垃圾，也不怎么复制到存活区/老年代。但如果不符合这种情况，那么很多新创建的对象就不能被 GC 清理，Minor GC 的停顿时间就会增大，就会产生比较明显的 GC 性能影响。
+
+   
 
 ### Minor GC  和 Full GC 触发条件
+
+我们知道，除了 Minor GC 外，另外两种 GC 事件则是：
+
+- Major GC（大型 GC）：清理老年代空间（Old Space）的 GC 事件。
+- Full GC（完全 GC）：清理整个堆内存空间的 GC 事件，包括年轻代空间和老年代空间。
+
+
+
+### 什么时候会触发 Full GC ?
+
+1. `System.gc()` 方法的调用
+
+   此方法的调用是建议 JVM 进行 Full GC，虽然只是建议而非一定，但很多情况下它会触发 Full GC，从而增加Full GC 的频率，也即增加了间歇性停顿的次数。强烈影响系建议能不使用此方法就别使用，让虚拟机自己去管理它的内存，可通过通过 -XX:+ DisableExplicitGC 来禁止 RMI 调用 System.gc。
+
+2. 老年代空间不足
+
+   老年代空间只有在新生代对象转入及创建大对象、大数组时才会出现不足的现象，当执行 Full GC 后空间仍然不足，则抛出如下错误：java.lang.OutOfMemoryError: Java heap space 为避免以上两种状况引起的 Full GC，调优时应尽量做到让对象在 Minor GC 阶段被回收、让对象在新生代多存活一段时间及不要创建过大的对象及数组。
+
+3. 老年代的内存使用率达到了一定阈值（可通过参数调整），直接触发 FGC
+
+4. 空间分配担保：在 YGC 之前，会先检查老年代最大可用的连续空间是否大于新生代所有对象的总空间。如果小于，说明 YGC 是不安全的，则会查看参数 HandlePromotionFailure 是否被设置成了允许担保失败，如果不允许则直接触发 Full GC；如果允许，那么会进一步检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果小于也会触发 Full GC
+
+5. Metaspace（元空间）在空间不足时会进行扩容，当扩容到了-XX:MetaspaceSize 参数的指定值时，也会触发FGC
 
 
 
@@ -608,14 +741,35 @@ MinorGC 采用复制算法。 （复制->清空->互换）
 比如 GC 的时候必须要等到 Java 线程都进入到 safepoint 的时候 VMThread 才能开始 执行 GC，
 
 1. 循环的末尾 (防止大循环的时候一直不进入 safepoint，而其他线程在等待它进入 safepoint)
-
 2. 方法返回前
 3. 调用方法的call之后 
 4. 抛出异常的位置
 
-------
 
 
+### 你们用的是什么 GC，都有哪些配置
+
+```
+xxx      143       1 54 Jun07 ?        1-13:05:06 /opt/local/jdk/bin/java -Djava.util.logging.config.file=/opt/local/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -server -Xmn1024m -Xms22938M -Xmx22938M -XX:PermSize=512m -XX:MaxPermSize=512m -XX:ParallelGCThreads=3 -XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=80 -XX:+CMSScavengeBeforeRemark -XX:SoftRefLRUPolicyMSPerMB=0 -XX:ParallelGCThreads=3 -Xss1m -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/opt/logs/gc.log -verbose:gc -XX:+DisableExplicitGC -Dsun.rmi.transport.tcp.maxConnectionThreads=400 -XX:+ParallelRefProcEnabled -XX:+PrintTenuringDistribution -Dsun.rmi.transport.tcp.handshakeTimeout=2000 -Xdebug -Xrunjdwp:transport=dt_socket,address=22062,server=y,suspend=n -Dcom.sun.management.snmp.port=18328 -Dcom.sun.management.snmp.interface=0.0.0.0 -Dcom.sun.management.snmp.acl=false -javaagent:/opt/opbin/service_control/script/jmx_prometheus_javaagent-0.13.0.jar=9999:/opt/opbin/service_control/script/config.yaml -Djdk.tls.ephemeralDHKeySize=2048 -Djava.protocol.handler.pkgs=org.apache.catalina.webresources -Dignore.endorsed.dirs= -classpath /opt/local/tomcat/bin/bootstrap.jar:/opt/local/tomcat/bin/tomcat-juli.jar -Dcatalina.base=/opt/local/tomcat -Dcatalina.home=/opt/local/tomcat -Djava.io.tmpdir=/opt/local/tomcat/temp org.apache.catalina.startup.Bootstrap start start
+```
+
+
+
+### Java 11 的 ZGC 和 Java12 的 Shenandoah 了解过吗
+
+ZGC 即 Z Garbage Collector（Z 垃圾收集器，Z 有 Zero 的意思，主要作者是 Oracle 的 Per Liden），这是一款低停顿、高并发，基于小堆块（region）、不分代的增量压缩式垃圾收集器，平均 GC 耗时不到 2 毫秒，最坏情况下的暂停时间也不超过 10 毫秒。
+
+像 G1 和 ZGC 之类的现代 GC 算法，只要空闲的堆内存足够多，基本上不触发 FullGC。
+
+所以很多时候，只要条件允许，加内存才是最有效的解决办法。
+
+既然低延迟是 ZGC 的核心看点，而 JVM 低延迟的关键是 GC 暂停时间，那么我们来看看有哪些方法可以减少 GC 暂停时间：
+
+- 使用多线程“并行”清理堆内存，充分利用多核 CPU 的资源；
+- 使用“分阶段”的方式运行 GC 任务，把暂停时间打散；
+- 使用“增量”方式进行处理，每次 GC 只处理一部分堆内存（小堆块，region）；
+- 让 GC 与业务线程“并发”执行，例如增加并发标记，并发清除等阶段，从而把暂停时间控制在非常短的范围内（目前来说还是必须使用少量的 STW 暂停，比如根对象的扫描，最终标记等阶段）；
+- 完全不进行堆内存整理，比如 Golang 的 GC 就采用这种方式（题外话）。
 
 
 
@@ -689,9 +843,31 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
 
 
 
+### 你平时工作用过的 JVM 常用基本配置参数有哪些？
+
+```
+# 设置堆内存
+-Xmx4g -Xms4g 
+# 指定 GC 算法
+-XX:+UseG1GC -XX:MaxGCPauseMillis=50 
+# 指定 GC 并行线程数
+-XX:ParallelGCThreads=4 
+# 打印 GC 日志
+-XX:+PrintGCDetails -XX:+PrintGCDateStamps 
+# 指定 GC 日志文件
+-Xloggc:gc.log 
+# 指定 Meta 区的最大值
+-XX:MaxMetaspaceSize=2g 
+# 设置单个线程栈的大小
+-Xss1m 
+# 指定堆内存溢出时自动进行 Dump
+-XX:+HeapDumpOnOutOfMemoryError 
+-XX:HeapDumpPath=/usr/local/
+```
 
 
-### 你说你做过 JVM 调优和参数配置，请问如何盘点查看 JVM 系统默认值
+
+### 你说你做过  JVM 调优和参数配置，请问如何盘点查看 JVM 系统默认值
 
 #### JVM参数类型
 
@@ -798,105 +974,15 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
 
 
 
-### 你平时工作用过的 JVM 常用基本配置参数有哪些？
-
-- -Xms
-
-  - 初始大小内存，默认为物理内存1/64
-  - 等价于 -XX:InitialHeapSize
-
-- -Xmx
-
-  - 最大分配内存，默认为物理内存的1/4
-  - 等价于 -XX:MaxHeapSize
-
-- -Xss
-
-  - 设置单个线程的大小，一般默认为 512k~1024k
-  - 等价于 -XX:ThreadStackSize
-  - 如果通过 `jinfo ThreadStackSize 线程 ID` 查看会显示为 0，指的是默认出厂设置
-
-- -Xmn
-
-  - 设置年轻代大小（一般不设置）
-
-- -XX:MetaspaceSize
-
-  - 设置元空间大小。元空间的本质和永久代类似，都是对 JMM 规范中方法区的实现。不过元空间与永久代最大的区别是，元空间并不在虚拟机中，而是使用本地内存。因此，默认情况下，元空间的大小仅受本地内存限制
-  - 但是元空间默认也很小，频繁 new 对象，也会 OOM
-  - -Xms10m -Xmx10m -XX:MetaspaceSize=1024m -XX:+PrintFlagsFinal
-
-- -XX:+PrintGCDetails
-
-  - 输出详细的 GC 收集日志信息 
-
-  - 测试时候，可以将参数调到最小，
-
-    `-Xms10m -Xmx10m -XX:+PrintGCDetails`
-
-    定义一个大对象，撑爆堆内存，
-
-    ```java
-    public static void main(String[] args) throws InterruptedException {
-        System.out.println("==hello gc===");
-    
-        //Thread.sleep(Integer.MAX_VALUE);
-    
-        //-Xms10m -Xmx10m -XX:PrintGCDetails
-    
-        byte[] bytes = new byte[11 * 1024 * 1024];
-    
-    }![](https://tva1.sinaimg.cn/large/007S8ZIlly1gehkvas3vzj31a90u0n7t.jpg)
-    ```
-
-  - GC![](https://tva1.sinaimg.cn/large/00831rSTly1gdefrf0dfqj31fs0honjk.jpg)
-
-  - Full GC![](https://tva1.sinaimg.cn/large/00831rSTly1gdefrc3lmbj31hy0gk7of.jpg)
-
-    ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefr8tvx0j31h60m41eq.jpg) 
-
-- -XX:SurvivorRatio
-
-  - 设置新生代中 eden 和S0/S1空间的比例
-  - 默认 -XX:SurvivorRatio=8,Eden:S0:S1=8:1:1
-  - SurvivorRatio值就是设置 Eden 区的比例占多少，S0/S1相同，如果设置  -XX:SurvivorRatio=2，那Eden:S0:S1=2:1:1
-
-- -XX:NewRatio
-
-  - 配置年轻代和老年代在堆结构的比例
-  - 默认 -XX:NewRatio=2，新生代 1，老年代 2，年轻代占整个堆的 1/3
-  - NewRatio值就是设置老年代的占比，如果设置-XX:NewRatio=4，那就表示新生代占 1，老年代占 4，年轻代占整个堆的 1/5
-
-- -XX:MaxTenuringThreshold
-
-  - 设置垃圾的最大年龄（java8 固定设置最大 15）
-  - ![](https://tva1.sinaimg.cn/large/00831rSTly1gdefr4xeq1j31g80lek6e.jpg)
-
-
-
 参数不懂，推荐直接去看官网，
 
 https://docs.oracle.com/javacomponents/jrockit-hotspot/migration-guide/cloptions.htm#JRHMG127
-
-
 
 https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BGBCIEFC
 
 https://docs.oracle.com/javase/8/
 
 Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html)
-
-
-
-
-
-
-
-### 4. 强引用、软引用、弱引用、虚引用分别是什么？
-
-
-
-
 
 
 
@@ -961,8 +1047,6 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 
 
-
-
 ### 怎么打出线程栈信息。
 
 **思路：** 可以说一下jps，top ，jstack这几个命令，再配合一次排查线上问题进行解答。
@@ -1009,7 +1093,7 @@ Java SE Tools Reference for UNIX](https://docs.oracle.com/javase/8/docs/technote
 
 ### 7.怎么查看服务器默认的垃圾收集器是哪个？生产上如何配置垃圾收集器？谈谈你对垃圾收集器的理解？
 
-### 8.G1 垃圾收集器？
+
 
 
 

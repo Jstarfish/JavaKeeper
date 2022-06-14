@@ -8,7 +8,7 @@ categories: JVM Java
 
 > 点赞+收藏 就学会系列，文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱，笔记自取
 
-![oom](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/oom.png)
+![oom](https://img.starfish.ink/jvm/oom.png)
 
 在《Java虚拟机规范》的规定里，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生 OutOfMemoryError 异常的可能。
 
@@ -27,7 +27,7 @@ categories: JVM Java
 
 > 我们常说的 OOM 异常，其实是 Error
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/jvm/error-oom.png)
+![error-oom](https://img.starfish.ink/jvm/error-oom.png)
 
 
 
@@ -116,8 +116,6 @@ Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 - 如果是业务峰值压力，可以考虑添加机器资源，或者做限流降级。
 - 如果是内存泄漏，需要找到持有的对象，修改代码设计，比如关闭没有释放的连接
 
-
-
 ![img](https://i03piccdn.sogoucdn.com/1b2bed506484c61d)
 
 > 面试官：说说内存泄露和内存溢出
@@ -126,7 +124,7 @@ Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 
 ### 内存泄露和内存溢出
 
-内存溢出(out of memory)，是指程序在申请内存时，没有足够的内存空间供其使用，出现out of memory；比如申请了一个 Integer，但给它存了 Long 才能存下的数，那就是内存溢出。
+内存溢出(out of memory)，是指程序在申请内存时，没有足够的内存空间供其使用，出现 out of memory；比如申请了一个 Integer，但给它存了 Long 才能存下的数，那就是内存溢出。
 
 内存泄露( memory leak)，是指程序在申请内存后，无法释放已申请的内存空间，一次内存泄露危害可以忽略，但内存泄露堆积后果很严重，无论多少内存，迟早会被占光。
 
@@ -136,7 +134,7 @@ Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 
 ## 三、GC overhead limit exceeded
 
-JVM 内置了垃圾回收机制GC，所以作为 Javaer 的我们不需要手工编写代码来进行内存分配和释放，但是当 Java 进程花费 98% 以上的时间执行 GC，但只恢复了不到 2% 的内存，且该动作连续重复了 5 次，就会抛出 `java.lang.OutOfMemoryError:GC overhead limit exceeded` 错误（**俗称：垃圾回收上头**）。简单地说，就是应用程序已经基本耗尽了所有可用内存， GC 也无法回收。
+JVM 内置了垃圾回收机制 GC，所以作为 Javaer 的我们不需要手工编写代码来进行内存分配和释放，但是当 Java 进程花费 98% 以上的时间执行 GC，但只恢复了不到 2% 的内存，且该动作连续重复了 5 次，就会抛出 `java.lang.OutOfMemoryError:GC overhead limit exceeded` 错误（**俗称：垃圾回收上头**）。简单地说，就是应用程序已经基本耗尽了所有可用内存， GC 也无法回收。
 
 假如不抛出 `GC overhead limit exceeded` 错误，那 GC 清理的那么一丢丢内存很快就会被再次填满，迫使 GC 再次执行，这样恶性循环，CPU 使用率 100%，而 GC 没什么效果。
 
@@ -272,7 +270,7 @@ java.lang.OutOfMemoryError: unable to create new native thread
 
 ### 5.2 原因分析
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ggg8qlm7f0j30jg066gly.jpg)
+![](https://img.starfish.ink/jvm/toomanythread.png)
 
 JVM 向 OS 请求创建 native 线程失败，就会抛出 `Unableto createnewnativethread`，常见的原因包括以下几类：
 
@@ -366,11 +364,11 @@ JVM 在为数组分配内存前，会检查要分配的数据结构在系统中�
 
 ## 八、Out of swap space
 
-启动 Java 应用程序会分配有限的内存。此限制是通过-Xmx和其他类似的启动参数指定的。
+启动 Java 应用程序会分配有限的内存。此限制是通过 `-Xmx` 和其他类似的启动参数指定的。
 
 在 JVM 请求的总内存大于可用物理内存的情况下，操作系统开始将内容从内存换出到硬盘驱动器。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gggbbrbgj2j30jg066t8k.jpg)
+![](https://img.starfish.ink/jvm/swapspace.png)
 
 
 
@@ -403,7 +401,7 @@ JVM 在为数组分配内存前，会检查要分配的数据结构在系统中�
 
 最后附上一张“涯海”大神的图
 
-![涯海](https://tva1.sinaimg.cn/large/007S8ZIlly1gggc8i8yk4j31qo0te49o.jpg)
+![涯海](https://img.starfish.ink/jvm/oom-end.png)
 
 ## 参考与感谢
 
