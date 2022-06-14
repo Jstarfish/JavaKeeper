@@ -16,7 +16,7 @@ categories: data-structure
 
 ## 单链表
 
-![single-linkedlist](http://img.starfish.ink/data-structure/single-linkedlist.png)
+![single-linkedlist](https://img.starfish.ink/data-structure/single-linkedlist.png)
 
 一种最简单的结点结构如上图所示，它是构成单链表的基本结点结构。在结点中数据域用来存储数据元素，指针域用于指向下一个具有相同结构的结点。
 
