@@ -166,7 +166,7 @@ InnoDB 中 count(\*) 语句是在执行的时候，全表扫描统计总数量�
 
 
 
-> CHAR 和 VARCHAR 的区别？
+### CHAR 和 VARCHAR 的区别？
 
 char是固定长度，varchar长度可变：
 
@@ -189,13 +189,13 @@ char是适合存储很短的、一般固定长度的字符串。例如，char非
 
 
 
-> 列的字符串类型可以是什么？
+### 列的字符串类型可以是什么？
 
 字符串类型是：SET、BLOB、ENUM、CHAR、TEXT、VARCHAR
 
 
 
-> BLOB和TEXT有什么区别？
+### BLOB和TEXT有什么区别？
 
 BLOB是一个二进制对象，可以容纳可变数量的数据。有四种类型的BLOB：TINYBLOB、BLOB、MEDIUMBLO和 LONGBLOB
 

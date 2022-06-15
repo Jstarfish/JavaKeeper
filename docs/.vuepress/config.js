@@ -175,6 +175,7 @@ function genDSASidebar() {
       	['soultion/Array-Solution', '数组'],
       	['soultion/String-Solution', '字符串'],
       	['soultion/LinkedList-Soultion', '链表'],
+      	['soultion/Math-Solution', '数学'],
         ['soultion/stock-problems', '股票问题']
       ]
     }
