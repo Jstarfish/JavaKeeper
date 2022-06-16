@@ -14,7 +14,7 @@ categories: Redis
 >
 > 这就是 Redis 的主从模式，主从库之间采用的是读写分离的方式。
 
-![redis-master-slave-index](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-master-slave-index.png)
+![redis-master-slave-index](../../../picBed/redis/redis-master-slave-index.png)
 
 ### 一、主从复制是啥
 
@@ -145,7 +145,7 @@ Redis 主从库之间的同步，在不同阶段有不同的处理方式，我�
 
 #### 4.1 全量复制 | 快照同步
 
-![redis-replicaof](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-replicaof.png)
+![redis-replicaof](../../_images/redis/redis-replicaof.png)
 
 为了节省篇幅，我把主要的步骤都 **浓缩** 在了上图中，其实也可以 **简化成三个阶段：建立连接阶段-数据同步阶段-命令传播阶段**。
 

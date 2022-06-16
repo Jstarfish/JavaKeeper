@@ -78,6 +78,8 @@ Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配�
 
 ### Spring 中有多少种 IOC 容器？
 
+Spring 中的 org.springframework.beans 包和 org.springframework.context 包构成了 Spring 框架 IoC 容器的基础。
+
 在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前，必须对它进行实例化。只有在容器实例化后， 才可以从 IOC 容器里获取 Bean 实例并使用
 
 Spring 提供了两种类型的 IOC 容器实现
@@ -345,7 +347,7 @@ Spring 框架并没有对单例 bean 进行任何多线程的封装处理。关�
 
 ### Spring bean 容器的生命周期是什么样的？
 
-Spring IOC 容器可以管理 Bean 的生命周期, Spring 允许在 Bean 生命周期的特定点执行定制的任务。
+Spring IOC 容器可以管理 Bean 的生命周期，Spring 允许在 Bean 生命周期的特定点执行定制的任务。
 
 Spring bean 容器的生命周期流程如下：
 

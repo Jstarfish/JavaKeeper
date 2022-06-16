@@ -4,7 +4,7 @@
 >
 > 微信搜「 **JavaKeeper** 」程序员成长充电站，互联网技术武道场。无套路领取 500+ 本电子书和 30+ 视频教学和源码。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200902192731.png)
+![](https://img.starfish.ink/spring/20200902192731.png)
 
 ## 前言
 
@@ -20,7 +20,7 @@
 
 所谓的循环依赖是指，A 依赖 B，B 又依赖 A，它们之间形成了循环依赖。或者是 A 依赖 B，B 依赖 C，C 又依赖 A，形成了循环依赖。更或者是自己依赖自己。它们之间的依赖关系如下：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200831102205.png)
+![](https://img.starfish.ink/spring/cycle-demo.png)
 
 这里以两个类直接相互依赖为例，他们的实现代码可能如下：
 
@@ -74,7 +74,7 @@ Spring “肯定”不会让这种事情发生的，如前言我们说的 Spring
 
 Spring IOC 容器中获取 bean 实例的简化版流程如下（排除了各种包装和检查的过程）
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200901094342.png)
+![](https://img.starfish.ink/spring/20200901094342.png)
 
 大概的流程顺序（可以结合着源码看下，我就不贴了，贴太多的话，呕~呕呕，想吐）：
 
@@ -138,7 +138,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 如果缓存没有的话，我们就要创建了，接着我们以单例对象为例，再看下创建 bean 的逻辑（大括号表示内部类调用方法）：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200901153322.png)
+![spring-createbean](https://img.starfish.ink/spring/spring-createbean.png)
 
 1. 创建 bean 从以下代码开始，一个匿名内部类方法参数（总觉得 Lambda 的方式可读性不如内部类好理解）
 
@@ -180,7 +180,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 建议搭配着“源码”看下边的逻辑图，更好下饭
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200901174635.png)
+![](https://img.starfish.ink/spring/cycle-dependency-code.png)
 
 流程其实上边都已经说过了，结合着上图我们再看下具体细节，用大白话再捋一捋：
 
@@ -193,7 +193,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 但是这个地方，不管是谁看源码都会有个小疑惑，为什么需要三级缓存呢，我赶脚二级他也够了呀
 
-革命尚未成功，同志仍需努力
+> 革命尚未成功，同志仍需努力
 
 跟源码的时候，发现在创建 beanB 需要引用 beanA 这个“半成品”的时候，就会触发"前期引用"，即如下代码：
 
@@ -278,7 +278,7 @@ public class HelloProcessor implements SmartInstantiationAwareBeanPostProcessor 
 
 可以看到，调用方法栈中有我们自己实现的 `HelloProcessor`，说明这个 bean 会通过 AOP 代理处理。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200902152407.png)
+![](https://img.starfish.ink/spring/getEarlyBeanReference-code.png)
 
 再从源码看下这个自己循环自己的 bean 的创建流程：
 
@@ -447,7 +447,7 @@ public class BeanB {
 
 执行结果，又是异常
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200901153526.png)
+![](https://img.starfish.ink/spring/cycle-dependency-constructor.png)
 
 看看官方给出的说法
 
