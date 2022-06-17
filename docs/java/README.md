@@ -25,5 +25,5 @@
 
 
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/end%20(13).jpg)
+![](https://img.starfish.ink/oceanus/end.jpg)
 
