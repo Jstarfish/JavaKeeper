@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/008eGmZEly1gmjoestg8dj31eu0ixtam.jpg)
+![](https://img.starfish.ink/redis/redis-mq-banner.jpg)
 
 现如今的互联网应用大都是采用 **分布式系统架构** 设计的，所以 **消息队列** 已经逐渐成为企业应用系统 **内部通信** 的核心手段，
 
@@ -32,7 +32,7 @@ categories: Redis
 >
 > 通过提供 **消息传递** 和 **消息排队** 模型，它可以在 **分布式环境** 下提供 **应用解耦**、**弹性伸缩**、**冗余存储**、**流量削峰**、**异步通信**、**数据同步** 等等功能，其作为 **分布式系统架构** 中的一个重要组件，有着举足轻重的地位。
 
-![mq_overview](https://tva1.sinaimg.cn/large/0081Kckwly1glwfccxrs1j33hc0ruwtq.jpg)
+![](https://img.starfish.ink/redis/mq.jpg)
 
 
 
@@ -104,7 +104,7 @@ Redis 提供了好几对 List 指令，先大概看下这些命令，混个眼�
 127.0.0.1:6379> 
 ```
 
-![redis-RPOP](https://tva1.sinaimg.cn/large/0081Kckwly1glyvjgvlowj33li0l0wmw.jpg)
+![redis-RPOP](https://img.starfish.ink/redis/redis-rpop.jpg)
 
 
 
@@ -172,7 +172,7 @@ Redis 提供了好几对 List 指令，先大概看下这些命令，混个眼�
 1) "three"
 ```
 
-![redis-rpoplpush](https://tva1.sinaimg.cn/large/0081Kckwly1gm3u36miftj33390u04a3.jpg)
+![redis-rpoplpush](https://img.starfish.ink/redis/redis-rpoplpush.jpg)
 
 
 
@@ -193,7 +193,7 @@ Redis 提供了好几对 List 指令，先大概看下这些命令，混个眼�
 
 List 实现方式其实就是点对点的模式，下边我们再看下 Redis 的发布订阅模式（消息多播），这才是“根正苗红”的 Redis MQ
 
-![redis-pub_sub](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis0081Kckwly1gm3py9nvc9j321q0u0dv3.jpg)
+![redis-pub_sub](https://img.starfish.ink/redis/redis-pub_sub.jpg)
 
 "发布/订阅"模式同样可以实现进程间的消息传递，其原理如下:
 
@@ -207,11 +207,11 @@ Redis 通过 `PUBLISH` 、 `SUBSCRIBE` 等命令实现了订阅与发布模式�
 
 我们启动三个 Redis 客户端看下效果：
 
-![redis-subscribe](https://tva1.sinaimg.cn/large/0081Kckwly1gm2qvbkezmj31z00q4ql8.jpg)
+![redis-subscribe](https://img.starfish.ink/redis/redis-subscribe.jpg)
 
 先启动两个客户端订阅（subscribe） 名字叫 framework 的频道，然后第三个客户端往 framework 发消息，可以看到前两个客户端都会接收到对应的消息：
 
-![redis-publish](https://tva1.sinaimg.cn/large/0081Kckwly1gm2r9bsurcj31jn0u0qn3.jpg)
+![redis-publish](https://img.starfish.ink/redis/redis-publish.jpg)
 
 我们可以看到订阅的客户端每次可以收到一个 3 个参数的消息，分别为：
 
@@ -221,11 +221,11 @@ Redis 通过 `PUBLISH` 、 `SUBSCRIBE` 等命令实现了订阅与发布模式�
 
 再来看下订阅符合给定**模式**的频道，这回订阅的命令是 `PSUBSCRIBE`
 
-![redis-psubscribe](https://tva1.sinaimg.cn/large/0081Kckwly1gm2rr2c9nhj31tg0tutrx.jpg)
+![redis-psubscribe](https://img.starfish.ink/redis/redis-psubscribe.jpg)
 
 我们往 `java.framework` 这个频道发送了一条消息，不止订阅了该频道的 Consumer1 和 Consumer2 可以接收到消息，订阅了模式 `java.*` 的 Consumer3 和 Consumer4 也可以接收到消息。
 
-![redis-psubscribe1](https://tva1.sinaimg.cn/large/0081Kckwly1gm4j4kxisrj31nt0u07ku.jpg)
+![redis-psubscribe1](https://img.starfish.ink/redis/redis-psubscribe-demo.jpg)
 
 #### Pub/Sub 常用命令：
 
@@ -250,7 +250,9 @@ Redis 5.0 版本新增了一个更强大的数据结构——**Stream**。它提
 
 它就像是个仅追加内容的**消息链表**，把所有加入的消息都串起来，每个消息都有一个唯一的 ID 和对应的内容。而且消息是持久化的。
 
-![redis-stream](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-stream.png)
+![redis-stream](https://img.starfish.ink/redis/redis-stream.png)
+
+
 
 
 
@@ -366,7 +368,7 @@ Streams 是 Redis 专门为消息队列设计的数据类型，所以提供了�
 
 `xread` 虽然可以扇形分发到 N 个客户端，然而，在某些问题中，我们想要做的不是向许多客户端提供相同的消息流，而是从同一流向许多客户端提供不同的消息子集。比如下图这样，三个消费者按轮训的方式去消费一个 Stream。
 
-![redis-stream-cg](https://tva1.sinaimg.cn/large/0081Kckwly1gmdro3lr69j31t60u0ttn.jpg)
+![redis-stream-cg](https://img.starfish.ink/redis/redis-stream-cg.jpg)
 
 Redis Stream 借鉴了很多 Kafka 的设计。
 
@@ -375,7 +377,7 @@ Redis Stream 借鉴了很多 Kafka 的设计。
 - **last_delivered_id** ：每个消费组会有个游标 last_delivered_id 在数组之上往前移动，表示当前消费组已经消费到哪条消息了
 - **pending_ids** ：消费者的状态变量，作用是维护消费者的未确认的 id。 pending_ids 记录了当前已经被客户端读取的消息，但是还没有 ack。如果客户端没有 ack，这个变量里面的消息 ID 会越来越多，一旦某个消息被 ack，它就开始减少。这个 pending_ids 变量在 Redis 官方被称之为 `PEL`，也就是 `Pending Entries List`，这是一个很核心的数据结构，它用来确保客户端至少消费了消息一次，而不会在网络传输的中途丢失了没处理。
 
-![redis-group-strucure](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-group-strucure.png)
+![redis-group-strucure](https://img.starfish.ink/redis/redis-group-strucure.png)
 
 Stream 不像 Kafak 那样有分区的概念，如果想实现类似分区的功能，就要在客户端使用一定的策略将消息写到不同的 Stream。
 
@@ -383,7 +385,7 @@ Stream 不像 Kafak 那样有分区的概念，如果想实现类似分区的功
 - `xgreadgroup`：读取消费组中的消息
 - `xack`：ack 掉指定消息
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cg-commands%20(1).jpg)
+![](https://img.starfish.ink/redis/redis-xgroup.jpg)
 
 ```shell
 # 创建消费者组的时候必须指定 ID, ID 为 0 表示从头开始消费，为 $ 表示只消费新的消息，也可以自己指定
@@ -480,7 +482,7 @@ Stream 提供了 `xreadgroup` 指令可以进行消费组的组内消费，需�
 
 > 以梦为马，越骑越傻。诗和远方，越走越慌。不忘初心是对的，但切记要出发，加油吧，程序员。
 
-> 在路上的你，可以微信搜「 **JavaKeeper** 」一起前行，无套路领取 500+ 本电子书和 30+ 视频教学和源码，本文 **GitHub** [github.com/JavaKeeper)](https://github.com/Jstarfish/JavaKeeper)已经收录，服务端开发、面试必备技能兵器谱，有你想要的！
+![](https://img.starfish.ink/oceanus/end.jpg)
 
 
 
