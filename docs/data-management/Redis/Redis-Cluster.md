@@ -34,7 +34,7 @@ Redis 集群刚好解决了上述问题，实现了较为完善的高可用方�
 
 2. **高可用**： 集群支持主从复制和主节点的 **自动故障转移** *（与哨兵类似）*，当任一节点发生故障时，集群仍然可以对外提供服务。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-framework.png)
+![](https://img.starfish.ink/redis/redis-cluster-framework.png)
 
 上图展示了 **Redis Cluster** 典型的架构图，集群中的每一个 Redis 节点都 **互相两两相连**，客户端任意 **直连** 到集群中的 **任意一台**，就可以对其他 Redis 节点进行 **读写** 的操作。
 
@@ -42,7 +42,7 @@ Redis 集群刚好解决了上述问题，实现了较为完善的高可用方�
 
 ### 1.3 Redis 集群的基本原理
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-slot.png)
+![](https://img.starfish.ink/redis/redis-cluster-slot.png)
 
 Redis 集群中内置了 `16384` 个哈希槽。当客户端连接到 Redis 集群之后，会同时得到一份关于这个 **集群的配置信息**，当客户端具体对某一个 `key` 值进行操作时，会计算出它的一个 Hash 值，然后把结果对 `16384` **求余数**，这样每个 `key` 都会对应一个编号在 `0-16383` 之间的哈希槽，Redis 会根据节点数量 **大致均等** 的将哈希槽映射到不同的节点。
 
@@ -93,7 +93,7 @@ redis-server cluster_config/redis_7005.conf
 
 然后执行 `ps -ef | grep redis` 查看是否启动成功：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluseter-ps.png)
+![](https://img.starfish.ink/redis/redis-sentinel-ps.png)
 
 可以看到 `6` 个 Redis 节点都以集群的方式成功启动了，**但是现在每个节点还处于独立的状态**，也就是说它们每一个都各自成了一个集群，还没有互相联系起来，我们需要手动地把他们之间建立起联系。
 
@@ -109,7 +109,7 @@ redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.
 
 观察控制台输出：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-new.jpg)
+![](https://img.starfish.ink/redis/redis-cluster-new.jpg)
 
 看到 `[OK]` 的信息之后，就表示集群已经搭建成功了，可以看到，这里我们正确地创建了三主三从的集群。
 
@@ -139,7 +139,7 @@ OK
 
 我们再使用 `cluster info` *(查看集群信息)* 和 `cluster nodes` *(查看节点列表)* 来分别看看：*(任意节点输入均可)*
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/cluster-info.png)
+![](https://img.starfish.ink/redis/cluster-info.png)
 
 
 
@@ -165,7 +165,7 @@ Redis 集群最核心的功能就是数据分区，数据分区之后又伴随�
 
 一致性哈希算法将 **整个哈希值空间** 组织成一个虚拟的圆环，范围一般是 0 - $2^{32}$，对于每一个数据，根据 `key` 计算 hash 值，确定数据在环上的位置，然后从此位置沿顺时针行走，找到的第一台服务器就是其应该映射到的服务器：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-consistency.png)
+![](https://img.starfish.ink/redis/redis-consistency.png)
 
 与哈希取余分区相比，一致性哈希分区将 **增减节点的影响限制在相邻节点**。以上图为例，如果在 `node1` 和 `node2` 之间增加 `node5`，则只有 `node2` 中的一部分数据会迁移到 `node5`；如果去掉 `node2`，则原 `node2` 中的数据只会迁移到 `node3` 中，只有 `node3` 会受影响。
 
@@ -248,7 +248,7 @@ Redis 集群相对单机在功能上存在一些限制，需要开发人员提�
 
 > 对于一个分布式集群来说，它的良好运行离不开集群节点信息和节点状态的正常维护。为了实现这一目标，通常我们可以选择**中心化**的方法，使用一个第三方系统，比如 Zookeeper 或 etcd，来维护集群节点的信息、状态等。同时，我们也可以选择**去中心化**的方法，让每个节点都维护彼此的信息、状态，并且使用集群通信协议 Gossip 在节点间传播更新的信息，从而实现每个节点都能拥有一致的信息。下图就展示了这两种集群节点信息维护的方法，你可以看下。
 >
-> ![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-gossip.png)
+> ![](https://img.starfish.ink/redis/redis-gossip.png)
 
 节点间通信，按照通信协议可以分为几种类型：单对单、广播、Gossip 协议等。重点是广播和 Gossip 的对比。
 
@@ -268,14 +268,14 @@ Gossip 协议的主要职责就是信息交换。信息交换的载体就是节�
 
 节点间发送的消息主要分为 `5` 种：`meet 消息`、`ping 消息`、`pong 消息`、`fail 消息`、`publish 消息`。不同的消息类型，通信协议、发送的频率和时机、接收节点的选择等是不同的：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-message-type.png)
+![](https://img.starfish.ink/redis/redis-message-type.png)
 
 - **MEET 消息：** 用于通知新节点加入。消息发送者通知接收者加入到当前集群，meet 消息通信正常完成后，接收节点会加入到集群中并进行周期性的 ping、pong 消息交换。
 - **PING 消息：** 集群里每个节点每秒钟会选择部分节点发送 `PING` 消息，接收者收到消息后会回复一个 `PONG` 消息。**PING 消息的内容是自身节点和部分其他节点的状态信息**，作用是彼此交换信息，以及检测节点是否在线。`PING` 消息使用 Gossip 协议发送，接收节点的选择兼顾了收敛速度和带宽成本（内部频繁进行信息交换，而且 ping/pong 消息会携带当前节点和部分其他节点的状态数据，势必会加重带宽和计算的负担，所以选择需要通信的节点列表就很重要了），**具体规则如下**：
   1. 随机找 5 个节点，在其中选择最久没有通信的 1 个节点；
   2. 扫描节点列表，选择最近一次收到 `PONG` 消息时间大于 `cluster_node_timeout / 2` 的所有节点，防止这些节点长时间未更新。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-ping.png)
+![](https://img.starfish.ink/redis/redis-cluster-ping.png)
 
 - **PONG消息：** `PONG` 消息封装了自身状态数据。可以分为两种：
   1. **第一种** 是在接到 `MEET/PING` 消息后回复的 `PONG` 消息；
@@ -503,7 +503,7 @@ Redis 集群自身实现了高可用。高可用首先需要解决集群部分�
 
    当从节点收集到 N/2+1 个持有槽的主节点投票时，从节点可以执行替换主节点操作，例如集群内有 5 个持有槽的主节点，主节点 b 故障后还有 4 个， 当其中一个从节点收集到 3 张投票时代表获得了足够的选票可以进行替换主节点操作。
 
-​		![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-cluster-vote.png)
+​		![](https://img.starfish.ink/redis/redis-cluster-vote.png)
 
 5. 替换主节点
 

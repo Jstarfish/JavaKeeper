@@ -22,7 +22,7 @@ categories: data-structure
 
 单链表中的每个结点不仅包含值，还包含链接到下一个结点的`引用字段`。通过这种方式，单链表将所有结点按顺序组织起来。
 
-![single-linkedlist-node](http://img.starfish.ink/data-structure/single-linkedlist-node.png)
+![single-linkedlist-node](https://img.starfish.ink/data-structure/single-linkedlist-node.png)
 
 链表的第一个结点和最后一个结点，分别称为链表的**首结点**和**尾结点**。尾结点的特征是其 next 引用为空（null）。链表中每个结点的 next 引用都相当于一个指针，指向另一个结点，借助这些 next 引用，我们可以从链表的首结点移动到尾结点。如此定义的结点就称为**单链表**（single linked list）。
 
@@ -91,7 +91,7 @@ public int get(int index) {
 
 单链表中数据元素的插入，是通过在链表中插入数据元素所属的结点来完成的。对于链表的不同位置，插入的过程会有细微的差别。
 
-![single-linkedlist-add](http://img.starfish.ink/data-structure/single-linkedlist-add.png)
+![single-linkedlist-add](https://img.starfish.ink/data-structure/single-linkedlist-add.png)
 
 除了单链表的首结点由于没有直接前驱结点，所以可以直接在首结点之前插入一个新的结点之外，在单链表中的其他任何位置插入一个新结点时，都只能是在已知某个特定结点引用的基础上在其后面插入一个新结点。并且在已知单链表中某个结点引用的基础上，完成结点的插入操作需要的时间是 $O(1)$。
 

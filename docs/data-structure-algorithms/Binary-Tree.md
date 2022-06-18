@@ -1,4 +1,11 @@
-# 程序员心里得有点树——重学数据结构之二叉树
+---
+title: 程序员心里得有点树——重学数据结构之二叉树
+date: 2022-06-09
+tags: 
+ - data-structure
+ - binary-tree
+categories: data-structure
+---
 
 ## 前言
 
@@ -13,7 +20,7 @@
 - 在通用树中，一个节点可以具有任意数量的子节点，但它只能有一个父节点
 - 下图就是一棵树，节点 `A` 为根节点，而其他节点可以看作是 `A` 的子节点
 
-![tree-demo](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475367871726e6e666a3331393230686f7463762e6a7067.jpeg)
+![tree-demo](https://img.starfish.ink/data-structure/tree-demo.png)
 
 
 
@@ -49,7 +56,6 @@
 
    ......
 
-   [![img](https://camo.githubusercontent.com/8a33cd5c67ca4961456946bac93a996b6f4db0ac0d24c429b6947f15108ed17d/68747470733a2f2f69303170696363646e2e736f676f7563646e2e636f6d2f31633466386664396464333336313061)](https://camo.githubusercontent.com/8a33cd5c67ca4961456946bac93a996b6f4db0ac0d24c429b6947f15108ed17d/68747470733a2f2f69303170696363646e2e736f676f7563646e2e636f6d2f31633466386664396464333336313061)
 
 > 其他都好理解，主要回顾下几种遍历操作，也是面试常客
 
@@ -59,11 +65,11 @@
 
 | 遍历方法 | 顺序                     | 示意图                                                       | 顺序     | 应用                                                         |
 | -------- | ------------------------ | ------------------------------------------------------------ | -------- | ------------------------------------------------------------ |
-| 前序     | **根 ➜ 左 ➜ 右**         | ![img](https://camo.githubusercontent.com/0104158eb34d17b00348299bde73588e961a54e4a51fc51df50c4e4a3e9f9147/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316768346574647862626e6a333067613066726162662e6a7067) | 12457836 | 想在节点上直接执行操作（或输出结果）使用先序                 |
-| 中序     | **左 ➜ 根 ➜ 右**         | [![img](https://camo.githubusercontent.com/5552a974bd7d5979f1e64fb5594f0cc8386eed15ee82fc46c518900139a5cf3d/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316768346635756d6263396a3330686630667261626c2e6a7067)](https://camo.githubusercontent.com/5552a974bd7d5979f1e64fb5594f0cc8386eed15ee82fc46c518900139a5cf3d/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316768346635756d6263396a3330686630667261626c2e6a7067) | 42758136 | 在**二分搜索树**中，中序遍历的顺序符合从小到大（或从大到小）顺序的 要输出排序好的结果使用中序 |
-| 后序     | **左 ➜ 右 ➜ 根**         | ![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676834666268616673376a3330686e306676676e322e6a7067.jpeg) | 47852631 | 后续遍历的特点是在执行操作时，肯定**已经遍历过该节点的左右子节点** 适用于进行破坏性操作 比如删除所有节点，比如判断树中是否存在相同子树 |
-| 广度优先 | **层序，横向访问**       | ![img](https://camo.githubusercontent.com/7e40e2efd626bdf594db5a3d879a82dba1c9faf0988e1a40323240ad574e5500/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676834666664786d71756a333067613066727134372e6a7067) | 12345678 | 当**树的高度非常高**（非常瘦） 使用广度优先剑节省空间        |
-| 深度优先 | **纵向，探底到叶子节点** | ![img](https://camo.githubusercontent.com/2e5073e5b981ef95503fefe796247b7ade50586a85326cfa99e79d30d22f31bd/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676834666f67797737656a333067613066727439772e6a7067) | 12457836 | 当**每个节点的子节点非常多**（非常胖），使用深度优先遍历节省空间 （访问顺序和入栈顺序相关，相当于先序遍历） |
+| 前序     | **根 ➜ 左 ➜ 右**         | ![](https://img.starfish.ink/data-structure/binary-tree-preorder.png) | 12457836 | 想在节点上直接执行操作（或输出结果）使用先序                 |
+| 中序     | **左 ➜ 根 ➜ 右**         | ![](https://img.starfish.ink/data-structure/binary-tree-inorder.png) | 42758136 | 在**二分搜索树**中，中序遍历的顺序符合从小到大（或从大到小）顺序的 要输出排序好的结果使用中序 |
+| 后序     | **左 ➜ 右 ➜ 根**         | ![](https://img.starfish.ink/data-structure/binary-tree-postorder.jpeg) | 47852631 | 后续遍历的特点是在执行操作时，肯定**已经遍历过该节点的左右子节点** 适用于进行破坏性操作 比如删除所有节点，比如判断树中是否存在相同子树 |
+| 广度优先 | **层序，横向访问**       | ![](https://img.starfish.ink/data-structure/binary-tree-leveltraverse.png) | 12345678 | 当**树的高度非常高**（非常瘦） 使用广度优先剑节省空间        |
+| 深度优先 | **纵向，探底到叶子节点** | ![](https://img.starfish.ink/data-structure/binary-tree-dfs.png) | 12457836 | 当**每个节点的子节点非常多**（非常胖），使用深度优先遍历节省空间 （访问顺序和入栈顺序相关，相当于先序遍历） |
 
 > 之所以叫前序、中序、后序遍历，是因为根节点在前、中、后
 
@@ -78,7 +84,7 @@
 
 根据二叉树的定义和特点，可以将二叉树分为五种不同的形态，如下图所示
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c793167647565757a673234696a33316f3030646b7134722e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-structure.jpeg)
 
 ### 二叉树的性质
 
@@ -97,7 +103,7 @@
   - 具有 n 个节点的满二叉树的深度为 log2(n+1)
 - **完全二叉树**：若设二叉树的深度为 h，除第 h 层外，其它各层 (1～(h-1)层) 的结点数都达到最大个数，第 h 层所有的结点都连续集中在最左边，这就是完全二叉树。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316764756238786a6f39656a333139643069323431372e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-special-case.jpeg)
 
 **满二叉树一定是一颗棵完全二叉树，但完全二叉树不一定是满二叉树。**
 
@@ -113,11 +119,11 @@
 
 完全二叉树的顺序存储，仅需从根节点开始，按照层次依次将树中节点存储到数组即可。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475386964617536726a33307479306d636468752e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-store1.jpeg)
 
 普通二叉树转完全二叉树，只需给二叉树额外添加一些节点，将其"拼凑"成完全二叉树即可。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475387062367561366a3330776f306d633736382e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-store2.jpeg)
 
 #### 二叉树的链式存储结构
 
@@ -131,13 +137,13 @@
 
 其中，data 域存放某结点的数据信息；lchild 与 rchild 分别存放指向左孩子和右孩子的指针，当左孩子或右孩子不存在时，相应指针域值为空（用符号 ∧ 或 NULL 表示）。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475623767656f6d396a33316530306a6f37366f2e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-node-store.jpeg)
 
 ##### 三叉链表存储
 
 为了方便找到父节点，可以在上述结点结构中增加一个指针域，指向结点的父结点。利用此结点结构得到的二叉树存储结构称为三叉链表。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316764756238336d6430386a33316b79306c636164392e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-tree-three-store.jpeg)
 
 ### 二叉树的基本操作
 
@@ -158,7 +164,7 @@
 3. 左、右子树也分别为二叉排序树
 4. 没有键值相等的节点
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475686674657968386a3331366b306a716469792e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/binary-search-tree.jpeg)
 
 ### 性质
 
@@ -231,7 +237,7 @@ public void postOrder(TreeNode<E> cursor){
 
 树的搜索和树的遍历差不多，就是在遍历的时候只搜索不输出就可以了（类比有序数组的搜索）
 
-![图片来源：penjee.com](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475686c787475617567333063693061697462732e676966.gif)
+![图片来源：penjee.com](https://img.starfish.ink/data-structure/binary-search-tree-penjee.gif)
 
 ```java
 public boolean searchNode(TreeNode<E> node){
@@ -260,7 +266,7 @@ public boolean searchNode(TreeNode<E> node){
 3. 若插入的元素值小于根节点值，则将元素插入到左子树中
 4. 若插入的元素值不小于根节点值，则将元素插入到右子树中
 
-![图片来源：penjee.com](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475686d366736317667333062343037336a76382e676966.gif)
+![图片来源：penjee.com](https://img.starfish.ink/data-structure/binary-search-tree-insert.gif)
 
 ```java
 public void insertNode(TreeNode<E> node){
@@ -306,7 +312,7 @@ public void insertNode(TreeNode<E> node){
 
   例如：要在树中删除元素 20
 
-![img](https://camo.githubusercontent.com/5ee19e7c662a5ca1afcc587f37a8869072afdfca2176960ddaa4c9ef8140e760/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c793167647569317663333773673330677a30357a6a73772e676966)
+![img](https://img.starfish.ink/data-structure/binary-serach-tree-del.png)
 
 - 如果删除的元素有两个儿子，那么可以取左子树中最大元素或者右子树中最小元素进行替换，然后将最大元素最小元素原位置置空
 
@@ -316,11 +322,11 @@ public void insertNode(TreeNode<E> node){
 
 - 有序数组转为二叉查找树
 
-![图片来源：penjee.com](https://camo.githubusercontent.com/510f4796320d1381ef161d7cdceafdace3ce6e6a6e2c70affd9c65d69fc39bef/68747470733a2f2f626c6f672e70656e6a65652e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031352f31322f6f7074696d616c2d62696e6172792d7365617263682d747265652d66726f6d2d736f727465642d61727261792e676966)
+![图片来源：penjee.com](https://img.starfish.ink/data-structure/array-2-binary-tree.png)
 
 - 将二叉树转为有序数组
 
-![图片来源：penjee.com](https://camo.githubusercontent.com/665c1d5eb211cfb69a8209a52f79bdb95b0fc94742c83b7e63ceeac27e349b72/68747470733a2f2f626c6f672e70656e6a65652e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031352f31312f62696e6172792d7365617263682d747265652d646567656e65726174696e672d64656d6f2d616e696d6174696f6e2e676966)
+![图片来源：penjee.com](https://img.starfish.ink/data-structure/binary-tree-2-array.png)
 
 ------
 
@@ -328,15 +334,13 @@ public void insertNode(TreeNode<E> node){
 
 二叉搜索树虽然在插入和删除时的效率都有所提升，但是如果原序列有序时，比如 {3,4,5,6,7}，这个时候构造二叉树搜索树就变成了斜树，二叉树退化成单链表，搜索效率降低到 $O(n)$，查找数字 7 的话，需要找 5 次。这又说明了**二叉查找树的高度决定了二叉查找树的查找效率**。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c7931676475696d617735356a6a33303838303874676d302e6a7067.jpeg)
+![](https://img.starfish.ink/data-structure/skewed-binary-tree.jpeg)
 
 为了解决这一问题，两位科学家大爷，G. M. Adelson-Velsky 和 E. M. Landis 又发明了平衡二叉树，从他两名字中提取出了 AVL，所以平衡二叉树又叫 **AVL 树**。
 
 二叉搜索树的查找效率取决于树的高度，所以保持树的高度最小，就可保证树的查找效率，如下保持左右平衡，像不像天平？
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/datastrucutre/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316764756b76707a3779316a3330386f3037373734702e6a7067.jpeg)
-
-![](https://camo.githubusercontent.com/9d7104e88f2a6f400d8aed0bf35cf045e48e69b60304967f59c4bed7c493fcd0/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316764756b75366179766e6a3330386f3037353074352e6a7067)
+![](https://img.starfish.ink/data-structure/balance-binary-tree.jpeg)
 
 **定义**：
 
@@ -410,7 +414,7 @@ RL的旋转示意图如下： [![索引](https://camo.githubusercontent.com/36a2
 3. 对 A 的右儿子的左子树进行一次插入
 4. 对 A 的右儿子的右子树进行一次插入
 
-![](https://camo.githubusercontent.com/ff977c44979a77ea9ed8f8cdcc0d5ca529bf0196333b0b02321ba845e613340d/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303753385a496c6c79316764756c67686a7130366a33316673306a676469342e6a7067)
+![](https://img.starfish.ink/data-structure/avl-tree.png)
 
 情形 1 和情形 4 是关于 A 的镜像对称，情形 2 和情形 3 也是关于 A 的镜像对称，因此理论上看只有两种情况，但编程的角度看还是四种情形。
 

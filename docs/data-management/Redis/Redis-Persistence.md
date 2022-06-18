@@ -3,9 +3,10 @@ title: Redis的持久化机制
 date: 2020-12-20
 tags: 
  - Redis
+categories: Redis
 ---
 
-# Redis的持久化机制
+![](https://images.pexels.com/photos/33278/disc-reader-reading-arm-hard-drive.jpg?cs=srgb&dl=pexels-pixabay-33278.jpg&fm=jpg)
 
 > 带着疑问，或者是面试问题去看 Redis 的持久化，或许会有不一样的视角，这几个问题你废了吗？
 >
@@ -47,11 +48,11 @@ RDB 的缺点是最后一次持久化后的数据可能丢失。
 
 **配置位置**： SNAPSHOTTING
 
-![redis-snapshotting](https://tva1.sinaimg.cn/large/0081Kckwly1glpibe56w3j316n0u0162.jpg)
+![redis-snapshotting](https://img.starfish.ink/redis/redis-snapshotting.jpg)
 
 rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
-![redis-rdb-file](https://tva1.sinaimg.cn/large/0081Kckwly1glpqfjq3voj319k04m411.jpg)
+![redis-rdb-file](https://img.starfish.ink/redis/redis-rdb-file.jpg)
 
 你可以对 Redis 进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时， 自动保存一次数据集。
 
@@ -70,7 +71,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 > 简单来说，bgsave 子进程是由主线程 fork 生成的，可以共享主线程的所有内存数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。此时，如果主线程对这些数据也都是读操作（例如图中的键值对K1），那么，主线程和 bgsave 子进程相互不影响。但是，如果主线程要修改一块数据（例如图中的键值对 K3），那么，这块数据就会被复制一份，生成该数据的副本。然后，bgsave 子进程会把这个副本数据写入 RDB 文件，而在这个过程中，主线程仍然可以直接修改原来的数据。
 >
-> ![redis-bgsave](https://tva1.sinaimg.cn/large/0081Kckwly1glodiw5p3dj31bj0u07nl.jpg)
+> ![redis-bgsave](https://img.starfish.ink/redis/redis-bgsave.jpg)
 
 
 
@@ -88,7 +89,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 将备份文件 (dump.rdb) 移动到 Redis 安装目录并启动服务即可（`CONFIG GET dir` 获取目录）
 
-![redis-rdb-bak](https://tva1.sinaimg.cn/large/0081Kckwly1glpiurb8zqj30ss070tbi.jpg)
+![redis-rdb-bak](https://img.starfish.ink/redis/redis-rdb-bak.jpg)
 
 
 
@@ -115,7 +116,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 #### 小总结
 
-![redis-rdb-summary](https://tva1.sinaimg.cn/large/0081Kckwly1glphb8ykjzj32e70u0gsg.jpg)
+![redis-rdb-summary](https://img.starfish.ink/redis/redis-rdb-summary.jpg)
 
 - RDB 是一个非常紧凑的文件
 

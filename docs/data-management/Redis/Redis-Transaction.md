@@ -8,7 +8,7 @@ categories: Redis
 
 > 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200824161651.jpg)
+![](https://img.starfish.ink/redis/redis-reansaction-banner.jpg)
 
 > 假设现在有这样一个业务，用户获取的某些数据来自第三方接口信息，为避免频繁请求第三方接口，我们往往会加一层缓存，缓存肯定要有时效性，假设我们要存储的结构是 hash（没有String的'**SET anotherkey "will expire in a minute" EX 60**'这种原子操作），我们既要批量去放入缓存，又要保证每个 key 都加上过期时间（以防 key 永不过期），这时候事务操作是个比较好的选择
 
@@ -200,7 +200,7 @@ OK
 
 在代表数据库的 `server.h/redisDb` 结构类型中， 都保存了一个 `watched_keys` 字典， 字典的键是这个数据库被监视的键， 而字典的值是一个链表， 链表中保存了所有监视这个键的客户端，如下图。
 
-![Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825112354.png)
+![Redis设计与实现](https://img.starfish.ink/redis/redis-watch-key.png)
 
 ```c
 typedef struct redisDb {
@@ -222,7 +222,7 @@ list *watched_keys;     /* Keys WATCHED for MULTI/EXEC CAS */
 
 举个例子， 如果当前客户端为 `client99` ， 那么当客户端执行 `WATCH key2 key3` 时， 前面展示的 `watched_keys` 将被修改成这个样子：
 
-![图：Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825112441.png)
+![图：Redis设计与实现](https://img.starfish.ink/redis/redis-watch-client99.png)
 
 通过 `watched_keys` 字典， 如果程序想检查某个键是否被监视， 那么它只要检查字典中是否存在这个键即可； 如果程序要获取监视某个键的所有客户端， 那么只要取出键的值（一个链表）， 然后对链表进行遍历即可。
 
@@ -230,7 +230,7 @@ list *watched_keys;     /* Keys WATCHED for MULTI/EXEC CAS */
 
 在任何对数据库键空间（key space）进行修改的命令成功执行之后 （比如 FLUSHDB、SET 、DEL、LPUSH、 SADD，诸如此类）， `multi.c/touchWatchedKey` 函数都会被调用 —— 它会去 `watched_keys` 字典， 看是否有客户端在监视已经被命令修改的键， 如果有的话， 程序将所有监视这个/这些被修改键的客户端的 `REDIS_DIRTY_CAS` 选项打开：
 
-![图：Redis设计与实现](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200825123241.png)
+![图：Redis设计与实现](https://img.starfish.ink/redis/redis-transaction-client-cut.png)
 
 ```c
 void multiCommand(client *c) {

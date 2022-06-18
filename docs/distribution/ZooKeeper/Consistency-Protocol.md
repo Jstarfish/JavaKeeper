@@ -1,10 +1,17 @@
-# 「分布式一致性协议」从2PC、3PC、Paxos到 ZAB
+---
+title: 「分布式一致性协议」从2PC、3PC、Paxos到 ZAB
+date: 2022-06-09
+tags: 
+ - zk
+ - 分布式
+categories: zookeeper
+---
 
 ## CAP
 
 设计一个分布式系统必定会遇到一个问题—— **因为分区容忍性（partition tolerance）的存在，就必定要求我们需要在系统可用性（availability）和数据一致性（consistency）中做出权衡** 。这就是著名的 `CAP` 定理。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/007S8ZIlly1gevqnrlzg6j30b60as3ys.jpg)
+![](https://img.starfish.ink/zookeeper/cap.jpg)
 
 
 
@@ -119,7 +126,7 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 
 这个阶段其实和 `2PC` 的第二阶段差不多，如果协调者收到了所有参与者在 `PreCommit` 阶段的 YES 响应，那么协调者将会给所有参与者发送 `DoCommit` 请求，**参与者收到 DoCommit 请求后则会进行事务的提交工作**，完成后则会给协调者返回响应，协调者收到所有参与者返回的事务提交成功的响应之后则完成事务。若协调者在 `PreCommit` 阶段 **收到了任何一个 NO 或者在一定时间内没有收到所有参与者的响应** ，那么就会进行中断请求的发送，参与者收到中断请求后则会 **通过上面记录的回滚日志** 来进行事务的回滚操作，并向协调者反馈回滚状况，协调者收到参与者返回的消息后，中断事务。
 
-![3PC](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/3pc.png)
+![3PC](https://img.starfish.ink/zookeeper/3pc.png)
 
 #### 优缺点
 
@@ -155,7 +162,7 @@ XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范�
 2. 如果 Acceptor 收到一个针对编号为N的提案的Accept请求，只要该 Acceptor 没有对编号大于 N 的 Prepare 请求做出过响应，它就通过该提案。如果N小于 Acceptor 以及响应的 prepare 请求，则拒绝，不回应或回复error（当proposer没有收到过半的回应，那么他会重新进入第一阶段，递增提案号，重新提出prepare请求）
 3. 最后是 Learner 获取通过的提案（有多种方式）
 
-![Paxos](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/paxos.png)
+![Paxos](https://img.starfish.ink/zookeeper/paxos.png)
 
 #### `paxos` 算法的死循环问题
 
@@ -193,7 +200,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 
 #### 消息广播模式
 
-![ZAB](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/zab.png)
+![ZAB](https://img.starfish.ink/zookeeper/zab.png)
 
 1. Leader从客户端收到一个事务请求（如果是集群中其他机器接收到客户端的事务请求，会直接转发给 Leader 服务器）
 2. Leader 服务器生成一个对应的事务 Proposal，并为这个事务生成一个全局递增的唯一的ZXID（通过其 ZXID 来进行排序保证顺序性）
@@ -202,7 +209,7 @@ ZAB（Zookeeper Atomic Broadcast） 协议是为分布式协调服务 Zookeeper 
 5. 当 Leader 收到超过半数 Follower 的 ack 消息，Leader 会广播一个 commit 消息
 6. 当 Follower 收到 commit 请求时，会判断该事务的 ZXID 是不是比历史队列中的任何事务的 ZXID 都小，如果是则提交，如果不是则等待比它更小的事务的 commit
 
-![zab-commit](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/zk/zab-commit.png)
+![zab-commit](https://img.starfish.ink/zookeeper/zab-commit.png)
 
 #### 崩溃恢复模式
 

@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![img](https://tva1.sinaimg.cn/large/008i3skNly1gv7wlh9bedj61410u0age02.jpg)
+![](https://tva1.sinaimg.cn/large/008i3skNly1gv7wlh9bedj61410u0age02.jpg)
 
 > 我们总说的 Redis 具有高可靠性，其实，这里有两层含义：一是数据尽量少丢失，二是服务尽量少中断。
 >
@@ -14,7 +14,7 @@ categories: Redis
 >
 > 这就是 Redis 的主从模式，主从库之间采用的是读写分离的方式。
 
-![redis-master-slave-index](../../../picBed/redis/redis-master-slave-index.png)
+![](https://img.starfish.ink/redis/redis-master-slave-mode.png)
 
 ### 一、主从复制是啥
 
@@ -145,7 +145,7 @@ Redis 主从库之间的同步，在不同阶段有不同的处理方式，我�
 
 #### 4.1 全量复制 | 快照同步
 
-![redis-replicaof](../../_images/redis/redis-replicaof.png)
+![redis-replicaof](https://img.starfish.ink/redis/redis-replicaof.png)
 
 为了节省篇幅，我把主要的步骤都 **浓缩** 在了上图中，其实也可以 **简化成三个阶段：建立连接阶段-数据同步阶段-命令传播阶段**。
 
@@ -192,7 +192,7 @@ replicaof  所选从库的IP 6379
 
 再看下文章开头的图。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-master-slave-index.png)
+![](https://img.starfish.ink/redis/redis-master-slave-mode.png)
 
 ##### 无盘复制
 
@@ -243,13 +243,11 @@ replicaof  所选从库的IP 6379
 
 主库对应的偏移量是 `master_repl_offset`，从库的偏移量 `slave_repl_offset` 。正常情况下，这两个偏移量基本相等。
 
-
-
-![redis-backlog_buffer](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-backlog_buffer%20(2).jpg)
+![redis-backlog_buffer](https://img.starfish.ink/redis/redis-backlog_buffer.jpg)
 
 在网络断连阶段，主库可能会收到新的写操作命令，这时，`master_repl_offset` 会大于 `slave_repl_offset`。此时，主库只用把 `master_repl_offset` 和 `slave_repl_offset` 之间的命令操作同步给从库就可以了。
 
-![redis-increment-copy](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-increment-copy.png)
+![redis-increment-copy](https://img.starfish.ink/redis/redis-increment-copy.png)
 
 > PS：因为 repl_backlog_buffer 是一个环形缓冲区（可以理解为是一个定长的环形数组），所以在缓冲区写满后，主库会继续写入，此时，就会覆盖掉之前写入的操作。**如果从库的读取速度比较慢，就有可能导致从库还未读取的操作被主库新写的操作覆盖了，这会导致主从库间的数据不一致**。如果从库和主库**断连时间过长**，造成它在主库 repl_backlog_buffer 的 slave_repl_offset 位置上的数据已经被覆盖掉了，此时从库和主库间将进行全量复制。
 >

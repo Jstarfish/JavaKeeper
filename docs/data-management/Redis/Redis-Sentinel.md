@@ -22,7 +22,7 @@ categories: Redis
 
 ### 一、Redis Sentinel 哨兵
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-sentinel.png)
+![](https://img.starfish.ink/redis/redis-sentinel.png)
 
 上图 展示了一个典型的哨兵架构图，它由两部分组成，哨兵节点和数据节点：
 
@@ -43,7 +43,7 @@ categories: Redis
 
 - **配置提供者（Configuration provider）：** 客户端在初始化时，通过连接哨兵来获得当前 Redis 服务的主节点地址。
 
-  当客户端试图连接失效的主服务器时， 集群也会向客户端返回新主服务器的地址， 使得集群可以使用新主服务器代替失效服务器。
+  当客户端试图连接失效的主服务器时， 集群也会向客户端返回新主服务器的地址，使得集群可以使用新主服务器代替失效服务器。
 
 其中，监控和自动故障转移功能，使得哨兵可以及时发现主节点故障并完成转移。而配置提供者和通知功能，则需要在与客户端的交互中才能体现。
 
@@ -162,7 +162,7 @@ master0:name=mymaster,status=ok,address=127.0.0.1:6379,slaves=2,sentinels=3
 
 我们先看下我们启动的 redis 进程，3 个数据节点，3 个哨兵节点
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-sentinel-ps.png)
+![](https://img.starfish.ink/redis/redis-sentinel-ps.png)
 
 使用 `kill` 命令来杀掉主节点，**同时** 在哨兵节点中执行 `info Sentinel` 命令来观察故障节点的过程：
 
@@ -272,7 +272,7 @@ master0:name=mymaster,status=ok,address=127.0.0.1:6381,slaves=2,sentinels=3
 
   每个实例都会有一个 runid，这个 ID 就类似于这里的从库的编号。目前，Redis 在选主库时，有一个默认的规定：在优先级和复制进度都相同的情况下，ID 号最小的从库得分最高，会被选为新主库。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-select-master%20(1).jpg)
+![](https://img.starfish.ink/redis/redis-sentinel-select-master.jpg)
 
 
 
@@ -323,7 +323,7 @@ sentinel monitor mymaster 127.0.0.1 6379 2
 
 在下图中，哨兵 sentinel_26379 把自己的 IP（127.0.0.1）和端口（26379）发布到频道上，哨兵 26380 和 26381 订阅了该频道。那么此时，其他哨兵就可以从这个频道直接获取哨兵 sentinel_26379 的 IP 地址和端口号。通过这个方式，各个哨兵之间就可以建立网络连接，哨兵集群就形成了。它们相互间可以通过网络连接进行通信，比如说对主库有没有下线这件事儿进行判断和协商。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-sentinel-cluster.png)
+![](https://img.starfish.ink/redis/redis-sentinel-cluster.png)
 
 #### 4.2 哨兵和从库的连接
 
@@ -335,7 +335,7 @@ sentinel monitor mymaster 127.0.0.1 6379 2
 
 就像下图所示，哨兵 sentinel_26380 给主库发送 INFO 命令，主库接受到这个命令后，就会把从库列表返回给哨兵。接着，哨兵就可以根据从库列表中的连接信息，和每个从库建立连接，并在这个连接上持续地对从库进行监控。senetinel_26379 和 senetinel_26381 可以通过相同的方法和从库建立连接。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/redis-sentinel-slave.png)
+![](https://img.starfish.ink/redis/redis-sentinel-slave.png)
 
 #### 4.3 哨兵和客户端的连接
 
@@ -411,7 +411,7 @@ PSUBSCRIBE *
 
 
 
-### 参考与来源
+### References
 
 - 《Redis 开发与运维》
 - 《Redis 核心技术与实战》

@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/locks-505878_1280.jpg)
+![](https://img.starfish.ink/redis/redis-lock-banner.jpg)
 
 > 分布式锁的文章其实早就烂大街了，但有些“菜鸟”写的太浅，或者自己估计都没搞明白，没用过，看完后我更懵逼了，有些“大牛”写的吧，又太高级，只能看懂前半部分，后边就开始讲论文了，也比较懵逼，所以还得我这个中不溜的来总结下
 >
@@ -176,7 +176,7 @@ RLock 提供了各种锁方法，我们来解读下这个接口方法，
 
 #### RLock
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/RLock.png)
+![](https://img.starfish.ink/redis/RLock.png)
 
 ```java
 public interface RLock extends Lock, RLockAsync {
@@ -274,7 +274,7 @@ try {
 
 先看下 RLock 的类关系
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/redis/RLock-UML.png)
+![](https://img.starfish.ink/redis/RLock-UML.png)
 
 跟着源码，可以发现 RedissonLock 是 RLock 的直接实现，也是我们加锁、解锁操作的核心类
 

@@ -1,4 +1,10 @@
-# 烂了大街的 Spring 循环依赖问题，你觉得自己会了吗
+---
+title: 烂了大街的 Spring 循环依赖问题，你觉得自己会了吗
+date: 2022-06-09
+tags: 
+ - spring
+categories: spring
+---
 
 > 文章已收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N 线互联网开发、面试必备技能兵器谱，笔记自取。
 >

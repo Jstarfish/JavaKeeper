@@ -43,19 +43,19 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
   消息生产者生产消息发送到 Queue 中，然后消息消费者从 Queue 中取出并且消费消息。 消息被消费以后，queue 中不再有存储，所以消息消费者不可能消费到已经被消费的消息。 Queue 支持存在多个消费者，但是对一个消息而言，只会有一个消费者可以消费。
 
-  ![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/007S8ZIlly1gh18nit3iwj31fo0amjre.jpg)
+  ![图片：mrbird.cc](https://img.starfish.ink/mq/mq-point2point.jpg)
 
 - **发布/订阅模式**（一对多，数据生产后，推送给所有订阅者） 
 
   消息生产者（发布）将消息发布到 topic 中，同时有多个消息消费者（订阅）消费该消息。和点对点方式不同，发布到 topic 的消息会被所有订阅者消费。
 
-  ![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/007S8ZIlly1gh18nn09vuj31fg0d0glq.jpg)
+  ![图片：mrbird.cc](https://img.starfish.ink/mq/mq-one2many.jpg)
 
 
 
 ### 1.3 Kafka 基础架构图
 
-![图片：mrbird.cc](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/QQ20200324-210522@2x.png)
+![图片：mrbird.cc](https://img.starfish.ink/mq/kafka-structure.png)
 
 - Producer ：消息生产者，就是向 kafka broker 发消息的客户端；
 - Consumer ：消息消费者，向 kafka broker 取消息的客户端；
