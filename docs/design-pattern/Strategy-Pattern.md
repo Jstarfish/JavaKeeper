@@ -6,7 +6,7 @@
 >
 > 先贴个阿里的《 Java 开发手册》中的一个规范
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/ali-strategy.png) 
+![](https://img.starfish.ink/design-patterns/ali-strategy.png) 
 
 我们先不探讨其他方式，主要讲策略模式。
 
@@ -63,7 +63,7 @@ public String getCheckResult(String type) {
 
 ## 类图
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/strategy-pattern.jpg)
+![](https://img.starfish.ink/design-patterns/strategy-pattern-uml.png)
 
 策略模式涉及到三个角色：
 
@@ -154,7 +154,7 @@ public static void main(String[] args) {
 
  『 **策略模式 = 实现策略接口（或抽象类）的每个策略类 + 上下文的逻辑分派** 』
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/if-else.jpg)
+![](https://img.starfish.ink/design-patterns/strategy-pattern-if-else.png)
 
 > 策略模式的本质：分离算法，选择实现  ——《研磨设计模式》
 

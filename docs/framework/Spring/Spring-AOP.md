@@ -49,7 +49,7 @@ public void add(int i, int j) {
 
 代理设计模式的原理：**使用一个代理将对象包装起来**，然后用该代理对象取代原始对象。任何对原始对象的调用都要通过代理。代理对象决定是否以及何时将方法调用转到原始对象上。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/spring/Untitled%20Diagram-%E7%AC%AC%204%20%E9%A1%B5.svg)
+![](https://img.starfish.ink/spring/spring-aop-log.svg)
 
 
 
@@ -173,7 +173,7 @@ public static void main(String[] args) {
   - 业务模块更简洁，只包含核心业务代
 
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/spring/aop-demo.svg)
+![](https://img.starfish.ink/spring/spring-aop-demo.svg)
 
 ### AOP 核心概念
 

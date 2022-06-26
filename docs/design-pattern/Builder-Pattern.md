@@ -1,14 +1,16 @@
-# 建造者模式
+---
+title: 建造者模式
+date: 2021-10-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/1*jGC9cgC7N3eUKDafMzRnCw.jpeg)
+![](https://img.starfish.ink/design-patterns/builder-pattern-banner.png)
 
 > StringBuilder 你肯定用过，JDK 中的建造者模式
 >
 > lombok 中的 @Bulider，你可能也用过，恩，这也是我们要说的建造者模式
-
-
-
-
 
 > 直接使用构造函数或者配合 set 方法就能创建对象，为什么还需要建造者模式来创建呢？
 >
@@ -131,7 +133,7 @@ public class User {
 
 ## 结构
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/builder-UML.png)
+![](https://img.starfish.ink/design-patterns/builder-UML.png)
 
 从 UML 图上可以看到有 4 个不同的角色
 
@@ -146,7 +148,7 @@ public class User {
 
 假设我是个汽车工厂，需求就是能造各种车（或者造电脑、造房子、做煎饼、生成不同文件TextBuilder、HTMLBuilder等等，都是一个道理）
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/builder-car.png)
+![](https://img.starfish.ink/design-patterns/builder-car.png)
 
 1、生成器（Builder）接口声明在所有类型生成器中通用的产品构造步骤
 

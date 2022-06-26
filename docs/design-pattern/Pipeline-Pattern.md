@@ -1,6 +1,12 @@
-# 管道模式
+---
+title: 管道模式
+date: 2021-10-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1gre4983htzj30hs0a0wg3.jpg)
+![](https://img.starfish.ink/design-patterns/008i3skNly1gt0lx0zc1dj30rs0ijwhs.jpg)
 
 
 
@@ -8,7 +14,7 @@
 
 假设我们有这样的一个需求，读取文件内容，并过滤包含 “hello” 的字符串，然后将其反转
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/hello-file.png)
+![](https://img.starfish.ink/design-patterns/hello-file.png)
 
 Linux 一行搞定
 
@@ -40,7 +46,7 @@ System.out.println(new StringBuilder(String.join("",helloStr)).reverse().toStrin
 
 恩，这就是我们要说的管道模式
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/pipeline-pattern-csharp-uml.png)
+![](https://img.starfish.ink/design-patterns/pipeline-pattern-csharp-uml.png)
 
 
 
@@ -52,7 +58,7 @@ System.out.println(new StringBuilder(String.join("",helloStr)).reverse().toStrin
 
 顾名思义，管道模式就像一条管道把多个对象连接起来，整体看起来就像若干个阀门嵌套在管道中，而处理逻辑就放在阀门上，需要处理的对象进入管道后，分别经过各个阀门，每个阀门都会对进入的对象进行一些逻辑处理，经过一层层的处理后从管道尾出来，此时的对象就是已完成处理的目标对象。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/pipeline-filter-pattern-csharp-implementations2.jpg)
+![](https://img.starfish.ink/design-patterns/pipeline-filter-pattern-csharp-implementations2.jpg)
 
 管道模式用于将复杂的进程分解成多个独立的子任务。每个独立的任务都是可复用的，因此这些任务可以被组合成复杂的进程。
 
@@ -164,13 +170,13 @@ public class ClientTest {
 
 ### 5、结果
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/pipeline-result.png)
+![](https://img.starfish.ink/design-patterns/pipeline-result.png)
 
 
 
 ### UML  类图
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/design-pattern/pipeline-uml.png)
+![](https://img.starfish.ink/design-patterns/pipeline-uml.png)
 
 
 
