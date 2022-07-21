@@ -61,4 +61,3 @@
 - [hello logback](logging/logback简单使用.md)
 - **Links**
 - [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/jhildenbiddle/docsify-tabs)
-- [![Blog](https://icongr.am/simple/aboutme.svg?colored&size=16)My Blog](https://www.lazyegg.net)
