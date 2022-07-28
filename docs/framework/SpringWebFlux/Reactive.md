@@ -34,9 +34,9 @@
 
 同时，讨论的方式也一反常态，并不会直奔主题地解释什么 Reactive Programming，而是从问题的角度出发，从 Reactive 规范和框架的论点，了解传统编程模型中所遇到的困境，逐步地揭开 Reactive 神秘的面纱。其中 Reactive 规范是 JVM Reactive 扩展规范 [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm)，而 Reactive 实现框架则是最典型的实现：
 
-- RxJava ： Reactive Extensions
-- Reactor: Spring WebFlux Reactive 类库
-- Flow API： Java 9 Flow API 实现
+- RxJava：Reactive Extensions
+- Reactor：Spring WebFlux Reactive 类库
+- Flow API：Java 9 Flow API 实现
 
 ### 传统编程模型中的某些困境
 
@@ -175,9 +175,13 @@ public class ParallelDataLoader extends DataLoader {
 load() 总耗时：3068 毫秒
 ```
 
-- 结论
+- 结论和思考
 
-明显地，程序改造为并行加载后，性能和资源利用率得到提升，消耗时间取最大者，即三秒，由于线程池操作的消耗，整体时间将略增一点。不过，以上实现为什么不直接使用 `Future#get()` 方法强制所有任务执行完毕，然后再统计总耗时？
+明显地，程序改造为并行加载后，性能和资源利用率得到提升，消耗时间取最大者，即三秒，由于线程池操作的消耗，整体时间将略增一点。
+
+不过，以上实现为什么不直接使用 `Future#get()` 方法强制所有任务执行完毕，然后再统计总耗时？
+
+以上三个方法之间没有数据依赖关系，所以执行方式由串行改为并行后，能提升性能。可是如果方法之间存在依赖关系，效果提升还会这么明显吗？并且怎么确保他们的执行顺序
 
 #### [Reactor](http://projectreactor.io/docs/core/release/reference/#_asynchronicity_to_the_rescue) 认为异步不一定能够救赎
 
@@ -263,7 +267,9 @@ public class JavaGUI {
 
 - 结论
 
-Java GUI 以及事件/监听模式基本采用匿名内置类实现，即回调实现。从本例可以得出，鼠标的点击确实没有被其他线程给阻塞。不过当监听的维度增多时，Callback 实现也随之增多。Java Swing 事件/监听是一种典型的既符合异步非阻塞，又属于 Callback 实现的场景，其并发模型可为同步或异步。不过，在 Java 8 之前，由于接口无法支持 `default` 方法，当接口方法过多时，通常采用 `Adapter` 模式作为缓冲方案，达到按需实现的目的。尤其在 Java GUI 场景中。即使将应用的 Java 版本升级到 8 ，由于这些 Adapter ”遗老遗少“实现的存在，使得开发人员仍不得不面对大量而繁琐的 Callback 折中方案。既然 Reactor 提出了这个问题，那么它或者 Reactive 能否解决这个问题呢？暂时存疑，下一步是如何理解 `Future` 的限制。
+  Java GUI 以及事件/监听模式基本采用匿名内置类实现，即回调实现。从本例可以得出，鼠标的点击确实没有被其他线程给阻塞。不过当监听的维度增多时，Callback 实现也随之增多。Java Swing 事件/监听是一种典型的既符合异步非阻塞，又属于 Callback 实现的场景，其并发模型可为同步或异步。
+
+  不过，在 Java 8 之前，由于接口无法支持 `default` 方法，当接口方法过多时，通常采用 `Adapter` 模式作为缓冲方案，达到按需实现的目的。尤其在 Java GUI 场景中。即使将应用的 Java 版本升级到 8 ，由于这些 Adapter ”遗老遗少“实现的存在，使得开发人员仍不得不面对大量而繁琐的 Callback 折中方案。既然 Reactor 提出了这个问题，那么它或者 Reactive 能否解决这个问题呢？暂时存疑，下一步是如何理解 `Future` 的限制。
 
 ##### 理解 `Future` 的限制
 
@@ -311,7 +317,7 @@ load() 总耗时：6100 毫秒
 
 - 结论
 
-`ParallelDataLoader` 加载耗时为”3068 毫秒“，调整后的 `FutureBlockingDataLoader` 则比串行的 `DataLoader` 加载耗时（“6031 毫秒”）还要长。说明`Future#get()` 方法不得不等待任务执行完成，换言之，如果多个任务提交后，返回的多个 Future 逐一调用 `get()` 方法时，将会依次 blocking，任务的执行从并行变为串行。这也是之前为什么 `ParallelDataLoader` 不采取 `Future` 的解决方案的原因。
+  `ParallelDataLoader` 加载耗时为”3068 毫秒“，调整后的 `FutureBlockingDataLoader` 则比串行的 `DataLoader` 加载耗时（“6031 毫秒”）还要长。说明`Future#get()` 方法不得不等待任务执行完成，换言之，如果多个任务提交后，返回的多个 Future 逐一调用 `get()` 方法时，将会依次 blocking，任务的执行从并行变为串行。这也是之前为什么 `ParallelDataLoader` 不采取 `Future` 的解决方案的原因。
 
 ###### 限制二：`Future` 不支持链式操作 
 
@@ -359,9 +365,17 @@ load() 总耗时：6093 毫秒
 
 > 稍作解释，`CompletableFuture` 不仅可以支持 `Future` 链式操作，而且提供三种生命周期回调，即执行回调（Action）、完成时回调（Complete）、和异常回调（Exception），类似于 Spring 4 `ListenableFuture` 以及 Guava `ListenableFuture`。
 
-至此，Reactor 的官方参考文档再没有出现其他有关”传统编程模型中的某些困境“的描述，或许读者老爷和我一样，对 Reactive 充满疑惑，它真能解决以上问题吗？当然，监听则明，偏听则暗，下面我们再来参考 [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm) 的观点。
+至此，Reactor 的官方参考文档再没有出现其他有关”传统编程模型中的某些困境“的描述，或许读者和我一样，对 Reactive 充满疑惑，它真能解决以上问题吗？当然，监听则明，偏听则暗，下面我们再来参考 [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm) 的观点。
 
-[Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm#goals-design-and-scope) 认为异步系统和资源消费需要特殊处理
+疑问：
+
+- 如果阻塞导致性能瓶颈和资源浪费的话，Reactive 也能解决这个问题吗？
+- CompletableFuture 属于一部操作，如果强制等待结束的话，又回到了阻塞编程的方式，那 Reactive 也会面临同样的问题吗
+- CompletableFuture 让我们理解到非阻塞不一定能提升性能，那 Reactive 也会这样吗
+
+
+
+#### [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm#goals-design-and-scope) 认为异步系统和资源消费需要特殊处理
 
 > Handling streams of data—especially “live” data whose volume is not predetermined—requires special care in an asynchronous system. The most prominent issue is that resource consumption needs to be carefully controlled such that a fast data source does not overwhelm the stream destination. Asynchrony is needed in order to enable the parallel use of computing resources, on collaborating network hosts or multiple CPU cores within a single machine.
 
@@ -375,7 +389,13 @@ load() 总耗时：6093 毫秒
 
 无论两者的观点孰优谁劣，至少说明一个现象，业界对于 Reactive 所解决的问题并非达到一致，几乎各说各话。那么，到底怎样才算 Reactive Programming 呢？
 
-### 什么是 Reactive Programming
+- Reactive 到底是什么？
+- Reactive 的使用场景在哪里
+- Reactiv 存在哪些限制和不足
+
+
+
+## 什么是 Reactive Programming
 
 关于什么是 Reactive Programming，下面给出六种渠道的定义，尝试从不同的角度，了解 Reactive Programming 的意涵。首先了解的是“[The Reactive Manifesto](https://www.reactivemanifesto.org/)” 中的定义
 
@@ -402,13 +422,13 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 >
 > > 参考地址：https://en.wikipedia.org/wiki/Reactive_programming
 
-维基百科认为 Reactive programming 是一种声明式的编程范式，其核心要素是**数据流（data streams ）**与**其传播变化（ propagation of change）**，前者是关于数据结构的描述，包括静态的数组（arrays）和动态的事件发射器（event emitters）。由此描述，在[小马哥](https://www.imooc.com/u/5387391)脑海中浮现出以下技术视图：
+维基百科认为 Reactive programming 是一种声明式的编程范式，其核心要素是**数据流（data streams ）**与**其传播变化（ propagation of change）**，前者是关于数据结构的描述，包括静态的数组（arrays）和动态的事件发射器（event emitters）。由此描述，脑海中浮现出以下技术视图：
 
 - 数据流：Java 8 `Stream`
 - 传播变化：Java `Observable`/`Observer`
 - 事件/监听：Java `EventObject`/`EventListener`
 
-这些技术能够很好地满足维基百科对于 Reactive 的定义，那么， Reactive 框架和规范的存在意义又在何方？或许以上定义过于抽象，还无法诠释 Reactive 的全貌。于是乎，[小马哥](https://www.imooc.com/u/5387391)想到了去 Spring 官方找寻答案，正如所愿，在 Spring Framework 5 官方参考文档中找到其中定义。
+这些技术能够很好地满足维基百科对于 Reactive 的定义，那么， Reactive 框架和规范的存在意义又在何方？或许以上定义过于抽象，还无法诠释 Reactive 的全貌。
 
 #### [Spring](https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-why-reactive) 5 中的定义
 
@@ -416,7 +436,7 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 >
 > > 参考地址：https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-why-reactive
 
-相对于维基百科的定义，Spring 5 WebFlux 章节同样也提到了变化响应（reacting to change ） ，并且还说明非阻塞（non-blocking）就是 Reactive。同时，其定义的侧重点在响应通知方面，包括操作完成（operations complete）和数据可用（data becomes available）。Spring WebFlux 作为 Reactive Web 框架，天然支持非阻塞，不过早在 Servlet 3.1 规范时代皆以实现以上需求，其中包括 Servlet 3.1 非阻塞 API `ReadListener` 和`WriteListener`，以及 Servlet 3.0 所提供的异步上下文 `AsyncContext` 和事件监听 `AsyncListener`。这些 Servlet 特性正是为 Spring WebFlux 提供适配的以及，所以 Spring WebFlux 能完全兼容 Servlet 3.1 容器。[小马哥](https://www.imooc.com/u/5387391)不禁要怀疑，难道 Reactive 仅是新包装的概念吗？或许就此下结论还为时尚早，不妨在了解一下 ReactiveX 的定义。
+相对于维基百科的定义，Spring 5 WebFlux 章节同样也提到了变化响应（reacting to change ） ，并且还说明非阻塞（non-blocking）就是 Reactive。同时，其定义的侧重点在响应通知方面，包括操作完成（operations complete）和数据可用（data becomes available）。Spring WebFlux 作为 Reactive Web 框架，天然支持非阻塞，不过早在 Servlet 3.1 规范时代皆以实现以上需求，其中包括 Servlet 3.1 非阻塞 API `ReadListener` 和`WriteListener`，以及 Servlet 3.0 所提供的异步上下文 `AsyncContext` 和事件监听 `AsyncListener`。这些 Servlet 特性正是为 Spring WebFlux 提供适配的以及，所以 Spring WebFlux 能完全兼容 Servlet 3.1 容器。难道 Reactive 仅是新包装的概念吗？或许就此下结论还为时尚早，不妨在了解一下 ReactiveX 的定义。
 
 #### [ReactiveX](http://reactivex.io/intro.html) 中的定义
 
@@ -434,7 +454,7 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 >
 > > [http](http://projectreactor.io/docs/core/release/reference/)[://projectreactor.io/docs/core/release/reference/#](http://projectreactor.io/docs/core/release/reference/)[intro-reactive](http://projectreactor.io/docs/core/release/reference/)
 
-同样地，Reactor 也提到了观察者模式（Observer pattern ）和迭代器模式（Iterator pattern）。不过它将 Reactive 定义为响应流模式（Reactive streams pattern ），并解释了该模式和迭代器模式在数据读取上的差异，即前者属于推模式（push-based），后者属于拉模式（pull-based）。难道就因为这因素，就要使用 Reactive 吗？这或许有些牵强。个人认为，以上组织均没有坦诚或者简单地向用户表达，都采用一种模糊的描述，多少难免让人觉得故弄玄虚。幸运地是，我从 ReactiveX 官方找到一位前端牛人 [André Staltz](https://gist.github.com/staltz)，他在学习 Reactive 过程中与[小马哥](https://www.imooc.com/u/5387391)一样，吃了不少的苦头，在他博文[《The introduction to Reactive Programming you've been missing》](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)中，他给出了中肯的解释。
+同样地，Reactor 也提到了观察者模式（Observer pattern ）和迭代器模式（Iterator pattern）。不过它将 Reactive 定义为响应流模式（Reactive streams pattern ），并解释了该模式和迭代器模式在数据读取上的差异，即前者属于推模式（push-based），后者属于拉模式（pull-based）。难道就因为这因素，就要使用 Reactive 吗？这或许有些牵强。个人认为，以上组织均没有坦诚或者简单地向用户表达，都采用一种模糊的描述，多少难免让人觉得故弄玄虚。幸运地是，我从 ReactiveX 官方找到一位前端牛人 [André Staltz](https://gist.github.com/staltz)，在他博文[《The introduction to Reactive Programming you've been missing》](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)中，他给出了中肯的解释。
 
 #### [André Staltz](https://gist.github.com/staltz) 给出的定义
 
@@ -444,13 +464,83 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 >
 > > ["What is Reactive Programming?"](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754#what-is-reactive-programming)
 
-他在文章指出，Reactive Programming 并不是新东西，而是司空见惯的混合物，比如事件总监、鼠标点击事件等。同时，文中也提到异步（asynchronous ）以及数据流（data streams）等关键字。如果说因为 Java 8 Stream 是迭代器模式的缘故，它不属于Reactive Programming 范式的话，那么，Java GUI 事件/监听则就是 Reactive。那么，Java 开发人员学习 RxJava、Reactor、或者 Java 9 Flow API 的必要性又在哪里呢？因此，非常有必要深入探讨 Reactive Programming 的使用场景。
+他在文章指出，Reactive Programming 并不是新东西，而是司空见惯的混合物，比如事件监听、鼠标点击事件等。同时，文中也提到异步（asynchronous ）以及数据流（data streams）等关键字。如果说因为 Java 8 Stream 是迭代器模式的缘故，它不属于Reactive Programming 范式的话，那么，Java GUI 事件/监听则就是 Reactive。那么，Java 开发人员学习 RxJava、Reactor、或者 Java 9 Flow API 的必要性又在哪里呢？因此，非常有必要深入探讨 Reactive Programming 的使用场景。
+
+
+
+### Reactive Programming特性
+
+#### Reactive编程模型
+
+语言模型：响应式编程+函数式编程（可选）
+
+> 参考资料：https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-programming-models
+
+Spring WebFlux提供了两种编程模型的选择：
+
+- Annotated Controllers: 与Spring MVC一致，并基于spring-web模块中的相同注解。Spring MVC和WebFlux控制器都支持reactive (Reactor和RxJava)返回类型，因此，很难将它们区分开来，一个显著的区别是WebFlux也支持响应性的@RequestBody参数。
+
+- Functional Endpoints: 基于lambda的轻量级函数式编程模型，可以将其看作一个小型库或一组实用程序，应用程序可以使用它们来路由和处理请求。与带注解的控制器最大的不同是，应用程序从头到尾负责处理请求，而不是通过注解声明然后被回调。
+
+
+
+#### 对立模型：命令式编程（Imperative programming）
+
+https://en.wikipedia.org/wiki/Imperative_programming
+
+在计算机科学中，命令式编程是一种使用语句改变程序状态的编程范式。就像自然语言中的命令式语气表达命令的方式一样，命令式程序由计算机执行的命令组成。命令式编程着重于描述程序是如何操作的。
+
+结论：
+
+- Reactive Programming：同步或异步非阻塞执行，数据传播被动通知
+- Imperative Programming：同步阻塞执行，数据主动获取
+
+
+
+#### 数据结构
+
+- 流式（Streams）
+- 序列（Sequences）
+- 事件（Events）
+  https://gist.github.com/staltz/868e7e9bc2a7b8c1f754#what-is-reactive-programming
+
+流是按时间顺序排列的一系列进行中的事件。
+
+ 
+
+#### 设计模式
+
+- 扩展模式：观察者（Observer），推模式
+- 对立模式：迭代器（Iterator），拉模式
+- 混合模式：反应堆（Reactor）、Proactor
+
+> 模式对比：
+>
+> http://reactivex.io/intro.html
+>
+> An Observable is the asynchronous/push “dual” to the synchronous/pull Iterable
+
+结论：
+
+Reactive Programming作为观察者模式（Observer）的延伸，在处理流式数据的过中，并非使用传统的命令编程方式（Imperative Programming）同步拉取数据，如迭代器模式（Iterator），而是采用同步或异步非阻塞的推拉相结合的方式，响应数据传播时的变化。
+
+ 
+
+#### 并发模型
+
+非阻塞（Non-Blocking） 前提条件
+
+- 同步（Synchronous）
+- 异步（Asynchronous）
+
+屏蔽并发编程细节，如线程、同步、线程安全以及并发数据结构。
+
 
 ### Reactive Programming 使用场景
 
 正如同 Reactive Programming 的定义那样，各个组织各执一词，下面仍采用多方引证的方式，寻求 Reactive Programming 使用场景的“最大公约数”。
 
-[Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm) 认为的使用场景
+#### [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm) 认为的使用场景
 
 > The main goal of Reactive Streams is to govern the exchange of stream data across an asynchronous boundary.
 >
@@ -458,7 +548,7 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 
 [Reactive Streams JVM](https://github.com/reactive-streams/reactive-streams-jvm) 认为 Reactive Streams 用于在异步边界（asynchronous boundary）管理流式数据交换（ govern the exchange of stream data）。异步说明其并发模型，流式数据则体现数据结构，管理则强调它们的它们之间的协调。
 
-[Spring 5](https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web-reactive.html#webflux-performance) 认为的使用场景
+#### [Spring 5](https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web-reactive.html#webflux-performance) 认为的使用场景
 
 > Reactive and non-blocking generally do not make applications run faster. They can, in some cases, for example if using the `WebClient` to execute remote calls in parallel. On the whole it requires more work to do things the non-blocking way and that can increase slightly the required processing time.
 >
@@ -466,13 +556,13 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 
 Spring 认为 Reactive 和非阻塞通常并非让应用运行更快速（generally do not make applications run faster），甚至会增加少量的处理时间，因此，它的使用场景则利用较少的资源，提升应用的伸缩性（scale with a small, fixed number of threads and less memory）。
 
-[ReactiveX](http://reactivex.io/intro.html) 认为的使用场景
+#### [ReactiveX](http://reactivex.io/intro.html) 认为的使用场景
 
 > The ReactiveX Observable model allows you to treat streams of asynchronous events with the same sort of simple, composable operations that you use for collections of data items like arrays. It frees you from tangled webs of callbacks, and thereby makes your code more readable and less prone to bugs.
 
 ReactiveX 所描述的使用场景与 Spring 的不同，它没有从性能入手，而是代码可读性和减少 Bugs 的角度出发，解释了 Reactive Programming 的价值。同时，强调其框架的核心特性：异步（asynchronous）、同顺序（same sort）和组合操作（composable operations）。它也间接地说明了，Java 8 `Stream` 在组合操作的限制，以及操作符的不足。
 
-[Reactor](http://projectreactor.io/docs/core/release/reference/#intro-reactive) 认为的使用场景
+#### [Reactor](http://projectreactor.io/docs/core/release/reference/#intro-reactive) 认为的使用场景
 
 > Composability and readability
 >
@@ -492,6 +582,176 @@ Reactor 同样强调结构性和可读性（Composability and readability）和�
 
 Reactive Programming 作为观察者模式（[Observer] 的延伸，不同于传统的命令编程方式同步拉取数据的方式，如迭代器模式（[Iterator] 。而是采用数据发布者同步或异步地推送到数据流（Data Streams）的方案。当该数据流（Data Steams）订阅者监听到传播变化时，立即作出响应动作。在实现层面上，Reactive Programming 可结合函数式编程简化面向对象语言语法的臃肿性，屏蔽并发实现的复杂细节，提供数据流的有序操作，从而达到提升代码的可读性，以及减少 Bugs 出现的目的。同时，Reactive Programming 结合背压（Backpressure）的技术解决发布端生成数据的速率高于订阅端消费的问题。
 
-## 了解更多？
 
-尽管上述的讨论篇幅较多，然而这不过是冰山之一角，更多关于 Reactive 内容，[小马哥](https://coding.imooc.com/class/252.html?mc_marking=64b5e72b012d5e5c8)在[《Spring Boot 2.0深度实践之核心技术篇》](https://coding.imooc.com/class/252.html?mc_marking=64b5e72b012d5e5c81e815f34cf38c5d&mc_channel=weixin)的“第8章 从 Reactive 到 WebFlux”中有系统和深入地讨论。
+
+### Reactive Stream规范
+
+> https://github.com/reactive-streams/reactive-streams-jvm
+
+Reactive Stream是JVM的面向流的库的标准和规范:
+
+- 处理可能无限多的元素
+- 按顺序
+- 在组件之间异步传递元素
+- 非阻塞背压
+
+ 
+
+#### API组件
+
+Publisher：数据发布者（上游）
+Subscriber：数据订阅者（下游）
+Subscription：订阅信号
+Processor：Publisher和Subscriber混合体
+
+##### Publisher
+
+数据发布者，数据上游
+
+ 接口：
+
+```
+public interface Publisher<T> {
+    public void subscribe(Subscriber<? super T> s);
+}
+```
+
+##### Subscriber
+
+接口：
+
+```
+public interface Subscriber<T> {
+    public void onSubscribe(Subscription s);
+    public void onNext(T t);
+    public void onError(Throwable t);
+    public void onComplete();
+}
+```
+
+
+信号事件：
+
+onSubscribe：当下游订阅时
+onNext：当下游接收数据时
+onComplete：当数据流（Data Streams）执行完成时
+onError：当数据流（Data Stream）执行错误时
+
+##### Subscription
+
+订阅信号控制
+
+接口：
+
+```
+public interface Subscription {
+    public void request(long n);
+    public void cancel();
+}
+```
+
+
+信号操作：
+
+request：请求上游元素的数量
+cancel：请求停止发送数据并且清除资源
+
+##### Processor
+
+消息发布者和订阅者综合体
+
+接口：
+
+```
+public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
+}
+```
+
+
+
+#### 背压
+
+https://en.wikipedia.org/wiki/Back_pressure
+
+在信息技术领域，这个术语也被类比地用来描述在I/O开关后的数据积累，如果缓冲区是满的，不能接收任何更多的数据; 传输设备停止发送数据包，直到缓冲区被清空并再次能够存储信息。
+
+关键字:
+
+- I/O 切换(I/O switch )
+- 缓冲填满(the buffers are full )
+- 数据无法接受(incapable of receiving any more data)
+- 传输设备(transmitting device )
+- 停止发送数据包 (halts the sending of data packets )
+
+> http://projectreactor.io/docs/core/release/reference/#reactive.backpressure
+>
+> Propagating signals upstream is also used to implement backpressure, which we described in the assembly line analogy as a feedback signal sent up the line when a workstation processes more slowly than an upstream workstation.
+>
+> The real mechanism defined by the Reactive Streams specification is pretty close to the analogy: a subscriber can work in unbounded mode and let the source push all the data at its fastest achievable rate or it can use the request mechanism to signal the source that it is ready to process at most n elements.
+
+关键字:
+
+- Propagating signals upstream(传播上游信号)
+- 无边界模式(unbounded mode)
+- 处理最大元素数量(process at most n elements)
+
+
+总结背压
+
+假设下游Subscriber工作在无边界大小的数据流水线时，当上游Publisher提供数据的速率快于下游Subscriber的消费数据速率时，下游Subscriber将通过传播信号(request)到上游Publisher，请求限制数据的数量( Demand )或通知上游停止数据生产。
+
+ 
+
+#### Reactor框架运用
+
+核心API
+
+- Mono：0-1的异步结果
+- Flux：0-N的异步序列
+- Scheduler：Reactor调度线程池
+
+##### Mono
+
+定义：0-1的异步结果
+
+实现：Reactive Stream JVM API Publisher
+
+类比：异步 Optional
+
+ 
+
+##### Flux
+
+定义：0-N的异步序列
+
+实现：Reactive Streams JVM API Publisher
+
+类比：异步Stream
+
+  
+
+##### Scheduler
+
+定义：Reactor调度线程池
+
+- 当前线程: Schedulers.immediate()
+  - 等价关系:Thread.currentThread()
+- 单复用线程: Schedulers.single()
+  - 内部名称:"single"
+  - 线程名称:"single"
+  - 线程数量:单个
+  - 线程idel时间:Long Live
+  - 底层实现:ScheduledThreadPoolExecutor (core 1)
+  - 弹性线程池: Schedulers.elastic()
+  - 内部名称:"elastic"
+  - 线程名称:"elastic-evictor-{num}"
+  - 线程数量:无限制(unbounded)
+  - 线程idel时间:60 秒
+  - 底层实现:ScheduledThreadPoolExecutor
+- 并行线程池: Schedulers.parallel()
+  - 内部名称:"parallel"
+  - 线程名称:"parallel-{num}"
+  - 线程数量:处理器数量
+  - 线程idel时间:60 秒
+  - 底层实现:ScheduledThreadPoolExecutor
+
