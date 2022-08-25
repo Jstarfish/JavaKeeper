@@ -12,12 +12,12 @@
   - **Lambda表达式**：一个新的语言特性， 它们使您能够将函数视为方法参数，或将代码视为数据 
   - **方法引用**： 方法引用为已经有名称的方法提供易于阅读的lambda表达式 
   - **默认方法**：使用 default 关键字为接口定义默认方法（有实现的方法）
-  -  **重复注解**提供了将同一注解多次应用于同一声明或类型使用的能力 
-  -  **类型注解**提供了在使用类型的任何地方应用注解的能力，而不仅仅是在声明上
-  -  Java8 增强了**类型推断**  
-  -  方法参数反射 
-  -  `java.util.function`:  一个新的包，它包含为lambda表达式和方法引用提供目标类型的通用功能接口 
--  集合（Collections）
+  - **重复注解**提供了将同一注解多次应用于同一声明或类型使用的能力 
+  - **类型注解**提供了在使用类型的任何地方应用注解的能力，而不仅仅是在声明上
+  - Java8 增强了**类型推断**  
+  - 方法参数反射 
+  - `java.util.function`:  一个新的包，它包含为lambda表达式和方法引用提供目标类型的通用功能接口 
+- 集合（Collections）
   -   `java.util.stream`包中新增了 **Stream API** ，用来支持对元素流的函数式操作 
   -   改进了有键冲突问题的 **HashMap**
 -  精简运行时（Compact Profiles）
@@ -2052,6 +2052,26 @@ String类也新增􏱗了一个静态方法，名叫join。它可以用一个分
 ### Reflection  
 
 Reflection API的变化就是为了支持Java 8中注解机制的改变。 除此之外，Relection接口的另一个变化是**新增了可以查询方法参数信息的API**，比如，你现在可以使用新的`java.lang.reflect.Parameter`类查询方法参数的名称和修饰符。 
+
+
+
+### 级联表达式和珂里化
+
+```java
+/**
+ * 珂里化：把多个参数的函数转换为只有一个参数的函数
+ * 珂里化的目的：函数标准化
+ * 高阶函数：返回函数的函数 
+ **/
+public static void main(String[] args) {
+  //实现了 x+y 的级联表达式
+  Function<Integer,Function<Integer,Integer>> fun = x ->y -> x + y;
+
+  System.out.println(fun.apply(2).apply(3));
+}
+```
+
+
 
 ------
 

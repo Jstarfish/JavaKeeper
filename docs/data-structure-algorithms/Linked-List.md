@@ -98,37 +98,37 @@ public int get(int index) {
 > 思考：如果是带头结点的单链表进行插入操作，是什么样子呢？
 
 ```java
-	//最外层有个链表长度，便于我们头插和尾插操作
-	int size;
+//最外层有个链表长度，便于我们头插和尾插操作
+int size;
 
-  public void addAtHead(int val) {
-    addAtIndex(0, val);
+public void addAtHead(int val) {
+  addAtIndex(0, val);
+}
+
+//尾插就是从最后一个
+public void addAtTail(int val) {
+  addAtIndex(size, val);
+}
+
+public void addAtIndex(int index, int val) {
+
+  if (index > size) return;
+
+  if (index < 0) index = 0;
+
+  ++size;
+  // find predecessor of the node to be added
+  ListNode pred = head;
+  for(int i = 0; i < index; ++i) {
+    pred = pred.next;
   }
 
-  //尾插就是从最后一个
-  public void addAtTail(int val) {
-    addAtIndex(size, val);
-  }
-
-  public void addAtIndex(int index, int val) {
-    
-    if (index > size) return;
-
-    if (index < 0) index = 0;
-
-    ++size;
-    // find predecessor of the node to be added
-    ListNode pred = head;
-    for(int i = 0; i < index; ++i) {
-      pred = pred.next;
-    }
-
-    // node to be added
-    ListNode toAdd = new ListNode(val);
-    // insertion itself
-    toAdd.next = pred.next;
-    pred.next = toAdd;
-  }
+  // node to be added
+  ListNode toAdd = new ListNode(val);
+  // insertion itself
+  toAdd.next = pred.next;
+  pred.next = toAdd;
+}
 ```
 
 
@@ -241,7 +241,6 @@ class MyLinkedList {
 使用 Java 语言实现整个过程的关键语句是
 
 ```java
-
 
   public void addAtHead(int val) {
     ListNode pred = head, succ = head.next;

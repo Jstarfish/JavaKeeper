@@ -56,6 +56,8 @@ public ListNode reverseList_1(ListNode head){
 }
 ```
 
+**思路**：递归 (https://leetcode.cn/problems/reverse-linked-list/solution/shi-pin-jiang-jie-die-dai-he-di-gui-hen-hswxy/)
+
 
 
 ### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
@@ -216,8 +218,6 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 > ```
 
 **思路**：如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。
-
-
 
 ![img](https://pic.leetcode-cn.com/fe5eca7edea29a76316f7e8529f73a90ae4990fd66fea093c6ee91567788e482-%E5%B9%BB%E7%81%AF%E7%89%874.JPG)
 
@@ -512,3 +512,57 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 
 
 
+### [86. 分隔链表](https://leetcode.cn/problems/partition-list/)
+
+> 给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+>
+> 你应当 保留 两个分区中每个节点的初始相对位置。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/01/04/partition.jpg)
+>
+> ```
+> 输入：head = [1,4,3,2,5,2], x = 3
+> 输出：[1,2,2,4,3,5]
+> ```
+
+
+
+
+
+
+
+### [23. 合并K个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists)
+
+> 给你一个链表数组，每个链表都已经按升序排列。
+>
+> 请你将所有链表合并到一个升序链表中，返回合并后的链表。
+>
+> ```
+> 输入：lists = [[1,4,5],[1,3,4],[2,6]]
+> 输出：[1,1,2,3,4,4,5,6]
+> 解释：链表数组如下：
+> [
+>   1->4->5,
+>   1->3->4,
+>   2->6
+> ]
+> 将它们合并到一个有序链表中得到。
+> 1->1->2->3->4->4->5->6
+> ```
+
+
+
+
+
+### [92. 反转链表 II](https://leetcode.cn/problems/reverse-linked-list-ii/)
+
+> 给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/02/19/rev2ex2.jpg)
+>
+> ```
+> 输入：head = [1,2,3,4,5], left = 2, right = 4
+> 输出：[1,4,3,2,5]
+> ```
+>
+> **索引是从 1 开始的**

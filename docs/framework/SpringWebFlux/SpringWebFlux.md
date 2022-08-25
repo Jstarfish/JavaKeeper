@@ -134,7 +134,7 @@ Reactor是一个响应式流，它也有对应的发布者(Publisher )，Reactor
 
 
 1. Spring提供了完整的支持响应式的服务端技术栈。
-  如下图所示，左侧为基于spring-webmvc的技术栈，右侧为基于spring-webflux的技术栈，- Spring WebFlux是基于响应式流的，因此可以用来建立异步的、非阻塞的、事件驱动的服务。它采用Reactor作为首选的响应式流的实现库，不过也提供了对RxJava的支持。
+    如下图所示，左侧为基于spring-webmvc的技术栈，右侧为基于spring-webflux的技术栈，- Spring WebFlux是基于响应式流的，因此可以用来建立异步的、非阻塞的、事件驱动的服务。它采用Reactor作为首选的响应式流的实现库，不过也提供了对RxJava的支持。
     - 由于响应式编程的特性，Spring WebFlux和Reactor底层需要支持异步的运行环境，比如Netty和Undertow；也可以运行在支持异步I/O的Servlet 3.1的容器之上，比如Tomcat（8.0.23及以上）和Jetty（9.0.4及以上）。
     - 从图的纵向上看，spring-webflux上层支持两种开发模式：
       类似于Spring WebMVC的基于注解（@Controller、@RequestMapping）的开发模式；
@@ -143,7 +143,7 @@ Reactor是一个响应式流，它也有对应的发布者(Publisher )，Reactor
 
 
 2. 响应式Http客户端 此外，Spring WebFlux也提供了一个响应式的Http客户端API WebClient。它可以用函数式的方式异步非阻塞地发起Http请求并处理响应。其底层也是由Netty提供的异步支持。
-  我们可以把WebClient看做是响应式的RestTemplate，与后者相比，前者：
+    我们可以把WebClient看做是响应式的RestTemplate，与后者相比，前者：
     - 是非阻塞的，可以基于少量的线程处理更高的并发；
     - 可以使用Java 8 lambda表达式；
     - 支持异步的同时也可以支持同步的使用方式；
@@ -178,6 +178,40 @@ spring框架提供2种开发模式来编写响应式代码，使用mvc之前的�
 在命令式编程中，方法的调用关系摆在面上，我们通常可以通过stack trace追踪的问题出现的位置。但是在异步的响应式编程中，一方面有诸多的调用是在水面以下的，作为响应式开发库的使用者是不需要了解的；另一方面，基于事件的异步响应机制导致stack trace并非很容易在代码中按图索骥的。
 
 
+
+------
+
+
+
+## Reactive Redis
+
+底层框架是Lettuce
+
+ReactiveRedisTemplate与RedisTemplate使用类似，但它提供的是异步的，响应式Redis交互方式。
+
+这里再强调一下，响应式编程是异步的，ReactiveRedisTemplate发送Redis请求后不会阻塞线程，当前线程可以去执行其他任务。
+
+等到Redis响应数据返回后，ReactiveRedisTemplate再调度线程处理响应数据。
+
+响应式编程可以通过优雅的方式实现异步调用以及处理异步结果，正是它的最大的意义。
+
+
+
+### Redis异步
+
+说到Redis的通信，我们都知道Redis基于RESP(Redis Serialization Protocol)协议来通信，并且通信方式是`停等模型`，也就说一次通信独占一个连接直到client读取到返回结果之后才能释放该连接让其他线程使用。
+
+这里小伙伴们思考一下，针对Redis客户端，我们能否使用异步通信方式呢？首先要理解这里讨论的异步到底是指什么，这里的异步就是能够让client端在等待Redis服务端返回结果的这段时间内不再阻塞死等，而是可以继续干其他事情。
+
+针对异步，其实有两种实现思路，一种是类似于dubbo那样使用`单连接+序列号（标识单次通信）`的通信方式，另外一种是类似于netty client那样直接基于`Reactor模型`来做。*注意：方式一的底层通信机制一般也是基于Reactor模型，client端不管是什么处理方式，对于redis server端来说是无感知的。*
+
+https://zhuanlan.zhihu.com/p/77328969
+
+
+
+https://subscription.packtpub.com/book/programming/9781788995979/5/ch05lvl1sec40/spring-mvc-versus-webflux
+
+![img](https://static.packt-cdn.com/products/9781788995979/graphics/d2af6e5b-5d26-448d-b54c-64b42d307736.png)
 
 ## References
 
