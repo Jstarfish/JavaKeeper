@@ -1,13 +1,15 @@
 ---
 title: MySQL 锁
-date: 2022-2-15
+date: 2022-02-15
 tags: 
  - MySQL 锁
 categories: MySQL
 ---
 
-![](https://images.pexels.com/photos/6534898/pexels-photo-6534898.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260)
+![](https://img.starfish.ink/mysql/banner-mysql-lock.png)
 
+> Hello, 我是海星。
+>
 > 锁是计算机协调多个进程或线程并发访问某一资源的机制。
 >
 > 数据库锁定机制简单来说，就是数据库为了保证数据的一致性，而使各种共享资源在被并发访问变得有序所设计的一种规则。主要用来处理并发问题。

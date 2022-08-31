@@ -212,6 +212,7 @@ function genDataManagementSidebar(){
         ['MySQL/MySQL-Storage-Engines', 'MySQL 存储引擎'],
         ['MySQL/MySQL-Index', 'MySQL 索引'],
         ['MySQL/MySQL-Transaction', 'MySQL 事务'],
+        ['MySQL/MySQL-Log', 'MySQL 日志'],
         ['MySQL/MySQL-Lock', 'MySQL 锁'],
         ['MySQL/MySQL-select', 'MySQL 查询'],
         ['MySQL/数据库三范式', '数据库三范式'],
