@@ -6,7 +6,7 @@
 - 设计模式是软件开发人员的“标准词汇”，学习设计模式是个人技术能力提高的捷径
 - 设计模式包含了面向对象的精髓，“懂了设计模式，你就懂了面向对象分析和设计（OOA/D）的精要”
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/knowledge.jpeg)
+![](https://img.starfish.ink/design-patterns/knowledge.jpeg)
 
 ## 软件设计模式概述
 
@@ -256,7 +256,7 @@
 泛化（Generalization）关系是对象之间耦合度最大的一种关系，表示一般与特殊的关系，是父类与子类之间的关系，是一种**继承关系**，是 is-a 的关系。
 在 UML 类图中，泛化关系用带空心三角箭头的实线来表示，箭头从子类指向父类。在代码实现时，使用面向对象的继承机制来实现泛化关系。
 
-![Abstract Class and Method Example](https://tva1.sinaimg.cn/large/006tNbRwly1gbewgz6t91j30c60563yi.jpg)
+![](https://tva1.sinaimg.cn/large/006tNbRwly1gbewgz6t91j30c60563yi.jpg)
 
 #### 6.实现关系
 
@@ -271,8 +271,6 @@
 
 ## 参考
 
-https://zhuanlan.zhihu.com/p/44518805 
-
-https://www.edrawsoft.cn/uml-diagram-introduction/ 
-
-http://c.biancheng.net/view/1319.html 
+- https://zhuanlan.zhihu.com/p/44518805 
+- https://www.edrawsoft.cn/uml-diagram-introduction/ 
+- http://c.biancheng.net/view/1319.html 

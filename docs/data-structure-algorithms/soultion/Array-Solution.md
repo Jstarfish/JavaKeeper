@@ -69,13 +69,13 @@ public static List<List<Integer>> threeSum(int[] nums) {
       if (sum == 0) {
         result.add(Arrays.asList(nums[i], nums[l], nums[r]));
         //去重（相同数字的话就移动指针）
-        while (nums[l] == nums[l + 1]) l++;
-        while (nums[r] == nums[r - 1]) r--;
+        while (l< r && nums[l] == nums[l + 1]) l++;
+        while (l< r && nums[r] == nums[r - 1]) r--;
         //移动指针
         l++;
         r--;
       } else if (sum < 0) l++;
- 			else if (sum > 0) r--;
+ 		else if (sum > 0) r--;
     }
   }
   return result;

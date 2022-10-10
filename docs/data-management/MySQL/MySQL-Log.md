@@ -1,5 +1,5 @@
 ---
-title: MySQL  是怎么想的，搞这么多种日志
+Lltitle: MySQL  是怎么想的，搞这么多种日志
 date: 2022-08-01
 tags: 
  - MySQL
@@ -29,7 +29,7 @@ UPDATE fish SET type = 2 WHERE name = 'starfish';
 
 先说个不怎么被提到的，通用查询日志
 
-## 通用查询日志(general log)
+## 一、通用查询日志(general log)
 
 通用查询日志记录了所有用户的连接开始时间和截止时间，以及发给 MySQL 数据库服务器的所有 SQL 指令。当我们的数据发生异常时，开启通用查询日志，还原操作时的具体场景，可以帮助我们准确定位问题。
 
@@ -59,9 +59,38 @@ SET GLOBAL general_log = 'ON'
 
 
 
-## 重做日志(redo log)
+## 二、重做日志(redo log)
 
-这块，比较喜欢丁奇老师的比喻
+解这块知识，我们要先知道这么几个前置知识点，先看下官网的 InnoDB 架构图
+
+![](/Users/starfish/oceanus/picBed/mysql/innodb-architecture.png)
+
+> #### 什么是 随机 IO 和 顺序 IO 
+>
+> 磁盘读写数据的两种方式。随机 IO 需要先找到地址，再读写数据，每次拿到的地址都是随机的。比如 MySQL 执行增删改操作时。就像送外卖，每一单送的地址都不一样，到处跑，效率极低。而顺序 IO，由于地址是连贯的，找到地址后，一次可以读写许多数据，效率比较高，比如在末尾追加日志这种。就像送外卖，所有的单子地址都在一栋楼，一下可以送很多，效率很高。
+
+> ####  什么是数据页？
+>
+> MySQL 的 InnoDB 存储引擎以 Data Page（数据页）作为磁盘和内存之间交互的基本单位，他的大小一般为默认值 16K。
+>
+> 从数据页的作用来分，可以分为Free Page（空闲页）、Clean Page（干净页）、Dirty Page（脏页）；
+>
+> - **当内存数据页 和 磁盘数据页内容不一致的时候，这个内存页 就为 “脏页”**。将内存中的数据同步到磁盘中的这个过程就被称为**“刷脏”**
+> - **内存数据页写入磁盘后，内存数据页 和 磁盘数据页内容一致，称之为 “干净页”**
+>
+> 从类型来分的话，还可以分成存放 UNDO 日志的页、存放 INODE 信息的页、存放表空间头部信息的页等。
+
+> #### 什么是缓冲池？ TODO 是被取消了吗
+>
+> 关系型数据库的特点就是需要对磁盘中大量的数据进行存取，所以有时候也被叫做基于磁盘的数据库。正是因为数据库需要频繁对磁盘进行 IO 操作，为了改善因为直接读写磁盘导致的 IO 性能问题，所以引入了缓冲池。
+>
+> 缓冲池是一片内存区域，存储引擎在读取数据时，会先将页读取到缓冲池中。下次读取时，先判断是否在缓冲池，如果在，则直接读取，否则从磁盘中读取。在修改数据时，如果缓冲池中不存在所需的数据页，则从磁盘读入缓冲池，否则直接对缓冲池中的数据页进行修改。
+>
+> 这样的好处是，如果我们频繁修改某一个位于磁盘的数据页，我们可以不用每次都去磁盘读写（注意是读和写）该页，而是直接对缓冲池中的内容修改，在一定的时机再把数据刷新到磁盘。这样就会使得对磁盘的多次操作变为一次。即便修改的内容在磁盘中相距较远的不同数据页上，我们也可以将对多次对磁盘的 IO 合并为一次随机 IO。被修改的数据页会与磁盘上的数据产生短暂的不一致，我们称此时缓冲池中的数据页为 脏页 ，将该页刷到磁盘的操作称为 刷脏页 （本句是重点，后面要吃）。
+
+### 2.1 为什么需要 redo log
+
+好了，我们步入主题 redo log，这里比较喜欢丁奇老师的比喻
 
 > 酒店掌柜有一个粉板，专门用来记录客人的赊账记录。如果赊账的人不多，可以把顾客名和账目写在板上。但如果赊账的人多了，粉板总会有记不下的时候，这个时候掌柜一定还有一个专门记录赊账的账本。
 >
@@ -74,43 +103,216 @@ SET GLOBAL general_log = 'ON'
 >
 > 这整个过程想想都麻烦。相比之下，还是先在粉板上记一下方便。你想想，如果掌柜没有粉板的帮助，每次记账都得翻账本，效率是不是低得让人难以忍受？
 >
-> 同样，在 MySQL 里也有这个问题，如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，MySQL 的设计者就用了类似酒店掌柜粉板的思路来提升更新效率。
->
 
-而粉板和账本配合的整个过程，其实就是 MySQL 里经常说到的 WAL 技术，WAL 的全称是 Write-Ahead Log，它的关键点就是先写日志，再写磁盘，也就是先写粉板，等不忙的时候再写账本。
+- 同样，在 MySQL 里也有这个问题，Innodb 是以`页`为单位进行磁盘交互的，而一个事务很可能只修改一个数据页里面的几个字节，这个时候将完整的数据页刷到磁盘的话，整个过程 IO 成本、查找成本都很高。
 
-DBA 口中的日志先行说的就是这个 WAL 技术。
+- 一个事务可能涉及修改多个数据页，并且这些数据页在物理上并不连续，使用随机 IO 写入性能太差！
 
-redo log 是 Innodb 存储引擎层生成的日志，实现了事务中的**持久性**，主要**用于掉电等故障恢复**；
+这样的性能问题，我们是不能忍的，前面我们讲到数据页在缓冲池中被修改会变成脏页。如果这时宕机，脏页就会失效，这就导致我们修改的数据丢失了，也就无法保证事务的**<mark>持久性</mark>**。
 
-### 为什么需要记录REDO
+为了解决这些问题，MySQL 的设计者就用了类似酒店掌柜粉板的思路，设计了`redo log`，**具体来说就是只记录事务对数据页做了哪些修改**，这样就能完美地解决性能问题了(相对而言文件更小并且是顺序IO)。
 
-REDO 主要有 2 个作用：
-
-1. 在系统遇到故障的恢复过程中，可以修复被未完成的事务修改的数据。
-2. InnoDB 为了提高数据存取的效率，减少磁盘操作的频率，对数据的更新操作不会立即写到磁盘上，而是把数据更新先保存在内存中(**InnoDB Buffer Pool**)，积累到一定程度，再集中进行磁盘读写操作。这样就存在一个问题：一旦出现宕机或者停电等异常情况，内存中保存的数据更新操作可能会丢失。为了保证数据库本身的一致性和持久性，InnoDB 维护了 REDO LOG。修改 Page 之前需要先将修改的内容记录到 REDO 中，并保证 REDO LOG 早于对应的 Page 落盘，也就是常说的WAL。当故障发生导致内存数据丢失后，InnoDB 会在重启时，通过重放 REDO，将 Page 恢复到崩溃前的状态。
-
-
+而粉板和账本配合的整个过程，其实就类似 MySQL 里经常说到的 **WAL 技术**（Write-Ahead Loging），它的关键点就是**先写日志，再写磁盘**，也就是先写粉板，等不忙的时候再写账本。这又解决了我们的持久性问题。
 
 具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
-如果今天赊账的不多，掌柜可以等打烊后再整理。但如果某天赊账的特别多，粉板写满了，又怎么办呢？这个时候掌柜只好放下手中的活儿，把粉板中的一部分赊账记录更新到账本中，然后把这些记录从粉板上擦掉，为记新账腾出空间。
-
-与此类似，InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么这块“粉板”总共就可以记录 4GB 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。
-
-![](https://static001.geekbang.org/resource/image/16/a7/16a7950217b3f0f4ed02db5db59562a7.png)
-
-write pos 是当前记录的位置，一边写一边后移，写到第 3 号文件末尾后就回到 0 号文件开头。checkpoint 是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
-
-write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以用来记录新的操作。如果 write pos 追上 checkpoint，表示“粉板”满了，这时候不能再执行新的更新，得停下来先擦掉一些记录，把 checkpoint 推进一下。
-
-有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为**crash-safe**。
-
-要理解 crash-safe 这个概念，可以想想我们前面赊账记录的例子。只要赊账记录记在了粉板上或写在了账本上，之后即使掌柜忘记了，比如突然停业几天，恢复生意后依然可以通过账本和粉板上的数据明确赊账账目。
+> DBA 口中的日志先行说的就是这个 WAL 技术。
+>
+> 记录下对磁盘中某某页某某位置数据的修改结果的 redo log，这种日志被称为**物理日志**，可以节省很多磁盘空间
+>
+> 最开始看到的通用查询日志，记录了所有数据库的操作，我们叫**逻辑日志**，还有下边会说的 binlog、undo log 也都属于逻辑日志
 
 
 
-## 回滚日志(undo log)
+### 2.2 组织 redo log 
+
+#### 「redo log 结构」
+
+MySQL redo日志是一组日志文件，在 MySQL 8.0.30  版本中，MySQL 会生成 32 个 redo log 文件（老版本默认 2 个）
+
+![](https://img.starfish.ink/mysql/ib_redo-file.png)
+
+> [`innodb_log_file_size`](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_log_file_size) and [`innodb_log_files_in_group`](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_log_files_in_group) are deprecated in MySQL 8.0.30. These variables are superseded by [`innodb_redo_log_capacity`](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_redo_log_capacity). For more information, see [Section 15.6.5, “Redo Log”](https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html).
+
+为了应对 InnoDB 各种各样不同的需求，到 MySQL 8.0 为止，已经有多达 65 种的 REDO 记录，每种都不太一样，我们看下比较通用的结构了解了解就 OK（主要有作用于 Page，作用于 Space 以及提供额外信息的 Logicd 类型的三大类）
+
+![](/Users/starfish/oceanus/picBed/mysql/redolog-content.png)
+
+比如 `MLOG_WRITE_STRING` 类型的 REDO 表示写入一串数据，但是因为不能确定写入的数据占多少字节，所以需要在日志结构中添加一个长度字段来表示写入了多长的数据。
+
+除此之外，还有一些复杂的 REDO 类型来记录一些复杂的操作。例如插入一条数据，并不仅仅只是在数据页中插入一条数据，还可能会导致数据页和索引页的分裂，可能要修改数据页中的头信息（Page Header）、目录槽信息（Page Directory）等等。
+
+#### 「Mini-Transaction」
+
+一个事务中可能有多个增删改的SQL语句，而一个SQL语句在执行过程中可能修改若干个页面，会有多个操作。
+
+> 例如一个 INSERT 语句：
+>
+> - 如果表没有主键，会去更新内存中的`Max Row ID`属性，并在其值为`256`的倍数时，将其刷新到`系统表空间`的页号为`7`的`Max Row ID`属性处。
+> - 接着向聚簇索引插入数据，这个过程要根据索引找到要插入的缓存页位置，向数据页插入记录。这个过程还可能会涉及数据页和索引页的分裂，那就会增加或修改一些缓存页，移动页中的记录。
+> - 如果有二级索引，还会向二级索引中插入记录。
+>
+> 最后还可能要改动一些系统页面，比如要修改各种段、区的统计信息，各种链表的统计信息等等。
+
+所以 InnoDB 将执行语句的过程中产生的`redo log`划分成了若干个不可分割的组，一组`redo log`就是对底层页面的一次原子访问，这个原子访问也称为 `Mini-Transaction`，简称 **mtr**。一个 `mtr` 就包含一组`redo log`，在崩溃恢复时这一组`redo log`就是一个不可分割的整体。
+
+#### 「redo log block」
+
+`redo log` 并不是一条一条写入磁盘的日志文件中的，而且一个原子操作的 `mtr` 包含一组 `redo log`，一条一条的写就无法保证写磁盘的原子性了。
+
+磁盘是块设备，InnoDB 中也用 Block 的概念来读写数据，设计了一个 `redo log block` 的数据结构，称为重做日志块（`block`），重做日志块跟缓存页有点类似，只不过日志块记录的是一条条 redo log。
+
+S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最小单位都是一个 Block。
+
+一个 `redo log block` 固定 `512字节` 大小，由三个部分组成：
+
+- 12字节的**Block Header**，主要记录一些额外的信息，包括文件信息、log 版本、lsn 等
+- Block 中剩余的中间 498 个字节就是 REDO 真正内容的存放位置
+
+- Block 末尾是 4 字节的 **Block Tailer**，记录当前 Block 的 Checksum，通过这个值，读取 Log 时可以明确Block 数据有没有被完整写盘。
+
+#### 「redo log 组成」
+
+前置知识点说了，缓冲池有提效的功效，所以 redo log 也不是直接干到日志文件（磁盘中），而是有个类似缓冲池的 `redo log buffer`（内存中），在写 redo log 时会先写 `redo log buffer`
+
+> 用户态下的缓冲区数据是无法直接写入磁盘的。因为中间必须经过操作系统的内核空间缓冲区（OS Buffer）。
+
+写入 redo log buffer 后，再写入 OS Buffer，然后操作系统调用 fsync() 函数将日志刷到磁盘。
+
+![](/Users/starfish/oceanus/picBed/mysql/redolog-buf.png)
+
+写完 redo log buffer 后，我们就要顺序追加日志了，可是每次往哪里写，肯定需要个标识的，类似 offset
+
+
+
+#### 「redo 结构小结」
+
+我们那把这几个 redo 内容串起来，其实就是 redo log 有 32 个文件，每个文件以 Block 为单位划分，多个文件首尾相连顺序写入 REDO 内容，Redo 又按不同类型有不同内容。
+
+一个 `mtr` 中的 redo log 实际上是先写到 redo log buffer，然后再”找机会“ 将一个个 mtr 的日志记录复制到`block`中，最后在一些时机将`block`刷新到磁盘日志文件中。
+
+redo 文件结构大致是下图这样：
+
+![](/Users/starfish/oceanus/picBed/mysql/redolog-flow.png)
+
+
+
+### 2.3 写入 redo log
+
+刚才说了，会找机会将 block 刷盘，那到底是什么时候呢？
+
+#### 刷盘时机
+
+写入到日志文件（刷新到磁盘）的时机有这么 3 种：
+
+- MySQL 正常关闭时；
+- 每秒刷新一次
+- redo log buffer 剩余空间小于 1/2 时
+- 每次事务提交时都将缓存在 redo log buffer 里的 redo log 直接持久化到磁盘，这个策略可由 innodb_flush_log_at_trx_commit 参数控制，有 3 种策略可选择
+
+#### 刷盘策略
+
+`innodb_flush_log_at_trx_commit` 的值可以是 1、2、0
+
+- 当设置该值为 1 时，每次事务提交都要做一次 fsync，这是最安全的配置，即使宕机也不会丢失事务，这是默认值；
+
+- 当设置为 2 时，则在事务提交时只做write操作，只保证写到系统的 page cache，因此实例 crash 不会丢失事务，但宕机则可能丢失事务；
+
+- 当设置为 0 时，事务提交不会触发 redo 写操作，而是留给后台线程每秒一次的刷盘操作，因此实例crash将最多丢失1秒钟内的事务
+
+  ![](/Users/starfish/oceanus/picBed/mysql/redolog-flush.png)
+
+#### 「LSN」
+
+刷盘时机、刷盘策略看着好像 挺合适，如果刷盘还没结束，服务器 GG（宕机）了呢？ 知道你不慌，redo 可以用来保证持久性嘛~
+
+重启服务后，我们肯定需要通过 redo 重放来恢复数据，但是从哪开始恢复呢？
+
+为解决这个问题 InnoDB 为 redo log 记录了序列号，这被称为 LSN（Log Sequence Number），可以理解为偏移量。
+
+在 MySQL Innodb 引擎中 LSN 是一个非常重要的概念，表示从日志记录创建开始到特定的日志记录已经写入的字节数，LSN 的计算是包含每个 BLOCK 的头和尾字段的。
+
+在 InnoDB 的日志系统中，LSN 无处不在，它既用于表示修改脏页时的日志序号，也用于记录 checkpoint，通过 LSN，可以具体的定位到其在 redo log 文件中的位置。
+
+> 那如何由一个给定 LSN 的日志，在日志文件中找到它存储的位置的偏移量并能正确的读出来呢。所有的日志文件要属于日志组，而在 log_group_t 里的 lsn 和 lsn_offset字段已经记录了某个日志 lsn 和其存放在文件内的偏移量之间的对应关系。我们可以利用存储在 group 内的 lsn 和给定 lsn 之间的相对位置，来计算出给定 lsn 在文件中的存储位置。(具体怎么算我们先不讨论)
+
+越新的日志 LSN 越大。InnoDB 用检查点（ checkpoint_lsn ）指示未被刷盘的数据从这里开始，用 lsn 指示下一个应该被写入日志的位置。不过由于有 redo log buffer 的缘故，实际被写入磁盘的位置往往比 lsn 要小。
+
+redo log采用逻辑环形结构来复用空间（循环写入），这种环形结构一般需要几个指针去配合使用
+
+![](/Users/starfish/oceanus/picBed/mysql/redolog-lsn.png)
+
+
+
+如果 lsn 追上了 checkpoint，就意味着 **redo log 文件满了，这时 MySQL 不能再执行新的更新操作，也就是说 MySQL 会被阻塞**（*因此所以针对并发量大的系统，适当设置 redo log 的文件大小非常重要*），此时**会停下来将 Buffer Pool 中的脏页刷新到磁盘中，然后标记 redo log 哪些记录可以被擦除，接着对旧的 redo log 记录进行擦除，等擦除完旧记录腾出了空间，checkpoint 就会往后移动（图中顺时针）**，然后 MySQL 恢复正常运行，继续执行新的更新操作。
+
+
+
+#### Checkpoint
+
+CheckPiont的意思是检查点，用于推进Redo Log的失效。当触发Checkpoint后，会去看Flush List中最早的那个节点old_lsn是多少，也就是说当前Flush List还剩的最早被修改的数据页的redo log lsn是多少，并且将这个lsn记录到Checkpoint中，因为在这之前被修改的数据页都已经刷新到磁盘了，对应的redo log也就无效了，所以说之后在这个old_lsn之后的redo log才是有用的。这就解释了之前说的redo log文件组如何覆盖无效日志。
+
+
+
+#### 一个重做全过程的示例
+
+我们小结下 redo log 的过程
+
+![](/Users/starfish/oceanus/picBed/mysql/redolog-write.png)
+
+以更新事务为例
+
+1. 将原始数据读入内存，修改数据的内存副本。
+
+2. 先将内存中Buffer pool 的脏页写入到 Redo log buffer 当中**记录数据的变化**。然后再将 redo log buffer 当中记录数据变化的日志通过**顺序IO**刷新到磁盘的 redo log file 当中 
+
+   > 在缓冲池中有一条 Flush 链表用来维护被修改的数据页面，也就是脏页所组成的链表。
+
+3. 写入操作系统 **Page Cache**
+
+4. 刷盘，将重做日志缓冲区中的内容刷新到重做日志文件（如果此时脏页没刷完，会通过redo log 重放来恢复数据）
+
+5. 唤醒用户线程完成 commit
+
+6. 随后正常将内存中的脏页刷回磁盘。
+
+
+
+有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为 **crash-safe**。
+
+
+
+## 三、回滚日志(undo log)
+
+回滚日志的作用是进行事务回滚，是 Innodb 存储引擎层生成的日志，实现了事务中的**原子性**，主要**用于事务回滚和 MVCC**。
+
+当事务执行的时候，回滚日志中记录了事务中每次数据更新前的状态。当事务需要回滚的时候，可以通过读取回滚日志，恢复到指定的位置。另一方面，回滚日志也可以让其他的事务读取到这个事务对数据更改之前的值，从而确保了其他事务可以不受这个事务修改数据的影响。
+
+> Undo Log 是 InnoDB 十分重要的组成部分，它的作用横贯 InnoDB 中两个最主要的部分，并发控制（Concurrency Control）和故障恢复（Crash Recovery）。
+>
+> - Undo Log用来记录每次修改之前的历史值，配合Redo Log用于故障恢复
+
+#### 3.1 为什么需要 undo log
+
+##### 事务回滚
+
+由于如硬件故障，软件Bug，运维操作等原因的存在，数据库在任何时刻都有突然崩溃的可能。
+
+这个时候没有完成提交的事务可能已经有部分数据写入了磁盘，如果不加处理，会违反数据库对原子性的保证。
+
+针对这个问题，直观的想法是等到事务真正提交时，才能允许这个事务的任何修改落盘，也就是 No-Steal 策略。显而易见，这种做法一方面造成很大的内存空间压力，另一方面提交时的大量随机 IO 会极大的影响性能。因此，数据库实现中通常会在正常事务进行中，就不断的连续写入 Undo Log，来记录本次修改之前的历史值。当 Crash 真正发生时，可以在 Recovery 过程中通过回放 Undo Log 将未提交事务的修改抹掉。InnoDB 采用的就是这种方式。
+
+##### MVCC（Multi-Versioin Concurrency Control）
+
+用于MVCC（实现非锁定读），读取一行记录时，若已被其他事务占据，则通过undo读取之前的版本
+
+为了避免只读事务与写事务之间的冲突，避免写操作等待读操作，几乎所有的主流数据库都采用了多版本并发控制（MVCC）的方式，也就是为每条记录保存多份历史数据供读事务访问，新的写入只需要添加新的版本即可，无需等待。
+
+InnoDB在这里复用了Undo Log中已经记录的历史版本数据来满足 MVCC 的需求。
+
+InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是说，Undo Log日志本身也像其他的数据库数据一样，会写自己对应的Redo Log，通过 Redo Log 来保证自己的原子性。因此，更合适的称呼应该是 **Undo Data**。
+
+
 
 > 我们在执行执行一条“增删改”语句的时候，虽然没有输入 begin 开启事务和 commit 提交事务，但是 MySQL 会**隐式开启事务**来执行“增删改”语句的，执行完就自动提交事务的，这样就保证了执行完“增删改”语句后，我们可以及时在数据库表看到“增删改”的结果了。
 >
@@ -124,129 +326,146 @@ write pos 和 checkpoint 之间的是“粉板”上还空着的部分，可以�
 >
 > undo log 是一种用于撤销回退的日志。在事务没提交之前，MySQL 会先记录更新前的数据到 undo log 日志文件里面，当事务回滚时，可以利用 undo log 来进行回滚。
 
-是 Innodb 存储引擎层生成的日志，实现了事务中的**原子性**，主要**用于事务回滚和 MVCC**。
-
-回滚日志的作用是进行事务回滚
-
-当事务执行的时候，回滚日志中记录了事务中每次数据更新前的状态。当事务需要回滚的时候，可以通过读取回滚日志，恢复到指定的位置。另一方面，回滚日志也可以让其他的事务读取到这个事务对数据更改之前的值，从而确保了其他事务可以不受这个事务修改数据的影响。
 
 
+#### 3.2 组织 undo log
 
-## 慢查询日志(slow query log)
+> 前边我们简单提过下，Undo Log 属于逻辑日志，为什么不用物理日志呢？
+>
+> Undo Log 需要的是事务之间的并发，以及方便的多版本数据维护，其重放逻辑不希望因 DB 的物理存储变化而变化。因此，InnoDB 中的 Undo Log 采用了基于事务的 **Logical Logging** 的方式。
+>
+> InnoDB中其实是把Undo当做一种数据来维护和使用的，也就是说，Undo Log日志本身也像其他的数据库数据一样，会写自己对应的Redo Log，通过Redo Log来保证自己的原子性。因此，更合适的称呼应该是**Undo Data**。
 
-慢查询日志用来记录执行时间超过指定时长的查询。它的主要作用是，帮助我们发现那些执行时间特别长的 SQL 查询，并且有针对性地进行优化，从而提高系统的整体效率。当我们的数据库服务器发生阻塞、运行变慢的时候，检查一下慢查询日志，找到那些慢查询，对解决问题很有帮助。
+![](/Users/starfish/oceanus/picBed/mysql/innodb-architecture-undo.png)
 
-> Mac 没有 my.ini/my.cnf 文件，需要自己搞，我们只对本次生效吧。`set global slow_query_log=1`
+> 各个版本的 MySQL，undo tablespaces 存储有一些差距，我们以 8.0 版本说明
 
-```mysql
-mysql> show variables like '%slow_query%';
-+---------------------+------------------------------------------------------+
-| Variable_name       | Value                                                |
-+---------------------+------------------------------------------------------+
-| slow_query_log      | OFF                                                  |
-| slow_query_log_file | /usr/local/mysql/data/starfishdeMacBook-Pro-slow.log |
-+---------------------+------------------------------------------------------+
-2 rows in set (0.02 sec)
-```
+#### 「undo log 的两种类型」
 
-默认也是关闭的，其实我们说的慢查询日志，有两个值
+根据行为的不同，undo log 分为两种：insert undo log 和 update undo log
 
-```mysql
-mysql> show variables like '%long_query_time%';
-+-----------------+-----------+
-| Variable_name   | Value     |
-+-----------------+-----------+
-| long_query_time | 10.000000 |
-+-----------------+-----------+
-1 row in set (0.01 sec)
+- **insert undo log，是在 insert 操作中产生的。**
 
-mysql> show variables like '%row_limit%';
-+------------------------+-------+
-| Variable_name          | Value |
-+------------------------+-------+
-| min_examined_row_limit | 0     |
-+------------------------+-------+
-1 row in set (0.01 sec)
-```
+  insert操作的记录只对事务本身可见，对于其它事务此记录是不可见的，所以 insert undo log 可以在事务提交后直接删除而不需要进行purge操作。
 
-`long_query_time`：慢查询的时间阈值
+  Insert Undo Record仅仅是为了可能的事务回滚准备的，并不在MVCC功能中承担作用。
 
-`min_examined_row_limit`：查询扫描过的最少记录数，因为这个值默认是 0，所以常被我们忽略
+  ![](/Users/starfish/oceanus/picBed/mysql/insert-undo-log.png)
 
-查询的执行时间和最少扫描记录，共同组成了判别一个查询是否是慢查询的条件。如果查询扫描过的记录数大于等于这个变量的值，并且查询执行时间超过 long_query_time 的值，那么，这个查询就被记录到慢查询日志中；反之，则不被记录到慢查询日志中。
+  存在一组长度不定的 Key Fields，因为对应表的主键可能由多个 field 组成，这里需要记录 Record 完整的主键信息，回滚的时候可以通过这个信息在索引中定位到对应的 Record。
 
+- **update undo log 是 update 或 delete 操作中产生。**
 
+  由于MVCC需要保留Record的多个历史版本，当某个Record的历史版本还在被使用时，这个Record是不能被真正的删除的。
 
-## 错误日志(error log)
+  因此，当需要删除时，其实只是修改对应Record的Delete Mark标记。对应的，如果这时这个Record又重新插入，其实也只是修改一下Delete Mark标记，也就是将这两种情况的delete和insert转变成了update操作。再加上常规的Record修改，因此这里的Update Undo Record会对应三种Type：
 
-错误日志记录了 MySQL 服务器启动、停止运行的时间，以及系统启动、运行和停止过程中的诊断信息，包括错误、警告和提示等。当我们的数据库服务器发生系统故障时，错误日志是发现问题、解决故障的首选。
+  - TRX_UNDO_UPD_EXIST_REC
+  - TRX_UNDO_DEL_MARK_REC
+  - TRX_UNDO_UPD_DEL_REC。
 
-错误日志默认是开启的
+  他们的存储内容也类似，我们看下 TRX_UNDO_UPD_EXIST_REC
 
-```mysql
-mysql> show variables like '%log_error%';
-+----------------------------+----------------------------------------+
-| Variable_name              | Value                                  |
-+----------------------------+----------------------------------------+
-| binlog_error_action        | ABORT_SERVER                           |
-| log_error                  | /usr/local/mysql/data/mysqld.local.err |
-| log_error_services         | log_filter_internal; log_sink_internal |
-| log_error_suppression_list |                                        |
-| log_error_verbosity        | 2                                      |
-+----------------------------+----------------------------------------+
-5 rows in set (0.01 sec)
-```
+  ![](/Users/starfish/oceanus/picBed/mysql/update-undo-log.png)
 
-我们可以看到错误日志的地址，当出现数据库不能正常启动、使用的时候，第一个查的就是错误日志，有时候错误日志中也会有些优化信息，比如告诉我们需要增大 InnoDB 引擎的 redo log 这种。
+  除了跟 Insert Undo Record 相同的头尾信息，以及主键 Key Fileds之外，Update Undo Record 增加了：
+
+  - Transaction Id记录了产生这个历史版本事务Id，用作后续MVCC中的版本可见性判断
+  - Rollptr指向的是该记录的上一个版本的位置，包括space number，page number和page内的offset。沿着Rollptr可以找到一个Record的所有历史版本。
+  - Update Fields中记录的就是当前这个Record版本相对于其之后的一次修改的Delta信息，包括所有被修改的Field的编号，长度和历史值。
+
+  > 因为会对已经存在的记录产生影响，为了提供 MVCC机制，因此 update undo log 不能在事务提交时就进行删除，而是将事务提交时放到入 history list 上，等待 purge 线程进行最后的删除操作
+  >
+  > 为了更好的支持并发，InnoDB的多版本一致性读是采用了基于回滚段的的方式。另外，对于更新和删除操作，InnoDB并不是真正的删除原来的记录，而是设置记录的delete mark为1。因此为了解决数据Page和Undo Log膨胀的问题，需要引入purge机制进行回收
+  >
+  > 为了保证事务并发操作时，在写各自的undo log时不产生冲突，InnoDB采用回滚段的方式来维护undo log的并发写入和持久化。回滚段实际上是一种 Undo 文件组织方式
 
 
 
-## 二进制日志(binlog)
+每当 InnoDB 中需要修改某个 Record 时，都会将其历史版本写入一个 Undo Log 中，对应的 Undo Record 是 Update 类型。
+
+当插入新的Record 时，还没有一个历史版本，但为了方便事务回滚时做逆向（Delete）操作，这里还是会写入一个Insert类型的 Undo Record。
+
+#### 「组织方式」
+
+每一次的修改都会产生至少一个Undo Record，那么大量 Undo Record 如何组织起来，来支持高效的访问和管理呢？
+
+每个事务其实会修改一组的 Record，对应的也就会产生一组Undo Record，这些Undo Record收尾相连就组成了这个事务的**Undo Log**。除了一个个的 Undo Record 之外，还在开头增加了一个Undo Log Header来记录一些必要的控制信息，因此，一个Undo Log的结构如下所示：
+
+![](/Users/starfish/oceanus/picBed/mysql/undo-log-header.png)
+
+- Trx Id：事务Id
+- Trx No：事务的提交顺序，也会用这个来判断是否能Purge
+- Delete Mark：标明该Undo Log中有没有TRX_UNDO_DEL_MARK_REC类型的Undo Record，避免Purge时不必要的扫描
+- Log Start Offset：记录Undo Log Header的结束位置，方便之后Header中增加内容时的兼容
+- Xid and DDL Flags：Flag信息
+- Table ID if DDL：表ID
+- Next Undo Log：标记后边的Undo Log
+- Prev Undo Log：标记前边的Undo Log
+- History List Node：
+
+![Iva](/Users/starfish/oceanus/picBed/mysql/undo-log-logicial.png)
+
+
+
+ undo是逻辑日志，只是将数据库**逻辑的**恢复到执行语句或事务之前。
+
+我们知道 InnoDB 中默认以 块 为单位存储，一个块默认是16KB。那么如何用固定的块大小承载不定长的Undo Log，以实现高效的空间分配、复用，避免空间浪费。InnoDB的**基本思路**是让多个较小的Undo Log紧凑存在一个Undo Page中，而对较大的Undo Log则随着不断的写入，按需分配足够多的Undo Page分散承载
+
+![](/Users/starfish/oceanus/picBed/mysql/undo-log-physical.png)
+
+Undo 的物理组织格式是—— Undo Segment，它会持有至少一个 Undo Page。
+
+InnoDB 中的 Undo 文件中准备了大量的 Undo Segment 的槽位，按照1024一组划分为**Rollback Segment**。
+
+Undo 的文件组织格式是——Undo Tablespace，每个 Undo Tablespace 最多会包含 128 个 Rollback Segment。MySQL 8.0 最多支持 127 个独立的 Undo Tablespace。
+
+在内存中也会维护对应的数据结构来管理 Undo Log，我们就不深入了。
+
+
+
+#### 3.3 MVCC  是如何实现的
+
+多版本的目的是为了避免写事务和读事务的互相等待，那么每个读事务都需要在不对Record加Lock的情况下， 找到对应的应该看到的历史版本。所谓历史版本就是假设在该只读事务开始的时候对整个DB打一个快照，之后该事务的所有读请求都从这个快照上获取。当然实现上不能真正去为每个事务打一个快照，这个时间空间都太高了。InnoDB的做法，是在读事务第一次读取的时候获取一份ReadView，并一直持有，其中记录所有当前活跃的写事务ID，由于写事务的ID是自增分配的，通过这个ReadView我们可以知道在这一瞬间，哪些事务已经提交哪些还在运行，根据Read Committed的要求，未提交的事务的修改就是不应该被看见的，对应地，已经提交的事务的修改应该被看到。
+
+作为存储历史版本的Undo Record，其中记录的trx_id就是做这个可见性判断的，对应的主索引的Record上也有这个值。当一个读事务拿着自己的ReadView访问某个表索引上的记录时，会通过比较Record上的trx_id确定是否是可见的版本，如果不可见就沿着Record或Undo Record中记录的rollptr一路找更老的历史版本。如下图所示，事务R开始需要查询表t上的id为1的记录，R开始时事务I已经提交，事务J还在运行，事务K还没开始，这些信息都被记录在了事务R的ReadView中。事务R从索引中找到对应的这条Record[1, C]，对应的trx_id是K，不可见。沿着Rollptr找到Undo中的前一版本[1, B]，对应的trx_id是J，不可见。继续沿着Rollptr找到[1, A]，trx_id是I可见，返回结果。
+
+![undo_mvcc](http://catkang.github.io/assets/img/innodb_undo/undo_mvcc.png)
+
+前面提到过，作为Logical Log，Undo中记录的其实是前后两个版本的diff信息，而读操作最终是要获得完整的Record内容的，也就是说这个沿着rollptr指针一路查找的过程中需要用Undo Record中的diff内容依次构造出对应的历史版本，这个过程在函数**row_search_mvcc**中，其中**trx_undo_prev_version_build**会根据当前的rollptr找到对应的Undo Record位置，这里如果是rollptr指向的是insert类型，或者找到了已经Purge了的位置，说明到头了，会直接返回失败。否则，就会解析对应的Undo Record，恢复出trx_id、指向下一条Undo Record的rollptr、主键信息，diff信息update vector等信息。之后通过**row_upd_rec_in_place**，用update vector修改当前持有的Record拷贝中的信息，获得Record的这个历史版本。之后调用自己ReadView的**changes_visible**判断可见性，如果可见则返回用户。完成这个历史版本的读取。
+
+
+
+#### 3.4 Undo Log 清理
+
+我们已经知道，InnoDB在Undo Log中保存了多份历史版本来实现MVCC，当某个历史版本已经确认不会被任何现有的和未来的事务看到的时候，就应该被清理掉。
+
+> #### InnoDB存储引擎的行结构
+>
+> InnoDB表数据的组织方式为主键聚簇索引，二级索引中采用的是(索引键值, 主键键值)的组合来唯一确定一条记录。
+>  InnoDB表数据为主键聚簇索引,mysql默认为每个索引行添加了4个隐藏的字段,分别是：
+>
+> - DB_ROW_ID：InnoDB引擎中一个表只能有一个主键,用于聚簇索引,如果表没有定义主键会选择第一个非Null 的唯一索引作为主键,如果还没有,生成一个隐藏的DB_ROW_ID作为主键构造聚簇索引。
+> - DB_TRX_ID：最近更改该行数据的事务ID。
+> - DB_ROLL_PTR：undo log的指针,用于记录之前历史数据在undo log中的位置。
+> - DELETE BIT：索引删除标志,如果DB删除了一条数据,是优先通知索引将该标志位设置为1,然后通过(purge)清除线程去异步删除真实的数据。
+>
+> ![img](https://upload-images.jianshu.io/upload_images/12645744-9382a13a0e4bc3a5.png?imageMogr2/auto-orient/strip|imageView2/2/w/700/format/webp)
+
+
+
+## 四、二进制日志(binlog)
 
 二进制日志，也被叫做归档日志，是 Server 层生成的日志，主要**用于数据备份和主从复制**
+
+- **主从复制**：在`Master`端开启`binlog`，然后将`binlog`发送到各个`Slave`端，`Slave`端重放`binlog`从而达到主从数据一致。
+- **数据恢复**：可以用 `mysqldump` 做数据备份，binlog 格式是二进制日志，可以使用 `mysqlbinlog` 工具解析，实现数据恢复
 
 二进制日志主要记录数据库的更新事件，比如创建数据表、更新表中的数据、数据更新所花费的时长等信息。通过这些信息，我们可以再现数据更新操作的全过程。而且，由于日志的延续性和时效性，我们还可以利用日志，完成无损失的数据恢复和主从服务器之间的数据同步。
 
 这就是我们最常说的 binlog
 
-### 查看 binlog
-
-查看二进制日志主要有 3 种情况，分别是查看当前正在写入的二进制日志、查看所有的二进制日志和查看二进制日志中的所有数据更新事件。
-
-```mysql
-mysql> show master status;
-+---------------+----------+--------------+------------------+-------------------+
-| File          | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
-+---------------+----------+--------------+------------------+-------------------+
-| binlog.000002 |    27736 |              |                  |                   |
-+---------------+----------+--------------+------------------+-------------------+
-1 row in set (0.00 sec)
-```
-
-```mysql
-mysql> show binary logs;
-+---------------+-----------+-----------+
-| Log_name      | File_size | Encrypted |
-+---------------+-----------+-----------+
-| binlog.000001 |       638 | No        |
-| binlog.000002 |     27736 | No        |
-+---------------+-----------+-----------+
-2 rows in set (0.01 sec)
-```
-
-
-
-## 中继日志(relay log)
-
-中继日志只在主从服务器架构的从服务器上存在。从服务器为了与主服务器保持一致，要从主服务器读取二进制日志的内容，并且把读取到的信息写入本地的日志文件中，这个从服务器本地的日志文件就叫中继日志。然后，从服务器读取中继日志，并根据中继日志的内容对从服务器的数据进行更新，完成主从服务器的数据同步。
-
-
-
-
-
-## binlog
-
-前面我们讲过，MySQL 整体来看，其实就有两块：一块是 Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面我们聊到的粉板 redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（归档日志）。
+前面我们讲过，MySQL 整体来看，其实就有两块：一块是 Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面我们聊到的粉板 redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（二进制日志）。
 
 我想你肯定会问，为什么会有两份日志呢？
 
@@ -272,7 +491,7 @@ mysql> show binary logs;
 
 你可能注意到了，最后三步看上去有点“绕”，将 redo log 的写入拆成了两个步骤：prepare 和 commit，这就是"两阶段提交"。
 
-# 两阶段提交
+### 两阶段提交
 
 为什么必须有“两阶段提交”呢？这是为了让两份日志之间的逻辑一致。要说明这个问题，我们得从文章开头的那个问题说起：**怎样让数据库恢复到半个月内任意一秒的状态？**
 
@@ -303,6 +522,170 @@ mysql> show binary logs;
 其实不是的，不只是误操作后需要用这个过程来恢复数据。当你需要扩容的时候，也就是需要再多搭建一些备库来增加系统的读能力的时候，现在常见的做法也是用全量备份加上应用 binlog 来实现的，这个“不一致”就会导致你的线上出现主从数据库不一致的情况。
 
 简单说，redo log 和 binlog 都可以用于表示事务的提交状态，而两阶段提交就是让这两个状态保持逻辑上的一致。
+
+![Redo log and binlog of MySQL log system](https://imgs.developpaper.com/imgs/1812744628-879390c57a1d2ec5_articlex.png)
+
+
+
+
+
+
+
+### 查看 binlog
+
+查看二进制日志主要有 3 种情况，分别是查看当前正在写入的二进制日志、查看所有的二进制日志和查看二进制日志中的所有数据更新事件。
+
+```mysql
+mysql> show master status;
++---------------+----------+--------------+------------------+-------------------+
+| File          | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++---------------+----------+--------------+------------------+-------------------+
+| binlog.000002 |    27736 |              |                  |                   |
++---------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+```
+
+```mysql
+mysql> show binary logs;
++---------------+-----------+-----------+
+| Log_name      | File_size | Encrypted |
++---------------+-----------+-----------+
+| binlog.000001 |       638 | No        |
+| binlog.000002 |     27736 | No        |
++---------------+-----------+-----------+
+2 rows in set (0.01 sec)
+```
+
+
+
+### **Binary logging formats**
+
+`binlog`日志有三种格式，分别为`STATMENT`、`ROW`和`MIXED`。
+
+> 在 `MySQL 5.7.7`之前，默认的格式是`STATEMENT`，`MySQL 5.7.7`之后，默认值是`ROW`。日志格式通过`binlog-format`指定。
+
+- `STATMENT` **基于`SQL`语句的复制(`statement-based replication, SBR`)，每一条会修改数据的sql语句会记录到`binlog`中**。 优点：**不需要记录每一行的变化，减少了`binlog`日志量，节约了`IO`, 从而提高了性能**； 缺点：**在某些情况下会导致主从数据不一致，比如执行`sysdate()`、`slepp()`等**。
+- `ROW` **基于行的复制(`row-based replication, RBR`)，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了**。 优点：**不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题**； 缺点：**会产生大量的日志，尤其是`alter table`的时候会让日志暴涨**
+- `MIXED` **基于`STATMENT`和`ROW`两种模式的混合复制(`mixed-based replication, MBR`)，一般的复制使用`STATEMENT`模式保存`binlog`，对于`STATEMENT`模式无法复制的操作使用`ROW`模式保存`binlog`**
+
+
+
+MySQL database logs offer three formats for binary logging.
+
+- **Statement-based logging:** In this format, MySQL records the SQL statements that produce data changes. Statement-based logging is useful when many rows are affected by an event because it is more efficient to log a few statements than many rows.
+- **Row-based logging:** In this format, changes to individual rows are recorded instead of the SQL statements. This is useful for queries that require a lot of execution time on the source but result in just a few rows being modified.
+- **Mixed logging:** This is the recommended logging format. It uses statement-based logging by default but switches to row-based logging when required.
+
+The binary logging format can be changed using the code below. However, you should note that it is not recommended to do so at runtime or while replication is ongoing.
+
+```
+SET GLOBAL binlog_format = 'STATEMENT';
+SET GLOBAL binlog_format = 'ROW';
+SET GLOBAL binlog_format = 'MIXED';
+```
+
+Enabling binary logging on your MySQL instance will lower the performance slightly. However, the advantages discussed above generally outweigh this minor dip in performance.
+
+
+
+## 五、错误日志(error log)
+
+错误日志记录了 MySQL 服务器启动、停止运行的时间，以及系统启动、运行和停止过程中的诊断信息，包括错误、警告和提示等。当我们的数据库服务器发生系统故障时，错误日志是发现问题、解决故障的首选。
+
+错误日志默认是开启的
+
+```mysql
+mysql> show variables like '%log_error%';
++----------------------------+----------------------------------------+
+| Variable_name              | Value                                  |
++----------------------------+----------------------------------------+
+| binlog_error_action        | ABORT_SERVER                           |
+| log_error                  | /usr/local/mysql/data/mysqld.local.err |
+| log_error_services         | log_filter_internal; log_sink_internal |
+| log_error_suppression_list |                                        |
+| log_error_verbosity        | 2                                      |
++----------------------------+----------------------------------------+
+5 rows in set (0.01 sec)
+```
+
+我们可以看到错误日志的地址，当出现数据库不能正常启动、使用的时候，第一个查的就是错误日志，有时候错误日志中也会有些优化信息，比如告诉我们需要增大 InnoDB 引擎的 redo log 这种。
+
+
+
+## 六、慢查询日志(slow query log)
+
+慢查询日志用来记录执行时间超过指定时长的查询。它的主要作用是，帮助我们发现那些执行时间特别长的 SQL 查询，并且有针对性地进行优化，从而提高系统的整体效率。当我们的数据库服务器发生阻塞、运行变慢的时候，检查一下慢查询日志，找到那些慢查询，对解决问题很有帮助。
+
+```mysql
+mysql> show variables like '%slow_query%';
++---------------------+------------------------------------------------------+
+| Variable_name       | Value                                                |
++---------------------+------------------------------------------------------+
+| slow_query_log      | OFF                                                  |
+| slow_query_log_file | /usr/local/mysql/data/starfishdeMacBook-Pro-slow.log |
++---------------------+------------------------------------------------------+
+2 rows in set (0.02 sec)
+```
+
+默认也是关闭的，其实我们说的慢查询日志，有两个值
+
+> Mac 没有 my.ini/my.cnf 文件，需要自己搞，我们只对本次生效吧。`set global slow_query_log=1`
+
+```mysql
+mysql> show variables like '%long_query_time%';
++-----------------+-----------+
+| Variable_name   | Value     |
++-----------------+-----------+
+| long_query_time | 10.000000 |
++-----------------+-----------+
+1 row in set (0.01 sec)
+
+mysql> show variables like '%row_limit%';
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| min_examined_row_limit | 0     |
++------------------------+-------+
+1 row in set (0.01 sec)
+```
+
+`long_query_time`：慢查询的时间阈值
+
+`min_examined_row_limit`：查询扫描过的最少记录数，因为这个值默认是 0，所以常被我们忽略
+
+查询的执行时间和最少扫描记录，共同组成了判别一个查询是否是慢查询的条件。如果查询扫描过的记录数大于等于这个变量的值，并且查询执行时间超过 long_query_time 的值，那么，这个查询就被记录到慢查询日志中；反之，则不被记录到慢查询日志中。
+
+
+
+
+
+
+
+## 七、中继日志(relay log)
+
+中继日志只在主从服务器架构的从服务器上存在。从服务器为了与主服务器保持一致，要从主服务器读取二进制日志的内容，并且把读取到的信息写入本地的日志文件中，这个从服务器本地的日志文件就叫中继日志。然后，从服务器读取中继日志，并根据中继日志的内容对从服务器的数据进行更新，完成主从服务器的数据同步。
+
+Relay log(中继日志)是在MySQL主从复制时产生的日志，在MySQL的主从复制主要涉及到三个线程:
+
+\1) Log dump线程：向从库的IO线程传输主库的Binlog日志
+
+\2) IO线程：向主库请求Binlog日志，并将Binlog日志写入到本地的relay log中。
+
+\3) SQL线程：读取Relay log日志，将其解析为SQL语句并逐一执行。
+
+![img](https://s4.51cto.com/oss/202205/24/38d0c5872acd7d6511e591688f97514825e36b.png)
+
+图2
+
+从图2中可以看出，从库的IO线程接收到主库的logdump线程传递的Binlog日志后，会将其写入到本地的一个日志中，这个日志就是Relaylog。在文件目录中，一般由多个host_name-relay-bin.nnnnnn 的日志文件和host_name-relay-bin.index索引文件组成，其中日志文件记录的是事务中修改数据的信息，索引文件记录的是使用过的日志文件信息。
+
+Relaylog日志的格式与Binlog的一致，但是相较于Binlog多了master.info和relay-log.info两个日志(默认存储于数据文件目录中)。master.info主要记录上一次读取到master同步过来的binlog的位置，从节点的连接信息和主节点信息，以及连接master和启动复制必须的所有信息。relay-log.info主要记录了从节点文件复制的进度，下一个事件从什么位置开始，由sql线程负责更新。
+
+
+
+
+
+![img](https://i.stack.imgur.com/aW0ve.jpg)
 
 
 
@@ -337,7 +720,12 @@ mysql> update T set c=c+1 where ID=2;
 
 
 
+### 为什么需要记录REDO
 
+redo log 是 Innodb 存储引擎层生成的日志，实现了事务中的**持久性**，主要**用于掉电等故障恢复**：
+
+1. 在系统遇到故障的恢复过程中，可以修复被未完成的事务修改的数据。
+2. InnoDB 为了提高数据存取的效率，减少磁盘操作的频率，对数据的更新操作不会立即写到磁盘上，而是把数据更新先保存在内存中(**InnoDB Buffer Pool**)，积累到一定程度，再集中进行磁盘读写操作。这样就存在一个问题：一旦出现宕机或者停电等异常情况，内存中保存的数据更新操作可能会丢失。为了保证数据库本身的一致性和**持久性**，InnoDB 维护了 REDO LOG。修改 Page 之前需要先将修改的内容记录到 REDO 中，并保证 REDO LOG 早于对应的 Page 落盘，也就是常说的WAL。当故障发生导致内存数据丢失后，InnoDB 会在重启时，通过重放 REDO，将 Page 恢复到崩溃前的状态。
 
 回答面试官问题时候，如果能指明不同版本的差异，会加分的
 
@@ -348,5 +736,8 @@ mysql> update T set c=c+1 where ID=2;
 ## References
 
 - https://dev.mysql.com/doc/refman/8.0/en/server-logs.html
-- [《MySQL · 引擎特性 · 庖丁解InnoDB之UNDO LOG》](http://mysql.taobao.org/monthly/2021/10/01/)
+- https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_INNODB_REDO_LOG_THREADS.html
+- https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html
+- [《庖丁解InnoDB之UNDO LOG》](http://mysql.taobao.org/monthly/2021/10/01/)
+- [庖丁解InnoDB之Undo LOG](http://catkang.github.io/2021/10/30/mysql-undo.html)
 - https://www.51cto.com/article/639652.html

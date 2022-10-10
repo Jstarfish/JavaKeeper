@@ -1,0 +1,135 @@
+{
+  "main": {
+    "id": "2c9313c97191b3d5",
+    "type": "split",
+    "children": [
+      {
+        "id": "d328e22c3a421c71",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "data-structure-algorithms/soultion/Array-Solution.md",
+            "mode": "source",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c2ba06bd2f318734",
+    "type": "split",
+    "children": [
+      {
+        "id": "8aec8ec279c7aff1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ae760b575766f3f0",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "f88a42db0e3bb960",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "c7bda26138bbb70d",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4d54828aaab36d9f",
+    "type": "split",
+    "children": [
+      {
+        "id": "4acb1c44f8a68ec8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f56e43f509009e33",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "data-structure-algorithms/soultion/Array-Solution.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "e22cbd6030bde448",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "data-structure-algorithms/soultion/Array-Solution.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "37585a229386609d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "1b738c49f6ecdf2c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "data-structure-algorithms/soultion/Array-Solution.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "active": "d328e22c3a421c71",
+  "lastOpenFiles": [
+    "data-structure-algorithms/Array.md"
+  ]
+}
