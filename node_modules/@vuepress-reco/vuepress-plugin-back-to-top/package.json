@@ -1,0 +1,25 @@
+{
+  "name": "@vuepress-reco/vuepress-plugin-back-to-top",
+  "version": "1.6.0",
+  "description": "Back-to-top plugin for vuepress-theme-reco or other vuepress theme",
+  "keywords": [
+    "vuepress-theme-reco",
+    "backtotop",
+    "vuepress"
+  ],
+  "homepage": "https://vuepress-theme-reco.recoluan.com",
+  "bugs": {
+    "url": "https://github.com/vuepress-reco/vuepress-theme-reco/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuepress-reco/vuepress-plugin-pagation.git"
+  },
+  "license": "MIT",
+  "author": "reco_luan <recoluan@outlook.com>",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "65cf3b4ff85813bc58b85635fd474391f87edf2b"
+}

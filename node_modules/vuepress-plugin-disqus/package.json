@@ -1,0 +1,24 @@
+{
+  "name": "vuepress-plugin-disqus",
+  "version": "0.2.0",
+  "description": "Register a global Disqus component to add to your layouts",
+  "main": "index.js",
+  "keywords": [
+    "vuepress",
+    "plugin",
+    "disqus"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lorisleiva/vuepress-plugin-disqus.git"
+  },
+  "author": "Loris Leiva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lorisleiva/vuepress-plugin-disqus/issues"
+  },
+  "homepage": "https://github.com/lorisleiva/vuepress-plugin-disqus#readme",
+  "dependencies": {
+    "vue-disqus": "^3.0.5"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "element-closest",
+  "version": "3.0.2",
+  "description": "Return the closest element matching a selector up the DOM tree",
+  "author": "Jonathan Neal <jonathantneal@hotmail.com>",
+  "license": "CC0-1.0",
+  "repository": "jonathantneal/closest",
+  "homepage": "https://github.com/jonathantneal/closest#readme",
+  "bugs": "https://github.com/jonathantneal/closest/issues",
+  "main": "index.js",
+  "module": "index.mjs",
+  "unpkg": "browser.js",
+  "jsdelivr": "browser.js",
+  "files": [
+    "browser.js",
+    "index.js",
+    "index.js.map",
+    "index.mjs",
+    "index.mjs.map"
+  ],
+  "scripts": {
+    "build": "npm run build:node && npm run build:browser",
+    "build:node": "rollup --config",
+    "build:browser": "cross-env NODE_ENV=browser rollup --config",
+    "prepublish": "npm run test && npm run build",
+    "test": "eslint src/*.js --cache --ignore-path .gitignore --quiet"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^6.0.3",
+    "eslint": "^6.6.0",
+    "eslint-config-dev": "^2.0.0",
+    "pre-commit": "^1.2.2",
+    "rollup": "^1.26.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-terser": "^5.1.2"
+  },
+  "eslintConfig": {
+    "extends": "dev",
+    "parser": "babel-eslint"
+  },
+  "keywords": [
+    "javascript",
+    "js",
+    "dom",
+    "document",
+    "element",
+    "node",
+    "closest",
+    "matches",
+    "polyfill",
+    "web",
+    "standard"
+  ]
+}

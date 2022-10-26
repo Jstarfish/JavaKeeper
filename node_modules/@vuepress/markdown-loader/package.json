@@ -1,0 +1,38 @@
+{
+  "name": "@vuepress/markdown-loader",
+  "version": "1.8.2",
+  "description": "markdown-loader for vuepress",
+  "keywords": [
+    "documentation",
+    "generator",
+    "vue",
+    "vuepress"
+  ],
+  "homepage": "https://github.com/vuejs/vuepress/blob/master/packages/@vuepress/markdown-loader#readme",
+  "bugs": {
+    "url": "https://github.com/vuejs/vuepress/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/vuepress.git",
+    "directory": "packages/@vuepress/markdown-loader"
+  },
+  "license": "MIT",
+  "author": "Evan You",
+  "main": "index.js",
+  "dependencies": {
+    "@vuepress/markdown": "1.8.2",
+    "loader-utils": "^1.1.0",
+    "lru-cache": "^5.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "maintainers": [
+    {
+      "name": "ULIVZ",
+      "email": "chl814@foxmail.com"
+    }
+  ],
+  "gitHead": "11eed0f0f105b97a7324cfa8e59d7d27bb966842"
+}

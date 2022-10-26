@@ -1,0 +1,49 @@
+{
+  "name": "vue-property-decorator",
+  "version": "9.1.2",
+  "description": "property decorators for Vue Component",
+  "main": "lib/index.umd.js",
+  "module": "lib/index.js",
+  "keywords": [
+    "vue",
+    "typescript",
+    "decorator"
+  ],
+  "author": "kaorun343",
+  "license": "MIT",
+  "directories": {
+    "tests": "tests"
+  },
+  "scripts": {
+    "build": "tsc -p ./src/tsconfig.json && rollup -c",
+    "test": "jest"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.9",
+    "jest": "^26.6.3",
+    "reflect-metadata": "^0.1.13",
+    "rollup": "^2.33.3",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.1.2",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.2.3"
+  },
+  "typings": "./lib/index.d.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "vue": "*",
+    "vue-class-component": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaorun343/vue-property-decorator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kaorun343/vue-property-decorator/issues"
+  },
+  "homepage": "https://github.com/kaorun343/vue-property-decorator#readme"
+}

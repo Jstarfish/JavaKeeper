@@ -1,0 +1,13 @@
+{
+  "name": "jsonp",
+  "repo": "webmodules/jsonp",
+  "description": "A sane JSONP implementation.",
+  "version": "0.2.1",
+  "dependencies": {
+    "visionmedia/debug": "*"
+  },
+  "scripts": [
+    "index.js"
+  ],
+  "main": "index.js"
+}

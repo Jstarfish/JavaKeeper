@@ -877,8 +877,6 @@ mysql> update T set c=c+1 where ID=2;
 >
 > redo log 和 binlog 都可以用于表示事务的提交状态，而两阶段提交就是让这两个状态保持逻辑上的一致。
 
-![](https://static001.geekbang.org/resource/image/2e/be/2e5bff4910ec189fe1ee6e2ecc7b4bbe.png)
-
 - 客户端先通过连接器建立连接，连接器自会判断用户身份；
 - 因为这是一条 update 语句，所以不需要经过查询缓存，但是表上有更新语句，是会把整个表的查询缓存情空的，所以说查询缓存很鸡肋，在 MySQL 8.0 就被移除这个功能了；
 - 解析器会通过词法分析识别出关键字 update，表名等等，构建出语法树，接着还会做语法分析，判断输入的语句是否符合 MySQL 语法；

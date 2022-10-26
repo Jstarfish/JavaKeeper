@@ -1,0 +1,41 @@
+import { PropertyList } from '../Tree/Node.js';
+export declare type OperatorDef = [number, number, number, PropertyList];
+export declare type OperatorList = {
+    [name: string]: OperatorDef;
+};
+export declare type RangeDef = [number, number, number, string];
+export declare function OPDEF(lspace: number, rspace: number, texClass?: number, properties?: PropertyList): OperatorDef;
+export declare const MO: {
+    ORD: [number, number, number, PropertyList];
+    ORD11: [number, number, number, PropertyList];
+    ORD21: [number, number, number, PropertyList];
+    ORD02: [number, number, number, PropertyList];
+    ORD55: [number, number, number, PropertyList];
+    OP: [number, number, number, PropertyList];
+    OPFIXED: [number, number, number, PropertyList];
+    INTEGRAL: [number, number, number, PropertyList];
+    INTEGRAL2: [number, number, number, PropertyList];
+    BIN3: [number, number, number, PropertyList];
+    BIN4: [number, number, number, PropertyList];
+    BIN01: [number, number, number, PropertyList];
+    BIN5: [number, number, number, PropertyList];
+    TALLBIN: [number, number, number, PropertyList];
+    BINOP: [number, number, number, PropertyList];
+    REL: [number, number, number, PropertyList];
+    REL1: [number, number, number, PropertyList];
+    REL4: [number, number, number, PropertyList];
+    RELSTRETCH: [number, number, number, PropertyList];
+    RELACCENT: [number, number, number, PropertyList];
+    WIDEREL: [number, number, number, PropertyList];
+    OPEN: [number, number, number, PropertyList];
+    CLOSE: [number, number, number, PropertyList];
+    INNER: [number, number, number, PropertyList];
+    PUNCT: [number, number, number, PropertyList];
+    ACCENT: [number, number, number, PropertyList];
+    WIDEACCENT: [number, number, number, PropertyList];
+};
+export declare const RANGES: RangeDef[];
+export declare const MMLSPACING: number[][];
+export declare const OPTABLE: {
+    [form: string]: OperatorList;
+};

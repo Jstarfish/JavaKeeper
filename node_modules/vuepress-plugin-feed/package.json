@@ -1,0 +1,59 @@
+{
+  "name": "vuepress-plugin-feed",
+  "version": "0.1.9",
+  "description": "RSS, Atom, and JSON feeds generator plugin for VuePress 1.x",
+  "main": "index.js",
+  "scripts": {
+    "version": "git add --all",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webmasterish/vuepress-plugin-feed.git"
+  },
+  "keywords": [
+    "vue",
+    "vuepress",
+    "plugin",
+    "vuepress-plugin",
+    "blog",
+    "feed",
+    "xml",
+    "rss",
+    "atom",
+    "json",
+    "json-feed",
+    "syndication"
+  ],
+  "author": {
+    "name": "webmasterish",
+    "email": "webmasterish@gmail.com",
+    "url": "https://webmasterish.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/webmasterish/vuepress-plugin-feed",
+  "bugs": {
+    "url": "https://github.com/webmasterish/vuepress-plugin-feed/issues"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "feed": "2.0.4",
+    "lodash.defaultsdeep": "4.6.1",
+    "lodash.isempty": "4.4.0",
+    "lodash.trimend": "^4.5.1",
+    "lodash.trimstart": "^4.5.1",
+    "remove-markdown": "0.3.0",
+    "striptags": "3.1.1"
+  },
+  "peerDependencies": {
+    "vuepress": "1.x"
+  },
+  "files": [
+    "lib",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ]
+}

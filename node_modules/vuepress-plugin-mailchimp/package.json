@@ -1,0 +1,42 @@
+{
+  "name": "vuepress-plugin-mailchimp",
+  "version": "1.4.2",
+  "description": "A VuePress plugin for Mailchimp subscriptions",
+  "keywords": [
+    "mailchimp",
+    "newsletter",
+    "plugin",
+    "vuepress"
+  ],
+  "bugs": {
+    "url": "https://github.com/newsbielt703/vuepress-plugin-mailchimp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "newsbielt703/vuepress-plugin-mailchimp"
+  },
+  "license": "MIT",
+  "author": "Billyyyyy3320 <newsbielt703@gmail.com>",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "vuepress build docs --temp docs/.temp",
+    "dev": "vuepress dev docs --temp docs/.temp",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "lint": "eslint src --ext .ts,.vue",
+    "prepublishOnly": "yarn cypress run && yarn build"
+  },
+  "dependencies": {
+    "jsonp": "^0.2.1",
+    "query-string": "^6.9.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "cypress": "^3.7.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-vue": "^6.1.2",
+    "vuepress": "^1.2.0"
+  }
+}
