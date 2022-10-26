@@ -9,8 +9,8 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "data-structure-algorithms/soultion/Array-Solution.md",
-            "mode": "source",
+            "file": "data-structure-algorithms/Recursion.md",
+            "mode": "preview",
             "source": false
           }
         }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/soultion/Array-Solution.md",
+                "file": "data-structure-algorithms/Recursion.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/soultion/Array-Solution.md",
+                "file": "data-structure-algorithms/Recursion.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/soultion/Array-Solution.md"
+                "file": "data-structure-algorithms/Recursion.md"
               }
             }
           }
@@ -130,6 +130,9 @@
   },
   "active": "d328e22c3a421c71",
   "lastOpenFiles": [
+    "data-management/Big-Data/Bloom-Filter.md",
+    "data-structure-algorithms/Linked-List.md",
+    "data-structure-algorithms/soultion/Array-Solution.md",
     "data-structure-algorithms/Array.md"
   ]
 }

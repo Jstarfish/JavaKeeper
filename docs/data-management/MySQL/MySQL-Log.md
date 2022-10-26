@@ -177,9 +177,36 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 
 > 用户态下的缓冲区数据是无法直接写入磁盘的。因为中间必须经过操作系统的内核空间缓冲区（OS Buffer）。
 
-写入 redo log buffer 后，再写入 OS Buffer，然后操作系统调用 fsync() 函数将日志刷到磁盘。
+写入 `redo log buffer` 后，再写入 `OS Buffer`，然后操作系统调用 fsync() 函数将日志刷到磁盘。
 
 ![](/Users/starfish/oceanus/picBed/mysql/redolog-buf.png)
+
+> 扩展点：
+>
+> - redo log buffer 里面的内容，既然是在操作系统调用 fsync() 函数持久化到磁盘的，那如果事务执行期间 MySQL 发生异常重启，那这部分日志就丢了。由于事务并没有提交，所以这时日志丢了也不会有损失。
+> - fsync() 的时机不是我们控制的，那就有可能在事务还没提交的时候，redo log buffer 中的部分日志被持久化到磁盘中
+>
+> 所以，redo log 是存在不同状态的
+>
+> 这三种状态分别是：
+>
+> 1. 存在 redo log buffer 中，物理上是在 MySQL 进程内存中；
+> 2. 写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面；
+> 3. 持久化到磁盘，对应的是 hard disk。
+>
+> ![](/Users/starfish/oceanus/picBed/mysql/redo-status.png)
+>
+> 日志写到 redo log buffer 是很快的，wirte 到 page cache 也差不多，但是持久化到磁盘的速度就慢多了。
+>
+> 为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：
+>
+> 1. 设置为 0 的时候，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中 ;
+> 2. 设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；
+> 3. 设置为 2 的时候，表示每次事务提交时都只是把 redo log 写到 page cache。
+>
+> InnoDB 有一个后台线程，每隔 1 秒，就会把 redo log buffer 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。
+>
+> 注意，事务执行中间过程的 redo log 也是直接写在 redo log buffer 中的，这些 redo log 也会被后台线程一起持久化到磁盘。也就是说，一个没有提交的事务的 redo log，也是可能已经持久化到磁盘的。
 
 写完 redo log buffer 后，我们就要顺序追加日志了，可是每次往哪里写，肯定需要个标识的，类似 offset
 
@@ -216,11 +243,21 @@ redo 文件结构大致是下图这样：
 
 - 当设置该值为 1 时，每次事务提交都要做一次 fsync，这是最安全的配置，即使宕机也不会丢失事务，这是默认值；
 
-- 当设置为 2 时，则在事务提交时只做write操作，只保证写到系统的 page cache，因此实例 crash 不会丢失事务，但宕机则可能丢失事务；
+- 当设置为 2 时，则在事务提交时只做 write 操作，只保证写到系统的 page cache，因此实例 crash 不会丢失事务，但宕机则可能丢失事务；
 
 - 当设置为 0 时，事务提交不会触发 redo 写操作，而是留给后台线程每秒一次的刷盘操作，因此实例crash将最多丢失1秒钟内的事务
 
   ![](/Users/starfish/oceanus/picBed/mysql/redolog-flush.png)
+  
+  > #### 组提交（group commit）
+  >
+  > redo log 的刷盘操作将会是最终影响 MySQL TPS 的瓶颈所在。为了缓解这一问题，MySQL 使用了组提交，将多个刷盘操作合并成一个，如果说 10 个事务依次排队刷盘的时间成本是 10，那么将这 10 个事务一次性一起刷盘的时间成本则近似于 1。
+  >
+  > 当开启 binlog 时（下边还会介绍）
+  >
+  > 为了保证 redo log 和 binlog 的数据一致性，MySQL 使用了二阶段提交，由 binlog 作为事务的协调者。而引入二阶段提交使得binlog 又成为了性能瓶颈，先前的 Redo log 组提交也成了摆设。为了再次缓解这一问题，MySQL 增加了 binlog 的组提交，目的同样是将 binlog 的多个刷盘操作合并成一个，结合 redo log 本身已经实现的组提交，分为三个阶段(Flush 阶段、Sync 阶段、Commit 阶段)完成 binlog 组提交，最大化每次刷盘的收益，弱化磁盘瓶颈，提高性能。
+  >
+  > 
 
 #### 「LSN」
 
@@ -236,9 +273,11 @@ redo 文件结构大致是下图这样：
 
 > 那如何由一个给定 LSN 的日志，在日志文件中找到它存储的位置的偏移量并能正确的读出来呢。所有的日志文件要属于日志组，而在 log_group_t 里的 lsn 和 lsn_offset字段已经记录了某个日志 lsn 和其存放在文件内的偏移量之间的对应关系。我们可以利用存储在 group 内的 lsn 和给定 lsn 之间的相对位置，来计算出给定 lsn 在文件中的存储位置。(具体怎么算我们先不讨论)
 
-越新的日志 LSN 越大。InnoDB 用检查点（ checkpoint_lsn ）指示未被刷盘的数据从这里开始，用 lsn 指示下一个应该被写入日志的位置。不过由于有 redo log buffer 的缘故，实际被写入磁盘的位置往往比 lsn 要小。
+LSN 是单调递增的，用来对应 redo log 的一个个写入点。每次写入长度为 length 的 redo log， LSN 的值就会加上 length。越新的日志 LSN 越大。
 
-redo log采用逻辑环形结构来复用空间（循环写入），这种环形结构一般需要几个指针去配合使用
+InnoDB 用检查点（ checkpoint_lsn ）指示未被刷盘的数据从这里开始，用 lsn 指示下一个应该被写入日志的位置。不过由于有 redo log buffer 的缘故，实际被写入磁盘的位置往往比 lsn 要小。
+
+redo log 采用逻辑环形结构来复用空间（循环写入），这种环形结构一般需要几个指针去配合使用
 
 ![](/Users/starfish/oceanus/picBed/mysql/redolog-lsn.png)
 
@@ -276,11 +315,16 @@ CheckPiont的意思是检查点，用于推进Redo Log的失效。当触发Check
 
 6. 随后正常将内存中的脏页刷回磁盘。
 
-
+### 2.4 redo 小结
 
 有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为 **crash-safe**。
 
+所以有了 redo log，再通过 WAL 技术，InnoDB 就可以保证即使数据库发生异常重启，之前已提交的记录都不会丢失，这个能力称为 **crash-safe**（崩溃恢复）。可以看出来， **redo log 保证了事务四大特性中的持久性**。
 
+redo log 作用
+
+- **实现事务的持久性，让 MySQL 有 crash-safe 的能力**，能够保证 MySQL 在任何时间段突然崩溃，重启后之前已提交的记录都不会丢失；
+- **将写操作从「随机写」变成了「顺序写」**，提升 MySQL 写入磁盘的性能。
 
 ## 三、回滚日志(undo log)
 
@@ -404,11 +448,13 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 - Prev Undo Log：标记前边的Undo Log
 - History List Node：
 
+索引中的同一个Record被不同事务修改，会产生不同的历史版本，这些历史版本又通过**Rollptr**穿成一个链表，供MVCC使用。如下图所示：
+
 ![Iva](/Users/starfish/oceanus/picBed/mysql/undo-log-logicial.png)
 
+> 示例中有三个事务操作了表 t 上，主键 id 是 1 的记录，首先事务 X 插入了一条记录，事务 Y、Z 去修改了这条记录。X，Y，Z 三个事务分别有自己的逻辑上连续的三条 Undo Log，每条 Undo Log 有自己的 Undo Log Header。从索引中的这条 Record 沿着 Rollptr 可以依次找到这三个事务 Undo Log 中关于这条记录的历史版本。同时可以看出，Insert 类型 Undo Record 中只记录了对应的主键值：id=1，而 Update 类型的 Undo Record 中还记录了对应的历史版本的生成事务 Trx_id，以及被修改的 name 的历史值。
 
-
- undo是逻辑日志，只是将数据库**逻辑的**恢复到执行语句或事务之前。
+undo 是逻辑日志，只是将数据库**逻辑的**恢复到执行语句或事务之前。
 
 我们知道 InnoDB 中默认以 块 为单位存储，一个块默认是16KB。那么如何用固定的块大小承载不定长的Undo Log，以实现高效的空间分配、复用，避免空间浪费。InnoDB的**基本思路**是让多个较小的Undo Log紧凑存在一个Undo Page中，而对较大的Undo Log则随着不断的写入，按需分配足够多的Undo Page分散承载
 
@@ -426,72 +472,233 @@ Undo 的文件组织格式是——Undo Tablespace，每个 Undo Tablespace 最�
 
 #### 3.3 MVCC  是如何实现的
 
-多版本的目的是为了避免写事务和读事务的互相等待，那么每个读事务都需要在不对Record加Lock的情况下， 找到对应的应该看到的历史版本。所谓历史版本就是假设在该只读事务开始的时候对整个DB打一个快照，之后该事务的所有读请求都从这个快照上获取。当然实现上不能真正去为每个事务打一个快照，这个时间空间都太高了。InnoDB的做法，是在读事务第一次读取的时候获取一份ReadView，并一直持有，其中记录所有当前活跃的写事务ID，由于写事务的ID是自增分配的，通过这个ReadView我们可以知道在这一瞬间，哪些事务已经提交哪些还在运行，根据Read Committed的要求，未提交的事务的修改就是不应该被看见的，对应地，已经提交的事务的修改应该被看到。
+多版本的目的是为了避免写事务和读事务的互相等待，那么每个读事务都需要在不对 Record 加 Lock 的情况下， 找到对应的应该看到的历史版本。所谓历史版本就是假设在该只读事务开始的时候对整个 DB 打一个快照，之后该事务的所有读请求都从这个快照上获取。当然实现上不能真正去为每个事务打一个快照，这个时间空间都太高了。
 
-作为存储历史版本的Undo Record，其中记录的trx_id就是做这个可见性判断的，对应的主索引的Record上也有这个值。当一个读事务拿着自己的ReadView访问某个表索引上的记录时，会通过比较Record上的trx_id确定是否是可见的版本，如果不可见就沿着Record或Undo Record中记录的rollptr一路找更老的历史版本。如下图所示，事务R开始需要查询表t上的id为1的记录，R开始时事务I已经提交，事务J还在运行，事务K还没开始，这些信息都被记录在了事务R的ReadView中。事务R从索引中找到对应的这条Record[1, C]，对应的trx_id是K，不可见。沿着Rollptr找到Undo中的前一版本[1, B]，对应的trx_id是J，不可见。继续沿着Rollptr找到[1, A]，trx_id是I可见，返回结果。
+> MVCC 的实现还有一个概念：快照读，快照信息就记录在 undo 中
+>
+> 所谓快照读，就是读取的是快照数据，即快照生成的那一刻的数据，像我们常用的**普通的SELECT语句在不加锁情况下就是快照读**。如：
+>
+> ```mysql
+> SELECT * FROM t WHERE ...
+> ```
+>
+> 和快照读相对应的另外一个概念叫做当前读，当前读就是读取最新数据，所以，**加锁的 SELECT，或者对数据进行增删改都会进行当前读**，比如：
+>
+> ```mysql
+> SELECT * FROM t LOCK IN SHARE MODE;
+> 
+> SELECT * FROM t FOR UPDATE;
+> 
+> INSERT INTO t ...
+> 
+> DELETE FROM t ...
+> 
+> UPDATE t ...
+> ```
 
-![undo_mvcc](http://catkang.github.io/assets/img/innodb_undo/undo_mvcc.png)
+InnoDB **通过 ReadView + undo log 实现 MVCC**
 
-前面提到过，作为Logical Log，Undo中记录的其实是前后两个版本的diff信息，而读操作最终是要获得完整的Record内容的，也就是说这个沿着rollptr指针一路查找的过程中需要用Undo Record中的diff内容依次构造出对应的历史版本，这个过程在函数**row_search_mvcc**中，其中**trx_undo_prev_version_build**会根据当前的rollptr找到对应的Undo Record位置，这里如果是rollptr指向的是insert类型，或者找到了已经Purge了的位置，说明到头了，会直接返回失败。否则，就会解析对应的Undo Record，恢复出trx_id、指向下一条Undo Record的rollptr、主键信息，diff信息update vector等信息。之后通过**row_upd_rec_in_place**，用update vector修改当前持有的Record拷贝中的信息，获得Record的这个历史版本。之后调用自己ReadView的**changes_visible**判断可见性，如果可见则返回用户。完成这个历史版本的读取。
+对于「读提交」和「可重复读」隔离级别的事务来说，它们的快照读（普通 select 语句）是通过 Read View + undo log 来实现的，它们的区别在于创建 Read View 的时机不同：
+
+- 「读提交」隔离级别是在每个 select 都会生成一个新的 Read View，也意味着，事务期间的多次读取同一条数据，前后两次读的数据可能会出现不一致，因为可能这期间另外一个事务修改了该记录，并提交了事务。
+- 「可重复读」隔离级别是启动事务时生成一个 Read View，然后整个事务期间都在用这个 Read View，这样就保证了在事务期间读到的数据都是事务启动前的记录。
+
+这两个隔离级别实现是通过「事务的 Read View 里的字段」和「记录中的两个隐藏列（trx_id 和 roll_pointer）」的比对，如果不满足可见行，就会顺着 undo log 版本链里找到满足其可见性的记录，从而控制并发事务访问同一个记录时的行为，这就叫 MVCC（多版本并发控制）。
+
+InnoDB的做法，是在读事务第一次读取的时候获取一份 ReadView，并一直持有，其中记录所有当前活跃的写事务 ID，由于写事务的 ID 是自增分配的，通过这个 ReadView 我们可以知道在这一瞬间，哪些事务已经提交哪些还在运行，根据 Read Committed 的要求，未提交的事务的修改就是不应该被看见的，对应地，已经提交的事务的修改应该被看到。
+
+> **Read View 主要来帮我们解决可见性的问题的**, 即他会来告诉我们本次事务应该看到哪个快照，不应该看到哪个快照。
+>
+> 在 Read View 中有几个重要的属性：
+>
+> - trx_ids，系统当前未提交的事务 ID 的列表。
+> - low_limit_id，未提交的事务中最大的事务 ID。
+> - up_limit_id，未提交的事务中最小的事务 ID。
+> - creator_trx_id，创建这个 Read View 的事务 ID。
+>
+> 每开启一个事务，我们都会从数据库中获得一个事务 ID，这个事务 ID 是自增长的，通过 ID 大小，我们就可以判断事务的时间顺序。
+
+作为存储历史版本的 Undo Record，其中记录的 trx_id 就是做这个可见性判断的，对应的主索引的 Record 上也有这个值。当一个读事务拿着自己的 ReadView 访问某个表索引上的记录时，会通过比较 Record 上的 trx_id 确定是否是可见的版本，如果不可见就沿着 Record 或 Undo Record 中记录的 rollptr 一路找更老的历史版本。
+
+具体的事务id，指向undo log 的指针 rollptr，这些信息是放在哪里呢，这就是我们常说的 InnoDB 隐藏字段了
+
+> #### InnoDB存储引擎的行结构
+>
+> InnoDB 表数据的组织方式为主键聚簇索引，二级索引中采用的是(索引键值, 主键键值)的组合来唯一确定一条记录。
+> InnoDB表数据为主键聚簇索引,mysql默认为每个索引行添加了4个隐藏的字段,分别是：
+>
+> - DB_ROW_ID：InnoDB引擎中一个表只能有一个主键,用于聚簇索引,如果表没有定义主键会选择第一个非Null 的唯一索引作为主键,如果还没有,生成一个隐藏的DB_ROW_ID作为主键构造聚簇索引。
+> - DB_TRX_ID：最近更改该行数据的事务ID。
+> - DB_ROLL_PTR：回滚指针，指向这条记录的上一个版本，其实他指向的就是Undo Log中的上一个版本的快照的地址
+> - DELETE BIT：索引删除标志,如果DB删除了一条数据,是优先通知索引将该标志位设置为1,然后通过(purge)清除线程去异步删除真实的数据。
+>
+> ![img](https://upload-images.jianshu.io/upload_images/12645744-9382a13a0e4bc3a5.png?imageMogr2/auto-orient/strip|imageView2/2/w/700/format/webp)
+
+如下图所示，事务 R 需要查询表 t 上的 id 为 1 的记录，R 开始时事务 X 已经提交，事务 Y 还在运行，事务 Z 还没开始，这些信息都被记录在了事务 R 的 ReadView 中。事务 R 从索引中找到对应的这条 Record[1, stafish]，对应的 trx_id 是 Z，不可见。沿着 Rollptr 找到Undo 中的前一版本[1, fish]，对应的 trx_id 是 Y，不可见。继续沿着 Rollptr 找到[1, star]，trx_id是I可见，返回结果。
+
+![](/Users/starfish/oceanus/picBed/mysql/undo-log-mvcc.png)
+
+前面提到过，作为 Logical Log，Undo 中记录的其实是前后两个版本的 diff 信息，而读操作最终是要获得完整的 Record 内容的，也就是说这个沿着 rollptr 指针一路查找的过程中需要用 Undo Record 中的 diff 内容依次构造出对应的历史版本，这个过程在函数 **row_search_mvcc **中，其中 **trx_undo_prev_version_build** 会根据当前的 rollptr 找到对应的 Undo Record 位置，这里如果是 rollptr指向的是 insert 类型，或者找到了已经 Purge 了的位置，说明到头了，会直接返回失败。否则，就会解析对应的 Undo Record，恢复出trx_id、指向下一条Undo Record的rollptr、主键信息，diff信息update vector等信息。之后通过**row_upd_rec_in_place**，用update vector修改当前持有的Record拷贝中的信息，获得Record的这个历史版本。之后调用自己ReadView的**changes_visible**判断可见性，如果可见则返回用户。完成这个历史版本的读取。
 
 
 
 #### 3.4 Undo Log 清理
 
-我们已经知道，InnoDB在Undo Log中保存了多份历史版本来实现MVCC，当某个历史版本已经确认不会被任何现有的和未来的事务看到的时候，就应该被清理掉。
+我们已经知道，InnoDB 在 Undo Log 中保存了多份历史版本来实现 MVCC，当某个历史版本已经确认不会被任何现有的和未来的事务看到的时候，就应该被清理掉。
 
-> #### InnoDB存储引擎的行结构
+InnoDB中每个写事务结束时都会拿一个递增的编号**trx_no**作为事务的提交序号，而每个读事务会在自己的ReadView中记录自己开始的时候看到的最大的trx_no为**m_low_limit_no**。那么，如果一个事务的trx_no小于当前所有活跃的读事务Readview中的这个**m_low_limit_no**，说明这个事务在所有的读开始之前已经提交了，其修改的新版本是可见的， 因此不再需要通过undo构建之前的版本，这个事务的Undo Log也就可以被清理了。
+
+
+
+> redo log 和 undo log 区别在哪？
 >
-> InnoDB表数据的组织方式为主键聚簇索引，二级索引中采用的是(索引键值, 主键键值)的组合来唯一确定一条记录。
->  InnoDB表数据为主键聚簇索引,mysql默认为每个索引行添加了4个隐藏的字段,分别是：
->
-> - DB_ROW_ID：InnoDB引擎中一个表只能有一个主键,用于聚簇索引,如果表没有定义主键会选择第一个非Null 的唯一索引作为主键,如果还没有,生成一个隐藏的DB_ROW_ID作为主键构造聚簇索引。
-> - DB_TRX_ID：最近更改该行数据的事务ID。
-> - DB_ROLL_PTR：undo log的指针,用于记录之前历史数据在undo log中的位置。
-> - DELETE BIT：索引删除标志,如果DB删除了一条数据,是优先通知索引将该标志位设置为1,然后通过(purge)清除线程去异步删除真实的数据。
->
-> ![img](https://upload-images.jianshu.io/upload_images/12645744-9382a13a0e4bc3a5.png?imageMogr2/auto-orient/strip|imageView2/2/w/700/format/webp)
+> - redo log 记录了此次事务「**完成后**」的数据状态，记录的是更新**之后**的值；
+> - undo log 记录了此次事务「**开始前**」的数据状态，记录的是更新**之前**的值；
 
 
 
 ## 四、二进制日志(binlog)
 
-二进制日志，也被叫做归档日志，是 Server 层生成的日志，主要**用于数据备份和主从复制**
+前面我们讲过，MySQL 整体来看，其实就有两块：一块是 Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面我们聊到的 redo log 和 undo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（二进制日志）。
+
+二进制日志，也被叫做「归档日志」，主要**用于数据备份和主从复制**
 
 - **主从复制**：在`Master`端开启`binlog`，然后将`binlog`发送到各个`Slave`端，`Slave`端重放`binlog`从而达到主从数据一致。
 - **数据恢复**：可以用 `mysqldump` 做数据备份，binlog 格式是二进制日志，可以使用 `mysqlbinlog` 工具解析，实现数据恢复
 
 二进制日志主要记录数据库的更新事件，比如创建数据表、更新表中的数据、数据更新所花费的时长等信息。通过这些信息，我们可以再现数据更新操作的全过程。而且，由于日志的延续性和时效性，我们还可以利用日志，完成无损失的数据恢复和主从服务器之间的数据同步。
 
-这就是我们最常说的 binlog
 
-前面我们讲过，MySQL 整体来看，其实就有两块：一块是 Server 层，它主要做的是 MySQL 功能层面的事情；还有一块是引擎层，负责存储相关的具体事宜。上面我们聊到的粉板 redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为 binlog（二进制日志）。
 
-我想你肯定会问，为什么会有两份日志呢？
+### 4.1 binlog VS redolog
+
+是不会有点疑惑，binlog 和 redo log 是不是有点重复？这个问题跟 MySQL 的时间线有关系。
 
 因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，binlog 日志只能用于归档。而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统——也就是 redo log 来实现 crash-safe 能力。
 
-这两种日志有以下三点不同。
+这两种日志有以下四点区别。
 
 1. redo log 是 InnoDB 引擎特有的；binlog 是 MySQL 的 Server 层实现的，所有引擎都可以使用。
 2. redo log 是物理日志，记录的是“在某个数据页上做了什么修改”；binlog 是逻辑日志，记录的是这个语句的原始逻辑，比如“给 ID=2 这一行的 c 字段加 1 ”。
 3. redo log 是循环写的，空间固定会用完；binlog 是可以追加写入的。“追加写”是指 binlog 文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。
+4. redo log 用于掉电等故障恢复。binlog 用于备份恢复、主从复制
 
-有了对这两个日志的概念性理解，我们再来看执行器和 InnoDB 引擎在执行这个简单的 update 语句时的内部流程。
 
-1. 执行器先找引擎取 ID=2 这一行。ID 是主键，引擎直接用树搜索找到这一行。如果 ID=2 这一行所在的数据页本来就在内存中，就直接返回给执行器；否则，需要先从磁盘读入内存，然后再返回。
-2. 执行器拿到引擎给的行数据，把这个值加上 1，比如原来是 N，现在就是 N+1，得到新的一行数据，再调用引擎接口写入这行新数据。
+
+### 4.2 查看 binlog
+
+查看二进制日志主要有 3 种情况，分别是查看当前正在写入的二进制日志、查看所有的二进制日志和查看二进制日志中的所有数据更新事件。
+
+```mysql
+mysql> show master status;
++---------------+----------+--------------+------------------+-------------------+
+| File          | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++---------------+----------+--------------+------------------+-------------------+
+| binlog.000002 |    27736 |              |                  |                   |
++---------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+```
+
+```mysql
+mysql> show binary logs;
++---------------+-----------+-----------+
+| Log_name      | File_size | Encrypted |
++---------------+-----------+-----------+
+| binlog.000001 |       638 | No        |
+| binlog.000002 |     27736 | No        |
++---------------+-----------+-----------+
+2 rows in set (0.01 sec)
+```
+
+```mysql
+mysql> show variables like '%binlog_format%';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| binlog_format | ROW   |
++---------------+-------+
+1 row in set (0.00 sec)
+```
+
+
+
+### 4.3 Binary logging formats
+
+`binlog`日志有三种格式，分别为`STATMENT`、`ROW`和`MIXED`。
+
+> 在 `MySQL 5.7.7`之前，默认的格式是`STATEMENT`，`MySQL 5.7.7`之后，默认值是`ROW`。日志格式通过`binlog-format`指定。
+
+- `STATMENT` ：基于 SQL 语句的复制(`statement-based replication, SBR`)，每一条会修改数据的sql语句会记录到 binlog 中**。**
+  - 优点：不需要记录每一行的变化，减少了 binlog 日志量，节约了 IO, 从而提高了性能； 
+  - 缺点：在某些情况下会导致主从数据不一致，比如执行`sysdate()`、`slepp()`等。
+
+- `ROW` ：基于行的复制(`row-based replication, RBR`)，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了**。 **
+  - 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题**；**
+  - 缺点：会产生大量的日志，尤其是 `alter table` 的时候会让日志暴涨
+
+- `MIXED` ：基于 STATMENT 和 ROW 两种模式的混合复制(`mixed-based replication, MBR`)，mixed 格式的意思是，MySQL 自己会判断这条 SQL 语句是否可能引起主备不一致，如果有可能，就用 row 格式，否则就用 statement 格式
+
+> ```
+>SET GLOBAL binlog_format = 'STATEMENT';
+> SET GLOBAL binlog_format = 'ROW';
+> SET GLOBAL binlog_format = 'MIXED';
+> ```
+>
+
+
+
+### 4.4 binlog 的写入机制
+
+binlog 的写入逻辑比较简单：事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。
+
+一个事务的 binlog 是不能被拆开的，因此不论这个事务多大，也要确保一次性写入。这就涉及到了 binlog cache 的保存问题。
+
+系统给 binlog cache 分配了一片内存，每个线程一个，参数 binlog_cache_size 用于控制单个线程内 binlog cache 所占内存的大小。如果超过了这个参数规定的大小，就要暂存到磁盘。
+
+事务提交的时候，执行器把 binlog cache 里的完整事务写入到 binlog 中，并清空 binlog cache。
+
+![](/Users/starfish/oceanus/picBed/mysql/binlog-cache.png)
+
+
+
+可以看到，每个线程有自己 binlog cache，但是共用同一份 binlog 文件。
+
+- 图中的 write，指的就是指把日志写入到文件系统的 page cache，并没有把数据持久化到磁盘，所以速度比较快。
+- 图中的 fsync，才是将数据持久化到磁盘的操作。一般情况下，我们认为 fsync 才占磁盘的 IOPS。
+
+write 和 fsync 的时机，是由参数 sync_binlog 控制的：
+
+1. sync_binlog=0 的时候，表示每次提交事务都只 write，不 fsync；
+2. sync_binlog=1 的时候，表示每次提交事务都会执行 fsync；
+3. sync_binlog=N(N>1) 的时候，表示每次提交事务都 write，但累积 N 个事务后才 fsync。
+
+因此，在出现 IO 瓶颈的场景里，将 sync_binlog 设置成一个比较大的值，可以提升性能。在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成 0，比较常见的是将其设置为 100~1000 中的某个数值。
+
+但是，将 sync_binlog 设置为 N，对应的风险是：如果主机发生异常重启，会丢失最近 N 个事务的 binlog 日志。
+
+
+
+
+
+### 4.5 update 语句执行过程
+
+比较重要的undo、redo、binlog 都介绍完了，我们来看执行器和 InnoDB 引擎在执行一个简单的 update 语句时的内部流程。`update t set name='starfish' where id = 1;`
+
+1. 执行器先找引擎取 id=1 这一行。id 是主键，引擎直接用树搜索找到这一行。如果 id=1 这一行所在的数据页本来就在内存（buffer pool）中，就直接返回给执行器；否则，需要先从磁盘读入内存，然后再返回。
+2. 执行器拿到引擎给的行数据，更新 `nas行数据，再调用引擎接口写入这行新数据。
 3. 引擎将这行新数据更新到内存中，同时将这个更新操作记录到 redo log 里面，此时 redo log 处于 prepare 状态。然后告知执行器执行完成了，随时可以提交事务。
 4. 执行器生成这个操作的 binlog，并把 binlog 写入磁盘。
 5. 执行器调用引擎的提交事务接口，引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。
 
 这里我给出这个 update 语句的执行流程图，图中浅色框表示是在 InnoDB 内部执行的，深色框表示是在执行器中执行的。
 
-![](https://static001.geekbang.org/resource/image/2e/be/2e5bff4910ec189fe1ee6e2ecc7b4bbe.png)
+![](/Users/starfish/oceanus/picBed/mysql/update-flow.png)
+
+![img](https://img-blog.csdnimg.cn/20211011000352825.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5pif5aSc5a2k5biG,size_20,color_FFFFFF,t_70,g_se,x_16)
 
 你可能注意到了，最后三步看上去有点“绕”，将 redo log 的写入拆成了两个步骤：prepare 和 commit，这就是"两阶段提交"。
 
-### 两阶段提交
+### 4.6 两阶段提交
 
 为什么必须有“两阶段提交”呢？这是为了让两份日志之间的逻辑一致。要说明这个问题，我们得从文章开头的那个问题说起：**怎样让数据库恢复到半个月内任意一秒的状态？**
 
@@ -523,68 +730,51 @@ Undo 的文件组织格式是——Undo Tablespace，每个 Undo Tablespace 最�
 
 简单说，redo log 和 binlog 都可以用于表示事务的提交状态，而两阶段提交就是让这两个状态保持逻辑上的一致。
 
-![Redo log and binlog of MySQL log system](https://imgs.developpaper.com/imgs/1812744628-879390c57a1d2ec5_articlex.png)
 
 
+### 4.7 主从同步
 
+MySQL主从同步的作用主要有以下几点：
 
+- 故障切换。
+- 提供一定程度上的备份服务。
+- 实现MySQL数据库的读写分离。
 
+MySQL 的主从复制依赖于 binlog ，也就是记录 MySQL 上的所有变化并以二进制形式保存在磁盘上。复制的过程就是将 binlog 中的数据从主库传输到从库上。
 
+这个过程一般是**异步**的，也就是主库上执行事务操作的线程不会等待复制 binlog 的线程同步完成。
 
-### 查看 binlog
+![](/Users/starfish/oceanus/picBed/mysql/master-slave.png)
 
-查看二进制日志主要有 3 种情况，分别是查看当前正在写入的二进制日志、查看所有的二进制日志和查看二进制日志中的所有数据更新事件。
+具体详细过程如下：
 
-```mysql
-mysql> show master status;
-+---------------+----------+--------------+------------------+-------------------+
-| File          | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
-+---------------+----------+--------------+------------------+-------------------+
-| binlog.000002 |    27736 |              |                  |                   |
-+---------------+----------+--------------+------------------+-------------------+
-1 row in set (0.00 sec)
-```
+- MySQL 主库在收到客户端提交事务的请求之后，会先写入 binlog，再提交事务，更新存储引擎中的数据，事务提交完成后，返回给客户端“操作成功”的响应。
+- 从库会创建一个专门的 I/O 线程，连接主库的 log dump 线程，来接收主库的 binlog 日志，再把 binlog 信息写入 relay log 的中继日志里，再返回给主库“复制成功”的响应。
+- 从库会创建一个用于回放 binlog 的线程，去读 relay log 中继日志，然后回放 binlog 更新存储引擎中的数据，最终实现主从的数据一致性。
 
-```mysql
-mysql> show binary logs;
-+---------------+-----------+-----------+
-| Log_name      | File_size | Encrypted |
-+---------------+-----------+-----------+
-| binlog.000001 |       638 | No        |
-| binlog.000002 |     27736 | No        |
-+---------------+-----------+-----------+
-2 rows in set (0.01 sec)
-```
+在完成主从复制之后，你就可以在写数据时只写主库，在读数据时只读从库，这样即使写请求会锁表或者锁记录，也不会影响读请求的执行。
 
+> #### 中继日志(relay log)
+>
+> 中继日志只在主从服务器架构的从服务器上存在。从服务器为了与主服务器保持一致，要从主服务器读取二进制日志的内容，并且把读取到的信息写入本地的日志文件中，这个从服务器本地的日志文件就叫中继日志。然后，从服务器读取中继日志，并根据中继日志的内容对从服务器的数据进行更新，完成主从服务器的数据同步。
+>
+> Relay log(中继日志)是在MySQL主从复制时产生的日志，在MySQL的主从复制主要涉及到三个线程:
+>
+> 1) Log dump线程：向从库的IO线程传输主库的Binlog日志
+>
+> 2) IO线程：向主库请求Binlog日志，并将Binlog日志写入到本地的relay log中。
+>
+> 3) SQL线程：读取Relay log日志，将其解析为SQL语句并逐一执行。
+>
+> 
 
+> MySQL 主从复制还有哪些模型？
 
-### **Binary logging formats**
+主要有三种：
 
-`binlog`日志有三种格式，分别为`STATMENT`、`ROW`和`MIXED`。
-
-> 在 `MySQL 5.7.7`之前，默认的格式是`STATEMENT`，`MySQL 5.7.7`之后，默认值是`ROW`。日志格式通过`binlog-format`指定。
-
-- `STATMENT` **基于`SQL`语句的复制(`statement-based replication, SBR`)，每一条会修改数据的sql语句会记录到`binlog`中**。 优点：**不需要记录每一行的变化，减少了`binlog`日志量，节约了`IO`, 从而提高了性能**； 缺点：**在某些情况下会导致主从数据不一致，比如执行`sysdate()`、`slepp()`等**。
-- `ROW` **基于行的复制(`row-based replication, RBR`)，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了**。 优点：**不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题**； 缺点：**会产生大量的日志，尤其是`alter table`的时候会让日志暴涨**
-- `MIXED` **基于`STATMENT`和`ROW`两种模式的混合复制(`mixed-based replication, MBR`)，一般的复制使用`STATEMENT`模式保存`binlog`，对于`STATEMENT`模式无法复制的操作使用`ROW`模式保存`binlog`**
-
-
-
-MySQL database logs offer three formats for binary logging.
-
-- **Statement-based logging:** In this format, MySQL records the SQL statements that produce data changes. Statement-based logging is useful when many rows are affected by an event because it is more efficient to log a few statements than many rows.
-- **Row-based logging:** In this format, changes to individual rows are recorded instead of the SQL statements. This is useful for queries that require a lot of execution time on the source but result in just a few rows being modified.
-- **Mixed logging:** This is the recommended logging format. It uses statement-based logging by default but switches to row-based logging when required.
-
-The binary logging format can be changed using the code below. However, you should note that it is not recommended to do so at runtime or while replication is ongoing.
-
-```
-SET GLOBAL binlog_format = 'STATEMENT';
-SET GLOBAL binlog_format = 'ROW';
-SET GLOBAL binlog_format = 'MIXED';
-```
-
-Enabling binary logging on your MySQL instance will lower the performance slightly. However, the advantages discussed above generally outweigh this minor dip in performance.
+- **同步复制**：MySQL 主库提交事务的线程要等待所有从库的复制成功响应，才返回客户端结果。这种方式在实际项目中，基本上没法用，原因有两个：一是性能很差，因为要复制到所有节点才返回响应；二是可用性也很差，主库和所有从库任何一个数据库出问题，都会影响业务。
+- **异步复制**（默认模型）：MySQL 主库提交事务的线程并不会等待 binlog 同步到各从库，就返回客户端结果。这种模式一旦主库宕机，数据就会发生丢失。
+- **半同步复制**：MySQL 5.7 版本之后增加的一种复制方式，介于两者之间，事务线程不用等待所有的从库复制成功响应，只要一部分复制成功响应回来就行，比如一主二从的集群，只要数据成功复制到任意一个从库上，主库的事务线程就可以返回给客户端。这种**半同步复制的方式，兼顾了异步复制和同步复制的优点，即使出现主库宕机，至少还有一个从库有最新的数据，不存在数据丢失的风险**。
 
 
 
@@ -658,28 +848,6 @@ mysql> show variables like '%row_limit%';
 
 
 
-
-
-
-## 七、中继日志(relay log)
-
-中继日志只在主从服务器架构的从服务器上存在。从服务器为了与主服务器保持一致，要从主服务器读取二进制日志的内容，并且把读取到的信息写入本地的日志文件中，这个从服务器本地的日志文件就叫中继日志。然后，从服务器读取中继日志，并根据中继日志的内容对从服务器的数据进行更新，完成主从服务器的数据同步。
-
-Relay log(中继日志)是在MySQL主从复制时产生的日志，在MySQL的主从复制主要涉及到三个线程:
-
-\1) Log dump线程：向从库的IO线程传输主库的Binlog日志
-
-\2) IO线程：向主库请求Binlog日志，并将Binlog日志写入到本地的relay log中。
-
-\3) SQL线程：读取Relay log日志，将其解析为SQL语句并逐一执行。
-
-![img](https://s4.51cto.com/oss/202205/24/38d0c5872acd7d6511e591688f97514825e36b.png)
-
-图2
-
-从图2中可以看出，从库的IO线程接收到主库的logdump线程传递的Binlog日志后，会将其写入到本地的一个日志中，这个日志就是Relaylog。在文件目录中，一般由多个host_name-relay-bin.nnnnnn 的日志文件和host_name-relay-bin.index索引文件组成，其中日志文件记录的是事务中修改数据的信息，索引文件记录的是使用过的日志文件信息。
-
-Relaylog日志的格式与Binlog的一致，但是相较于Binlog多了master.info和relay-log.info两个日志(默认存储于数据文件目录中)。master.info主要记录上一次读取到master同步过来的binlog的位置，从节点的连接信息和主节点信息，以及连接master和启动复制必须的所有信息。relay-log.info主要记录了从节点文件复制的进度，下一个事件从什么位置开始，由sql线程负责更新。
 
 
 
