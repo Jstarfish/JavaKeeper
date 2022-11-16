@@ -98,7 +98,7 @@ public static List<List<Integer>> threeSum(int[] nums) {
 > 输出: false
 > ```
 
-**思路**：哈希，和两数之和的思路一样
+**思路**：哈希，和两数之和的思路一样 | 或者排序
 
 ```java
 public boolean containsDuplicate(int[] nums){
@@ -130,7 +130,9 @@ public boolean containsDuplicate(int[] nums){
 > 合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
 > ```
 
-**思路**：直接合并后排序、双指针
+**思路**：
+- 直接合并后排序
+- 双指针
 
 ```java
 public void merge(int[] nums1, int m, int[] nums2, int n) {

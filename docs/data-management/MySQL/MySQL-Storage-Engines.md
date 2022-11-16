@@ -25,7 +25,7 @@ show table status like 'tablename'
 show table status from database where name="tablename"
 ```
 
-![mysql-engines](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/mysql/mysql-engines.png)
+![mysql-engines](https://img.starfish.ink/mysql/mysql-engines.png)
 
 
 
