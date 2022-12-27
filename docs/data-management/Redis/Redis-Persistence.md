@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![](https://images.pexels.com/photos/33278/disc-reader-reading-arm-hard-drive.jpg?cs=srgb&dl=pexels-pixabay-33278.jpg&fm=jpg)
+![](https://images.pexels.com/photos/33278/disc-reader-reading-arm-hard-drive.jpg?cs=srgb&dl=pexels-pixabay-33278.jpg)
 
 > 带着疑问，或者是面试问题去看 Redis 的持久化，或许会有不一样的视角，这几个问题你废了吗？
 >
@@ -48,11 +48,11 @@ RDB 的缺点是最后一次持久化后的数据可能丢失。
 
 **配置位置**： SNAPSHOTTING
 
-![redis-snapshotting](https://img.starfish.ink/redis/redis-snapshotting.jpg)
+![](https://img.starfish.ink/redis/redis-snapshotting.jpg)
 
 rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
-![redis-rdb-file](https://img.starfish.ink/redis/redis-rdb-file.jpg)
+![](https://img.starfish.ink/redis/redis-rdb-file.jpg)
 
 你可以对 Redis 进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时， 自动保存一次数据集。
 
@@ -71,7 +71,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 > 简单来说，bgsave 子进程是由主线程 fork 生成的，可以共享主线程的所有内存数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。此时，如果主线程对这些数据也都是读操作（例如图中的键值对K1），那么，主线程和 bgsave 子进程相互不影响。但是，如果主线程要修改一块数据（例如图中的键值对 K3），那么，这块数据就会被复制一份，生成该数据的副本。然后，bgsave 子进程会把这个副本数据写入 RDB 文件，而在这个过程中，主线程仍然可以直接修改原来的数据。
 >
-> ![redis-bgsave](https://img.starfish.ink/redis/redis-bgsave.jpg)
+> ![](https://img.starfish.ink/redis/redis-bgsave.jpg)
 
 
 
@@ -89,7 +89,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 将备份文件 (dump.rdb) 移动到 Redis 安装目录并启动服务即可（`CONFIG GET dir` 获取目录）
 
-![redis-rdb-bak](https://img.starfish.ink/redis/redis-rdb-bak.jpg)
+![](https://img.starfish.ink/redis/redis-rdb-bak.jpg)
 
 
 
@@ -116,7 +116,7 @@ rdb 默认保存的是 **dump.rdb** 文件，如下（不可读）
 
 #### 小总结
 
-![redis-rdb-summary](https://img.starfish.ink/redis/redis-rdb-summary.jpg)
+![](https://img.starfish.ink/redis/redis-rdb-summary.jpg)
 
 - RDB 是一个非常紧凑的文件
 
@@ -140,7 +140,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 **配置位置**： APPEND ONLY MODE
 
-![redis-aof-conf](https://tva1.sinaimg.cn/large/0081Kckwly1glpjnzl6roj31hg0su7jj.jpg)
+![](https://tva1.sinaimg.cn/large/0081Kckwly1glpjnzl6roj31hg0su7jj.jpg)
 
 
 
@@ -167,7 +167,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 不过，AOF 日志正好相反，它是写后日志，“写后”的意思是 Redis 是先执行命令，把数据写入内存，然后才记录日志，如下图所示：
 
-![redis-aof-write-log](https://tva1.sinaimg.cn/large/0081Kckwly1glohquxp6lj31rv0u0qah.jpg)
+![](https://tva1.sinaimg.cn/large/0081Kckwly1glohquxp6lj31rv0u0qah.jpg)
 
 > Tip：日志先行的方式，如果宕机后，还可以通过之前保存的日志恢复到之前的数据状态。可是 AOF 后写日志的方式，如果宕机后，不就会把写入到内存的数据丢失吗？
 >
@@ -179,7 +179,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 例如，`*2` 表示有两个部分，`$6` 表示 6 个字节，也就是下边的 “SELECT” 命令，`$1` 表示 1 个字节，也就是下边的 “0” 命令，合起来就是 `SELECT 0`，选择 0 库。下边的指令同理，就很好理解了 `SET K1 V1`。
 
-![redis-aof-file](https://tva1.sinaimg.cn/large/0081Kckwly1glpo99yeg5j31ky0u0npd.jpg)
+![](https://tva1.sinaimg.cn/large/0081Kckwly1glpo99yeg5j31ky0u0npd.jpg)
 
 但是，为了避免额外的检查开销，**Redis 在向 AOF 里面记录日志的时候，并不会先去对这些命令进行语法检查。所以，如果先记日志再执行命令的话，日志中就有可能记录了错误的命令，Redis 在使用日志恢复数据时，就可能会出错。而写后日志这种方式，就是先让系统执行命令，只有命令能执行成功，才会被记录到日志中，否则，系统就会直接向客户端报错**。所以，Redis 使用写后日志这一方式的一大好处是，可以避免出现记录错误命令的情况。除此之外，AOF 还有一个好处：它是在命令执行后才记录日志，所以**不会阻塞当前的写操作**。
 
@@ -233,7 +233,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 - 是什么：AOF 采用文件追加方式，文件会越来越大，为了避免出现这种情况，新增了重写机制，当 AOF 文件的大小超过所设定的阈值时，Redis 就会启动 AOF 文件的内容压缩，只保留可以恢复数据的最小指令集，可以使用命令 `bgrewriteaof`，这个操作相当于对 AOF 文件“瘦身”。在重写的时候，是根据这个键值对当前的最新状态，为它生成对应的写入命令。这样一来，一个键值对在重写日志中只用一条命令就行了，而且，在日志恢复时，只用执行这条命令，就可以直接完成这个键值对的写入了。
 
-  ![减肥](https://i01piccdn.sogoucdn.com/8700d2e646eddccf)
+  ![](https://i01piccdn.sogoucdn.com/8700d2e646eddccf)
 
 - 重写原理：AOF 文件持续增长而过大时，会 fork 出一条新进程来将文件重写(也是先写临时文件最后再rename)，遍历新进程的内存中数据，转换成一条条的操作指令，再序列化到一个新的 AOF 文件中。
 
@@ -243,7 +243,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
   我们在客户端输入两次 `set k1 v1` ，然后比较 `bgrewriteaof` 前后两次的 appendonly.aof 文件（先要关闭混合持久化）
 
-![bgrewriteaof](https://tva1.sinaimg.cn/large/0081Kckwly1glppqcra0uj316w0u0e1q.jpg)
+![bgrewriteaof](https://img.starfish.ink/redis/bgrewriteaof.png)
 
 
 
@@ -277,7 +277,7 @@ AOF 重写和 RDB 创建快照一样，都巧妙地利用了写时复制机制�
 4. 当子进程完成重写工作时，它给父进程发送一个信号，父进程在接收到信号之后，将内存缓存中的所有数据追加到新 AOF 文件的末尾。
 5. 搞定！现在 Redis 原子地用新文件替换旧文件，之后所有命令都会直接追加到新 AOF 文件的末尾。
 
-![redis-aof-rewrite-work](https://tva1.sinaimg.cn/large/0081Kckwly1glpthcem5vj31gv0u07se.jpg)
+![](https://img.starfish.ink/redis/redis-aof-rewrite-work.png)
 
 #### 优势
 
@@ -293,7 +293,7 @@ AOF 重写和 RDB 创建快照一样，都巧妙地利用了写时复制机制�
 
 #### 总结
 
-![redis-aof-summary](https://tva1.sinaimg.cn/large/0081Kckwly1gloiswykuhj32830ocwjq.jpg)
+![](https://img.starfish.ink/redis/redis-aof-summary.png)
 
 - AOF 文件是一个只进行追加的日志文件
 - Redis 可以在 AOF 文件体积变得过大时，自动在后台对 AOF 进行重写 
@@ -356,7 +356,7 @@ Redis 4.0 中提出了一个**混合使用 AOF 日志和内存快照的方法**�
 
 同样我们执行 3 次 `set k1 v1`，然后手动瘦身 `bgrewriteaof` 后，查看 appendonly.aof 文件：
 
-![redis-mix-persistence-file](https://tva1.sinaimg.cn/large/0081Kckwly1glpq9abyx4j318s04cq5b.jpg)
+![](https://img.starfish.ink/redis/redis-mix-persistence-file.png)
 
 这样做的好处是可以结合 rdb 和 aof 的优点，快速加载同时避免丢失过多的数据，缺点是 aof 里面的 rdb 部分就是压缩格式不再是 aof 格式，可读性差。
 
@@ -366,7 +366,7 @@ Redis 4.0 中提出了一个**混合使用 AOF 日志和内存快照的方法**�
 
 如下图所示，两次快照中间时刻的修改，用 AOF 日志记录，等到第二次做全量快照时，就可以清空 AOF 日志，因为此时的修改都已经记录到快照中了，恢复时就不再用日志了。
 
-![redis-mix-persistence](https://tva1.sinaimg.cn/large/0081Kckwly1glpr9h1ab4j319l0u07wh.jpg)
+![](https://img.starfish.ink/redis/redis-mix-persistence.png)
 
 这个方法既能享受到 RDB 文件快速恢复的好处，又能享受到 AOF 只记录操作命令的简单优势，有点“鱼和熊掌可以兼得”的意思。
 

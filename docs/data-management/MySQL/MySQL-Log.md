@@ -61,7 +61,7 @@ SET GLOBAL general_log = 'ON'
 
 解这块知识，我们先要知道这么几个前置知识点，先看下官网的 InnoDB 架构图，有个大概印象
 
-![](/Users/starfish/oceanus/picBed/mysql/innodb-architecture.png)
+![](https://img.starfish.ink/mysql/innodb-architecture.png)
 
 > #### 什么是 随机 IO 和 顺序 IO 
 >
@@ -134,7 +134,7 @@ MySQL redo日志是一组日志文件，在 MySQL 8.0.30  版本中，MySQL 会�
 
 为了应对 InnoDB 各种各样不同的需求，到 MySQL 8.0 为止，已经有多达 65 种的 REDO 记录，每种都不太一样，我们看下比较通用的结构了解了解就 OK（主要有作用于 Page，作用于 Space 以及提供额外信息的 Logic 类型的三大类）
 
-![](/Users/starfish/oceanus/picBed/mysql/redolog-content.png)
+![](https://img.starfish.ink/mysql/redolog-content.png)
 
 比如 `MLOG_WRITE_STRING` 类型的 REDO 表示写入一串数据，但是因为不能确定写入的数据占多少字节，所以需要在日志结构中添加一个长度字段来表示写入了多长的数据。
 
@@ -177,7 +177,7 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 
 写入 `redo log buffer` 后，再写入 `OS Buffer`，然后操作系统调用 `fsync()` 函数将日志刷到磁盘。
 
-![](/Users/starfish/oceanus/picBed/mysql/redolog-buf.png)
+![](https://img.starfish.ink/mysql/redolog-buf.png)
 
 > 扩展点：
 >
@@ -192,7 +192,7 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 > 2. 写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面；
 > 3. 持久化到磁盘，对应的是 hard disk。
 >
-> ![](/Users/starfish/oceanus/picBed/mysql/redo-status.png)
+> ![](https://img.starfish.ink/mysql/redo-status.png)
 >
 > 日志写到 redo log buffer 是很快的，wirte 到 page cache 也差不多，但是持久化到磁盘的速度就慢多了。
 >
@@ -218,7 +218,7 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 
 redo 文件结构大致是下图这样：
 
-![](/Users/starfish/oceanus/picBed/mysql/redolog-flow.png)
+![](https://img.starfish.ink/mysql/redolog-flow.png)
 
 
 
@@ -245,7 +245,7 @@ redo 文件结构大致是下图这样：
 
 - 当设置为 0 时，事务提交不会触发 redo 写操作，而是留给后台线程每秒一次的刷盘操作，因此实例crash将最多丢失1秒钟内的事务
 
-  ![](/Users/starfish/oceanus/picBed/mysql/redolog-flush.png)
+  ![](https://img.starfish.ink/mysql/redolog-flush.png)
   
   > #### 组提交（group commit）
   >
@@ -277,7 +277,7 @@ InnoDB 用检查点（ checkpoint_lsn ）指示未被刷盘的数据从这里开
 
 redo log 采用逻辑环形结构来复用空间（循环写入），这种环形结构一般需要几个指针去配合使用
 
-![](/Users/starfish/oceanus/picBed/mysql/redolog-lsn.png)
+![](https://img.starfish.ink/mysql/redolog-lsn.png)
 
 
 
@@ -295,7 +295,7 @@ CheckPoint 的意思是检查点，用于推进 Redo Log 的失效。当触发 C
 
 我们小结下 redo log 的过程
 
-![](/Users/starfish/oceanus/picBed/mysql/redolog-write.png)
+![](https://img.starfish.ink/mysql/redolog-write.png)
 
 以更新事务为例
 
@@ -372,7 +372,7 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 > Undo Log 需要的是事务之间的并发，以及方便的多版本数据维护，其重放逻辑不希望因 DB 的物理存储变化而变化。因此，InnoDB 中的 Undo Log 采用了基于事务的 **Logical Logging** 的方式。
 >
 
-![](/Users/starfish/oceanus/picBed/mysql/innodb-architecture-undo.png)
+![](https://img.starfish.ink/mysql/innodb-architecture-undo.png)
 
 > 各个版本的 MySQL，undo tablespaces 存储有一些差距，我们以 8.0 版本说明
 
@@ -386,7 +386,7 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 
   Insert Undo Record 仅仅是为了可能的事务回滚准备的，并不在 MVCC 功能中承担作用。
 
-  ![](/Users/starfish/oceanus/picBed/mysql/insert-undo-log.png)
+  ![](https://img.starfish.ink/mysql/insert-undo-log.png)
 
   存在一组长度不定的 Key Fields，因为对应表的主键可能由多个 field 组成，这里需要记录 Record 完整的主键信息，回滚的时候可以通过这个信息在索引中定位到对应的 Record。
 
@@ -402,7 +402,7 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 
   他们的存储内容也类似，我们看下 TRX_UNDO_UPD_EXIST_REC
 
-  ![](/Users/starfish/oceanus/picBed/mysql/update-undo-log.png)
+  ![](https://img.starfish.ink/mysql/update-undo-log.png)
 
   除了跟 Insert Undo Record 相同的头尾信息，以及主键 Key Fileds 之外，Update Undo Record 增加了：
 
@@ -428,7 +428,7 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 
 每个事务其实会修改一组的 Record，对应的也就会产生一组 Undo Record，这些 Undo Record 首尾相连就组成了这个事务的**Undo Log**。除了一个个的 Undo Record 之外，还在开头增加了一个Undo Log Header来记录一些必要的控制信息，因此，一个Undo Log的结构如下所示：
 
-![](/Users/starfish/oceanus/picBed/mysql/undo-log-header.png)
+![](https://img.starfish.ink/mysql/undo-log-header.png)
 
 - Trx Id：事务Id
 - Trx No：事务的提交顺序，也会用这个来判断是否能Purge
@@ -442,7 +442,7 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 
 索引中的同一个 Record 被不同事务修改，会产生不同的历史版本，这些历史版本又通过**Rollptr**穿成一个链表，供MVCC使用。如下图所示：
 
-![Iva](/Users/starfish/oceanus/picBed/mysql/undo-log-logicial.png)
+![](https://img.starfish.ink/mysql/undo-log-logicial.png)
 
 > 示例中有三个事务操作了表 t 上，主键 id 是 1 的记录，首先事务 X 插入了一条记录，事务 Y、Z 去修改了这条记录。X，Y，Z 三个事务分别有自己的逻辑上连续的三条 Undo Log，每条 Undo Log 有自己的 Undo Log Header。从索引中的这条 Record 沿着 Rollptr 可以依次找到这三个事务 Undo Log 中关于这条记录的历史版本。同时可以看出，Insert 类型 Undo Record 中只记录了对应的主键值：id=1，而 Update 类型的 Undo Record 中还记录了对应的历史版本的生成事务 Trx_id，以及被修改的 name 的历史值。
 
@@ -450,7 +450,7 @@ undo 是逻辑日志，只是将数据库**逻辑的**恢复到执行语句或�
 
 我们知道 InnoDB 中默认以 块 为单位存储，一个块默认是 16KB。那么如何用固定的块大小承载不定长的 Undo Log，以实现高效的空间分配、复用，避免空间浪费。InnoDB 的**基本思路**是让多个较小的 Undo Log 紧凑存在一个 Undo Page 中，而对较大的 Undo Log 则随着不断的写入，按需分配足够多的 Undo Page 分散承载
 
-![](/Users/starfish/oceanus/picBed/mysql/undo-log-physical.png)
+![](https://img.starfish.ink/mysql/undo-log-physical.png)
 
 Undo 的物理组织格式是—— Undo Segment，它会持有至少一个 Undo Page。
 
@@ -527,7 +527,7 @@ InnoDB的做法，是在读事务第一次读取的时候获取一份 ReadView�
 
 如下图所示，事务 R 需要查询表 t 上的 id 为 1 的记录，R 开始时事务 X 已经提交，事务 Y 还在运行，事务 Z 还没开始，这些信息都被记录在了事务 R 的 ReadView 中。事务 R 从索引中找到对应的这条 Record[1, stafish]，对应的 trx_id 是 Z，不可见。沿着 Rollptr 找到Undo 中的前一版本[1, fish]，对应的 trx_id 是 Y，不可见。继续沿着 Rollptr 找到[1, star]，trx_id是 X 可见，返回结果。
 
-![](/Users/starfish/oceanus/picBed/mysql/undo-log-mvcc.png)
+![](https://img.starfish.ink/mysql/undo-log-mvcc.png)
 
 前面提到过，作为 Logical Log，Undo 中记录的其实是前后两个版本的 diff 信息，而读操作最终是要获得完整的 Record 内容的，也就是说这个沿着 rollptr 指针一路查找的过程中需要用 Undo Record 中的 diff 内容依次构造出对应的历史版本，这个过程在函数 **row_search_mvcc **中，其中 **trx_undo_prev_version_build** 会根据当前的 rollptr 找到对应的 Undo Record 位置，这里如果是 rollptr指向的是 insert 类型，或者找到了已经 Purge 了的位置，说明到头了，会直接返回失败。否则，就会解析对应的 Undo Record，恢复出trx_id、指向下一条Undo Record的rollptr、主键信息，diff信息update vector等信息。之后通过**row_upd_rec_in_place**，用update vector修改当前持有的Record拷贝中的信息，获得Record的这个历史版本。之后调用自己ReadView的**changes_visible**判断可见性，如果可见则返回用户。完成这个历史版本的读取。
 
@@ -648,7 +648,7 @@ binlog 的写入逻辑比较简单：事务执行过程中，先把日志写到 
 
 事务提交的时候，执行器把 binlog cache 里的完整事务写入到 binlog 中，并清空 binlog cache。
 
-![](/Users/starfish/oceanus/picBed/mysql/binlog-cache.png)
+![](https://img.starfish.ink/mysql/binlog-cache.png)
 
 
 
@@ -683,7 +683,7 @@ write 和 fsync 的时机，是由参数 sync_binlog 控制的：
 
 这里我给出这个 update 语句的执行流程图，图中浅色框表示是在 InnoDB 内部执行的，深色框表示是在执行器中执行的。
 
-![](/Users/starfish/oceanus/picBed/mysql/update-flow.png)
+![](https://img.starfish.ink/mysql/update-flow.png)
 
 你可能注意到了，最后三步看上去有点“绕”，将 redo log 的写入拆成了两个步骤：prepare 和 commit，这就是"两阶段提交"。
 
@@ -733,7 +733,7 @@ MySQL 的主从复制依赖于 binlog ，也就是记录 MySQL 上的所有变�
 
 这个过程一般是**异步**的，也就是主库上执行事务操作的线程不会等待复制 binlog 的线程同步完成。
 
-![](/Users/starfish/oceanus/picBed/mysql/master-slave.png)
+![](https://img.starfish.ink/mysql/master-slave.png)
 
 具体详细过程如下：
 
