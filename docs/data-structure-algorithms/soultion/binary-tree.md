@@ -117,10 +117,6 @@ public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
 
 思路：翻转整棵树其实就是交换每个节点的左右子节点，**只要把二叉树上的每一个节点的左右子节点进行交换，最后的结果就是完全翻转之后的二叉树**
 
-![226_2.gif](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/0f91f7cbf5740de86e881eb7427c6c3993f4eca3624ca275d71e21c5e3e2c550-226_2.gif)
-
-
-
 ```java
 public static TreeNode invertTree(TreeNode root) {
   if(root == null){
@@ -147,7 +143,7 @@ public static TreeNode invertTree(TreeNode root) {
 >
 > 例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
 >
->    ![](https://assets.leetcode.com/uploadls/2021/02/19/symtree1.jpg)
+>    ![](https://assets.leetcode.com/uploads/2021/02/19/symtree1.jpg)
 >    
 
 思路：递归的思想，画个图左右左右比较

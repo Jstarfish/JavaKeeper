@@ -59,7 +59,7 @@ public static List<List<Integer>> threeSum(int[] nums) {
     //排序后的第一个数字就大于0，就说明没有符合要求的结果
     if (nums[i] > 0) break;
 
-    //去重
+    //去重，当起始的值等于前一个元素，那么得到的结果将会和前一次相同，不能是 nums[i] == nums[i +1 ]，会造成遗漏
     if (i > 0 && nums[i] == nums[i - 1]) continue;
     //左右指针
     int l = i + 1;
@@ -69,6 +69,8 @@ public static List<List<Integer>> threeSum(int[] nums) {
       if (sum == 0) {
         result.add(Arrays.asList(nums[i], nums[l], nums[r]));
         //去重（相同数字的话就移动指针）
+        //在将左指针和右指针移动的时候，先对左右指针的值，进行判断,以防[0,0,0]这样的造成数组越界
+        //不要用成 if 判断，只跳过 1 条，还会有重复的
         while (l< r && nums[l] == nums[l + 1]) l++;
         while (l< r && nums[r] == nums[r - 1]) r--;
         //移动指针
@@ -115,33 +117,17 @@ public boolean containsDuplicate(int[] nums){
 
 
 
-### [88. 合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array/)
+### [56. 合并区间](https://leetcode.cn/problems/merge-intervals/)
 
-> 给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
->
-> 请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
->
-> 注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。
+> 以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
 >
 > ```
-> 输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
-> 输出：[1,2,2,3,5,6]
-> 解释：需要合并 [1,2,3] 和 [2,5,6] 。
-> 合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
+> 输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+> 输出：[[1,6],[8,10],[15,18]]
+> 解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
 > ```
 
 **思路**：
-- 直接合并后排序
-- 双指针
-
-```java
-public void merge(int[] nums1, int m, int[] nums2, int n) {
-  for (int i = 0; i != n; ++i) {
-    nums1[m + i] = nums2[i];
-  }
-  Arrays.sort(nums1);
-}
-```
 
 
 
@@ -175,6 +161,44 @@ public static int maxProfit_1(int[] nums){
     }
   }
   return maxProfit;
+}
+```
+
+
+
+### [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+> 给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0) 。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+>
+> ![](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
+>
+> ```
+> 输入：[1,8,6,2,5,4,8,3,7]
+> 输出：49 
+> 解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+> ```
+
+**思路**：双指针
+
+水量 = 两个指针指向的数字中较小值∗指针之间的距离
+
+一开始两个指针一个指向开头一个指向结尾，此时容器的底是最大的，随着我们移动两个指针，想要让指针移动后的容器面积增大，就要使移动后的容器的高尽量大，所以我们选择指针所指的高较小的那个指针进行移动，这样我们就保留了容器较高的那条边，放弃了较小的那条边
+
+```java
+public int maxArea(int[] height){
+  int l = 0;
+  int r = height.length - 1;
+  int ans = 0;
+  while( l < r){
+    int area = Math.min(height[l], height[r]) * (r - l);
+    ans = Math.max(ans,area);
+    if(height[l] < height[r]){
+      l ++;
+    }else {
+      r --;
+    }
+  }
+  return ans;
 }
 ```
 
@@ -244,26 +268,8 @@ public int maxSubArray(int[] nums) {
 ![283_2.gif](https://pic.leetcode-cn.com/36d1ac5d689101cbf9947465e94753c626eab7fcb736ae2175f5d87ebc85fdf0-283_2.gif)
 
 ```java
-public void moveZeroes(int[] nums){
-  int j=0;
-  //第一次遍历的时候，j指针记录非0的个数，只要是非0的统统都赋给nums[j]
-  for(int i=0;i<nums.length;i++){
-    if(nums[i] != 0){
-      nums[j++] = nums[i];
-    }
-  }
-  //非0元素统计完了，剩下的都是0了
-  //所以第二次遍历把末尾的元素都赋为0即可
-  for(int i = j;i<nums.length;i++){
-    nums[i] = 0;
-  }
-}
-```
-
-![283_2.gif](https://pic.leetcode-cn.com/36d1ac5d689101cbf9947465e94753c626eab7fcb736ae2175f5d87ebc85fdf0-283_2.gif)
-
-```java
 public void moveZeroes_1(int[] nums){
+    //两个指针i和j
     int j = 0;
     for (int i = 0; i < nums.length; i++) {
         //当前元素!=0，就把其交换到左边，等于0的交换到右边
@@ -313,38 +319,6 @@ public static List<Integer> findNumbers(int[] nums){
 
 
 
-
-### [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
-
-> 给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0) 。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
->
-> ![](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
->
-> ```
-> 输入：[1,8,6,2,5,4,8,3,7]
-> 输出：49 
-> 解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
-> ```
-
-**思路**：双指针
-
-```java
-public int maxArea(int[] height){
-  int l = 0;
-  int r = height.length - 1;
-  int ans = 0;
-  while( l < r){
-    int area = Math.min(height[l], height[r]) * (r - l);
-    ans = Math.max(ans,area);
-    if(height[l] < height[r]){
-      l ++;
-    }else {
-      r --;
-    }
-  }
-  return ans;
-}
-```
 
 
 
@@ -440,3 +414,37 @@ class Solution {
 > ```
 
 **思路**：
+
+
+
+
+
+### [88. 合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array/)
+
+> 给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
+>
+> 请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
+>
+> 注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。
+>
+> ```
+> 输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+> 输出：[1,2,2,3,5,6]
+> 解释：需要合并 [1,2,3] 和 [2,5,6] 。
+> 合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
+> ```
+
+**思路**：
+
+- 直接合并后排序
+- 双指针
+
+```java
+public void merge(int[] nums1, int m, int[] nums2, int n) {
+  for (int i = 0; i != n; ++i) {
+    nums1[m + i] = nums2[i];
+  }
+  Arrays.sort(nums1);
+}
+```
+

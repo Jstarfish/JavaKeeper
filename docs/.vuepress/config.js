@@ -228,7 +228,7 @@ function genDataManagementSidebar(){
         ['Redis/Redis-Persistence', 'Redis 持久化'],
         ['Redis/Redis-Conf', 'Redis 配置'],
         ['Redis/Redis-Transaction', 'Redis 事务'],
-        ['Redis/Reids-Lock', 'Redis 分布式锁'],
+        ['Redis/Redis-Lock', 'Redis 分布式锁'],
         ['Redis/Redis-Master-Slave', 'Redis 主从'],
         ['Redis/Redis-Sentinel', 'Redis 哨兵'],
         ['Redis/Redis-Cluster', 'Redis 集群'],

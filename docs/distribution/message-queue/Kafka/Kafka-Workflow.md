@@ -1,10 +1,14 @@
-# Kafka 工作流程和存储机制分析
+---
+title: Kafka 工作流程和存储机制分析
+date: 2023-02-15
+tags: 
+ - Kafka
+categories: Kafka
+---
 
-![](https://images.gitbook.cn/e49bc290-cf95-11e8-8388-bd48f25029c6)
+![](https://img.starfish.ink/mq/kafka-workflow.jpg)
 
 ### 一、Kafka 文件存储机制
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh45cng275j30ny0bjwfr.jpg)
 
 #### topic构成
 
@@ -12,7 +16,7 @@
 
 在 Kafka 中，一个 topic 可以分为多个 partition，一个 partition 分为多个 **segment**，每个 segment 对应两个文件：.index 和 .log 文件
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3ntjmvt8j31600mzac4.jpg)
+![](https://img.starfish.ink/mq/kafka-topic.png)
 
 **topic 是逻辑上的概念，而 patition 是物理上的概念**，每个 patition 对应一个 log 文件，而 log 文件中存储的就是 producer 生产的数据，patition 生产的数据会被不断的添加到 log 文件的末端，且每条数据都有自己的 offset。
 
@@ -37,7 +41,6 @@
 >
 > 在发送一条消息时，可以指定这个消息的 key，producer 根据这个 key 和 partition 机制来判断这个消息发送到哪个partition。partition 机制可以通过指定 producer 的 partition.class 这一参数来指定（即支持自定义），该 class 必须实现 kafka.producer.Partitioner 接口。
 >
-> 
 
 
 
@@ -51,11 +54,11 @@
 > bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic starfish
 ```
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3lsiywl1j31p804qdjk.jpg)
+![](https://img.starfish.ink/mq/kafka-topic-create.png)
 
 然后可以在 kafka-logs 目录（server.properties 默认配置）下看到会有个名为 starfish-0 的文件夹。如果，starfish 这个 topic 有三个分区，则其对应的文件夹为 starfish-0，starfish-1，starfish-2。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3lw95aahj30oy0bm764.jpg)
+![](https://img.starfish.ink/mq/kafka-topic-partition.png)
 
 这些文件的含义如下：
 
@@ -81,17 +84,17 @@ one
 one
 ```
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3md0mmslj31y40gcwqe.jpg)
+![](https://img.starfish.ink/mq/kafka-console-producer.png)
 
 查看 .log 文件下是否有数据 one
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh3mujbqwkj30zu082775.jpg)
+![](https://img.starfish.ink/mq/0000log.png)
 
 内容存在一些”乱码“，因为数据是经过序列化压缩的。
 
 那么数据文件 .log 大小有限制吗，能保存多久时间？这些我们都可以通过 Kafka 目录下 `conf/server.properties` 配置文件修改：
 
-```
+```properties
 # log文件存储时间，单位为小时，这里设置为1周
 log.retention.hours=168
 
@@ -111,13 +114,13 @@ log.segment.bytes=1073741824
 ```
 
 - 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
-- 偏移量：分区中的每一条消息都会被分配的一个连续的id值，该值用于唯一标识分区中的每一条消息
-- 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项`log.retention.hours=168` 就表示 7 天后删除老的消息文件
-- [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数 log.index.interval.bytes 限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是4KB，写4kb的数据然后在索引里写一条索引。
+- 偏移量：分区中的每一条消息都会被分配的一个连续的 id 值，该值用于唯一标识分区中的每一条消息
+- 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项 `log.retention.hours=168` 就表示 7 天后删除老的消息文件
+- [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka 在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数 `log.index.interval.bytes` 限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是 4KB，写 4kb 的数据然后在索引里写一条索引。
 
 举个栗子：00000000000000170410 的 “.index” 文件和 “.log” 文件的对应的关系，如下图
 
-![](https://images.gitbook.cn/60eafc10-cc9b-11e8-b452-15eec1b99303)
+![](https://img.starfish.ink/mq/60eafc10-cc9b-11e8-b452-15eec1b99303.png)
 
 > 问：为什么不能以 partition 作为存储单位？还要加个 segment？
 >
@@ -131,9 +134,9 @@ log.segment.bytes=1073741824
 
 
 
-下图展示了Kafka查找数据的过程：
+下图展示了 Kafka 查找数据的过程：
 
-![img](https://tva1.sinaimg.cn/large/e6c9d24ely1h2siwqg97qj20t40iwq5a.jpg)
+![](https://img.starfish.ink/mq/kafka-segement.jpg)
 
 `.index文件` 存储大量的索引信息，`.log文件` 存储大量的数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址。
 
@@ -158,7 +161,7 @@ Kafka 生产者用于生产消息。通过前面的内容我们知道，Kafka �
 
 producer 写入消息流程如下： 
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh45yc0vp8j30zz0gbdik.jpg)
+![](https://img.starfish.ink/mq/640-20230202151727014.jpeg)
 
 
 
@@ -279,7 +282,7 @@ leader 发生故障之后，就会从 ISR 中选举新的 leader。（之前还�
 
 由于我们并不能保证 Kafka 集群中每时每刻 follower 的长度都和 leader 一致（即数据同步是有时延的），那么当  leader 挂掉选举某个 follower 为新的 leader 的时候（原先挂掉的 leader 恢复了成为了 follower），可能会出现  leader 的数据比 follower 还少的情况。为了解决这种数据量不一致带来的混乱情况，Kafka 提出了以下概念：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh46fmpty5j31eq0hudfw.jpg)
+![](https://img.starfish.ink/mq/kafka-leo-hw.png)
 
 - LEO（Log End Offset）：指的是每个副本最后一个offset；
 - HW（High Wather）：指的是消费者能见到的最大的 offset，ISR 队列中最小的 LEO。
@@ -401,7 +404,7 @@ pull 模式不足之处是，如果 kafka 没有数据，消费者可能会陷�
 
 #### 4.1 消费者组
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4aejp3muj31aq0om41k.jpg)
+![](https://img.starfish.ink/mq/kafka-consume-group.png)
 
 **Consumer Group 是 Kafka 提供的可扩展且具有容错性的消费者机制**。
 
@@ -423,11 +426,11 @@ Kafka 有两种分配策略，一是 RoundRobin，一是 Range（新版本还有
 
 RoundRobin 即轮询的意思，比如现在有一个三个消费者 ConsumerA、ConsumerB 和 ConsumerC 组成的消费者组，同时消费 TopicA 主题消息，TopicA 分为 7 个分区，如果采用 RoundRobin 分配策略，过程如下所示：
 
-![图片：mrbird.cc](https://tva1.sinaimg.cn/large/007S8ZIlly1gh47iuetprj31es0ko74s.jpg)
+![](https://img.starfish.ink/mq/QQ20200401-145222@2x.png)
 
 这种轮询的方式应该很好理解。但如果消费者组消费多个主题的多个分区，会发生什么情况呢？比如现在有一个两个消费者 ConsumerA 和 ConsumerB 组成的消费者组，同时消费 TopicA 和 TopicB 主题消息，如果采用RoundRobin 分配策略，过程如下所示：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4avsimvoj31ey0ladgc.jpg)
+![](https://img.starfish.ink/mq/QQ20200401-150317@2x.png)
 
 > 注：TAP0 表示 TopicA Partition0 分区数据，以此类推。
 
@@ -443,11 +446,11 @@ Kafka 默认采用 Range 分配策略，Range 顾名思义就是按范围划分�
 
 比如现在有一个三个消费者 ConsumerA、ConsumerB 和 ConsumerC 组成的消费者组，同时消费 TopicA 主题消息，TopicA 分为 7 个分区，如果采用 Range 分配策略，过程如下所示：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh47xvny6fj31eo0kot93.jpg)
+![](https://img.starfish.ink/mq/QQ20200401-152904@2x.png)
 
 假如现在有一个两个消费者 ConsumerA 和 ConsumerB 组成的消费者组，同时消费 TopicA 和 TopicB 主题消息，如果采用 Range 分配策略，过程如下所示：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh47xrhr61j31fa0lamxi.jpg)
+![](https://img.starfish.ink/mq/QQ20200401-153300@2x.png)
 
 Range 算法并不会把多个主题分区当成一个整体。
 
@@ -463,7 +466,7 @@ Range 算法并不会把多个主题分区当成一个整体。
 
 Kafka 0.9 版本之前，consumer 默认将 offset 保存在 Zookeeper 中，从 0.9 版本开始，consumer 默认将 offset 保存在 Kafka 一个内置的 topic 中，该 topic 为 **_consumer_offsets**。
 
-> 将位移保存在 ZooKeeper 外部系统的做法，最显而易见的好处就是减少了 Kafka Broker 端的状态保存开销。现在比较流行的提法是将服务器节点做成无状态的，这样可以自由地扩缩容，实现超强的伸缩性。Kafka 最开始也是基于这样的考虑，才将 Consumer Group 位移保存在独立于 Kafka 集群之外的框架中。
+> 将位移保存在 ZooKeeper 外部系统的做法，最显而易见的好处就是减少了 Kafka Broker 端的状态保存开销。现在比较流行的做法是将服务器节点做成无状态的，这样可以自由地扩缩容，实现超强的伸缩性。Kafka 最开始也是基于这样的考虑，才将 Consumer Group 位移保存在独立于 Kafka 集群之外的框架中。
 >
 > 不过，慢慢地人们发现了一个问题，即 ZooKeeper 这类元框架其实并不适合进行频繁的写更新，而 Consumer Group 的位移更新却是一个非常频繁的操作。这种大吞吐量的写操作会极大地拖慢 ZooKeeper 集群的性能，因此 Kafka 社区渐渐有了这样的共识：将 Consumer 位移保存在 ZooKeeper 中是不合适的做法。
 
@@ -480,7 +483,7 @@ one
 Math.abs(groupID.hashCode()) % numPartitions
 ```
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh485ouy5aj31aq0u04qp.jpg)
+![](https://img.starfish.ink/mq/kafka-consumer-offset.png)
 
 
 
@@ -493,7 +496,7 @@ Math.abs(groupID.hashCode()) % numPartitions
 一般有三种情况会触发再平衡：
 
 - 组成员数发生变更：consumer group 中的新增或删除某个 consumer，导致其所消费的分区需要分配到组内其他的 consumer上；
-- 订阅主题发生变更：consumer 订阅的 topic 发生变化，比如订阅的 topic 采用的是正则表达式的形式，如 `test-*` 此时如果有一个新建了一个topic `test-user`，那么这个 topic 的所有分区也是会自动分配给当前的 consumer 的，此时就会发生再平衡；
+- 订阅主题发生变更：consumer 订阅的 topic 发生变化，比如订阅的 topic 采用的是正则表达式的形式，如 `test-*` 此时如果有一个新建了一个 topic `test-user`，那么这个 topic 的所有分区也是会自动分配给当前的 consumer 的，此时就会发生再平衡；
 - 订阅主题的分区数发生变更：consumer 所订阅的 topic 发生了新增分区的行为，那么新增的分区就会分配给当前的 consumer，此时就会触发再平衡。
 
 

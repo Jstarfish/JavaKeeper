@@ -6,7 +6,7 @@ tags:
 categories: Kafka
 ---
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/glasses-g7ac23922c_1920.jpg)
+![](https://img.starfish.ink/mq/kafka-version-banner.png)
 
 > 用 Kafka 的时候，其实大家都会有默认的共识，客户端和服务端版本号要尽量统一，因为不同版本之间的差异和功能其实差距还是挺大的，记得刚工作那会，我对 kafka 的命名就很迷惑，0.11.0.0  后来就升级到 1.0.1？这篇算是一个交代吧，祝好
 
@@ -14,19 +14,19 @@ categories: Kafka
 
 截止到目前，Apache Kafka 已经到了 3.1 版本，我们看下之前的版本
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/kafka-version.png)
+![](https://img.starfish.ink/mq/kafka-version-name.png)
 
 
 
 比如我们在官网上下载 Kafka 时，会看到这样的版本：
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/imprint.png)
+![](https://img.starfish.ink/mq/kafka-version.png)
 
 Kafka 的版本命名，这么长一串，其实呢，前面的版本号是编译 Kafka 源代码的 Scala 编译器版本，真正的版本号其实是后边的 `3.1.0`，
 
 > Kafka 服务器端的代码完全由 Scala 语言编写，Scala 同时支持面向对象编程和函数式编程，用 Scala 写成的源代码编译之后也是普通的“.class”文件，因此我们说 Scala 是 JVM 系的语言，它的很多设计思想都是为人称道的。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/kafka-tags.png)
+![](https://img.starfish.ink/mq/kafka-tags.png)
 
 1.x 版本后，kafka 启用三位数的命名规则，从 tag 记录可以看到，之前的版本都是 `0.10.2.2` 、 `0.11.0.2` 这种，新的版本命名采用了 
 

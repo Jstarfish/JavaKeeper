@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1gv7wlh9bedj61410u0age02.jpg)
+![](https://img.starfish.ink/redis/redis-master-slave-banner.png)
 
 > 我们总说的 Redis 具有高可靠性，其实，这里有两层含义：一是数据尽量少丢失，二是服务尽量少中断。
 >
@@ -243,11 +243,11 @@ replicaof  所选从库的IP 6379
 
 主库对应的偏移量是 `master_repl_offset`，从库的偏移量 `slave_repl_offset` 。正常情况下，这两个偏移量基本相等。
 
-![redis-backlog_buffer](https://img.starfish.ink/redis/redis-backlog_buffer.jpg)
+![](https://img.starfish.ink/redis/redis-backlog_buffer.jpg)
 
 在网络断连阶段，主库可能会收到新的写操作命令，这时，`master_repl_offset` 会大于 `slave_repl_offset`。此时，主库只用把 `master_repl_offset` 和 `slave_repl_offset` 之间的命令操作同步给从库就可以了。
 
-![redis-increment-copy](https://img.starfish.ink/redis/redis-increment-copy.png)
+![](https://img.starfish.ink/redis/redis-increment-copy.png)
 
 > PS：因为 repl_backlog_buffer 是一个环形缓冲区（可以理解为是一个定长的环形数组），所以在缓冲区写满后，主库会继续写入，此时，就会覆盖掉之前写入的操作。**如果从库的读取速度比较慢，就有可能导致从库还未读取的操作被主库新写的操作覆盖了，这会导致主从库间的数据不一致**。如果从库和主库**断连时间过长**，造成它在主库 repl_backlog_buffer 的 slave_repl_offset 位置上的数据已经被覆盖掉了，此时从库和主库间将进行全量复制。
 >

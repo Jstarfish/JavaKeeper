@@ -1,4 +1,16 @@
-![](/Users/apple/Desktop/screenshot/截屏2022-01-04 下午4.19.16.png)
+> x`The **two pointer technique** is a near necessity in any software developer's toolkit, especially when it comes to technical interviews.
+>
+> But what are `pointers`? In computer science, a `pointer` is a reference to an object. In many programming languages, that object stores a memory address of another value located in computer memory, or in some cases, that of memory-mapped computer hardware.
+>
+> ![r](/Users/starfish/oceanus/picBed/leetcode/two-point.png)
+
+
+
+在数组中并没有真正意义上的指针，但我们可以把索引当做数组中的指针
+
+
+
+
 
 归纳下双指针算法，其实总共就三类
 
@@ -8,30 +20,22 @@
 
 
 
-#### [42. 接雨水](https://leetcode-cn.com/problems/trapping-rain-water/)
-
-
-
-
-
 ## 一、左右指针
 
-左右指针在数组中其实就是两个索引值，
+左右指针在数组中其实就是两个索引值，两个指针相向而行或者相背而行
 
 TODO: 一般都是有序数组？或者先排序后？
 
 Javaer 一般这么表示：
 
 ```java
-int left = i + 1;
-int right = nums.length - 1;
+int left = 0;
+int right = arr.length - 1;
 while(left < right)
   ***
 ```
 
 这两个指针 **相向交替移动**
-
-![](https://storage.googleapis.com/algodailyrandomassets/curriculum/arrays/two-pointer-2.svg)
 
 
 
@@ -53,45 +57,102 @@ while(left < right)
 
 TODO: 画图对比各个算法
 
-### 两数之和 II - 输入有序数组
 
-> 给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 **和为目标值** *`target`* 的那 **两个** 整数，并返回它们的数组下标。
+
+### [反转字符串](https://leetcode.cn/problems/reverse-string/)
+
+> 编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 char[] 的形式给出。
 >
-> 你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+> 不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
 >
-> 你可以按任意顺序返回答案。
+> 你可以假设数组中的所有字符都是 ASCII 码表中的可打印字符。
 >
 > ```
-> 输入：nums = [2,7,11,15], target = 9
-> 输出：[0,1]
-> 解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+> 输入：["h","e","l","l","o"]
+> 输出：["o","l","l","e","h"]
+> ```
+>
+
+思路：
+
+- 因为要反转，所以就不需要相向移动了，如果用双指针思路的话，其实就是遍历中交换左右指针的字符
+
+```java
+public void reverseString(char[] s) {
+  int left = 0;
+  int right = s.length - 1;
+  while (left < right){
+    char tmp = s[left];
+    s[left] = s[right];
+    s[right] = tmp;
+    left++;
+    right--;
+  }
+}
+```
+
+简化一下
+
+```java
+public void reverseString(char[] s) {
+  int n = s.length;
+  for (int left = 0, right = n - 1; left < right; ++left, --right) {
+    char tmp = s[left];
+    s[left] = s[right];
+    s[right] = tmp;
+  }
+}
+```
+
+
+
+### [两数之和 II - 输入有序数组](https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/)
+
+> 给你一个下标从 1 开始的整数数组 numbers ，该数组已按 非递减顺序排列  ，请你从数组中找出满足相加之和等于目标数 target 的两个数。如果设这两个数分别是 numbers[index1] 和 numbers[index2] ，则 1 <= index1 < index2 <= numbers.length 。
+>
+> 以长度为 2 的整数数组 [index1, index2] 的形式返回这两个整数的下标 index1 和 index2。
+>
+> 你可以假设每个输入 只对应唯一的答案 ，而且你 不可以 重复使用相同的元素。
+>
+> 你所设计的解决方案必须只使用常量级的额外空间。
+>
+> ```
+> 输入：numbers = [2,7,11,15], target = 9
+> 输出：[1,2]
+> 解释：2 与 7 之和等于目标数 9 。因此 index1 = 1, index2 = 2 。返回 [1, 2] 。
 > ```
 
 直接用左右指针套就可以
 
 ```java
 public static int[] towSum(int[] nums, int target) {
-    int left = 0;
-    int rigth = nums.length - 1;
-    while(left < rigth){
-        int tmp = nums[left] + nums[rigth];
-        if (target == tmp) {
-            return new int[]{left, rigth};
-        } else if (tmp > target) {
-            rigth--; //右移
-        } else {
-            left++;  //左移
-        }
+  int left = 0;
+  int rigth = nums.length - 1;
+  while (left < rigth) {
+    int tmp = nums[left] + nums[rigth];
+    if (target == tmp) {
+      //数组下标是从1开始的
+      return new int[]{left + 1, rigth + 1};
+    } else if (tmp > target) {
+      rigth--; //右移
+    } else {
+      left++;  //左移
     }
-    return new int[]{-1, -1};
+  }
+  return new int[]{-1, -1};
 }
 ```
 
 
 
-### 三数之和
+### [三数之和](https://leetcode.cn/problems/3sum/)
 
-**排序、双指针、去重**
+> 给你一个整数数组 nums ，判断是否存在三元组 [nums[i], nums[j], nums[k]] 满足 i != j、i != k 且 j != k ，同时还满足 nums[i] + nums[j] + nums[k] == 0 。请你返回所有和为 0 且不重复的三元组。
+>
+> 注意：答案中不可以包含重复的三元组。
+>
+
+思路：**排序、双指针、去重**
 
 第一个想法是，这三个数，两个指针？
 
@@ -103,49 +164,43 @@ public static int[] towSum(int[] nums, int target) {
     - nums[left] == nums[left + 1]  移动指针，即去重
     - nums[right] == nums[right - 1]  移动指针
 
-
-
-
-
-![img](https://pic.leetcode-cn.com/00a09d9a4652c19ca3d1022b99a2395ae2f874bc4e41d19a4c61434566b156ec-2.png)
-
 ```java
 public static List<List<Integer>> threeSum(int[] nums) {
-  //存放结果list
-  List<List<Integer>> result = new ArrayList<>();
-  int length = nums.length;
-  //特例判断
-  if (length < 3) {
-    return result;
-  }
-  Arrays.sort(nums);
-  for (int i = 0; i < length; i++) {
-    //排序后的第一个数字就大于0，就说明没有符合要求的结果
-    if (nums[i] > 0) break;
+        //存放结果list
+        List<List<Integer>> result = new ArrayList<>();
+        int length = nums.length;
+        //特例判断
+        if (length < 3) {
+            return result;
+        }
+        Arrays.sort(nums);
+        for (int i = 0; i < length; i++) {
+            //排序后的第一个数字就大于0，就说明没有符合要求的结果
+            if (nums[i] > 0) break;
 
-    //去重
-    if (i > 0 && nums[i] == nums[i - 1]) continue;
-    //左右指针
-    int l = i + 1;
-    int r = length - 1;
-    while (l < r) {
-      int sum = nums[i] + nums[l] + nums[r];
-      if (sum == 0) {
-        result.add(Arrays.asList(nums[i], nums[l], nums[r]));
-        //去重（相同数字的话就移动指针）
-        while (nums[l] == nums[l + 1]) l++;
-        while (nums[r] == nums[r - 1]) r--;
-        //移动指针
-        l++;
-        r--;
-      } else if (sum < 0) {
-        l++;
-      } else if (sum > 0) {
-        r--;
-      }
-    }
-  }
-  return result;
+            //去重, 不能是 nums[i] == nums[i +1 ]，会造成遗漏
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            //左右指针
+            int l = i + 1;
+            int r = length - 1;
+            while (l < r) {
+                int sum = nums[i] + nums[l] + nums[r];
+                if (sum == 0) {
+                    result.add(Arrays.asList(nums[i], nums[l], nums[r]));
+                    //去重（相同数字的话就移动指针）
+                    //在将左指针和右指针移动的时候，先对左右指针的值，进行判断,以防[0,0,0]这样的造成数组越界
+                    //不要用成 if 判断，只跳过 1 条，还会有重复的，且需要再加上 l<r，以防死循环
+                    while (l < r && nums[l] == nums[l + 1]) l++;
+                    while (l < r && nums[r] == nums[r - 1]) r--;
+                    //移动指针
+                    l++;
+                    r--;
+                }
+                else if (sum < 0) l++;
+                else if (sum > 0) r--;
+            }
+        }
+        return result;
 }
 ```
 
@@ -163,7 +218,7 @@ public static List<List<Integer>> threeSum(int[] nums) {
 >
 > ![img](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
 
-思路：
+**思路**：
 
 - 求得是水量，水量 = 两个指针指向的数字中较小值 * 指针之间的距离（水桶原理，最短的板才不会漏水）
 - 为了求最大水量，我们需要存储所有条件的水量，进行比较才行
@@ -193,11 +248,13 @@ public int maxArea(int[] height){
 
 
 
-### 验证回文串
+### [验证回文串](https://leetcode.cn/problems/valid-palindrome/)
 
-> 给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
+> 如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。
 >
-> 说明：本题中，我们将空字符串定义为有效的回文串。
+> 字母和数字都属于字母数字字符。
+>
+> 给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。
 >
 > ```
 > 输入: "A man, a plan, a canal: Panama"
@@ -243,44 +300,6 @@ public boolean isPalindrome(String s) {
 
 
 
-### 反转字符串
-
-> 编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 char[] 的形式给出。
->
-> 不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
->
-> 你可以假设数组中的所有字符都是 ASCII 码表中的可打印字符。
->
-> ```
-> 输入：["h","e","l","l","o"]
-> 输出：["o","l","l","e","h"]
-> ```
->
-> ```
-> 输入：["H","a","n","n","a","h"]
-> 输出：["h","a","n","n","a","H"]
-> ```
-
-思路：
-
-- 因为要反转，所以就不需要相向移动了，如果用双指针思路的话，其实就是遍历中交换左右指针的字符
-
-```java
-public void reverseString(char[] s) {
-  int left = 0;
-  int right = s.length - 1;
-  while (left < right){
-    char tmp = s[left];
-    s[left] = s[right];
-    s[right] = tmp;
-    left++;
-    right--;
-  }
-}
-```
-
-
-
 ### 二分查找
 
 有重复数字的话，返回的其实就是最右匹配
@@ -311,7 +330,9 @@ public static int search(int[] nums, int target) {
 
 ## 二、快慢指针
 
-「快慢指针」，也称为「同步指针」
+「快慢指针」，也称为「同步指针」，所谓快慢指针，就是两个指针同向而行，一快一慢
+
+![](https://img.starfish.ink/leetcode/fast-slow-point.png)
 
 > [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
 >
@@ -325,11 +346,17 @@ public static int search(int[] nums, int target) {
 
 ### 环形链表
 
-![](/Users/apple/Downloads/cycle.png)
+> 给你一个链表的头节点 head ，判断链表中是否有环。
+>
+> 如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。注意：pos 不作为参数进行传递 。仅仅是为了标识链表的实际情况。
+>
+> 如果链表中存在环 ，则返回 true 。 否则，返回 false 。
+>
+> ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
 
 思路：
 
-- 快慢指针，两个指针，一块一慢的话，慢指针每次只移动一步，而快指针每次移动两步。初始时，慢指针在位置 head，而快指针在位置 head.next。这样一来，如果在移动的过程中，快指针反过来追上慢指针，就说明该链表为环形链表。否则快指针将到达链表尾部，该链表不为环形链表。
+- 快慢指针，两个指针，一快一慢的话，慢指针每次只移动一步，而快指针每次移动两步。初始时，慢指针在位置 head，而快指针在位置 head.next。这样一来，如果在移动的过程中，快指针反过来追上慢指针，就说明该链表为环形链表。否则快指针将到达链表尾部，该链表不为环形链表。
 
 ```java
 public boolean hasCycle(ListNode head) {
@@ -373,9 +400,7 @@ public boolean hasCycle(ListNode head) {
 
 
 
-
-
-### 链表的中间结点
+### [链表的中间结点](https://leetcode.cn/problems/middle-of-the-linked-list/)
 
 > 给定一个头结点为 `head` 的非空单链表，返回链表的中间结点。
 >
@@ -407,9 +432,48 @@ public ListNode middleNode(ListNode head) {
 
 
 
+### [ 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)
+
+> 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 
+>
+> ```
+> 输入：head = [1,2,2,1]
+> 输出：true
+> ```
+
+思路：
+
+- 双指针：将值复制到数组中后用双指针法
+- 或者使用快慢指针来确定中间结点，然后反转后半段链表，将前半部分链表和后半部分进行比较
+
+```java
+public boolean isPalindrome(ListNode head) {
+  List<Integer> vals = new ArrayList<Integer>();
+
+  // 将链表的值复制到数组中
+  ListNode currentNode = head;
+  while (currentNode != null) {
+    vals.add(currentNode.val);
+    currentNode = currentNode.next;
+  }
+
+  // 使用双指针判断是否回文
+  int front = 0;
+  int back = vals.size() - 1;
+  while (front < back) {
+    if (!vals.get(front).equals(vals.get(back))) {
+      return false;
+    }
+    front++;
+    back--;
+  }
+  return true;
+}
+```
 
 
-### 删除链表的倒数第 N 个结点
+
+### [删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
 
 > 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
 >
@@ -418,42 +482,47 @@ public ListNode middleNode(ListNode head) {
 > 输出：[1,2,3,5]
 > ```
 
+思路：
+
+1. 计算链表长度：从头节点开始对链表进行一次遍历，得到链表的长度，随后我们再从头节点开始对链表进行一次遍历，当遍历到第 L−n+1 个节点时，它就是我们需要删除的节点（为了与题目中的 n 保持一致，节点的编号从 1 开始）
+2. 栈：根据栈「先进后出」的原则，我们弹出栈的第 n 个节点就是需要删除的节点，并且目前栈顶的节点就是待删除节点的前驱节点
+3. 双指针：由于我们需要找到倒数第 n 个节点，因此我们可以使用两个指针 first 和 second 同时对链表进行遍历，并且 first 比 second 超前 n 个节点。当 first 遍历到链表的末尾时，second 就恰好处于倒数第 n 个节点。
+
+```java
+public ListNode removeNthFromEnd(ListNode head, int n) {
+  ListNode dummy = new ListNode(0, head);
+  ListNode first = head;
+  ListNode second = dummy;
+
+  //让 first 指针先移动 n 步
+  for (int i = 0; i < n; ++i) {
+    first = first.next;
+  }
+  while (first != null) {
+    first = first.next;
+    second = second.next;
+  }
+  second.next = second.next.next;
+  return dummy.next;
+}
+```
 
 
-### 删除有序数组中的重复项
 
-> 给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。
+### [删除有序数组中的重复项](https://leetcode.cn/problems/remove-duplicates-from-sorted-array/)
+
+> 给你一个 升序排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。元素的 相对顺序 应该保持 一致 。
 >
-> 不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 $O(1)$ 额外空间的条件下完成。
+> 由于在某些语言中不能改变数组的长度，所以必须将结果放在数组nums的第一部分。更规范地说，如果在删除重复项之后有 k 个元素，那么 nums 的前 k 个元素应该保存最终结果。
 >
-> 说明:
+> 将最终结果插入 nums 的前 k 个位置后返回 k 。
 >
-> 为什么返回数值是整数，但输出的答案是数组呢?
->
-> 请注意，输入数组是以**「引用」**方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。
->
-> 你可以想象内部操作如下:
->
-> ```java
-> // nums 是以“引用”方式传递的。也就是说，不对实参做任何拷贝
-> int len = removeDuplicates(nums);
-> // 在函数里修改输入数组对于调用者是可见的。
-> // 根据你的函数返回的长度, 它会打印出数组中 该长度范围内 的所有元素。
-> for (int i = 0; i < len; i++) {
->  	print(nums[i]);
-> }
-> ```
+> 不要使用额外的空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
 >
 > ```
 > 输入：nums = [1,1,2]
-> 输出：2, nums = [1,2]
+> 输出：2, nums = [1,2,_]
 > 解释：函数应该返回新的长度 2 ，并且原数组 nums 的前两个元素被修改为 1, 2 。不需要考虑数组中超出新长度后面的元素。
-> ```
->
-> ```
-> 输入：nums = [0,0,1,1,1,2,2,3,3,4]
-> 输出：5, nums = [0,1,2,3,4]
-> 解释：函数应该返回新的长度 5 ， 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4 。不需要考虑数组中超出新长度后面的元素。
 > ```
 
 **思路**：

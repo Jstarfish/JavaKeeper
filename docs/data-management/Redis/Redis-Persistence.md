@@ -140,7 +140,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 **配置位置**： APPEND ONLY MODE
 
-![](https://tva1.sinaimg.cn/large/0081Kckwly1glpjnzl6roj31hg0su7jj.jpg)
+![](https://img.starfish.ink/redis/redis-aof-conf.png)
 
 
 
@@ -167,7 +167,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 不过，AOF 日志正好相反，它是写后日志，“写后”的意思是 Redis 是先执行命令，把数据写入内存，然后才记录日志，如下图所示：
 
-![](https://tva1.sinaimg.cn/large/0081Kckwly1glohquxp6lj31rv0u0qah.jpg)
+![](https://img.starfish.ink/redis/redis-aof-write-log.png)
 
 > Tip：日志先行的方式，如果宕机后，还可以通过之前保存的日志恢复到之前的数据状态。可是 AOF 后写日志的方式，如果宕机后，不就会把写入到内存的数据丢失吗？
 >
@@ -179,7 +179,7 @@ AOF 默认保存的是 **appendonly.aof ** 文件
 
 例如，`*2` 表示有两个部分，`$6` 表示 6 个字节，也就是下边的 “SELECT” 命令，`$1` 表示 1 个字节，也就是下边的 “0” 命令，合起来就是 `SELECT 0`，选择 0 库。下边的指令同理，就很好理解了 `SET K1 V1`。
 
-![](https://tva1.sinaimg.cn/large/0081Kckwly1glpo99yeg5j31ky0u0npd.jpg)
+![](https://img.starfish.ink/redis/redis-aof-file.png)
 
 但是，为了避免额外的检查开销，**Redis 在向 AOF 里面记录日志的时候，并不会先去对这些命令进行语法检查。所以，如果先记日志再执行命令的话，日志中就有可能记录了错误的命令，Redis 在使用日志恢复数据时，就可能会出错。而写后日志这种方式，就是先让系统执行命令，只有命令能执行成功，才会被记录到日志中，否则，系统就会直接向客户端报错**。所以，Redis 使用写后日志这一方式的一大好处是，可以避免出现记录错误命令的情况。除此之外，AOF 还有一个好处：它是在命令执行后才记录日志，所以**不会阻塞当前的写操作**。
 

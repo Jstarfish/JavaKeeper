@@ -87,11 +87,11 @@ MULTI 执行之后， 客户端可以继续向服务器发送任意多条命令�
 
 **正常执行**（可以批处理，挺爽，每条操作成功的话都会各取所需，互不影响）
 
-![redis-transaction-case1.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13pr19z7j314g0eojwz.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-case1.png)
 
 **放弃事务**（discard 操作表示放弃事务，之前的操作都不算数）
 
-![redis-transaction-case2.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13rcxo7qj314e0c8n1z.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-case2.png)
 
  
 
@@ -112,11 +112,11 @@ Redis 针对如上两种错误采用了不同的处理策略，对于发生在 `
 
 **全体连坐**（某一条操作记录报错的话，exec 后所有操作都不会成功）
 
-![redis-transaction-case3.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13roq9olj31480icgtw.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-case3.png)
 
 **冤头债主**（示例中 k1 被设置为 String 类型，decr k1 可以放入操作队列中，因为只有在执行的时候才可以判断出语句错误，其他正确的会被正常执行）
 
-![redis-transaction-case4.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13s3dl4uj31480jen4s.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-case4.png)
 
 
 
@@ -154,17 +154,17 @@ OK
 
 我们看个简单的例子，用 watch 监控我的账号余额（一周100零花钱的我），正常消费
 
-![redis-transaction-watch1.png](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13slyi49j314i0fugs6.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-watch1.png)
 
 但这个卡，还绑定了我媳妇的支付宝，如果在我消费的时候，她也消费了，会怎么样呢？
 
 犯困的我去楼下 711 买了包烟，买了瓶水，这时候我媳妇在超市直接刷了 100，此时余额不足的我还在挑口香糖来着，，，
 
-![redis-transaction-watch2](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13swhge0j314c0mmtio.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-watch2.png)
 
 这时候我去结账，发现刷卡失败（事务中断），尴尬的一批
 
-![redis-transaction-watch3](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13tb8jadj314i0m2ti6.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-watch3.png)
 
 
 
@@ -172,7 +172,7 @@ OK
 
 > 当然，这里也会出现只要你媳妇刷了你的卡，就没办法刷成功的问题，这时候可以先查下余额，重新开启事务继续刷
 
-![redis-transaction-watch4](https://tva1.sinaimg.cn/large/007S8ZIlly1gi13tmbr58j314e0kkajh.jpg)
+![](https://img.starfish.ink/redis/redis-transaction-watch4.png)
 
 
 

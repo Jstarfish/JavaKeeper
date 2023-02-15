@@ -166,8 +166,6 @@ Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition �
 >
 > Kafka 只是用副本机制来提供数据冗余实现高可用性和高持久性，也就是第一个好处
 
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/interview/20210407180101.png)
-
 所谓副本，本质上就是一个只能追加写消息的提交日志。这些日志被相同的分散保存在不同的 Broker 上。
 
 在实际生产上，每台 Broker 都可能保存有各个主题下不同分区的不同副本。因此单个Broker上存有成百上千个副本现象是非常正常的。
@@ -175,8 +173,6 @@ Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition �
 既然多个Broker中保存分区下的多个副本，那么是如何保证副本当中的数据都是一致的呢？
 
 针对这个问题，kafka的解决方案就是**领导者副本机制**
-
-![img](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/interview/20210407191337.png)
 
 - 在kafka中，副本分成两类：领导者副本和追随者副本。每个分区在创建时都要选举一个副本，成为领导者副本，其余的副本自动称为追随者副本。
 - kafka中，**追随者副本是不会对外提供服务的**，所有的请求都必须由领导者副本来处理。它唯一的任务就是从领导者副本异步拉取消息，并写入到自己提交日志中，从而实现与领导者副本的同步。

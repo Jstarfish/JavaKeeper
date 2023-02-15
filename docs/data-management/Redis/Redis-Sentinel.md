@@ -6,7 +6,7 @@ tags:
 categories: Redis
 ---
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1gv7xoaskkvj60qo0eyjut02.jpg)
+![](https://img.starfish.ink/redis/redis-sentinel-banner.png)
 
 > 我们知道 Reids 提供了主从模式的机制，来保证可用性，可是如果主库发生故障了，那就直接会影响到从库的同步，怎么办呢？
 >

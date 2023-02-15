@@ -76,7 +76,7 @@ public static void main(String[] args) {
 
 ![外行人都能看懂的WebFlux，错过了血亏！_Java_09](https://img-blog.csdnimg.cn/img_convert/d6b7836ff0350a86ef964bd835530feb.png)
 
-Java 平台直到 JDK 9才提供了对于Reactive的完整支持，JDK9也定义了上述提到的四个接口，在java.util.concurrent包上
+Java 平台直到 JDK 9 才提供了对于Reactive的完整支持，JDK9也定义了上述提到的四个接口，在java.util.concurrent包上
 
 ![外行人都能看懂的WebFlux，错过了血亏！_Java_10](https://img-blog.csdnimg.cn/img_convert/23db7b08f8181fcc75118e7ce5623cba.png)
 
@@ -142,8 +142,11 @@ Reactor是一个响应式流，它也有对应的发布者(Publisher )，Reactor
     - Spring WebFlux也支持响应式的Websocket服务端开发。
 
 
-2. 响应式Http客户端 此外，Spring WebFlux也提供了一个响应式的Http客户端API WebClient。它可以用函数式的方式异步非阻塞地发起Http请求并处理响应。其底层也是由Netty提供的异步支持。
+2. 响应式Http客户端 
+    
+    此外，Spring WebFlux也提供了一个响应式的Http客户端API WebClient。它可以用函数式的方式异步非阻塞地发起Http请求并处理响应。其底层也是由Netty提供的异步支持。
     我们可以把WebClient看做是响应式的RestTemplate，与后者相比，前者：
+    
     - 是非阻塞的，可以基于少量的线程处理更高的并发；
     - 可以使用Java 8 lambda表达式；
     - 支持异步的同时也可以支持同步的使用方式；

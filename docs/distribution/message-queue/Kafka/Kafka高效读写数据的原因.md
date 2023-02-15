@@ -1,8 +1,16 @@
-# Kafka 为什么能那么快 | Kafka高效读写数据的原因
+---
+title: Kafka 为什么能那么快 | Kafka高效读写数据的原因
+date: 2023-02-15
+tags: 
+ - Kafka
+categories: Kafka
+---
+
+![](https://picx.zhimg.com/v2-dbf838a540c98ea0d9bb324d94e339a1_720w.jpg?source=172ae18b)
 
 无论 kafka 作为 MQ 也好，作为存储层也罢，无非就是两个功能（好简单的样子），一是 Producer 生产的数据存到 broker，二是 Consumer 从 broker 读取数据。那 Kafka 的快也就体现在读写两个方面了，下面我们就聊聊 Kafka 快的原因。
 
-![](https://img01.sogoucdn.com/app/a/100520093/e18d20c94006dfe0-20cbe3c7627c7e45-20667d70eb09be3df128e4c687167789.jpg)
+![](https://pic4.zhimg.com/80/v2-227bec1fb110b479e704e92d88848497_1440w.webp)
 
 ### 1. 利用 Partition 实现并行处理
 
@@ -26,11 +34,11 @@ Topic 只是一个逻辑的概念。每个 Topic 都包含一个或多个 Partit
 >
 >硬盘内部主要部件为磁盘盘片、传动手臂、读写磁头和主轴马达。实际数据都是写在盘片上，读写主要是通过传动手臂上的读写磁头来完成。实际运行时，主轴让磁盘盘片转动，然后传动手臂可伸展让读取头在盘片上进行读写操作。磁盘物理结构如下图所示：
 >
->![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71vfmov9j308c08c74b.jpg)
+>![](https://pic2.zhimg.com/80/v2-bbc26468cf46832c18fdbc2b7d0ba6cd_1440w.webp)
 >
 >由于单一盘片容量有限，一般硬盘都有两张以上的盘片，每个盘片有两面，都可记录信息，所以一张盘片对应着两个磁头。盘片被分为许多扇形的区域，每个区域叫一个扇区。盘片表面上以盘片中心为圆心，不同半径的同心圆称为磁道，不同盘片相同半径的磁道所组成的圆柱称为柱面。磁道与柱面都是表示不同半径的圆，在许多场合，磁道和柱面可以互换使用。磁盘盘片垂直视角如下图所示：
 >
->![图片来源：commons.wikimedia.org](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71uhvvykj30dc0dcgnx.jpg)
+>![图片来源：commons.wikimedia.org](https://pic3.zhimg.com/80/v2-5e0ed70f0174e07126e8c477ef6a7812_1440w.webp)
 >
 >影响磁盘的关键因素是磁盘服务时间，即磁盘完成一个 I/O 请求所花费的时间，它由寻道时间、旋转延迟和数据传输时间三部分构成。
 >
@@ -46,7 +54,7 @@ Topic 只是一个逻辑的概念。每个 Topic 都包含一个或多个 Partit
 
 ### 2. 顺序写磁盘
 
-![图片来源：kafka.apache.org](https://tva1.sinaimg.cn/large/007S8ZIlly1gh71vl4e5kj30bk07f3yr.jpg)
+![图片来源：kafka.apache.org](https://pic3.zhimg.com/80/v2-a8f1c2ea262c67dbbbe0022dedbb992e_1440w.webp)
 
 **Kafka 中每个分区是一个有序的，不可变的消息序列**，新的消息不断追加到 partition 的末尾，这个就是顺序写。
 
@@ -115,9 +123,7 @@ file.flush()
 
 同时，还伴随着四次上下文切换，如下图所示
 
-![](https://static01.imgkr.com/temp/8fc510468c6e40ecbeca875aac22b536.png)
-
-![img](https://pic2.zhimg.com/80/v2-e3b554661358b18b3f36cc17f0b0c8c1_720w.jpg)
+![](https://pic2.zhimg.com/80/v2-fdfe29d209918316409200f10cf63ebd_1440w.webp)
 
 数据落盘通常都是非实时的，kafka 生产者数据持久化也是如此。Kafka 的数据**并不是实时的写入硬盘**，它充分利用了现代操作系统分页存储来利用内存提高 I/O 效率，就是上一节提到的 Page Cache。
 
@@ -131,7 +137,7 @@ file.flush()
 
 mmap 也有一个很明显的缺陷——不可靠，写到 mmap 中的数据并没有被真正的写到硬盘，操作系统会在程序主动调用 flush 的时候才把数据真正的写到硬盘。Kafka 提供了一个参数——`producer.type` 来控制是不是主动 flush；如果 Kafka 写入到 mmap 之后就立即 flush 然后再返回 Producer 叫同步(sync)；写入 mmap 之后立即返回 Producer 不调用 flush 就叫异步(async)，默认是 sync。
 
-![](https://static01.imgkr.com/temp/68b8af0326f94444b3bb9a41c8918ab2.png)
+![](https://pic1.zhimg.com/80/v2-7b2d0b80328143322445f55f954144ec_1440w.webp)
 
 > 零拷贝（Zero-copy）技术指在计算机执行操作时，CPU 不需要先将数据从一个内存区域复制到另一个内存区域，从而可以减少上下文切换以及 CPU 的拷贝时间。
 >
@@ -167,7 +173,7 @@ Socket.send(buffer)
 
 Linux 2.4+ 内核通过 sendfile 系统调用，提供了零拷贝。数据通过 DMA 拷贝到内核态 Buffer 后，直接通过 DMA 拷贝到 NIC Buffer，无需 CPU 拷贝。这也是零拷贝这一说法的来源。除了减少数据拷贝外，因为整个读文件 - 网络发送由一个 sendfile 调用完成，整个过程只有两次上下文切换，因此大大提高了性能。
 
-![](https://static01.imgkr.com/temp/6753e5f7f2f7435687b6c3fb7c6d1eff.png)
+![](https://pic4.zhimg.com/80/v2-fb5b1c0a4358a5c7608251c91e6b971b_1440w.webp)
 
 Kafka 在这里采用的方案是通过 NIO 的 `transferTo/transferFrom` 调用操作系统的 sendfile 实现零拷贝。总共发生 2 次内核数据拷贝、2 次上下文切换和一次系统调用，消除了 CPU 数据拷贝
 
@@ -213,8 +219,6 @@ Producer 可将数据压缩后发送给 broker，从而减少网络传输代价�
 ### 小总结 | 下次面试官问我 kafka 为什么快，我就这么说
 
 从 3 个方面来看：
-
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/kafka/640)
 
 - partition 并行处理
 - 顺序写磁盘，充分利用磁盘特性
