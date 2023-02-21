@@ -1,6 +1,44 @@
-> https://labuladong.gitee.io/algo/2/22/61/
+---
+title: 二分查找
+date: 2023-02-09
+tags: 
+ - binary-search
+categories: algorithms
 
-### 二分查找
+---
+
+![](https://img.starfish.ink/algorithm/binary-search-banner.png)
+
+### 二分查找框架
+
+```java
+int binarySearch(int[] nums, int target) {
+    int left = 0, right = ...;
+
+    while(...) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) {
+            ...
+        } else if (nums[mid] < target) {
+            left = ...
+        } else if (nums[mid] > target) {
+            right = ...
+        }
+    }
+    return ...;
+}
+```
+
+**分析二分查找的一个技巧是：不要出现 else，而是把所有情况用 else if 写清楚，这样可以清楚地展现所有细节**。本文都会使用 else if，旨在讲清楚，读者理解后可自行简化。
+
+其中 `...` 标记的部分，就是可能出现细节问题的地方，当你见到一个二分查找的代码时，首先注意这几个地方。后文用实例分析这些地方能有什么样的变化。
+
+**另外提前说明一下，计算 `mid` 时需要防止溢出**，代码中 `left + (right - left) / 2` 就和 `(left + right) / 2` 的结果相同，但是有效防止了 `left` 和 `right` 太大，直接相加导致溢出的情况。
+
+### [二分查找](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
+
+> 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
+>
 
 ```java
 int binarySearch(int[] nums, int target) {
@@ -108,31 +146,8 @@ int left_bound(int[] nums, int target) {
 
 ### 寻找右侧边界的二分查找
 
-左闭右开的写法
-
 ```java
-int right_bound(int[] nums, int target) {
-    if (nums.length == 0) return -1;
-    int left = 0, right = nums.length;
-    
-    while (left < right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] == target) {
-            left = mid + 1; // 注意
-        } else if (nums[mid] < target) {
-            left = mid + 1;
-        } else if (nums[mid] > target) {
-            right = mid;
-        }
-    }
-    return left - 1; // 注意
-}
-```
-
-
-
-```java
-int right_bound(int[] nums, int target) {
+int getRightNums(int[] nums, int target) {
     int left = 0, right = nums.length - 1;
     while (left <= right) {
         int mid = left + (right - left) / 2;
@@ -145,78 +160,14 @@ int right_bound(int[] nums, int target) {
             left = mid + 1;
         }
     }
-    // 这里改为检查 right 越界的情况，见下图
-    if (right < 0 || nums[right] != target) {
-        return -1;
-    }
-    return right;
+    if (right < 0) return -1;
+    return nums[right] == target ? right : -1;
 }
 ```
-
-
 
 
 
 对于寻找左右边界的二分搜索，常见的手法是使用左闭右开的「搜索区间」，**我们还根据逻辑将「搜索区间」全都统一成了两端都闭，便于记忆，只要修改两处即可变化出三种写法**：
-
-```java
-int binary_search(int[] nums, int target) {
-    int left = 0, right = nums.length - 1; 
-    while(left <= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] < target) {
-            left = mid + 1;
-        } else if (nums[mid] > target) {
-            right = mid - 1; 
-        } else if(nums[mid] == target) {
-            // 直接返回
-            return mid;
-        }
-    }
-    // 直接返回
-    return -1;
-}
-
-int left_bound(int[] nums, int target) {
-    int left = 0, right = nums.length - 1;
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] < target) {
-            left = mid + 1;
-        } else if (nums[mid] > target) {
-            right = mid - 1;
-        } else if (nums[mid] == target) {
-            // 别返回，锁定左侧边界
-            right = mid - 1;
-        }
-    }
-    // 最后要检查 left 越界的情况
-    if (left >= nums.length || nums[left] != target) {
-        return -1;
-    }
-    return left;
-}
-
-int right_bound(int[] nums, int target) {
-    int left = 0, right = nums.length - 1;
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] < target) {
-            left = mid + 1;
-        } else if (nums[mid] > target) {
-            right = mid - 1;
-        } else if (nums[mid] == target) {
-            // 别返回，锁定右侧边界
-            left = mid + 1;
-        }
-    }
-    // 最后要检查 right 越界的情况
-    if (right < 0 || nums[right] != target) {
-        return -1;
-    }
-    return right;
-}
-```
 
 
 
@@ -680,3 +631,6 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 
 
 
+
+
+- https://labuladong.gitee.io/algo/2/22/61/

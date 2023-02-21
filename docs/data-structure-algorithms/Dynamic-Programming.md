@@ -797,6 +797,53 @@ public String longestPalindrome_1(String s) {
 
 
 
+### 8、数字三角形问题
+
+```
+7
+3 8
+8 1 0
+2 7 4 4 
+4 5 2 6 5
+```
+
+从上到下选择一条路，使得经过的数字之和最大。
+
+路径上的每一步只能往左下或者右下走。
+
+#### 分析题目
+
+递归解法
+
+可以看出每走第n行第m列时有两种后续:向下或者向右下。由于最后一行可以确定,当做边界条件,所以我们自然而然想到递归求解
+
+```java
+class Solution{
+
+	public int getMax(){
+		int MAX = 101;
+		int[][] D = new int[MAX][MAX];   //存储数字三角形
+		int n;              //n表示层数
+		int i = 0; int j = 0;
+		int maxSum = getMaxSum(D,n,i,j);
+		return maxSum;
+	}
+
+	public int getMaxSum(int[][] D,int n,int i,int j){
+		if(i == n){
+			return D[i][j];
+		}
+		int x = getMaxSum(D,n,i+1,j);
+		int y = getMaxSum(D,n,i+1,j+1);
+		return Math.max(x,y)+D[i][j];
+	}
+}
+```
+
+
+
+
+
 ## 总结
 
 ![](https://pic2.zhimg.com/80/v2-4e3a7d5ae4bb76ce96bc3393013f13f8_720w.jpg?source=1940ef5c)
