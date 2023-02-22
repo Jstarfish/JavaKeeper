@@ -1,12 +1,12 @@
 ---
 title: 股票买卖问题-套路解题
-date: 2022-3-09
+date: 2022-03-09
 tags: 
  - DP
 categories: leetcode
 ---
 
-![Stock Exchange Board](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/pexels-photo-210607.jpeg)
+![](https://img.starfish.ink/leetcode/stock-profit-banner.png)
 
 > 刷 labuladong-东哥 的文章时，发现这么宝藏的一篇，真是一个套路解决所有股票问题（文章主要来自英文版 leetcode 的题解翻译）
 >
@@ -51,7 +51,7 @@ leetcode 的股票问题目前总共有这么 6 题
 - buy 必须是在没有持仓的情况下
 - sell 必须是在手里持仓为 1 的情况
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/algorithms/stock-problems.png)
+![](https://img.starfish.ink/leetcode/stock-maxProfit.png)
 
 所以 `dp[i][k]` 可以拆成两部分，用三维数组来表示：`dp[i][k][0]` 和 `dp[i][k][1]` ，意思是手里没有股票和手里有股票的最大利润
 

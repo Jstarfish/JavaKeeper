@@ -171,7 +171,7 @@ Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition �
 
 
 
-#### Kafka 高效文件存储设计特点
+#### Kafka 高效文件存储设计特点?
 
 - Kafka 把 topic 中一个 parition 大文件分成多个小文件段，通过多个小文件段，就容易定期清除或删除已经消费完文件，减少磁盘占用。
 - 通过索引信息可以快速定位 message 和确定 response 的最大大小。
@@ -515,22 +515,19 @@ processMsg(messages);
 
 #### Kafka 如何保证消息的顺序消费?
 
-- Kafka 分布式的单位是 partition，同一个 partition 用一个 write ahead log 组织，所以可以保证 FIFO 的顺序。
+- 1 个 Topic 只创建 1 个Partition(分区)，这样生产者的所有数据都发送到了一个 Partition，保证了消息的消费顺序（这样的坏处就是磨灭了 kafka 最优秀的特性。所以可以思考下是不是技术选型有问题， kafka本身适合与流式大数据量，要求高吞吐，对数据有序性要求不严格的场景。
 
-- 不同 partition 之间不能保证顺序。
+- 生产者在发送消息的时候指定要发送到哪个 Partition
 
-- 但是绝大多数用户都可以通过 message key 来定义，因为同一个 key 的 message 可以保证只发送到同一个 partition，比如说 key 是 user id，table row id 等等，所以同一个 user 或者同一个 record 的消息永远只会发送到同一个 partition 上，保证了同一个 user或 record 的顺序。
-- Kafka 中发送 1 条消息的时候，可以指定(topic, partition, key) 3 个参数。partiton 和 key 是可选的。如果你指定了 partition，那就是所有消息发往同 1个 partition，就是有序的。并且在消费端，Kafka 保证，1 个 partition 只能被1 个 consumer 消费。或者你指定 key（ 比如 order id），具有同 1 个 key 的所有消息，会发往同 1 个 partition。但是消费者内部如果多线程就有问题，此时的解决方案是【使用内存队列处理，将 key hash 后分发到内存队列中，然后每个线程处理一个内存队列的数据。】
-
-> Apache Kafka 官方保证了partition内部的数据有效性（追加写、offset读）；为了提高Topic的并发吞吐能力，可以提高Topic的partition数，并通过设置partition的replica来保证数据高可靠；
->
-> 但是在多个Partition时，不能保证Topic级别的数据有序性。
->
-> 因此，如果你们就想死磕kafka，但是对数据有序性有严格要求，那我建议：
->
-> 创建Topic只指定1个partition，这样的坏处就是磨灭了kafka最优秀的特性。
->
-> 所以可以思考下是不是技术选型有问题， kafka本身适合与流式大数据量，要求高吞吐，对数据有序性要求不严格的场景。
+  > 怎么指定呢？我们需要将 producer 发送的数据封装成一个 ProducerRecord 对象。
+  >
+  > 1. 指明 partition 的情况下，直接将指明的值作为 partiton 值；
+  >
+  > 2. 没有指明 partition 值但有 key 的情况下，将 key 的 hash 值与 topic 的 partition数进行取余得到 partition 值；
+  >
+  >    在 Producer 往 Kafka 插入数据时，控制同一Key分发到同一 Partition，并且设置参数`max.in.flight.requests.per.connection=1`，也即同一个链接只能发送一条消息，如此便可严格保证 Kafka 消息的顺序
+  >
+  > 3. 既没有 partition 值又没有 key 值的情况下，第一次调用时随机生成一个整数（后面每次调用在这个整数上自增），将这个值与 topic 可用的 partition 总数取余得到 partition 值，也就是常说的 round-robin 算法。
 
 
 
@@ -556,41 +553,45 @@ processMsg(messages);
 
 #### 谈一谈 Kafka 的再均衡
 
-在 Kafka 中，当有新消费者加入或者订阅的 topic 数发生变化时，会触发 Rebalance(再均衡：在同一个消费者组当中，分区的所有权从一个消费者转移到另外一个消费者)机制，Rebalance顾名思义就是重新均衡消费者消费。
+Rebalance 本质上是一种协议，主要作用是为了保证消费者组（Consumer Group）下的所有消费者（Consumer）消费的主体分区达成均衡。
 
-Rebalance的过程如下：
+比如：我们有10个分区，当我们有一个消费者时，该消费者消费10个分区，当我们增加一个消费者，理论上每个消费者消费5个分区，这个分配的过程我们成为Rebalance（重平衡）触发条件
 
-1. 所有成员都向coordinator发送请求，请求入组。一旦所有成员都发送了请求，coordinator会从中选择一个consumer担任leader的角色，并把组成员信息以及订阅信息发给leader。
+**常见的有三种情况会触发Rebalance：**
 
-2. leader开始分配消费方案，指明具体哪个consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案发给coordinator。coordinator接收到分配方案之后会把方案发给各个consumer，这样组内的所有成员就都知道自己应该消费哪些分区了。
+- 组成员发生变更(新consumer加入组、已有consumer主动离开组或已有consumer崩溃了)
+- 订阅主题数发生变更，如果你使用了正则表达式的方式进行订阅，那么新建匹配正则表达式的topic就会触发rebalance
+- 订阅主题的分区数发生变更 
 
-所以对于 Rebalance 来说，Coordinator起着至关重要的作用，那么怎么查看消费者对应的Coordinator呢，我们知道某个消费者组对应__consumer_offsets 中的哪个Partation是通过hash计算出来的：partation=hash("test_group_1")%50=28，表示test_group_1这个消费者组属于28号partation，通过命令:
+**缺点**
 
-```
-./kafka-topics.sh --zookeeper 192.168.33.11:2181 --describe --topic __consumer_offsets
-```
+- Rebalance时所有消费者无法消费数据
+- Rebalance速度慢
+- Rebalance 效率不高
 
-可以找到28号Partation所对应的信息：
+**Rebalance的过程如下：**
 
-从而可以知道coordinator对应的broker为1
+和旧版本consumer依托于Zookeeper进行rebalance不同，新版本consumer使用了Kafka内置的一个全新的组协调协议（group coordination protocol）。
 
-在Rebalance期间，消费者会出现无法读取消息，造成整个消费者群组一段时间内不可用
+对于每个组而言，Kafka的某个broker会被选举为组协调者（group coordinator）。
 
-再均衡发生的场景有以下几种：
+Kafka新版本 consumer 默认提供了 3 种分配策略，分别是 range 策略、round-robin 策略和 sticky 策略
 
-1. 组成员发生变更(新consumer加入组、已有consumer主动离开组或已有consumer崩溃了)
-2. 订阅主题数发生变更，如果你使用了正则表达式的方式进行订阅，那么新建匹配正则表达式的topic就会触发rebalance
-3. 订阅主题的分区数发生变更
+1. 所有成员都向 coordinator 发送请求，请求入组。一旦所有成员都发送了请求，coordinator 会从中选择一个consumer 担任 leader 的角色，并把组成员信息以及订阅信息发给 leader。
 
-鉴于触发再均衡后会造成资源浪费的问题，所以我们尽量不要触发再均衡
+2. leader 开始分配消费方案，指明具体哪个 consumer 负责消费哪些 topic 的哪些 partition。一旦完成分配，leader 会将这个方案发给 coordinator。coordinator 接收到分配方案之后会把方案发给各个 consumer，这样组内的所有成员就都知道自己应该消费哪些分区了。
+
+
 
 
 
 #### Rebalance 会有什么影响
 
-### 创建topic时如何选择合适的分区数？
+#### 创建topic时如何选择合适的分区数？
 
 > 每天两三亿数据量，每秒几千条，设置多少分区合适
+
+根据集群的机器数量和需要的吞吐量来决定适合的分区数
 
 
 
@@ -604,6 +605,8 @@ Rebalance的过程如下：
 - 采用了零拷贝技术
   - Producer 生产的数据持久化到 broker，采用 mmap 文件映射，实现顺序的快速写入
   - Customer 从 broker 读取数据，采用 sendfile，将磁盘文件读到 OS 内核缓冲区后，转到 NIO buffer进行网络发送，减少 CPU 消耗
+
+
 
 #### Kafka 消息最大多大
 
@@ -622,6 +625,8 @@ By default, the maximum size of a Kafka message is **1MB** (megabyte). The broke
 
 
 #### Kafka 目前有哪些内部topic，他们都有什么特征，各自的作用又是什么
+
+__consumer_offsets 以下划线开头，保存消费组的偏移
 
 
 
