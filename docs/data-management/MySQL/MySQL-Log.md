@@ -1,5 +1,5 @@
 ---
-Lltitle: MySQL  是怎么想的，搞这么多种日志
+title: MySQL  是怎么想的，搞这么多种日志
 date: 2022-08-01
 tags: 
  - MySQL
@@ -392,9 +392,9 @@ InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是�
 
 - **update undo log 是 update 或 delete 操作中产生。**
 
-  由于MVCC需要保留Record的多个历史版本，当某个Record的历史版本还在被使用时，这个Record是不能被真正的删除的。
+  由于 MVCC 需要保留 Record 的多个历史版本，当某个 Record 的历史版本还在被使用时，这个 Record 是不能被真正的删除的。
 
-  因此，当需要删除时，其实只是修改对应Record的Delete Mark标记。对应的，如果这时这个Record又重新插入，其实也只是修改一下Delete Mark标记，也就是将这两种情况的delete和insert转变成了update操作。再加上常规的Record修改，因此这里的Update Undo Record会对应三种Type：
+  因此，当需要删除时，其实只是修改对应 Record 的Delete Mark标记。对应的，如果这时这个Record又重新插入，其实也只是修改一下Delete Mark标记，也就是将这两种情况的delete和insert转变成了update操作。再加上常规的Record修改，因此这里的Update Undo Record会对应三种Type：
 
   - TRX_UNDO_UPD_EXIST_REC
   - TRX_UNDO_DEL_MARK_REC

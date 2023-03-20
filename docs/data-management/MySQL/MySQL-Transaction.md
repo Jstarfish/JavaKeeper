@@ -20,6 +20,8 @@ categories: MySQL
 
 事务是由一组 SQL 语句组成的逻辑处理单元，具有 4 个属性，通常简称为事务的 ACID 属性。
 
+![](https://img.starfish.ink/mysql/ACID.png)
+
 - **A (Atomicity) 原子性**：整个事务中的所有操作，要么全部完成，要么全部不完成，不可能停滞在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。
 - **C (Consistency) 一致性**：在事务开始之前和事务结束以后，数据库的完整性约束没有被破坏。
 -  **I (Isolation)隔离性**：一个事务所做的修改在最终提交以前，对其他事务是不可见的。这种属性有时称为『串行化』，为了防止事务操作间的混淆，必须串行化或序列化请求，使得在同一时间仅有一个请求用于同一数据。
@@ -48,36 +50,35 @@ SET AUTOCOMMIT = {0 | 1}
 **事务使用注意点：**
 
 - 如果在锁表期间，用 start transaction 命令开始一个新事务，会造成一个隐含的 unlock tables 被执行。
-- 在同一个事务中，最好不使用不同存储引擎的表，否则 ROLLBACK 时需要对非事
-  务类型的表进行特别的处理，因为 COMMIT、ROLLBACK 只能对事务类型的表进行提交和回滚。
+- 在同一个事务中，最好不使用不同存储引擎的表，否则 ROLLBACK 时需要对非事务类型的表进行特别的处理，因为 COMMIT、ROLLBACK 只能对事务类型的表进行提交和回滚。
 - 和 Oracle 的事务管理相同，所有的 DDL 语句是不能回滚的，并且部分的 DDL 语句会造成隐式的提交。
 - 在事务中可以通过定义 SAVEPOINT（例如：mysql> savepoint test; 定义 savepoint，名称为 test），指定回滚事务的一个部分，但是不能指定提交事务的一个部分。对于复杂的应用，可以定义多个不同的 SAVEPOINT，满足不同的条件时，回滚
   不同的 SAVEPOINT。需要注意的是，如果定义了相同名字的 SAVEPOINT，则后面定义的SAVEPOINT 会覆盖之前的定义。对于不再需要使用的 SAVEPOINT，可以通过 RELEASE SAVEPOINT 命令删除 SAVEPOINT， 删除后的 SAVEPOINT， 不能再执行 ROLLBACK TO SAVEPOINT命令。
 
 **自动提交（autocommit）：**
-Mysql默认采用自动提交模式，可以通过设置autocommit变量来启用或禁用自动提交模式
+Mysql 默认采用自动提交模式，可以通过设置 `autocommit` 变量来启用或禁用自动提交模式
 
 - **隐式锁定**
 
-  InnoDB在事务执行过程中，使用两阶段锁协议：
+  InnoDB 在事务执行过程中，使用两阶段锁协议：
 
-  随时都可以执行锁定，InnoDB会根据隔离级别在需要的时候自动加锁；
+  随时都可以执行锁定，InnoDB 会根据隔离级别在需要的时候自动加锁；
 
-  锁只有在执行commit或者rollback的时候才会释放，并且所有的锁都是在**同一时刻**被释放。
+  锁只有在执行 commit 或者 rollback 的时候才会释放，并且所有的锁都是在**同一时刻**被释放。
 
 - **显式锁定**
 
-  InnoDB也支持通过特定的语句进行显示锁定（存储引擎层）：
+  InnoDB 也支持通过特定的语句进行显示锁定（存储引擎层）：
 
 ```mysql
 select ... lock in share mode //共享锁 
 select ... for update //排他锁 
 ```
 
-​	MySQL Server层的显示锁定：
+​	MySQL Server 层的显示锁定：
 
 ```mysql
-lock table和unlock table
+lock table 和 unlock table
 ```
 
 
@@ -178,6 +179,25 @@ mysql> show variables like 'transaction_isolation';
 
 
 
+#### demo
+
+```mysql
+create table T(t int) engine=InnoDB;
+insert into T(t) values(1);
+```
+
+![](https://img.starfish.ink/mysql/transaction-demo.png)
+
+- “读未提交”：则 V1 的值就是 2。这时候事务 B 虽然还没有提交，但是结果已经被 A 看到了。因此，V2、V3 也都是 2。
+- “读提交”：则 V1 是 1，V2 的值是 2。事务 B 的更新在提交后才能被 A 看到。所以， V3 的值也是 2。
+- “可重复读”：则 V1、V2 是 1，V3 是 2。之所以 V2 还是 1，遵循的就是这个要求：事务在执行期间看到的数据前后必须是一致的。
+- “串行化”：则在事务 B 执行“将 1 改成 2”的时候，会被锁住。直到事务 A 提交后，事务 B 才可以继续执行。所以从 A 的角度看， V1、V2 值是 1，V3 的值是 2。
+
+> - 读未提交：别人改数据的事务尚未提交，我在我的事务中也能读到。
+> - 读已提交：别人改数据的事务已经提交，我在我的事务中才能读到。
+> - 可重复读：别人改数据的事务已经提交，我在我的事务中也不去读。
+> - 串行：我的事务尚未提交，别人就别想改数据。
+
 | 事务隔离级别                 | 读数据一致性                             | 脏读 | 不可重复读 | 幻读 |
 | ---------------------------- | ---------------------------------------- | ---- | ---------- | ---- |
 | 读未提交（read-uncommitted） | 最低级被，只能保证不读取物理上损坏的数据 | 是   | 是         | 是   |
@@ -193,13 +213,23 @@ mysql> show variables like 'transaction_isolation';
 
 ## 三、MVCC 多版本并发控制
 
+在 MySQL 中，实际上每条记录在更新的时候都会同时记录一条回滚操作。记录上的最新值，通过回滚操作，都可以得到前一个状态的值。
+
+假设一个值从 1 被按顺序改成了 2、3、4，在回滚日志里面就会有类似下面的记录。
+
+![](https://static001.geekbang.org/resource/image/d9/ee/d9c313809e5ac148fc39feff532f0fee.png)
+
+当前值是 4，但是在查询这条记录的时候，不同时刻启动的事务会有不同的 read-view。如图中看到的，在视图 A、B、C 里面，这一个记录的值分别是 1、2、4，同一条记录在系统中可以存在多个版本，就是数据库的多版本并发控制（MVCC）。对于 read-view A，要得到 1，就必须将当前值依次执行图中所有的回滚操作得到。
+
+同时你会发现，即使现在有另外一个事务正在将 4 改成 5，这个事务跟 read-view A、B、C 对应的事务是不会冲突的。
+
+
+
 MySQL 的大多数事务型存储引擎实现都不是简单的行级锁。基于提升并发性考虑，一般都同时实现了多版本并发控制（MVCC），包括Oracle、PostgreSQL。只是实现机制各不相同。
 
 可以认为 MVCC 是行级锁的一个变种，但它在很多情况下避免了加锁操作，因此开销更低。虽然实现机制有所不同，但大都实现了非阻塞的读操作，写操作也只是锁定必要的行。
 
 MVCC 的实现是通过保存数据在某个时间点的快照来实现的。也就是说不管需要执行多长时间，每个事物看到的数据都是一致的。
-
-![](https://static001.geekbang.org/resource/image/d9/ee/d9c313809e5ac148fc39feff532f0fee.png)
 
 典型的 MVCC 实现方式，分为**乐观（optimistic）并发控制和悲观（pressimistic）并发控制**。
 
