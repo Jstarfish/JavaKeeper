@@ -200,6 +200,7 @@ int maxProfit_k_inf(int[] prices) {
     int n = prices.length;
     int[][] dp = new int[n][2];
     dp[0][0] = 0;
+    //0天，利润是 -prices[0]，所以后边今日卖出的话要 +prices[i]
     dp[0][1] = -prices[0];
     for (int i = 1; i < n; i++) {
         dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
@@ -214,13 +215,12 @@ int maxProfit_k_inf(int[] prices) {
 //只需要将 dp[i-1][0] 和 dp[i−1][1] 存放在两个变量中
 int maxProfit_k_inf(int[] prices) {
     int n = prices.length;
-    int dp_i_0 = 0, dp_i_1 = Integer.MIN_VALUE;
+    int dp0 = 0, dp1 = -prices[0];
     for (int i = 0; i < n; i++) {
-        int temp = dp_i_0;
-        dp_i_0 = Math.max(dp_i_0, dp_i_1 + prices[i]);
-        dp_i_1 = Math.max(dp_i_1, temp - prices[i]);
+        dp0 = Math.max(dp0, dp1 + prices[i]);
+        dp1 = Math.max(dp1, dp0 - prices[i]);
     }
-    return dp_i_0;
+    return dp0;
 }
 ```
 

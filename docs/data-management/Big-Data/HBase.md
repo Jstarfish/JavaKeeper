@@ -1,10 +1,18 @@
+---
+title: HBase
+date: 2023-03-09
+tags: 
+ - HBase
+categories: Big Data
+---
+
+![](https://hbase.apache.org/images/hbase_logo_with_orca_large.png)
+
 # 一、HBase 简介
 
 ### 1.1 HBase 定义
 
 HBase 是一种分布式、可扩展、支持海量数据存储的 NoSQL 数据库。
-
- 
 
 ### 1.2 HBase 的起源
 
@@ -33,7 +41,7 @@ HBase 的原型是 Google 的 BigTable 论文，受到了该论文思想的启�
 
 ### 1.4 特性
 
-Hbase是一种NoSQL数据库，这意味着它不像传统的RDBMS数据库那样支持SQL作为查询语言。Hbase是一种分布式存储的数据库，技术上来讲，它更像是分布式存储而不是分布式数据库，它缺少很多RDBMS系统的特性，比如列类型，辅助索引，触发器，和高级查询语言等待。那Hbase有什么特性呢？如下：
+Hbase是一种NoSQL数据库，这意味着它不像传统的RDBMS数据库那样支持SQL作为查询语言。Hbase是一种分布式存储的数据库，技术上来讲，它更像是分布式存储而不是分布式数据库，它缺少很多RDBMS系统的特性，比如列类型，辅助索引，触发器，和高级查询语言等。那Hbase有什么特性呢？如下：
 
 - 强读写一致，但是不是“最终一致性”的数据存储，这使得它非常适合高速的计算聚合
 - 自动分片，通过Region分散在集群中，当行数增长的时候，Region也会自动的切分和再分配
@@ -57,21 +65,19 @@ Hbase在单机环境也能运行，但是请在开发环境的时候使用
 
 
 
-
-
 ### 1.6 HBase 数据模型
 
 逻辑上，HBase 的数据模型同关系型数据库很类似，数据存储在一张表中，有行有列。但从 HBase 的底层物理存储结构（K-V）来看，HBase 更像是一个 **multi-dimensional map**（多维度map）。
 
 #### 1.6.1 HBase逻辑结构
 
-![](https://img-blog.csdnimg.cn/20210118182455612.png)
+![](https://img.starfish.ink/big-data/hbase-logic.png)
 
 > 通过横向切分 Region 和纵向切分 列族 来存储大数据
 
 #### 1.6.2 HBase 物理存储结构
 
-![](https://img-blog.csdnimg.cn/20210118182525234.png)
+![](https://img.starfish.ink/big-data/hbase-physical-structure.png)
 
 
 
@@ -128,7 +134,7 @@ Region 是基于 HDFS 的，它的所有数据存取操作都是调用了 HDFS �
 
 ### 1.8 HBase基本架构
 
-![img](https:////upload-images.jianshu.io/upload_images/426671-b201f552a0cc7e1b.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/1194/format/webp)
+![](https://img.starfish.ink/big-data/hbase-framework.png)
 
 - Zookeeper，作为分布式的协调。RegionServer也会把自己的信息写到ZooKeeper中。
 - HDFS是Hbase运行的底层文件系统
@@ -139,7 +145,7 @@ Region 是基于 HDFS 的，它的所有数据存取操作都是调用了 HDFS �
 
 详细点的：
 
-![img](https://img-blog.csdnimg.cn/20210118183353261.png)
+![](https://img.starfish.ink/big-data/hbase-framework1.png)
 
 架构角色：
 
@@ -173,7 +179,7 @@ HDFS为Hbase提供最终的底层数据存储服务，同时为HBase提供高可
 
 #### 架构细化
 
-![img](https:////upload-images.jianshu.io/upload_images/426671-794d662b7ebba360.png?imageMogr2/auto-orient/strip|imageView2/2/w/632/format/webp)
+![](https://img.starfish.ink/big-data/hbase-framework3.png)
 
 - HMaster是Master Server的实现，负责监控集群中的RegionServer实例，同时是所有metadata改变的接口，在集群中，通常运行在NameNode上面，[这里有一篇更细的HMaster介绍](https://links.jianshu.com/go?to=http%3A%2F%2Fblog.zahoor.in%2F2012%2F08%2Fhbase-hmaster-architecture%2F)
   - HMasterInterface暴露的接口，Table(createTable, modifyTable, removeTable, enable, disable),ColumnFamily (addColumn, modifyColumn, removeColumn),Region (move, assign, unassign)
@@ -197,7 +203,7 @@ https://hbase.apache.org/book.html#quickstart
 
 #### 3.1 Hbase中RegionServer架构
 
-![](https://img-blog.csdnimg.cn/2021011920584950.png)
+![](https://img.starfish.ink/big-data/hbase-regionserver.png)
 
 ##### 1）StoreFile
 
@@ -224,7 +230,7 @@ WAL的检查间隔由hbase.regionserver.logroll.period定义，默认值为1小�
 
 #### 一、写数据流程
 
-![](https://img-blog.csdnimg.cn/2021011921165373.png)
+![](https://img.starfish.ink/big-data/hbase-write-read.png)
 
 写流程：
 
@@ -274,7 +280,7 @@ memstore满的时候，或触发了其他的flush条件，memstore中的数据�
 
 #### 二、读取数据流程
 
-![](https://img-blog.csdnimg.cn/2021011921180170.png)
+![](https://img.starfish.ink/big-data/hbase-read.png)
 
 读流程
 

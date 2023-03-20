@@ -1,4 +1,10 @@
-# Kylin
+---
+title: Kylin
+date: 2023-03-09
+tags: 
+ - OLAP
+categories: OLAP
+---
 
 ![](https://siteprod-cdn.kyligence.io/wp-content/uploads/2019/02/apache-kylin896512.png)
 
@@ -18,7 +24,7 @@
 
 在这种情况下，Apache Kylin 应运而生。不同于“大规模并行处理”（Massive Parallel Processing，MPP）架构的 Hive、Presto 等，Apache Kylin 采用“**预计算**”的模式，用户只需要提前定义好查询维度，Kylin 将帮助我们进行计算，并将结果存储到 **HBase** 中，为海量数据的查询和分析提供亚秒级返回，是一种典型的“**空间换时间**”的解决方案。Apache Kylin 的出现不仅很好地解决了海量数据快速查询的问题，也避免了手动开发和维护提前计算程序带来的一系列麻烦。
 
-Apache Kylin 最初由 eBay 公司开发，并贡献给 Apache 基金会，但是目前 Apache Kylin 的核心开发团队已经自立门户，创建了Kyligence 公司。值得一提的是，Apache Kylin 是第一个由中国人主导的Apache顶级项目（2017 年 4 月 19 日，华为的 CarbonData 成为 Apache 顶级项目，因此 Apache Kylin 不再是唯一由国人贡献的 Apache 顶级项目）。由于互联网技术和开源思想进入我国的时间较晚，开源软件的世界一直是由西方国家主导，在数据领域也不例外。从 Hadoop 到 Spark，再到最近大热的机器学习平台 TenserFlow 等，均是如此。但近些年来，我们很欣喜地看到以 Apache Kylin 为首的各种以国人主导的开源项目不断地涌现出来，这些技术不断缩小着我国与西方开源技术强国之间的差距，提升我国技术人员在国际开源社区的影响力。
+Apache Kylin 最初由 eBay 公司开发，并贡献给 Apache 基金会，但是目前 Apache Kylin 的核心开发团队已经自立门户，创建了 Kyligence 公司。值得一提的是，Apache Kylin 是第一个由中国人主导的 Apache 顶级项目（2017 年 4 月 19 日，华为的 CarbonData 成为 Apache 顶级项目，因此 Apache Kylin 不再是唯一由国人贡献的 Apache 顶级项目）。由于互联网技术和开源思想进入我国的时间较晚，开源软件的世界一直是由西方国家主导，在数据领域也不例外。从 Hadoop 到 Spark，再到最近大热的机器学习平台 TenserFlow 等，均是如此。但近些年来，我们很欣喜地看到以 Apache Kylin 为首的各种以国人主导的开源项目不断地涌现出来，这些技术不断缩小着我国与西方开源技术强国之间的差距，提升我国技术人员在国际开源社区的影响力。
 
 ## 一、核心概念
 
@@ -44,11 +50,11 @@ OLAP（Online Analytical Process），联机分析处理，以多维度的方式
 
 简单地说，维度就是观察数据的角度。比如传感器的采集数据，可以从时间的维度来观察：
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1guipiqog3pj609s06n74b02.jpg)
+![](https://img.starfish.ink/big-data/kylin-dimension.png)
 
 也可以进一步细化，从时间和设备两个角度观察：
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1guipj9ykhqj60a90eot9602.jpg)
+![](https://img.starfish.ink/big-data/kylin-dimension2.png)
 
 **维度**一般是离散的值，比如时间维度上的每一个独立的日期，或者设备维度上的每一个独立的设备。因此统计时可以把维度相同的记录聚合在一起，然后应用聚合函数做累加、均值、最大值、最小值等聚合计算。
 
@@ -140,7 +146,7 @@ Apache Kylin 的这种架构使得它拥有许多非常棒的特性：
 
 ### 参考与感谢：
 
-- 原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051): 
+- 原文：[《一文读懂Apache Kylin》](https://www.jianshu.com/p/abd5e90ab051)
 - [《Apache Kylin 在百度地图的实践》](https://www.infoq.cn/article/practis-of-apache-kylin-in-baidu-map/)
 - 美团技术团队：[Apache Kylin的实践与优化](https://tech.meituan.com/2020/11/19/apache-kylin-practice-in-meituan.html)
 - [【硬刚Kylin】Kylin入门/原理/调优/OLAP解决方案和行业典型应用](https://www.modb.pro/db/79232)
