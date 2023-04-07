@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "interview/Kafka-FAQ.md",
+            "file": "data-management/MySQL/MySQL-Index.md",
             "mode": "preview",
             "source": false
           }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/Kafka-FAQ.md",
+                "file": "data-management/MySQL/MySQL-Index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/Kafka-FAQ.md",
+                "file": "data-management/MySQL/MySQL-Index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/Kafka-FAQ.md"
+                "file": "data-management/MySQL/MySQL-Index.md"
               }
             }
           }
@@ -130,6 +130,7 @@
   },
   "active": "17a0267a38d6cd5c",
   "lastOpenFiles": [
+    "interview/Kafka-FAQ.md",
     "work/DPA.md",
     "data-structure-algorithms/soultion/Array-Solution.md",
     "data-structure-algorithms/Array.md",

@@ -230,10 +230,11 @@ redo 文件结构大致是下图这样：
 
 写入到日志文件（刷新到磁盘）的时机有这么 3 种：
 
-- MySQL 正常关闭时；
+- MySQL 正常关闭时
 - 每秒刷新一次
-- redo log buffer 剩余空间小于 1/2 时
-- 每次事务提交时都将缓存在 redo log buffer 里的 redo log 直接持久化到磁盘，这个策略可由 innodb_flush_log_at_trx_commit 参数控制，有 3 种策略可选择
+- redo log buffer 剩余空间小于 1/2 时（内存不够用了，要先将脏页写到磁盘）
+
+每次事务提交时都将缓存在 redo log buffer 里的 redo log 直接持久化到磁盘，这个策略可由 innodb_flush_log_at_trx_commit 参数控制，有 3 种策略可选择
 
 #### 刷盘策略
 

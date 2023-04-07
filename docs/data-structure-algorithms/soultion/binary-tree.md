@@ -75,9 +75,9 @@ public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
   if (treeNode == null) {
     return null;
   }
+  List<List<Integer>> res = new ArrayList<>();
   //用LinkedList 实现类
   Queue<TreeNode> queue = new LinkedList<TreeNode>();
-  List<List<Integer>> res = new ArrayList<>();
   queue.offer(treeNode);
   // 从上到下遍历二叉树的每一层
   while (!queue.isEmpty()) {
