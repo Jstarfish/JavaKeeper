@@ -322,16 +322,20 @@ public static boolean isPalindrome_me(ListNode head){
 > 原因：342 + 465 = 807
 > ```
 
-**思路**：看例子中的原因就会很迷糊，直接从各自第一位相加，正常进位就行，然后按顺序返回链表
+**思路**：看例子中的原因就会很迷糊，直接从各自第一位 `l1.va、l2.val` 相加（也就是个位），正常进位就行，然后按顺序返回链表
 
-- 将两个链表看成是相同长度的进行遍历，如果一个链表较短则在前面补 00，比如 987 + 23 = 987 + 023 = 1010
 - 每一位计算的同时需要考虑上一位的进位问题，而当前位计算结束后同样需要更新进位值
 - 如果两个链表全部遍历完毕后，进位值为 11，则在新链表最前方添加节点 11
 - 小技巧：对于链表问题，返回结果为头结点时，通常需要先初始化一个预先指针 pre，该指针的下一个节点指向真正的头结点head。使用预先指针的目的在于链表初始化时无可用节点值，而且链表构造过程需要指针移动，进而会导致头指针丢失，无法返回结果。
 
+![](https://pic.leetcode-cn.com/2519bd7f7da0f3bd51dd0f06e6363f4f62bfb25472c5ec233cf969e5c1472e33-file_1559748028103)
+
+
 ```java
 public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+  //定义一个新联表伪指针，用来指向头指针，返回结果，不动
   ListNode pre = new ListNode(0);
+  //定义一个可移动的指针，指向头结点，动他
   ListNode cur = pre;
   //进位
   int carry = 0;
@@ -340,7 +344,7 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     int y = l2 == null ? 0 : l2.val;
     int sum = x + y + carry;
 
-    //如果大于10了，就进位
+    //如果大于10了，就进位，除以10来计算进位数
     carry = sum / 10;
     //进位后剩下的余数
     sum = sum % 10;

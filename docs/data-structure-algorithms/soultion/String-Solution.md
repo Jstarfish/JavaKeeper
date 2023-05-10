@@ -1,8 +1,12 @@
 ---
-
+title: 字符串-热题
+date: 2023-05-08
+tags: 
+ - String
+categories: leetcode
 ---
 
-
+> 字符串的题目，和数组的题目大差不大
 
 ### [20. 有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
 
@@ -82,6 +86,7 @@ public static int lengthOfLongestSubstring(String s) {
   if (s.length()==0) {
     return 0;
   }
+  // 哈希集合，记录每个字符是否出现过
   HashMap<Character, Integer> map = new HashMap<Character, Integer>();
   int max = 0;
   int left = 0;
