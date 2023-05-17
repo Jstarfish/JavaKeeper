@@ -1,16 +1,14 @@
-> x`The **two pointer technique** is a near necessity in any software developer's toolkit, especially when it comes to technical interviews.
->
-> But what are `pointers`? In computer science, a `pointer` is a reference to an object. In many programming languages, that object stores a memory address of another value located in computer memory, or in some cases, that of memory-mapped computer hardware.
->
-> ![r](/Users/starfish/oceanus/picBed/leetcode/two-point.png)
+---
+title: 双指针
+date: 2023-05-17
+tags: 
+ - pointers
+categories: LeetCode
+---
 
+![](https://img.starfish.ink/leetcode/two-pointer-banner.png)
 
-
-在数组中并没有真正意义上的指针，但我们可以把索引当做数组中的指针
-
-
-
-
+> 在数组中并没有真正意义上的指针，但我们可以把索引当做数组中的指针
 
 归纳下双指针算法，其实总共就三类
 
@@ -21,6 +19,8 @@
 
 
 ## 一、左右指针
+
+![](https://img.starfish.ink/leetcode/two-point.png)
 
 左右指针在数组中其实就是两个索引值，两个指针相向而行或者相背而行
 

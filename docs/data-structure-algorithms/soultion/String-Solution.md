@@ -82,23 +82,27 @@ public boolean isValid(String s) {
 **思路**：滑动窗口
 
 ```java
-public static int lengthOfLongestSubstring(String s) {
-  if (s.length()==0) {
-    return 0;
-  }
-  // 哈希集合，记录每个字符是否出现过
-  HashMap<Character, Integer> map = new HashMap<Character, Integer>();
-  int max = 0;
-  int left = 0;
-  for(int i = 0; i < s.length(); i ++){
-    if(map.containsKey(s.charAt(i))){
-      left = Math.max(left,map.get(s.charAt(i)) + 1);
+    public static int lengthOfLongestSubstring(String s) {
+        // 哈希集合，记录每个字符是否出现过,其中 key 值为字符，value 值为字符位置;
+        HashMap<Character, Integer> map = new HashMap<>();
+        int result = 0;
+        int left = 0;
+        //为了有左右指针的思想，我把我们常用的 i 写成了 right
+        for (int right = 0; right < s.length(); right++) {
+            //当前字符包含在当前有效的子段中，如：abca，当我们遍历到第二个a，当前有效最长子段是 abc，我们又遍历到a，
+            //那么此时更新 left 为 map.get(a)+1=1，当前有效子段更新为 bca；
+            //相当于左指针往前移动了一位
+            char alpha = s.charAt(right);
+            if (map.containsKey(alpha)) {
+                //返回上一个重复字符的下一个位置，这里要让left保持最大值，如果是 left = map.get(alpha) + 1; 的话，abba 就会有问题
+                left = Math.max(left, map.get(alpha) + 1);
+            }
+            //右指针一直往前移动
+            map.put(alpha, right);
+            result = Math.max(result, right - left + 1);
+        }
+        return result;
     }
-    map.put(s.charAt(i),i);
-    max = Math.max(max,i-left+1);
-  }
-  return max;
-}
 ```
 
 > 滑动窗口题目：

@@ -61,13 +61,13 @@
 
   - 啥叫**自顶向下**，比如我们求解递归问题，画递归树的时候，是从上向下延伸，都是从一个规模较大的原问题比如说 f(20)，向下逐渐分解规模，直到 f(1) 和 f(2) 触底，然后逐层返回答案，这就叫「自顶向下」，比如我们用递归法计算斐波那契数列的时候
 
-    ![](/Users/starfish/oceanus/picBed/leetcode/up2down.png)
+    ![](https://img.starfish.ink/leetcode/up2down.png)
 
     
 
   - 反过来，自底向上，肯定就是从最底下，最简单，问题规模最小的 f(1) 和 f(2) 开始往上推，直到推到我们想要的答案 f(20)，这就是动态规划的思路，这也是为什么动态规划一般都脱离了递归，而是由循环迭代完成计算。
 
-    ![](/Users/starfish/oceanus/picBed/leetcode/down2up.png)
+    ![](https://img.starfish.ink/leetcode/down2up.png)
 
 
 
@@ -719,7 +719,7 @@ public static int dp(int[] prices) {
 
 #### 分析题目
 
-回文的意思是正着念和倒着念一样，如：大波美人美波大
+回文的意思是正着念和倒着念一样，如：大波美人鱼人美波大
 
 建立二维数组 `dp` ，找出所有的回文子串。
 

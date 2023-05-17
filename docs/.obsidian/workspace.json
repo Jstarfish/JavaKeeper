@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/soultion/String-Solution.md",
+                "file": "data-structure-algorithms/Dynamic-Programming.md",
                 "mode": "preview",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/soultion/String-Solution.md",
+                "file": "data-structure-algorithms/Dynamic-Programming.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/soultion/String-Solution.md",
+                "file": "data-structure-algorithms/Dynamic-Programming.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/soultion/String-Solution.md"
+                "file": "data-structure-algorithms/Dynamic-Programming.md"
               }
             }
           }
@@ -161,10 +161,10 @@
   },
   "active": "264bec0c6c3126ab",
   "lastOpenFiles": [
+    "data-structure-algorithms/soultion/String-Solution.md",
     "data-structure-algorithms/soultion/LinkedList-Soultion.md",
     "data-structure-algorithms/soultion/stock-problems.md",
     "data-structure-algorithms/soultion/Math-Solution.md",
-    "data-structure-algorithms/soultion/String-Solution.md",
     "data-structure-algorithms/soultion/Array-Solution.md",
     "data-structure-algorithms/soultion/DP-Solution.md",
     "data-structure-algorithms/Linked-List.md",
