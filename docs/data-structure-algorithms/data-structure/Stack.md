@@ -1,4 +1,16 @@
-# 栈
+---
+title: Stack
+date: 2023-05-09
+tags: 
+ - Stack
+categories: data-structure
+---
+
+![](https://img.starfish.ink/spring/stack-banner.png)
+
+> 栈（stack）又名堆栈，它是**一种运算受限的线性表**。 限定仅在表尾进行插入和删除操作的线性表。 
+
+
 
 ## 一、概述
 
@@ -17,9 +29,7 @@
 - 栈中数据是按照"后进先出（LIFO, Last In First Out）"方式进出栈的。
 - 向栈中添加/删除数据时，只能从栈顶进行操作。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4mmnezg5j31cg0d6ab9.jpg)
-
-在上图中，当 ABCD 均已入栈后，出栈时得到的序列为 DCBA，这就是后进先出。
+![](https://static.javatpoint.com/ds/images/applications-of-stack-in-data-structure.png)
 
 
 

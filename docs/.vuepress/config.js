@@ -150,9 +150,16 @@ function genDSASidebar() {
   return [
     {
       title: "数据结构",
-      collapsable: false,
-      sidebarDepth: 2,    // 可选的, 默认值是 1
-      children: ["Array","Linked-List","Stack","Queue","Binary-Tree","Skip-List"]
+      collapsable: true,
+      //sidebarDepth: 2,    // 可选的, 默认值是 1
+      children: [
+        ['data-structure/Array','数组'],
+        ['data-structure/Linked-List','链表'],
+        ['data-structure/Stack','栈'],
+        ['data-structure/Queue','队列'],
+        ['data-structure/Binary-Tree','二叉树'],
+        ['data-structure/Skip-List','跳表']
+      ]
     },
     {
       title: "算法",

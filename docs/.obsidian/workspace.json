@@ -25,8 +25,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/Dynamic-Programming.md",
-                "mode": "preview",
+                "file": "data-structure-algorithms/Double-Pointer.md",
+                "mode": "source",
                 "source": false
               }
             }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/Dynamic-Programming.md",
+                "file": "data-structure-algorithms/Double-Pointer.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/Dynamic-Programming.md",
+                "file": "data-structure-algorithms/Double-Pointer.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/Dynamic-Programming.md"
+                "file": "data-structure-algorithms/Double-Pointer.md"
               }
             }
           }
@@ -161,16 +161,26 @@
   },
   "active": "264bec0c6c3126ab",
   "lastOpenFiles": [
+    "data-structure-algorithms/algorithm/Backtracking.md",
+    "data-structure-algorithms/algorithm/未命名.md",
+    "data-structure-algorithms/Leetcode-dynamic-programming.md",
+    "data-structure-algorithms/complexity.md",
+    "data-structure-algorithms/README.md",
+    "data-structure-algorithms/Linked-List.md",
+    "data-structure-algorithms/Array.md",
+    "data-structure-algorithms/algorithm",
+    "data-structure-algorithms/未命名文件夹",
+    "data-structure-algorithms/Back-Track.md",
+    "data-structure-algorithms/Double-Pointer.md",
+    "data-structure-algorithms/Dynamic-Programming.md",
     "data-structure-algorithms/soultion/String-Solution.md",
     "data-structure-algorithms/soultion/LinkedList-Soultion.md",
     "data-structure-algorithms/soultion/stock-problems.md",
     "data-structure-algorithms/soultion/Math-Solution.md",
     "data-structure-algorithms/soultion/Array-Solution.md",
     "data-structure-algorithms/soultion/DP-Solution.md",
-    "data-structure-algorithms/Linked-List.md",
     "interview/Kafka-FAQ.md",
     "work/DPA.md",
-    "data-structure-algorithms/Array.md",
     "data-structure-algorithms/Recursion.md",
     "data-management/Big-Data/Bloom-Filter.md"
   ]

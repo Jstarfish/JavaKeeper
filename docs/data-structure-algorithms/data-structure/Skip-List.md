@@ -1,4 +1,10 @@
-# 跳表
+---
+title: 跳表
+date: 2023-05-09
+tags: 
+ - Skip List
+categories: data-structure
+---
 
 ![](https://img.starfish.ink/data-structure/skiplist-banner.png)
 

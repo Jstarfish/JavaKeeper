@@ -462,8 +462,9 @@ void put(int key, int val) {
 public ListNode removeNthFromEnd_1(ListNode head, int n) {
         ListNode pre = new ListNode(0,head);
         int length = getLength(head);
-        ListNode cur = pre;
-        //遍历到需要删除的位置的前一个，比如1，2，3，4，5 遍历到第 < 4 就可以了
+        
+  cur = pre;
+        //遍历到需要删除的位置的前一个，比如1，2，3，4，5 遍历到第 < 4 就可以了,且 i 从 1 开始
         for (int i=1;i<length-n+1;i++){
             cur = cur.next;
         }
@@ -484,6 +485,8 @@ public ListNode removeNthFromEnd_1(ListNode head, int n) {
 ```
 
 - 双指针法，整体思路是让前面的指针先移动`n`步，之后前后指针共同移动直到前面的指针到尾部为止
+
+  ![](https://assets.leetcode-cn.com/solution-static/19/p3.png)
 
 ```java
 public ListNode removeNthFromEnd(ListNode head, int n) {

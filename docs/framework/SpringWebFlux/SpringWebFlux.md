@@ -103,7 +103,7 @@ Java 平台直到 JDK 9 才提供了对于Reactive的完整支持，JDK9也定�
 
 ## 三、Hello WebFlux
 
-WebFlux 是 Spring Framework5.0 中引入的一种新的反应式Web框架。通过Reactor项目实现Reactive Streams规范，完全异步和非阻塞框架。本身不会加快程序执行速度，但在高并发情况下借助异步IO能够以少量而稳定的线程处理更高的吞吐，规避文件IO/网络IO阻塞带来的线程堆积。
+WebFlux 是 Spring Framework5.0 中引入的一种新的反应式Web框架。通过Reactor项目实现 Reactive Streams规范，完全异步和非阻塞框架。本身不会加快程序执行速度，但在高并发情况下借助异步IO能够以少量而稳定的线程处理更高的吞吐，规避文件IO/网络IO阻塞带来的线程堆积。
 
 ####  WebFlux 的特性
 
@@ -143,7 +143,7 @@ Reactor是一个响应式流，它也有对应的发布者(Publisher )，Reactor
 
 
 2. 响应式Http客户端 
-    
+   
     此外，Spring WebFlux也提供了一个响应式的Http客户端API WebClient。它可以用函数式的方式异步非阻塞地发起Http请求并处理响应。其底层也是由Netty提供的异步支持。
     我们可以把WebClient看做是响应式的RestTemplate，与后者相比，前者：
     
