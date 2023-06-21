@@ -272,7 +272,31 @@ public class Stack<E> extends Vector<E> {}
 >输出: false
 >```
 
+**思路**
 
+- 栈先入后出特点恰好与本题括号排序特点一致，即若遇到左括号入栈，遇到右括号时将对应栈顶左括号出栈，则遍历完所有括号后 `stack` 仍然为空
+
+```java
+  public boolean isValid(String s) {
+      if(s.isEmpty()) {
+          return true;
+      }
+      Stack<Character> stack=new Stack<Character>();
+      //字符串转为字符串数组 遍历
+      for(char c:s.toCharArray()){
+          if(c=='(') {
+              stack.push(')');
+          } else if(c=='{') {
+              stack.push('}');
+          } else if(c=='[') {
+              stack.push(']');
+          } else if(stack.empty()||c!=stack.pop()) {
+              return false;
+          }
+      }
+      return stack.empty();
+  }
+```
 
 
 

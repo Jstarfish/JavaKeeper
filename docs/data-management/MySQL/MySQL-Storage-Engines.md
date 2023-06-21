@@ -1,10 +1,16 @@
-# Mysql Storage Engines
+---
+title: Mysql Storage Engines
+date: 2023-05-31
+tags: 
+ - MySQL
+categories: MySQL
+---
 
 存储引擎是 MySQL 的组件，用于处理不同表类型的 SQL 操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
 
 使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
 
- MySQL服务器使用可插拔的存储引擎体系结构，可以从运行中的MySQL服务器加载或卸载存储引擎 。
+ MySQL 服务器使用可插拔的存储引擎体系结构，可以从运行中的MySQL服务器加载或卸载存储引擎 。
 
 > [MySQL 5.7 可供选择的存储引擎](https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html)
 
@@ -25,7 +31,19 @@ show table status like 'tablename'
 show table status from database where name="tablename"
 ```
 
-![mysql-engines](https://img.starfish.ink/mysql/mysql-engines.png)
+![](https://img.starfish.ink/mysql/mysql-engines.png)
+
+> | 存储引擎    | 描述                                 |
+> | ----------- | ------------------------------------ |
+> | `ARCHIVE`   | 用于数据存档（行被插入后不能再修改） |
+> | `BLACKHOLE` | 丢弃写操作，读操作会返回空内容       |
+> | `CSV`       | 在存储数据时，以逗号分隔各个数据项   |
+> | `FEDERATED` | 用来访问远程表                       |
+> | `InnoDB`    | 具备外键支持功能的事务存储引擎       |
+> | `MEMORY`    | 置于内存的表                         |
+> | `MERGE`     | 用来管理多个MyISAM表构成的表集合     |
+> | `MyISAM`    | 主要的非事务处理存储引擎             |
+> | `NDB`       | MySQL集群专用存储引擎                |
 
 
 
@@ -158,33 +176,19 @@ SET default_storage_engine=NDBCLUSTER;
 
 在 InnoDB 存储引擎中，所有的数据都被逻辑地存放在表空间中，表空间（tablespace）是存储引擎中最高的存储逻辑单位，在表空间的下面又包括段（segment）、区（extent）、页（page）
 
- ![tablespace-segment-extent-page-row](../../_images/mysql/tablespace-segment-extent-page-row.jpg) 
+ ![](https://img.starfish.ink/mysql/table-space.jpg) 
 
  同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为 16KB，当然也可以通过改变 `innodb_page_size` 选项对默认大小进行修改，需要注意的是不同的页大小最终也会导致区大小的不同 
-
-![img](https://oss-emcsprod-public.modb.pro/wechatSpider/modb_20210809_11aefc96-f8bc-11eb-b9b6-00163e068ecd.png)
-
-从图中可以看出，在 InnoDB 存储引擎中，一个区的大小最小为 1MB，页的数量最少为 64 个。
 
 
 
 #### 如何存储表
 
-MySQL 使用 InnoDB 存储表时，会将表的定义和数据索引等信息分开存储，其中前者存储在 `.frm` 文件中，后者存储在 `.ibd` 文件中，这一节就会对这两种不同的文件分别进行介绍。
-
-![frm-and-ibd-file](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/frm-and-ibd-file.jpg)
+MySQL 使用 InnoDB 存储表时，会将表的定义和数据索引等信息分开存储，其中前者存储在 `.frm` 文件中，后者存储在 `.ibd` 文件中。
 
 #### .frm 文件
 
 无论在 MySQL 中选择了哪个存储引擎，所有的 MySQL 表都会在硬盘上创建一个 `.frm` 文件用来描述表的格式或者说定义；`.frm` 文件的格式在不同的平台上都是相同的。
-
-```mysql
-`CREATE TABLE test_frm(``  ``column1 CHAR(5),``  ``column2 INTEGER``);`
-```
-
-当我们使用上面的代码创建表时，会在磁盘上的 `datadir` 文件夹中生成一个 `test_frm.frm` 的文件，这个文件中就包含了表结构相关的信息：
-
-![frm-file-hex](../../_images/mysql/frm-file-hex.png)
 
 > MySQL 官方文档中的 [11.1 MySQL .frm File Format](https://dev.mysql.com/doc/internals/en/frm-file-format.html) 一文对于 `.frm` 文件格式中的二进制的内容有着非常详细的表述。
 
@@ -194,53 +198,72 @@ InnoDB 中用于存储数据的文件总共有两个部分，一是系统表空�
 
 当打开 `innodb_file_per_table` 选项时，`.ibd` 文件就是每一个表独有的表空间，文件存储了当前表的数据和相关的索引数据。
 
-#### 如何存储记录
+#### 如何存储记录 | InnoDB  行格式
 
-与现有的大多数存储引擎一样，InnoDB 使用页作为磁盘管理的最小单位；数据在 InnoDB 存储引擎中都是按行存储的，每个 16KB 大小的页中可以存放 2-7992 行的记录。（至少是2条记录，最多是7992条记录）
+InnoDB 存储引擎和大多数数据库一样，记录是以行的形式存储的，每个 16KB 大小的页中可以存放 2-200 条行记录。
 
-当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：
+它可以使用不同的行格式进行存储。
 
-![Antelope-Barracuda-Row-Format](../../_images/mysql/Antelope-Barracuda-Row-Format.jpg)
+InnoDB 早期的文件格式为 `Antelope`，可以定义两种行记录格式，分别是 `Compact` 和 `Redundant`，InnoDB 1.0.x 版本开始引入了新的文件格式 `Barracuda`。`Barracuda `文件格式下拥有两种新的行记录格式：`Compressed` 和 `Dynamic`。
 
-Antelope 是 InnoDB 最开始支持的文件格式，它包含两种行格式 Compact 和 Redundant，它最开始并没有名字；Antelope 的名字是在新的文件格式 Barracuda 出现后才起的，Barracuda 的出现引入了两种新的行格式 Compressed 和 Dynamic；InnoDB 对于文件格式都会向前兼容，而官方文档中也对之后会出现的新文件格式预先定义好了名字：Cheetah、Dragon、Elk 等等。
+> [InnoDB Row Formats](https://dev.mysql.com/doc/refman/5.7/en/innodb-row-format.html#innodb-row-format-redundant)
 
-两种行记录格式 Compact 和 Redundant 在磁盘上按照以下方式存储：
+![](https://img.starfish.ink/mysql/innodb-row-format.png)
 
-![COMPACT-And-REDUNDANT-Row-Format](../../_images/mysql/COMPACT-And-REDUNDANT-Row-Format.jpg)
+> ???? 与现有的大多数存储引擎一样，InnoDB 使用页作为磁盘管理的最小单位；数据在 InnoDB 存储引擎中都是按行存储的，每个 16KB 大小的页中可以存放 2-7992 行的记录。（至少是2条记录，最多是7992条记录）
 
-Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上看，Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
+MySQL 5.7 版本支持以下格式的行存储方式：
+
+```mysql
+CREATE TABLE 表名 (列的信息) ROW_FORMAT=行格式名称
+    
+ALTER TABLE 表名 ROW_FORMAT=行格式名称
+```
+
+`Compact`行记录格式是在 MySQL 5.0 中引入的，其首部是一个非 NULL 变长列长度列表，并且是逆序放置的，其长度为：
+
+- 若列的长度小于等于 255 字节，用 1 个字节表示；
+- 若列的长度大于 255 字节，用 2 个字节表示。
+
+变长字段的长度最大不可以超过 2 字节，这是因为 MySQL 数据库中 VARCHAR 类型的最大长度限制为 65535。变长字段之后的第二个部分是 NULL 标志位，该标志位指示了该行数据中某列是否为 NULL 值，有则用 1 表示，NULL 标志位也是不定长的。接下来是记录头部信息，固定占用 5 字节。
+
+`Redundant`是 MySQL 5.0 版本之前 InnoDB 的行记录格式，`Redundant`行记录格式的首部是每一列长度偏移列表，同样是逆序存放的。从整体上看，`Compact`格式的存储空间减少了约 20%，但代价是某些操作会增加 CPU 的使用。
+
+`Dynamic`和`Compressed`是`Compact`行记录格式的变种，`Compressed`会对存储在其中的行数据会以`zlib`的算法进行压缩，因此对于 BLOB、TEXT、VARCHAR 这类大长度类型的数据能够进行非常有效的存储。
+
+
 
 #### 行溢出数据
 
-当 InnoDB 使用 Compact 或者 Redundant 格式存储极长的 VARCHAR 或者 BLOB 这类大对象时，我们并不会直接将所有的内容都存放在数据页节点中，而是将行数据中的前 768 个字节存储在数据页中，后面会通过偏移量指向溢出页。
+当 InnoDB 存储极长的 TEXT 或者 BLOB 这类大对象时，MySQL 并不会直接将所有的内容都存放在数据页中。因为 InnoDB 存储引擎使用 B+Tree 组织索引，每个页中至少应该有两条行记录，因此，如果页中只能存放下一条记录，那么InnoDB存储引擎会自动将行数据存放到溢出页中。
 
-![Row-Overflo](../../_images/mysql/Row-Overflow.jpg)
+如果我们使用`Compact`或`Redundant`格式，那么会将行数据中的前 768 个字节存储在数据页中，后面的数据会通过指针指向 Uncompressed BLOB Page。
 
-但是当我们使用新的行记录格式 Compressed 或者 Dynamic 时都只会在行记录中保存 20 个字节的指针，实际的数据都会存放在溢出页面中。
+但是如果我们使用新的行记录格式`Compressed` 或者`Dynamic`时只会在行记录中保存 20 个字节的指针，实际的数据都会存放在溢出页面中。
 
-![Row-Overflow-in-Barracuda](../../_images/mysql/Row-Overflow-in-Barracuda.jpg)
 
-当然在实际存储中，可能会对不同长度的 TEXT 和 BLOB 列进行优化，不过这就不是本文关注的重点了。
-
-> 想要了解更多与 InnoDB 存储引擎中记录的数据格式的相关信息，可以阅读 [InnoDB Record Structure](https://dev.mysql.com/doc/internals/en/innodb-record-structure.html)
 
 #### 数据页结构
 
-页是 InnoDB 存储引擎管理数据的最小磁盘单位，而 B-Tree 节点就是实际存放表中数据的页面，我们在这里将要介绍页是如何组织和存储记录的；首先，一个 InnoDB 页有以下七个部分：
+页是 InnoDB 存储引擎管理数据的最小磁盘单位，一个页的大小一般是`16KB`。
 
-![InnoDB-B-Tree-Node](../../_images/mysql/InnoDB-B-Tree-Node.jpg)
+`InnoDB`为了不同的目的而设计了许多种不同类型的`页`，比如存放表空间头部信息的页，存放`Insert Buffer`信息的页，存放`INODE`信息的页，存放`undo`日志信息的页等等等等。
 
-每一个页中包含了两对 header/trailer：内部的 Page Header/Page Directory 关心的是页的状态信息，而 Fil Header/Fil Trailer 关心的是记录页的头信息。
+ B-Tree 节点就是实际存放表中数据的页面，我们在这里将要介绍页是如何组织和存储记录的；首先，一个 InnoDB 页有以下七个部分：
 
-在页的头部和尾部之间就是用户记录和空闲空间了，每一个数据页中都包含 Infimum 和 Supremum 这两个虚拟的记录（可以理解为占位符），Infimum 记录是比该页中任何主键值都要小的值，Supremum 是该页中的最大值：
+![](https://img.starfish.ink/mysql/innodb-b-tree-node.jpg)
 
-![Infimum-Rows-Supremum](../../_images/mysql/Infimum-Rows-Supremum.jpg)
+有的部分占用的字节数是确定的，有的部分占用的字节数是不确定的。
 
-User Records 就是整个页面中真正用于存放行记录的部分，而 Free Space 就是空余空间了，它是一个链表的数据结构，为了保证插入和删除的效率，整个页面并不会按照主键顺序对所有记录进行排序，它会自动从左侧向右寻找空白节点进行插入，行记录在物理存储上并不是按照顺序的，它们之间的顺序是由 `next_record` 这一指针控制的。
-
-B+ 树在查找对应的记录时，并不会直接从树中找出对应的行记录，它只能获取记录所在的页，将整个页加载到内存中，再通过 Page Directory 中存储的稀疏索引和 `n_owned`、`next_record` 属性取出对应的记录，不过因为这一操作是在内存中进行的，所以通常会忽略这部分查找的耗时。
-
-InnoDB 存储引擎中对数据的存储是一个非常复杂的话题，这一节中也只是对表、行记录以及页面的存储进行一定的分析和介绍，虽然作者相信这部分知识对于大部分开发者已经足够了，但是想要真正消化这部分内容还需要很多的努力和实践。
+| 名称                 | 中文名             | 占用空间大小 | 简单描述                 |
+| -------------------- | ------------------ | ------------ | ------------------------ |
+| `File Header`        | 文件头部           | `38`字节     | 页的一些通用信息         |
+| `Page Header`        | 页面头部           | `56`字节     | 数据页专有的一些信息     |
+| `Infimum + Supremum` | 最小记录和最大记录 | `26`字节     | 两个虚拟的行记录         |
+| `User Records`       | 用户记录           | 不确定       | 实际存储的行记录内容     |
+| `Free Space`         | 空闲空间           | 不确定       | 页中尚未使用的空间       |
+| `Page Directory`     | 页面目录           | 不确定       | 页中的某些记录的相对位置 |
+| `File Trailer`       | 文件尾部           | `8`字节      | 校验页是否完整           |
 
 
 

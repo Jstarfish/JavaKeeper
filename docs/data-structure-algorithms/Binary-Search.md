@@ -4,7 +4,6 @@ date: 2023-02-09
 tags: 
  - binary-search
 categories: algorithms
-
 ---
 
 ![](https://img.starfish.ink/algorithm/binary-search-banner.png)
@@ -280,10 +279,12 @@ public static int findMax(int[] nums) {
 
 **思路**：
 
+对于有序数组（部分有序也可以），可以使用二分查找的方法查找元素。
+
 旋转数组后，依然是局部有序，从数组中间分成左右两部分后，一定有一部分是有序的
 
-- 如果 [l, mid - 1] 是有序数组，且 target 的大小满足 [{nums}[l],{nums}[mid]))，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
-- 如果 [mid, r] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
+- 如果 [L, mid - 1] 是有序数组，且 target 的大小满足 [nums[L],nums[mid]，则我们应该将搜索范围缩小至 [L, mid - 1]，否则在 [mid + 1, R] 中寻找。
+- 如果 [mid, R] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[R]]，则我们应该将搜索范围缩小至 [mid + 1, R]，否则在 [l, mid - 1] 中寻找。
 
 ```java
 public static int search(int[] nums,int target) {
@@ -312,6 +313,7 @@ public static int search(int[] nums,int target) {
         left = mid + 1;
       }
     } else {  //右侧有序
+      //注意这里是 n ,不是 right
       if (nums[mid] < target && target <= nums[n - 1]) {
         left = mid + 1;
       } else {
