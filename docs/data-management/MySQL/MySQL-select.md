@@ -8,6 +8,8 @@ categories: MySQL
 
 ![](https://img.starfish.ink/mysql/banner-mysql-select.png)
 
+> `SQL`的全称是`Structured Query Language`，翻译后就是`结构化查询语言`。
+
 ## Order By
 
 在开发应用的时候，一定会经常碰到需要根据指定的字段排序来显示结果的需求。

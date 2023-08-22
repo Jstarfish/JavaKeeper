@@ -59,7 +59,7 @@ SET GLOBAL general_log = 'ON'
 
 ## 二、重做日志(redo log)
 
-解这块知识，我们先要知道这么几个前置知识点，先看下官网的 InnoDB 架构图，有个大概印象
+了解这块知识，我们先要知道这么几个前置知识点，先看下官网的 InnoDB 架构图，有个大概印象
 
 ![](https://img.starfish.ink/mysql/innodb-architecture.png)
 
@@ -112,13 +112,13 @@ SET GLOBAL general_log = 'ON'
 
 而粉板和账本配合的整个过程，其实就类似 MySQL 里经常说到的 **WAL 技术**（Write-Ahead Loging），它的关键点就是**先写日志，再写磁盘**，也就是先写粉板，等不忙的时候再写账本。这又解决了我们的持久性问题。
 
-具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
+具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 `redo log`（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
 > DBA 口中的日志先行说的就是这个 WAL 技术。
 >
 > 记录下对磁盘中某某页某某位置数据的修改结果的 redo log，这种日志被称为**物理日志**，可以节省很多磁盘空间。
 >
-> 最开始看到的通用查询日志，记录了所有数据库的操作，我们叫**逻辑日志**，还有下边会说的 binlog、undo log 也都属于逻辑日志
+> 最开始看到的通用查询日志，记录了所有数据库的操作，我们叫**逻辑日志**，还有下边会说的 binlog、undo log 也都属于逻辑日志。
 
 
 
@@ -146,13 +146,13 @@ MySQL redo日志是一组日志文件，在 MySQL 8.0.30  版本中，MySQL 会�
 
 > 例如一个 INSERT 语句：
 >
-> - 如果表没有主键，会去更新内存中的`Max Row ID`属性，并在其值为`256`的倍数时，将其刷新到`系统表空间`的页号为`7`的`Max Row ID`属性处。
+> - 如果表没有主键，会去更新内存中的 `Max Row ID` 属性，并在其值为 `256` 的倍数时，将其刷新到`系统表空间`的页号为 `7` 的`Max Row ID `属性处。
 > - 接着向聚簇索引插入数据，这个过程要根据索引找到要插入的缓存页位置，向数据页插入记录。这个过程还可能会涉及数据页和索引页的分裂，那就会增加或修改一些缓存页，移动页中的记录。
 > - 如果有二级索引，还会向二级索引中插入记录。
 >
 > 最后还可能要改动一些系统页面，比如要修改各种段、区的统计信息，各种链表的统计信息等等。
 
-所以 InnoDB 将执行语句的过程中产生的`redo log`划分成了若干个不可分割的组，一组`redo log`就是对底层页面的一次原子访问，这个原子访问也称为 `Mini-Transaction`，简称 **mtr**。一个 `mtr` 就包含一组 `redo log`，在崩溃恢复时这一组 `redo log` 就是一个不可分割的整体。
+所以 InnoDB 将执行语句的过程中产生的`redo log`划分成了若干个不可分割的组，一组 `redo log` 就是对底层页面的一次原子访问，这个原子访问也称为 `Mini-Transaction`，简称 **mtr**。一个 `mtr` 就包含一组 `redo log`，在崩溃恢复时这一组 `redo log` 就是一个不可分割的整体。
 
 #### 「redo log block」
 
@@ -196,7 +196,7 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 >
 > 日志写到 redo log buffer 是很快的，wirte 到 page cache 也差不多，但是持久化到磁盘的速度就慢多了。
 >
-> 为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：
+> 为了控制 redo log 的写入策略，InnoDB 提供了 `innodb_flush_log_at_trx_commit` 参数，它有三种可能取值：
 >
 > 1. 设置为 0 的时候，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中 ;
 > 2. 设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；
@@ -206,13 +206,13 @@ S_FILE_LOG_BLOCK_SIZE 等于磁盘扇区的大小 512B，每次 IO 读写的最�
 >
 > 注意，事务执行中间过程的 redo log 也是直接写在 redo log buffer 中的，这些 redo log 也会被后台线程一起持久化到磁盘。也就是说，一个没有提交的事务的 redo log，也是可能已经持久化到磁盘的。
 
-写完 redo log buffer 后，我们就要顺序追加日志了，可是每次往哪里写，肯定需要个标识的，类似 offset。
+写完 redo log buffer 后，我们就要顺序追加日志了，可是每次往哪里写，肯定需要个标识的，类似 offset，小结一下接着聊。
 
 
 
 #### 「redo 结构小结」
 
-我们那把这几个 redo 内容串起来，其实就是 redo log 有 32 个文件，每个文件以 Block 为单位划分，多个文件首尾相连顺序写入 REDO 内容，Redo 又按不同类型有不同内容。
+我们把这几个 redo 内容串起来，其实就是 redo log 有 32 个文件，每个文件以 Block 为单位划分，多个文件首尾相连顺序写入 REDO 内容，Redo 又按不同类型有不同内容。
 
 一个 `mtr` 中的 redo log 实际上是先写到 redo log buffer，然后再”找机会“ 将一个个 mtr 的日志记录复制到`block`中，最后在一些时机将`block`刷新到磁盘日志文件中。
 
@@ -234,7 +234,7 @@ redo 文件结构大致是下图这样：
 - 每秒刷新一次
 - redo log buffer 剩余空间小于 1/2 时（内存不够用了，要先将脏页写到磁盘）
 
-每次事务提交时都将缓存在 redo log buffer 里的 redo log 直接持久化到磁盘，这个策略可由 innodb_flush_log_at_trx_commit 参数控制，有 3 种策略可选择
+每次事务提交时都将缓存在 redo log buffer 里的 redo log 直接持久化到磁盘，这个策略可由 `innodb_flush_log_at_trx_commit` 参数控制，有 3 种策略可选择
 
 #### 刷盘策略
 
@@ -244,7 +244,7 @@ redo 文件结构大致是下图这样：
 
 - 当设置为 2 时，则在事务提交时只做 write 操作，只保证写到系统的 page cache，因此实例 crash 不会丢失事务，但宕机则可能丢失事务；
 
-- 当设置为 0 时，事务提交不会触发 redo 写操作，而是留给后台线程每秒一次的刷盘操作，因此实例crash将最多丢失1秒钟内的事务
+- 当设置为 0 时，事务提交不会触发 redo 写操作，而是留给后台线程每秒一次的刷盘操作，因此实例 crash 最多丢失 1 秒钟内的事务
 
   ![](https://img.starfish.ink/mysql/redolog-flush.png)
   
@@ -256,7 +256,6 @@ redo 文件结构大致是下图这样：
   >
   > 为了保证 redo log 和 binlog 的数据一致性，MySQL 使用了二阶段提交，由 binlog 作为事务的协调者。而引入二阶段提交使得binlog 又成为了性能瓶颈，先前的 Redo log 组提交也成了摆设。为了再次缓解这一问题，MySQL 增加了 binlog 的组提交，目的同样是将 binlog 的多个刷盘操作合并成一个，结合 redo log 本身已经实现的组提交，分为三个阶段(Flush 阶段、Sync 阶段、Commit 阶段)完成 binlog 组提交，最大化每次刷盘的收益，弱化磁盘瓶颈，提高性能。
   >
-  > 
 
 #### 「LSN」
 
@@ -282,13 +281,13 @@ redo log 采用逻辑环形结构来复用空间（循环写入），这种环�
 
 
 
-如果 lsn 追上了 checkpoint，就意味着 **redo log 文件满了，这时 MySQL 不能再执行新的更新操作，也就是说 MySQL 会被阻塞**（*因此所以针对并发量大的系统，适当设置 redo log 的文件大小非常重要*），此时**会停下来将 Buffer Pool 中的脏页刷新到磁盘中，然后标记 redo log 哪些记录可以被擦除，接着对旧的 redo log 记录进行擦除，等擦除完旧记录腾出了空间，checkpoint 就会往后移动（图中顺时针）**，然后 MySQL 恢复正常运行，继续执行新的更新操作。
+如果 lsn 追上了 checkpoint，就意味着 **redo log 文件满了，这时 MySQL 不能再执行新的更新操作，也就是说 MySQL 会被阻塞**（*所以针对并发量大的系统，适当设置 redo log 的文件大小非常重要*），此时**会停下来将 Buffer Pool 中的脏页刷新到磁盘中，然后标记 redo log 哪些记录可以被擦除，接着对旧的 redo log 记录进行擦除，等擦除完旧记录腾出了空间，checkpoint 就会往后移动（图中顺时针）**，然后 MySQL 恢复正常运行，继续执行新的更新操作。
 
 
 
 #### Checkpoint
 
-CheckPoint 的意思是检查点，用于推进 Redo Log 的失效。当触发 Checkpoint 后，会去看 Flush List 中最早的那个节点 old_lsn 是多少，也就是说当前 Flush List 还剩的最早被修改的数据页的 redo log lsn 是多少，并且将这个lsn 记录到 Checkpoint 中，因为在这之前被修改的数据页都已经刷新到磁盘了，对应的 redo log 也就无效了，所以说之后在这个 old_lsn 之后的 redo log 才是有用的。这就解释了之前说的 redo log 文件组如何覆盖无效日志。
+CheckPoint 的意思是检查点，用于推进 Redo Log 的失效。当触发 Checkpoint 后，会去看 Flush List 中最早的那个节点 old_lsn 是多少，也就是说当前 Flush List 还剩的最早被修改的数据页的 redo log lsn 是多少，并且将这个 lsn 记录到 Checkpoint 中，因为在这之前被修改的数据页都已经刷新到磁盘了，对应的 redo log 也就无效了，所以说之后在这个 old_lsn 之后的 redo log 才是有用的。这就解释了之前说的 redo log 文件组如何覆盖无效日志。
 
 
 
@@ -320,7 +319,7 @@ CheckPoint 的意思是检查点，用于推进 Redo Log 的失效。当触发 C
 
 所以有了 redo log，再通过 WAL 技术，InnoDB 就可以保证即使数据库发生异常重启，之前已提交的记录都不会丢失，这个能力称为 **crash-safe**（崩溃恢复）。可以看出来， **redo log 保证了事务四大特性中的持久性**。
 
-redo log 作用
+redo log 作用：
 
 - **实现事务的持久性，让 MySQL 有 crash-safe 的能力**，能够保证 MySQL 在任何时间段突然崩溃，重启后之前已提交的记录都不会丢失；
 - **将写操作从「随机写」变成了「顺序写」**，提升 MySQL 写入磁盘的性能。
@@ -335,13 +334,13 @@ redo log 作用
 
 > undo Log 是 InnoDB 十分重要的组成部分，它的作用横贯 InnoDB 中两个最主要的部分，并发控制（Concurrency Control）和故障恢复（Crash Recovery）。
 >
-> - Undo Log用来记录每次修改之前的历史值，配合 Redo Log 用于故障恢复
+> - Undo Log 用来记录每次修改之前的历史值，配合 Redo Log 用于故障恢复
 
 #### 3.1 为什么需要 undo log
 
 ##### 事务回滚
 
-由于如硬件故障，软件Bug，运维操作等原因的存在，数据库在任何时刻都有突然崩溃的可能。
+由于如硬件故障，软件 Bug，运维操作等原因的存在，数据库在任何时刻都有突然崩溃的可能。
 
 这个时候没有完成提交的事务可能已经有部分数据写入了磁盘，如果不加处理，会违反数据库对**原子性**的保证。
 
@@ -349,13 +348,13 @@ redo log 作用
 
 ##### MVCC（Multi-Versioin Concurrency Control）
 
-用于 MVCC（实现非锁定读），读取一行记录时，若已被其他事务占据，则通过 undo 读取之前的版本
+用于 MVCC（实现非锁定读），读取一行记录时，若已被其他事务占据，则通过 undo 读取之前的版本。
 
 为了避免只读事务与写事务之间的冲突，避免写操作等待读操作，几乎所有的主流数据库都采用了多版本并发控制（MVCC）的方式，也就是为每条记录保存多份历史数据供读事务访问，新的写入只需要添加新的版本即可，无需等待。
 
 InnoDB 在这里复用了 Undo Log 中已经记录的历史版本数据来满足 MVCC 的需求。
 
-InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是说，Undo Log日志本身也像其他的数据库数据一样，会写自己对应的Redo Log，通过 Redo Log 来保证自己的原子性。因此，更合适的称呼应该是 **Undo Data**。
+InnoDB 中其实是把 Undo 当做一种数据来维护和使用的，也就是说，Undo Log 日志本身也像其他的数据库数据一样，会写自己对应的Redo Log，通过 Redo Log 来保证自己的原子性。因此，更合适的称呼应该是 **Undo Data**。
 
 
 
@@ -522,15 +521,15 @@ InnoDB的做法，是在读事务第一次读取的时候获取一份 ReadView�
 >
 > - DB_ROW_ID：InnoDB引擎中一个表只能有一个主键,用于聚簇索引,如果表没有定义主键会选择第一个非Null 的唯一索引作为主键,如果还没有,生成一个隐藏的DB_ROW_ID作为主键构造聚簇索引。
 > - DB_TRX_ID：最近更改该行数据的事务ID。
-> - DB_ROLL_PTR：回滚指针，指向这条记录的上一个版本，其实他指向的就是Undo Log中的上一个版本的快照的地址
-> - DELETE BIT：索引删除标志,如果DB删除了一条数据,是优先通知索引将该标志位设置为1,然后通过(purge)清除线程去异步删除真实的数据。
+> - DB_ROLL_PTR：回滚指针，指向这条记录的上一个版本，其实他指向的就是 Undo Log 中的上一个版本的快照的地址
+> - DELETE BIT：索引删除标志，如果DB删除了一条数据,是优先通知索引将该标志位设置为1,然后通过(purge)清除线程去异步删除真实的数据。
 >
 
 如下图所示，事务 R 需要查询表 t 上的 id 为 1 的记录，R 开始时事务 X 已经提交，事务 Y 还在运行，事务 Z 还没开始，这些信息都被记录在了事务 R 的 ReadView 中。事务 R 从索引中找到对应的这条 Record[1, stafish]，对应的 trx_id 是 Z，不可见。沿着 Rollptr 找到Undo 中的前一版本[1, fish]，对应的 trx_id 是 Y，不可见。继续沿着 Rollptr 找到[1, star]，trx_id是 X 可见，返回结果。
 
 ![](https://img.starfish.ink/mysql/undo-log-mvcc.png)
 
-前面提到过，作为 Logical Log，Undo 中记录的其实是前后两个版本的 diff 信息，而读操作最终是要获得完整的 Record 内容的，也就是说这个沿着 rollptr 指针一路查找的过程中需要用 Undo Record 中的 diff 内容依次构造出对应的历史版本，这个过程在函数 **row_search_mvcc **中，其中 **trx_undo_prev_version_build** 会根据当前的 rollptr 找到对应的 Undo Record 位置，这里如果是 rollptr指向的是 insert 类型，或者找到了已经 Purge 了的位置，说明到头了，会直接返回失败。否则，就会解析对应的 Undo Record，恢复出trx_id、指向下一条Undo Record的rollptr、主键信息，diff信息update vector等信息。之后通过**row_upd_rec_in_place**，用update vector修改当前持有的Record拷贝中的信息，获得Record的这个历史版本。之后调用自己ReadView的**changes_visible**判断可见性，如果可见则返回用户。完成这个历史版本的读取。
+前面提到过，作为 Logical Log，Undo 中记录的其实是前后两个版本的 diff 信息，而读操作最终是要获得完整的 Record 内容的，也就是说这个沿着 rollptr 指针一路查找的过程中需要用 Undo Record 中的 diff 内容依次构造出对应的历史版本，这个过程在函数 **row_search_mvcc **中，其中 **trx_undo_prev_version_build** 会根据当前的 rollptr 找到对应的 Undo Record 位置，这里如果是 rollptr指向的是 insert 类型，或者找到了已经 Purge 了的位置，说明到头了，会直接返回失败。否则，就会解析对应的 Undo Record，恢复出trx_id、指向下一条 Undo Record 的 rollptr、主键信息，diff 信息 update vector 等信息。之后通过 **row_upd_rec_in_place**，用update vector 修改当前持有的 Record 拷贝中的信息，获得 Record 的这个历史版本。之后调用自己 ReadView 的 **changes_visible** 判断可见性，如果可见则返回用户。完成这个历史版本的读取。
 
 
 

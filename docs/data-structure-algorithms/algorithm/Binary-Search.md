@@ -8,7 +8,9 @@ categories: algorithms
 
 ![](https://img.starfish.ink/algorithm/binary-search-banner.png)
 
-### 二分查找框架
+> 二分查找并不简单，Knuth 大佬（发明 KMP 算法的那位）都说二分查找：**思路很简单，细节是魔鬼**。很多人喜欢拿整型溢出的 bug 说事儿，但是二分查找真正的坑根本就不是那个细节问题，而是在于到底要给 `mid` 加一还是减一，while 里到底用 `<=` 还是 `<`。
+
+### 二分查找基础框架
 
 ```java
 int binarySearch(int[] nums, int target) {
@@ -30,11 +32,11 @@ int binarySearch(int[] nums, int target) {
 
 **分析二分查找的一个技巧是：不要出现 else，而是把所有情况用 else if 写清楚，这样可以清楚地展现所有细节**。本文都会使用 else if，旨在讲清楚，读者理解后可自行简化。
 
-其中 `...` 标记的部分，就是可能出现细节问题的地方，当你见到一个二分查找的代码时，首先注意这几个地方。后文用实例分析这些地方能有什么样的变化。
+其中 `...` 标记的部分，就是可能出现细节问题的地方，当你见到一个二分查找的代码时，首先注意这几个地方。
 
 **另外提前说明一下，计算 `mid` 时需要防止溢出**，代码中 `left + (right - left) / 2` 就和 `(left + right) / 2` 的结果相同，但是有效防止了 `left` 和 `right` 太大，直接相加导致溢出的情况。
 
-### [二分查找](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
+### [704. 二分查找](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
 
 > 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
 >
@@ -67,106 +69,63 @@ int binarySearch(int[] nums, int target) {
 
 刚才明确了「搜索区间」这个概念，而且本算法的搜索区间是两端都闭的，即 `[left, right]`。那么当我们发现索引 `mid` 不是要找的 `target` 时，下一步应该去搜索哪里呢？
 
+当然是去搜索区间 `[left, mid-1]` 或者区间 `[mid+1, right]` 对不对？**因为 `mid` 已经搜索过，应该从搜索区间中去除**。
 
+
+
+> 比如说给你有序数组 `nums = [1,2,2,2,3]`，`target` 为 2，此算法返回的索引是 2，没错。但是如果我想得到 `target` 的左侧边界，即索引 1，或者我想得到 `target` 的右侧边界，即索引 3，这样的话此算法是无法处理的。
+>
+> 所以又有了下边两种左右边界的二分。
 
 ### 寻找左侧边界的二分搜索
 
 ```java
-public static int getLeftNums(int[] nums,int target) {
-  int left = 0;
-  int right = nums.length;
-  while (left < right) {
-    int mid = left + (right - left) / 2;
-    if (nums[mid] == target) {
-      right = mid;
-    } else if (nums[mid] > target) {
-      right = mid - 1;
-    } else {
-      left = mid + 1;
-    }
-  }
-  return left;
-}
-```
-
-**1、为什么 while 中是 `<` 而不是 `<=`**?
-
-答：用相同的方法分析，因为 `right = nums.length` 而不是 `nums.length - 1`。因此每次循环的「搜索区间」是 `[left, right)` 左闭右开。
-
-`while(left < right)` 终止的条件是 `left == right`，此时搜索区间 `[left, left)` 为空，所以可以正确终止。
-
-
-
-**为什么 `left = mid + 1`，`right = mid` ？和之前的算法不一样**？
-
-答：这个很好解释，因为我们的「搜索区间」是 `[left, right)` 左闭右开，所以当 `nums[mid]` 被检测之后，下一步的搜索区间应该去掉 `mid` 分割成两个区间，即 `[left, mid)` 或 `[mid + 1, right)`。
-
-
-
-**4、为什么该算法能够搜索左侧边界**？
-
-答：关键在于对于 `nums[mid] == target` 这种情况的处理：
-
-```java
-    if (nums[mid] == target)
-        right = mid;
-```
-
-可见，找到 target 时不要立即返回，而是缩小「搜索区间」的上界 `right`，在区间 `[left, mid)` 中继续搜索，即不断向左收缩，达到锁定左侧边界的目的。
-
-
-
-```java
-int left_bound(int[] nums, int target) {
+public int getLeftNums(int[] nums,int target) {
     int left = 0, right = nums.length - 1;
     // 搜索区间为 [left, right]
     while (left <= right) {
         int mid = left + (right - left) / 2;
-        if (nums[mid] < target) {
-            // 搜索区间变为 [mid+1, right]
-            left = mid + 1;
+        if (nums[mid] == target) {
+             // 收缩右侧边界
+             right = mid - 1;
         } else if (nums[mid] > target) {
             // 搜索区间变为 [left, mid-1]
             right = mid - 1;
-        } else if (nums[mid] == target) {
-            // 收缩右侧边界
-            right = mid - 1;
+        } else if (nums[mid] < target) {
+            // 搜索区间变为 [mid+1, right]
+            left = mid + 1;
         }
     }
-    // 检查出界情况
-    if (left >= nums.length || nums[left] != target) {
-        return -1;
-    }
-    return left;
+    // 判断 target 是否存在于 nums 中，防止数组越界
+    // 此时 target 比所有数都大，返回 -1
+    if (left == nums.length) return -1;
+    // 判断一下 nums[left] 是不是 target
+    return nums[left] == target ? left : -1;
 }
 ```
 
-
+> while 终止的条件是 `left == right`，所以返回 left 和 right 是一样的
 
 ### 寻找右侧边界的二分查找
 
 ```java
-int getRightNums(int[] nums, int target) {
+public int getRightNums(int[] nums, int target) {
     int left = 0, right = nums.length - 1;
     while (left <= right) {
         int mid = left + (right - left) / 2;
-        if (nums[mid] < target) {
+        if (nums[mid] == target) {
+            // 别返回，增大「搜索区间」的左边界，收缩左侧边界，
             left = mid + 1;
         } else if (nums[mid] > target) {
             right = mid - 1;
-        } else if (nums[mid] == target) {
-            // 这里改成收缩左侧边界即可
-            left = mid + 1;
+        } else if (nums[mid] < target) {
+					  left = mid + 1;
         }
     }
     if (right < 0) return -1;
     return nums[right] == target ? right : -1;
 }
 ```
-
-
-
-对于寻找左右边界的二分搜索，常见的手法是使用左闭右开的「搜索区间」，**我们还根据逻辑将「搜索区间」全都统一成了两端都闭，便于记忆，只要修改两处即可变化出三种写法**：
 
 
 
@@ -204,8 +163,6 @@ int getRightNums(int[] nums, int target) {
 >
 > - 如果有目标值 target，那么直接让 arr[mid] 和 target 比较即可。
 > - 如果没有目标值，一般可以考虑 **端点**
-
-
 
 旋转数组，那最小值右侧的元素肯定都小于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
 
@@ -333,7 +290,7 @@ public static int search(int[] nums,int target) {
 >
 > 如果数组中不存在目标值 target，返回 [-1, -1]。
 >
-> 你可以设计并实现时间复杂度为 O(log n) 的算法解决此问题吗？
+> 你可以设计并实现时间复杂度为 $O(log n)$ 的算法解决此问题吗？
 >
 > ```
 > 输入：nums = [5,7,7,8,8,10], target = 8
@@ -388,6 +345,41 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 }
 ```
 
+两端探索方式（无法保证二分查找对数级的复杂度）
+
+```java
+public int[] query(int[] nums, int target) {
+    // 暴力二分，找到后向找到的结果的两端探索
+    // 确定左区间 [left,mid) 右区间 [mid, right)
+    int length = nums.length;
+    int left = 0;
+    int right = length - 1;
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        if (target == nums[mid]) {
+            // 向两边探索
+            int l = mid;
+            int r = mid;
+            while (l > 0 && nums[l - 1] == target) {
+                l--;
+            }
+            while (r < length - 1 && nums[r + 1] == target) {
+                r++;
+            }
+            return new int[]{l, r};
+        }
+        if (target < nums[mid]) {
+            // 区间左移
+            right = mid - 1;
+        } else {
+            // 区间右移
+            left = mid + 1;
+        }
+    }
+    return new int[]{-1, -1};
+}
+```
+
 
 
 ### [287. 寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number/)
@@ -396,7 +388,7 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 >
 > 假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
 >
-> 你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
+> 你设计的解决方案必须 不修改 数组 nums 且只用常量级 $O(1)$ 的额外空间。
 >
 > ```
 > 输入：nums = [1,3,4,2,2]
@@ -412,9 +404,10 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 
 二分查找的思路是先猜一个数（有效范围 [left..right] 里位于中间的数 mid），然后统计原始数组中 小于等于 mid 的元素的个数 cnt：
 
-如果 cnt 严格大于 mid。根据抽屉原理，重复元素就在区间 [left..mid] 里；
-否则，重复元素就在区间 [mid + 1..right] 里。
+如果 cnt 严格大于 mid。根据抽屉原理，重复元素就在区间 [left..mid] 里；否则，重复元素就在区间 [mid + 1..right] 里。
 与绝大多数使用二分查找问题不同的是，这道题正着思考是容易的，即：思考哪边区间存在重复数是容易的，因为有抽屉原理做保证。
+
+> 抽屉原理：把 `10` 个苹果放进 `9` 个抽屉，至少有一个抽屉里至少放 `2` 个苹果。
 
 ```java
 public int findDuplicate(int[] nums) {
@@ -632,6 +625,8 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 ```
 
 
+
+### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
 
 

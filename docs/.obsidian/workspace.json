@@ -30,9 +30,19 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "5fb9b5242c50d2a2",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.3.5"
+              }
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -75,6 +85,14 @@
             "type": "leaf",
             "state": {
               "type": "starred",
+              "state": {}
+            }
+          },
+          {
+            "id": "123cfa366479ce4d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
               "state": {}
             }
           }
@@ -159,7 +177,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "264bec0c6c3126ab",
+  "active": "5fb9b5242c50d2a2",
   "lastOpenFiles": [
     "data-structure-algorithms/algorithm/Backtracking.md",
     "data-structure-algorithms/algorithm/未命名.md",
