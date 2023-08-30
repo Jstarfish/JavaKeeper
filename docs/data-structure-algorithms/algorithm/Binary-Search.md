@@ -138,7 +138,7 @@ public int getRightNums(int[] nums, int target) {
 >
 > 给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
 >
-> 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+> 你必须设计一个时间复杂度为 $O(log n)$ 的算法解决此问题。
 >
 > ```
 > 输入：nums = [3,4,5,1,2]
@@ -156,6 +156,8 @@ public int getRightNums(int[] nums, int target) {
 
 升序数组+旋转，仍然是部分有序，考虑用二分查找。
 
+> 我们先搞清楚题目中的数组是通过怎样的变化得来的，基本上就是等于将整个数组向右平移
+
 > 这种二分查找难就难在，arr[mid] 跟谁比。
 >
 > 我们的目的是：当进行一次比较时，一定能够确定答案在 mid 的某一侧。一次比较为 arr[mid] 跟谁比的问题。
@@ -164,7 +166,9 @@ public int getRightNums(int[] nums, int target) {
 > - 如果有目标值 target，那么直接让 arr[mid] 和 target 比较即可。
 > - 如果没有目标值，一般可以考虑 **端点**
 
-旋转数组，那最小值右侧的元素肯定都小于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
+![fig1](https://assets.leetcode-cn.com/solution-static/153/1.png)
+
+旋转数组，最小值右侧的元素肯定都小于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
 
 ```java
 public static int findMin(int[] nums) {
@@ -417,6 +421,7 @@ public int findDuplicate(int[] nums) {
   while (left < right) {
     int mid = left + (right - left) / 2;
 
+    // nums 中小于等于 mid 的元素的个数
     int cnt = 0;
     for (int num : nums) {
       if (num <= mid) {
@@ -556,7 +561,6 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 言归正传，有序的数组，我们首先应该想到二分
 
 ```java
-
 class Solution {
     public boolean searchMatrix(int[][] matrix, int target) {
         for (int[] row : matrix) {
