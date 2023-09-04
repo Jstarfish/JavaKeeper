@@ -452,7 +452,7 @@ public int findDuplicate(int[] nums) {
 >
 > 你可以假设 nums[-1] = nums[n] = -∞ 。
 >
-> 你必须实现时间复杂度为 O(log n) 的算法来解决此问题。
+> 你必须实现时间复杂度为 $O(log n) $的算法来解决此问题。
 >
 > ```
 > 输入：nums = [1,2,3,1]
@@ -471,11 +471,11 @@ public int findDuplicate(int[] nums) {
 
 这题，最简单的思路就是直接找最大值，但这样复杂度是 $O(n)$
 
-在二分查找中，每次会找到一个位置 midmid。我们发现，midmid 只有如下三种情况：
+在二分查找中，每次会找到一个位置 mid。我们发现，mid 只有如下三种情况：
 
-- midmid 为一个峰值，此时我们通过比较 midmid 位置元素与两边元素大小即可。
-- midmid 在一个峰值右侧，此时有 nums[mid] < nums[mid + 1]nums[mid]<nums[mid+1]，此时我们向右调整搜索范围，在 [mid + 1, r][mid+1,r] 范围内继续查找。
-- midmid 在一个峰值左侧，此时有 nums[mid] < nums[mid - 1]nums[mid]<nums[mid−1]，此时我们向左调整搜索范围，在 [l + 1, mid][l+1,mid] 范围内继续查找。
+- mid 为一个峰值，此时我们通过比较 mid 位置元素与两边元素大小即可。
+- mid 在一个峰值右侧，此时有 nums[mid] < nums[mid + 1]，此时我们向右调整搜索范围，在 [mid + 1, r] 范围内继续查找。
+- mid 在一个峰值左侧，此时有 nums[mid] < nums[mid - 1]，此时我们向左调整搜索范围，在 [l + 1, mid] 范围内继续查找。
 
 ```java
 public int findPeakElement(int[] nums) {
@@ -517,20 +517,12 @@ public int findPeakElement(int[] nums) {
 >
 > 现有矩阵 matrix 如下：
 >
-> ```
-> [
->   [1,   4,  7, 11, 15],
->   [2,   5,  8, 12, 19],
->   [3,   6,  9, 16, 22],
->   [10, 13, 14, 17, 24],
->   [18, 21, 23, 26, 30]
-> ]
-> ```
->
-> 给定 target = 5，返回 true。
->
-> 给定 target = 20，返回 false。
->
+> ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/11/25/searchgrid2.jpg)
+> 
+>   ```
+>   输入：matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 5
+>   输出：true
+>   ```
 
 **思路**：
 
