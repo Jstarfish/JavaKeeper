@@ -19,7 +19,7 @@ MySQL日志文件：用来记录 MySQL 实例对某种条件做出响应时写�
 
 他们都有什么作用和关联，我们一起捋一捋（基于 InnoDB）
 
-![](https://img.starfish.ink/mysql/MySQL-logs.png)
+![](https://img.starfish.ink/mysql/logs.png)
 
 我们从一条 SQL 语句说起吧
 

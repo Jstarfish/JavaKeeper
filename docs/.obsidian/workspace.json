@@ -40,9 +40,21 @@
                 "currentVersion": "1.3.5"
               }
             }
+          },
+          {
+            "id": "0d9db99c2c25b1c2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "data-management/MySQL/MySQL-Storage-Engines.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -116,7 +128,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md",
+                "file": "data-management/MySQL/MySQL-Storage-Engines.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -133,7 +145,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md",
+                "file": "data-management/MySQL/MySQL-Storage-Engines.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -156,7 +168,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md"
+                "file": "data-management/MySQL/MySQL-Storage-Engines.md"
               }
             }
           }
@@ -177,7 +189,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5fb9b5242c50d2a2",
+  "active": "0d9db99c2c25b1c2",
   "lastOpenFiles": [
     "data-structure-algorithms/algorithm/Backtracking.md",
     "data-structure-algorithms/algorithm/未命名.md",

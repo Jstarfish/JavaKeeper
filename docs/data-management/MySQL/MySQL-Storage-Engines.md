@@ -176,7 +176,9 @@ SET default_storage_engine=NDBCLUSTER;
 
 在 InnoDB 存储引擎中，所有的数据都被逻辑地存放在表空间中，表空间（tablespace）是存储引擎中最高的存储逻辑单位，在表空间的下面又包括段（segment）、区（extent）、页（page）
 
- ![](https://img.starfish.ink/mysql/table-space.jpg) 
+![](https://img.starfish.ink/mysql/table-space.jpg)
+
+ 
 
  同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为 16KB，当然也可以通过改变 `innodb_page_size` 选项对默认大小进行修改，需要注意的是不同的页大小最终也会导致区大小的不同 
 
@@ -204,11 +206,11 @@ SET default_storage_engine=NDBCLUSTER;
 | `Page Directory`     | 页面目录           | 不确定       | 页中的某些记录的相对位置 |
 | `File Trailer`       | 文件尾部           | `8`字节      | 校验页是否完整           |
 
-
-
 在页的 7 个组成部分中，我们自己存储的记录会按照我们指定的`行格式`存储到 `User Records` 部分。但是在一开始生成页的时候，其实并没有 `User Records` 这个部分，每当我们插入一条记录，都会从 `Free Space` 部分，也就是尚未使用的存储空间中申请一个记录大小的空间划分到 `User Records` 部分，当 `Free Space` 部分的空间全部被 `User Records` 部分替代掉之后，也就意味着这个页使用完了，如果还有新的记录插入的话，就需要去申请新的页了，这个过程的图示如下：
 
-![img](https://relph1119.github.io/mysql-learning-notes/images/05-02.png)
+![](https://img.starfish.ink/mysql/page-application-record.png)
+
+
 
 #### 如何存储表
 
@@ -271,6 +273,7 @@ ALTER TABLE 表名 ROW_FORMAT=行格式名称
 
 
 
+参考与引用：
 
-
-> [踏雪无痕-InnoDB存储引擎](https://www.cnblogs.com/chenpingzhao/p/9177324.html) 
+- [踏雪无痕-InnoDB存储引擎](https://www.cnblogs.com/chenpingzhao/p/9177324.html) 
+- [MySQL 与 InnoDB 存储引擎总结](https://wingsxdu.com/posts/database/mysql/innodb/)
