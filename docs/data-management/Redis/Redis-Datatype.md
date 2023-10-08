@@ -1,4 +1,10 @@
-# Redis 数据类型篇
+---
+title: Redis 数据类型篇
+date: 2022-08-25
+tags: 
+ - Redis
+categories: Redis
+---
 
 > 一提到 Redis，我们的脑子里马上就会出现一个词：“快。”
 >

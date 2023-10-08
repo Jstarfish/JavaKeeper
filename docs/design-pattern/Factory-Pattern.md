@@ -1,4 +1,12 @@
-# 工厂模式——我有不止一个对象
+---
+title: 工厂模式——我有不止一个对象
+date: 2023-09-12
+tags: 
+ - Design Pattern
+categories: Design Pattern
+---
+
+![](https://img.starfish.ink/design-pattern/banner-factory.jpg)
 
 > 3年工作经验是吧？
 >
@@ -16,8 +24,6 @@
 
 在工厂模式中，我们在创建对象时不会对客户端暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。
 
-<img src="https://tva1.sinaimg.cn/large/00831rSTly1gcmy3e9tbzg30p00ge16a.gif" style="zoom:33%;" />
-
 
 
 ### 工厂模式可以分为三类：
@@ -26,7 +32,7 @@
 - 工厂方法模式（Factory Method）
 - 抽象工厂模式（Abstract Factory）
 
-简单工厂其实不是一个标准的的设计模式。GOF 23种设计模式中只有「工厂方法模式」与「抽象工厂模式」。简单工厂模式可以看为工厂方法模式的一种特例，为了统一整理学习，就都归为工厂模式。
+简单工厂其实不是一个标准的的设计模式。GOF 23 种设计模式中只有「工厂方法模式」与「抽象工厂模式」。简单工厂模式可以看为工厂方法模式的一种特例，为了统一整理学习，就都归为工厂模式。
 
 这三种工厂模式在设计模式的分类中都属于**创建型模式**，三种模式从上到下逐步抽象。
 
@@ -38,7 +44,7 @@
 
 创建型模式隐藏了类的实例的创建细节，通过隐藏对象如何被创建和组合在一起达到使整个系统独立的目的。
 
-工厂模式是创建型模式中比较重要的。工厂模式的主要功能就是帮助我们实例化对象。之所以名字中包含工厂模式四个字，是因为对象的实例化过程是通过工厂实现的，是用工厂代替new操作的。
+工厂模式是创建型模式中比较重要的。工厂模式的主要功能就是帮助我们实例化对象。之所以名字中包含工厂模式四个字，是因为对象的实例化过程是通过工厂实现的，是用工厂代替 new 操作的。
 
 ### 工厂模式优点：
 
@@ -50,7 +56,7 @@
 
 不管是简单工厂模式，工厂方法模式还是抽象工厂模式，他们具有类似的特性，所以他们的适用场景也是类似的。 
 
-首先，作为一种创建类模式，在任何需要生成**复杂对象**的地方，都可以使用工厂方法模式。有一点需要注意的地方就是复杂对象适合使用工厂模式，而简单对象，特别是只需要通过new就可以完成创建的对象，无需使用工厂模式。如果使用工厂模式，就需要引入一个工厂类，会增加系统的复杂度。 
+首先，作为一种创建类模式，在任何需要生成**复杂对象**的地方，都可以使用工厂方法模式。有一点需要注意的地方就是复杂对象适合使用工厂模式，而简单对象，特别是只需要通过 new 就可以完成创建的对象，无需使用工厂模式。如果使用工厂模式，就需要引入一个工厂类，会增加系统的复杂度。 
 
 其次，工厂模式是一种典型的**解耦模式**，迪米特法则在工厂模式中表现的尤为明显。假如调用者自己组装产品需要增加依赖关系时，可以考虑使用工厂模式。将会大大降低对象之间的耦合度。
 
@@ -146,9 +152,7 @@ public static void main(String[] args) {
 - Product：抽象类产品， 它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法，它的引入将提高系统的灵活性，使得在工厂类中只需定义一个通用的工厂方法，因为所有创建的具体产品对象都是其子类对象
 - ConcreteProduct：具体产品， 它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例。它要实现抽象产品中声明的抽象方法
 
-#### UML类图
-
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcp76z5g27j30li0fpjsv.jpg)
+![](https://img.starfish.ink/design-pattern/easy-factory-uml.png)
 
 #### 实例
 
@@ -199,7 +203,7 @@ public static void main(String[] args) {
 
 ### 1.3 简单工厂模式存在的问题
 
-当我们需要增加一种计算时，例如开平方。这个时候我们需要先定义一个类继承Operation类，其中实现平方的代码。除此之外我们还要修改 OperationFactory 类的代码，增加一个 case。这显然是**违背开闭原则**的。可想而知对于新产品的加入，工厂类是很被动的。
+当我们需要增加一种计算时，例如开平方。这个时候我们需要先定义一个类继承 Operation 类，其中实现平方的代码。除此之外我们还要修改 OperationFactory 类的代码，增加一个 case。这显然是**违背开闭原则**的。可想而知对于新产品的加入，工厂类是很被动的。
 
 我们举的例子是最简单的情况。而在实际应用中，很可能产品是一个多层次的树状结构。 简单工厂可能就不太适用了。
 
@@ -236,7 +240,7 @@ public static void main(String[] args) {
 
 #### UML类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcp774606hj30za0hagmu.jpg)
+![](https://img.starfish.ink/design-pattern/factory-uml.png)
 
 ####  实例
 
@@ -371,13 +375,13 @@ public class Client {
 
 #### UML类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcp778i6yhj31gu0u0ahy.jpg)
+![](https://img.starfish.ink/design-pattern/abstract-facotry-uml.png)
 
 #### 实例
 
 我把维基百科的例子改下用于理解，假设我们要生产两种产品，键盘（Keyboard）和鼠标（Mouse） ，每一种产品都支持多种系列，比如 Mac 系列和 Windows 系列。这样每个系列的产品分别是 MacKeyboard WinKeyboard, MacMouse, WinMouse 。为了可以在运行时刻创建一个系列的产品族，我们可以为每个系列的产品族创建一个工厂 MacFactory 和 WinFactory 。每个工厂都有两个方法 CreateMouse 和 CreateKeyboard 并返回对应的产品，可以将这两个方法抽象成一个接口 HardWare 。这样在运行时刻我们可以选择创建需要的产品系列。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcp77dgtchj31gu0u0ag5.jpg)
+![](https://img.starfish.ink/design-pattern/abstract-factory-demo.png)
 
 1. 抽象产品
 
@@ -499,7 +503,7 @@ public class Client {
 
 ### 3.4 抽象工厂模式总结
 
-抽象工厂模式是工厂方法模式的进一步延伸，由于它提供了功能更为强大的工厂类并且具备较好的可扩展性，在软件开发中得以广泛应用，尤其是在一些框架和API类库的设计中，例如在Java语言的AWT（抽象窗口工具包）中就使用了抽象工厂模式，它使用抽象工厂模式来实现在不同的操作系统中应用程序呈现与所在操作系统一致的外观界面。抽象工厂模式也是在软件开发中最常用的设计模式之一。
+抽象工厂模式是工厂方法模式的进一步延伸，由于它提供了功能更为强大的工厂类并且具备较好的可扩展性，在软件开发中得以广泛应用，尤其是在一些框架和 API 类库的设计中，例如在 Java 语言的AWT（抽象窗口工具包）中就使用了抽象工厂模式，它使用抽象工厂模式来实现在不同的操作系统中应用程序呈现与所在操作系统一致的外观界面。抽象工厂模式也是在软件开发中最常用的设计模式之一。
 
 **优点：** 
 
@@ -539,8 +543,8 @@ public class Client {
 
 ## 参考
 
-https://blog.csdn.net/lovelion/article/details/17517213 
+- https://blog.csdn.net/lovelion/article/details/17517213 
 
-https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
+- https://wiki.jikexueyuan.com/project/java-design-pattern/abstract-factory-pattern.html 
 
-https://blog.csdn.net/lovelion/article/details/17517213                                                                                                                                    
+- https://blog.csdn.net/lovelion/article/details/17517213                                                                                                                                    

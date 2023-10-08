@@ -1,12 +1,18 @@
-# 从原型模型到浅拷贝和深拷贝
+---
+title: 从原型模型到浅拷贝和深拷贝
+date: 2023-09-12
+tags: 
+ - Design Pattern
+categories: Design Pattern
+---
 
-## 问题
+![](https://img.starfish.ink/design-pattern/banner-prototype.jpg)
 
 > 如果你有一个对象， 并希望生成与其完全相同的一个复制品， 你该如何实现呢？ 
 >
 > 首先， 你必须新建一个属于相同类的对象。 然后， 你必须遍历原始对象的所有成员变量， 并将成员变量值复制到新对象中。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghc9zjhrg7j30b4061glx.jpg)
+![](https://img.starfish.ink/design-pattern/format.png)
 
 ```java
 for (int i = 0; i < 10; i++) {
@@ -35,7 +41,7 @@ for (int i = 0; i < 10; i++) {
 
 ### 类图
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghcc24lo53j30ze0i20ud.jpg)
+![](https://img.starfish.ink/design-pattern/prototype-UML.png)
 
 - Prototype : **原型** （Prototype） 接口将对克隆方法进行声明
 
@@ -82,8 +88,6 @@ class Sheep implements Cloneable {
 ### 2、具体原型
 
 按业务的不同实现不同的原型对象，假设现在主角是王二小，羊群里有山羊、绵羊一大群
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghckw0rdprj305005i746.jpg)
 
 ```java
 public class Goat extends Sheep{
@@ -189,7 +193,7 @@ public class Client {
 
 感兴趣的同学可以深入源码看下具体的实现，在 AbstractBeanFactory 的 `doGetBean()` 方法中
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1ghcodcuwidj324y0qiwrs.jpg)
+![](https://img.starfish.ink/design-pattern/prototype-demo-doGetBean.png)
 
 
 

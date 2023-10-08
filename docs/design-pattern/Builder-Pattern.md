@@ -24,9 +24,7 @@ Builder Pattern，中文翻译为**建造者模式**或者**构建者模式**，
 
 **定义**：将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。
 
-![](https://tva1.sinaimg.cn/large/008i3skNly1grd7fknsyig60ek0854qp02.gif)
-
-
+![](https://img.starfish.ink/design-pattern/frc-8d65236e72e9b84771951a1f4af83e86.gif)
 
 
 

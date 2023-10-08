@@ -29,7 +29,7 @@ categories: data-structure
 - 栈中数据是按照"后进先出（LIFO, Last In First Out）"方式进出栈的。
 - 向栈中添加/删除数据时，只能从栈顶进行操作。
 
-![](https://static.javatpoint.com/ds/images/applications-of-stack-in-data-structure.png)
+![](https://img.starfish.ink/data-structure/applications-of-stack-in-data-structure.png)
 
 
 
@@ -148,7 +148,7 @@ public class MyArrayStack implements MyStack {
 
 下面以不带头结点的单链表为例实现栈，如下示意图所示：
 
-![不带头结点单链表栈示意图](https://tva1.sinaimg.cn/large/007S8ZIlly1gh4n6ws71lj3106050aa4.jpg)
+![](https://img.starfish.ink/data-structure/stack-linked.png)
 
 在上图中，top 为栈顶结点的引用，始终指向当前栈顶元素所在的结点。若 top 为null，则表示空栈。入栈操作是在 top 所指结点之前插入新的结点，使新结点的 next 域指向 top，top 前移即可；出栈则直接让 top 后移即可。
 
@@ -300,7 +300,7 @@ public class Stack<E> extends Vector<E> {}
 
 
 
-
+### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)
 
 >请根据每日 `气温` 列表，重新生成一个列表。对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。
 >
