@@ -188,7 +188,7 @@ public class DispatcherHandler implements WebHandler, ApplicationContextAware {
 }
 ```
 
-Spring WebFlux为了适配我们在Spring MVC中养成的开发习惯，围绕熟知的Controller进行了相应的适配设计，其中有一个WebHandler实现类DispatcherHandler(如下代码所示)，是请求处理的调度中心，实际处理工作则由可配置的委托组件执行。该模型非常灵活，支持多种工作流程。
+Spring WebFlux 为了适配我们在 Spring MVC 中养成的开发习惯，围绕熟知的Controller进行了相应的适配设计，其中有一个WebHandler实现类DispatcherHandler(如下代码所示)，是请求处理的调度中心，实际处理工作则由可配置的委托组件执行。该模型非常灵活，支持多种工作流程。
 
 换句话说，DispatcherHandler就是HTTP请求相应处理器（handler）或控制器（controller）的中央调度程序。DispatcherHandler会从Spring Configuration中发现自己所需的组件，也就是它会从应用程序上下文中（application context）查找以下内容。
 

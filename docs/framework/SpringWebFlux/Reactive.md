@@ -436,7 +436,7 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 >
 > > 参考地址：https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-why-reactive
 
-相对于维基百科的定义，Spring 5 WebFlux 章节同样也提到了变化响应（reacting to change ） ，并且还说明非阻塞（non-blocking）就是 Reactive。同时，其定义的侧重点在响应通知方面，包括操作完成（operations complete）和数据可用（data becomes available）。Spring WebFlux 作为 Reactive Web 框架，天然支持非阻塞，不过早在 Servlet 3.1 规范时代皆以实现以上需求，其中包括 Servlet 3.1 非阻塞 API `ReadListener` 和`WriteListener`，以及 Servlet 3.0 所提供的异步上下文 `AsyncContext` 和事件监听 `AsyncListener`。这些 Servlet 特性正是为 Spring WebFlux 提供适配的以及，所以 Spring WebFlux 能完全兼容 Servlet 3.1 容器。难道 Reactive 仅是新包装的概念吗？或许就此下结论还为时尚早，不妨在了解一下 ReactiveX 的定义。
+相对于维基百科的定义，Spring 5 WebFlux 章节同样也提到了变化响应（reacting to change ） ，并且还说明非阻塞（non-blocking）就是 Reactive。同时，其定义的侧重点在响应通知方面，包括操作完成（operations complete）和数据可用（data becomes available）。Spring WebFlux 作为 Reactive Web 框架，天然支持非阻塞，不过早在 Servlet 3.1 规范时代皆以实现以上需求，其中包括 Servlet 3.1 非阻塞 API `ReadListener` 和`WriteListener`，以及 Servlet 3.0 所提供的异步上下文 `AsyncContext` 和事件监听 `AsyncListener`。这些 Servlet 特性正是为 Spring WebFlux 提供适配的，所以 Spring WebFlux 能完全兼容 Servlet 3.1 容器。难道 Reactive 仅是新包装的概念吗？或许就此下结论还为时尚早，不妨在了解一下 ReactiveX 的定义。
 
 #### [ReactiveX](http://reactivex.io/intro.html) 中的定义
 
@@ -476,7 +476,7 @@ Reactive Systems are: Responsive, Resilient, Elastic and Message Driven.
 
 > 参考资料：https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-programming-models
 
-Spring WebFlux提供了两种编程模型的选择：
+Spring WebFlux 提供了两种编程模型的选择：
 
 - Annotated Controllers: 与Spring MVC一致，并基于spring-web模块中的相同注解。Spring MVC和WebFlux控制器都支持reactive (Reactor和RxJava)返回类型，因此，很难将它们区分开来，一个显著的区别是WebFlux也支持响应性的@RequestBody参数。
 

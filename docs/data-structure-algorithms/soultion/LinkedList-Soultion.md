@@ -6,9 +6,9 @@ tags:
 categories: leetcode
 ---
 
-
-
-> 无法高效获取长度，无法根据偏移快速访问元素，是链表的两个劣势。然而面试的时候经常碰见诸如获取倒数第k个元素，获取中间位置的元素，判断链表是否存在环，判断环的长度等和长度与位置有关的问题。这些问题都可以通过灵活运用双指针来解决。
+> **导读**：无法高效获取长度，无法根据偏移快速访问元素，是链表的两个劣势。然而面试的时候经常碰见诸如获取倒数第 k 个元素，获取中间位置的元素，判断链表是否存在环，判断环的长度等和长度与位置有关的问题。这些问题都可以通过灵活运用双指针来解决。
+>
+> **关键词**：双指针、快慢指针
 
 ### 小技巧
 
@@ -213,6 +213,7 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
         pA = pA == null ? headB : pA.next;
         pB = pB == null ? headA : pB.next;
     }
+   //如果没有相交，这里会返回 null
     return pA;
 }
 ```
@@ -253,6 +254,42 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 - 时间复杂度：$O(n+m)$，其中 n 和 m 分别为两个链表的长度。因为每次调用递归都会去掉 l1 或者 l2 的头节点（直到至少有一个链表为空），函数 mergeTwoList 至多只会递归调用每个节点一次。因此，时间复杂度取决于合并后的链表长度，即 $O(n+m)$。
 
 - 空间复杂度：$O(n + m)$，其中 n 和 m 分别为两个链表的长度。递归调用 mergeTwoLists 函数时需要消耗栈空间，栈空间的大小取决于递归调用的深度。结束递归调用时 mergeTwoLists 函数最多调用 n+m 次，因此空间复杂度为 $O(n+m)$。
+
+迭代法：
+
+```java
+  public ListNode mergeList(ListNode n1,ListNode n2){
+      if(n1 == null) return n2;
+      if(n2 == null) return n1;
+
+      ListNode dummy = new ListNode(-1);
+      ListNode p = dummy;
+
+      // 比较 p1 和 p2 两个指针
+      // 将值较小的的节点接到 p 指针
+      while (n1 != null && n2 != null){
+          if(n1.val <= n2.val) {
+              p.next = n1;
+              n1 = n1.next;
+          }else {
+              p.next = n2;
+              n2 = n2.next;
+          }
+          // p 指针不断前进
+          p = p.next;
+      }
+
+      //处理比较后较长的链表剩余部分
+      if (n1 != null) {
+          p.next = n1;
+      }
+
+      if (n2 != null) {
+          p.next = n2;
+      }
+      return dummy.next;
+  }
+```
 
 
 
@@ -325,15 +362,15 @@ public static boolean isPalindrome_me(ListNode head){
 **思路**：看例子中的原因就会很迷糊，直接从各自第一位 `l1.va、l2.val` 相加（也就是个位），正常进位就行，然后按顺序返回链表
 
 - 每一位计算的同时需要考虑上一位的进位问题，而当前位计算结束后同样需要更新进位值
-- 如果两个链表全部遍历完毕后，进位值为 11，则在新链表最前方添加节点 11
-- 小技巧：对于链表问题，返回结果为头结点时，通常需要先初始化一个预先指针 pre，该指针的下一个节点指向真正的头结点head。使用预先指针的目的在于链表初始化时无可用节点值，而且链表构造过程需要指针移动，进而会导致头指针丢失，无法返回结果。
+- 如果两个链表全部遍历完毕后，进位值为 1，则在新链表最前方添加节点 1
+- 小技巧：对于链表问题，返回结果为头结点时，通常需要先初始化一个预先指针 pre，该指针的下一个节点指向真正的头结点 head。使用预先指针的目的在于链表初始化时无可用节点值，而且链表构造过程需要指针移动，进而会导致头指针丢失，无法返回结果。
 
 ![](https://pic.leetcode-cn.com/2519bd7f7da0f3bd51dd0f06e6363f4f62bfb25472c5ec233cf969e5c1472e33-file_1559748028103)
 
 
 ```java
 public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-  //定义一个新联表伪指针，用来指向头指针，返回结果，不动
+  //定义一个新链表伪指针，用来指向头指针，返回结果，不动
   ListNode pre = new ListNode(0);
   //定义一个可移动的指针，指向头结点，动他
   ListNode cur = pre;
@@ -345,7 +382,7 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     int sum = x + y + carry;
 
     //如果大于10了，就进位，除以10来计算进位数
-    carry = sum / 10;
+    carry = sum / 10;1
     //进位后剩下的余数
     sum = sum % 10;
     //进位后的数据
@@ -463,7 +500,7 @@ public ListNode removeNthFromEnd_1(ListNode head, int n) {
         ListNode pre = new ListNode(0,head);
         int length = getLength(head);
         
-  cur = pre;
+  			cur = pre;
         //遍历到需要删除的位置的前一个，比如1，2，3，4，5 遍历到第 < 4 就可以了,且 i 从 1 开始
         for (int i=1;i<length-n+1;i++){
             cur = cur.next;
@@ -543,7 +580,38 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 > 输出：[1,2,2,4,3,5]
 > ```
 
+```java
+public ListNode partition(ListNode head, int x) {
+   // 存放小于 x 的链表的虚拟头结点
+    ListNode dummy1 = new ListNode(-1);
+    // 存放大于等于 x 的链表的虚拟头结点
+    ListNode dummy2 = new ListNode(-1);
+    // p1, p2 指针负责生成结果链表
+    ListNode p1 = dummy1, p2 = dummy2;
+    // p 负责遍历原链表，类似合并两个有序链表的逻辑
+    // 这里是将一个链表分解成两个链表
+    ListNode p = head;
+    while (p != null) {
+        if (p.val >= x) {
+            p2.next = p;
+            p2 = p2.next;
+        } else {
+            p1.next = p;
+            p1 = p1.next;
+        }
+        // 不能直接让 p 指针前进，
+        // p = p.next
+        // 断开原链表中的每个节点的 next 指针
+        ListNode temp = p.next;
+        p.next = null;
+        p = temp;
+    }
+    // 连接两个链表
+    p1.next = dummy2.next;
 
+    return dummy1.next;
+ }
+```
 
 
 

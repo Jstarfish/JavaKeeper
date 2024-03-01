@@ -276,7 +276,7 @@ public class Stack<E> extends Vector<E> {}
 
 左括号进栈，右括号匹配出栈
 
-- 栈先入后出特点恰好与本题括号排序特点一致，即若遇到左括号入栈，遇到右括号时将对应栈顶左括号出栈，则遍历完所有括号后 `stack` 仍然为空
+- 栈先入后出特点恰好与本题括号排序特点一致，即若遇到左括号时，把右括号入栈，遇到右括号时将对应栈顶元素与其对比并出栈，相同的话说明匹配，继续遍历，遍历完所有括号后 `stack` 仍然为空，说明是有效的。
 
 ```java
   public boolean isValid(String s) {
@@ -304,11 +304,12 @@ public class Stack<E> extends Vector<E> {}
 
 ### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)
 
->请根据每日 `气温` 列表，重新生成一个列表。对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。
+>给定一个整数数组 `temperatures` ，表示每天的温度，返回一个数组 `answer` ，其中 `answer[i]` 是指对于第 `i`天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。
 >
->例如，给定一个列表 `temperatures = [73, 74, 75, 71, 69, 72, 76, 73]`，你的输出应该是 `[1, 1, 4, 2, 1, 1, 0, 0]`。
->
->**提示：**`气温` 列表长度的范围是 `[1, 30000]`。每个气温的值的均为华氏度，都是在 `[30, 100]` 范围内的整数。
+>```
+>输入: temperatures = [73,74,75,71,69,72,76,73]
+>输出: [1,1,4,2,1,1,0,0]
+>```
 
 **思路**：
 
@@ -337,4 +338,209 @@ public class Stack<E> extends Vector<E> {}
 
 
 
-> 逆波兰表达式求值
+### [150. 逆波兰表达式求值](https://leetcode.cn/problems/evaluate-reverse-polish-notation/)
+
+> 给你一个字符串数组 `tokens` ，表示一个根据 [逆波兰表示法](https://baike.baidu.com/item/逆波兰式/128437) 表示的算术表达式。
+>
+> 请你计算该表达式。返回一个表示表达式值的整数。
+>
+> **注意：**
+>
+> - 有效的算符为 `'+'`、`'-'`、`'*'` 和 `'/'` 。
+> - 每个操作数（运算对象）都可以是一个整数或者另一个表达式。
+> - 两个整数之间的除法总是 **向零截断** 。
+> - 表达式中不含除零运算。
+> - 输入是一个根据逆波兰表示法表示的算术表达式。
+> - 答案及所有中间计算结果可以用 **32 位** 整数表示。
+>
+> ```
+> 输入：tokens = ["4","13","5","/","+"]
+> 输出：6
+> 解释：该算式转化为常见的中缀算术表达式为：(4 + (13 / 5)) = 6
+> ```
+
+> **逆波兰表达式：**
+>
+> 逆波兰表达式是一种后缀表达式，所谓后缀就是指算符写在后面。
+>
+> - 平常使用的算式则是一种中缀表达式，如 `( 1 + 2 ) * ( 3 + 4 )` 。
+> - 该算式的逆波兰表达式写法为 `( ( 1 2 + ) ( 3 4 + ) * )` 。
+>
+> 逆波兰表达式主要有以下两个优点：
+>
+> - 去掉括号后表达式无歧义，上式即便写成 `1 2 + 3 4 + * `也可以依据次序计算出正确结果。
+> - 适合用栈操作运算：遇到数字则入栈；遇到算符则取出栈顶两个数字进行计算，并将结果压入栈中
+
+**思路**：逆波兰表达式严格遵循「从左到右」的运算。
+
+计算逆波兰表达式的值时，使用一个栈存储操作数，从左到右遍历逆波兰表达式，进行如下操作：
+
+- 如果遇到操作数，则将操作数入栈；
+
+- 如果遇到运算符，则将两个操作数出栈，其中先出栈的是右操作数，后出栈的是左操作数，使用运算符对两个操作数进行运算，将运算得到的新操作数入栈。
+
+整个逆波兰表达式遍历完毕之后，栈内只有一个元素，该元素即为逆波兰表达式的值。
+
+```java
+  public int evalRPN(String[] tokens) {
+      List<String> charts = Arrays.asList("+", "-", "*", "/");
+      Stack<Integer> stack = new Stack<>();
+      for (String s : tokens) {
+          if (!charts.contains(s)) {
+              stack.push(Integer.parseInt(s));
+          } else {
+              int num2 = stack.pop();
+              int num1 = stack.pop();
+              switch (s) {
+                  case "+":
+                      stack.push(num1 + num2);
+                      break;
+                  case "-":
+                      stack.push(num1 - num2);
+                      break;
+                  case "*":
+                      stack.push(num1 * num2);
+                      break;
+                  case "/":
+                      stack.push(num1 / num2);
+                      break;
+              }
+          }
+      }
+      return stack.peek();
+  }
+}
+```
+
+
+
+### [155. 最小栈](https://leetcode.cn/problems/min-stack/)
+
+> 设计一个支持 `push` ，`pop` ，`top` 操作，并能在常数时间内检索到最小元素的栈。
+>
+> 实现 `MinStack` 类:
+>
+> - `MinStack()` 初始化堆栈对象。
+> - `void push(int val)` 将元素val推入堆栈。
+> - `void pop()` 删除堆栈顶部的元素。
+> - `int top()` 获取堆栈顶部的元素。
+> - `int getMin()` 获取堆栈中的最小元素。
+
+**思路**： 添加一个辅助栈，这个栈同时保存的是每个数字 `x` 进栈的时候的**值 与 插入该值后的栈内最小值**。
+
+```java
+import java.util.Stack;
+
+public class MinStack {
+
+    // 数据栈
+    private Deque<Integer> data;
+    // 辅助栈
+    private  Deque<Integer> helper;
+
+    public MinStack() {
+        data = new LinkedList<Integer>();
+        helper = new LinkedList<Integer>();
+        helper.push(Integer.MAX_VALUE);
+    }
+
+    public void push(int x) {
+        data.push(x);
+        helper.push(Math.min(helper.peek(), x));
+    }
+
+    public void pop() {
+        data.pop();
+        helper.pop();
+    }
+
+    public int top() {
+        return data.peek();
+    }
+
+    public int getMin() {
+        return helper.peek();
+    }
+
+}
+```
+
+
+
+### [227. 基本计算器 II](https://leetcode.cn/problems/basic-calculator-ii/)
+
+> 给你一个字符串表达式 `s` ，请你实现一个基本计算器来计算并返回它的值。
+>
+> 整数除法仅保留整数部分。
+>
+> 你可以假设给定的表达式总是有效的。所有中间结果将在 `[-231, 231 - 1]` 的范围内。
+>
+> **注意：**不允许使用任何将字符串作为数学表达式计算的内置函数，比如 `eval()` 。
+>
+> ```
+> 输入：s = "3+2*2"
+> 输出：7
+> ```
+
+**思路**：和逆波兰表达式有点像
+
+- 加号：将数字压入栈；
+- 减号：将数字的相反数压入栈；
+- 乘除号：计算数字与栈顶元素，并将栈顶元素替换为计算结果。
+
+> 这个得先知道怎么把字符串形式的正整数转成 int
+>
+> ```java
+> String s = "458";
+> 
+> int n = 0;
+> for (int i = 0; i < s.length(); i++) {
+>     char c = s.charAt(i);
+>     n = 10 * n + (c - '0');
+> }
+> // n 现在就等于 458
+> ```
+>
+> 这个还是很简单的吧，老套路了。但是即便这么简单，依然有坑：**`(c - '0')` 的这个括号不能省略，否则可能造成整型溢出**。
+>
+> 因为变量 `c` 是一个 ASCII 码，如果不加括号就会先加后减，想象一下 `s` 如果接近 INT_MAX，就会溢出。所以用括号保证先减后加才行。
+
+```java
+  public static int calculate(String s) {
+      Stack<Integer> stack = new Stack<>();
+      int length = s.length();
+      int num = 0;
+      char operator = '+';
+      for (int i = 0; i < length; i++) {
+          if (Character.isDigit(s.charAt(i))) {
+              // 转为 int
+              num = num * 10 + (s.charAt(i) - '0');
+          }
+          // 计算符 （排除空格） 
+          if (!Character.isDigit(s.charAt(i)) && s.charAt(i) != ' ' || i == length - 1) {
+            // switch (s.charAt(i)){ 这里是要和操作符比对，考虑第一次
+            switch (operator) {
+                  case '+':
+                      stack.push(num);
+                      break;
+                  case '-':
+                      stack.push(-num);
+                      break;
+                  case '*':
+                      stack.push(stack.pop() * num);
+                      break;
+                  default:
+                      stack.push(stack.pop() / num);
+              }
+              operator = s.charAt(i);
+              num = 0;
+          }
+      }
+      int result = 0;
+      while (!stack.isEmpty()) {
+          result += stack.pop();
+      }
+      return result;
+  }
+```
+

@@ -30,6 +30,16 @@ categories: Redis
 
 因为这个哈希表保存了所有的键值对，所以，也把它称为**全局哈希表**。哈希表的最大好处很明显，就是让我们可以用 $O(1)$ 的时间复杂度来快速查找到键值对——我们只需要计算键的哈希值，就可以知道它所对应的哈希桶位置，然后就可以访问相应的 entry 元素。
 
+```c
+struct redisObject {
+    unsigned type:4;      // 类型
+    unsigned encoding:4;  // 编码
+    unsigned lru:LRU_BITS; // 对象最后一次被访问的时间
+    int refcount;					//引用计数
+    void *ptr;						//指向实际值的指针
+};
+```
+
 你看，这个查找过程主要依赖于哈希计算，和数据量的多少并没有直接关系。也就是说，不管哈希表里有 10 万个键还是 100 万个键，我们只需要一次计算就能找到相应的键。但是，如果你只是了解了哈希表的 $O(1)$ 复杂度和快速查找特性，那么，当你往 Redis 中写入大量数据后，就可能发现操作有时候会突然变慢了。这其实是因为你忽略了一个潜在的风险点，那就是哈希表的冲突问题和 rehash 可能带来的操作阻塞。
 
 ### 为什么哈希表操作变慢了？
@@ -40,13 +50,30 @@ Redis 解决哈希冲突的方式，就是<mark>链式哈希</mark>。和 JDK7 �
 
 如下图所示：哈希桶 6 上就有 3 个连着的 entry，也叫作哈希冲突链。
 
-![redis-kv-conflict](https://tva1.sinaimg.cn/large/008i3skNly1gqsfbb5t10j31kx0u0qqw.jpg)
+![redis-kv-conflict](https://img.starfish.ink/redis/redis-kv-conflict.jpg)
 
 但是，这里依然存在一个问题，哈希冲突链上的元素只能通过指针逐一查找再操作。如果哈希表里写入的数据越来越多，哈希冲突可能也会越来越多，这就会导致某些哈希冲突链过长，进而导致这个链上的元素查找耗时长，效率降低。对于追求“快”的 Redis 来说，这是不太能接受的。
 
 所以，Redis 会对哈希表做 rehash 操作。rehash 也就是增加现有的哈希桶数量，让逐渐增多的 entry 元素能在更多的桶之间分散保存，减少单个桶中的元素数量，从而减少单个桶中的冲突。那具体怎么做呢？
 
-其实，为了使 rehash 操作更高效，Redis 默认使用了两个全局哈希表：哈希表 1 和哈希表 2。一开始，当你刚插入数据时，默认使用哈希表 1，此时的哈希表 2 并没有被分配空间。随着数据逐步增多，Redis 开始执行 rehash，这个过程分为三步：
+其实，为了使 rehash 操作更高效，Redis 默认使用了两个全局哈希表：哈希表 1 和哈希表 2。
+
+```c
+struct dict {
+    dictType *type;
+
+    dictEntry **ht_table[2];
+    unsigned long ht_used[2];
+
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+
+    /* Keep small vars at end for optimal (minimal) struct padding */
+    int16_t pauserehash; /* If >0 rehashing is paused (<0 indicates coding error) */
+    signed char ht_size_exp[2]; /* exponent of size. (size = 1<<exp) */
+};
+```
+
+一开始，当你刚插入数据时，默认使用哈希表 1，此时的哈希表 2 并没有被分配空间。随着数据逐步增多，Redis 开始执行 rehash，这个过程分为三步：
 
 1. 给哈希表 2 分配更大的空间，例如是当前哈希表 1 大小的两倍；
 2. 把哈希表 1 中的数据重新映射并拷贝到哈希表 2 中；
@@ -72,11 +99,11 @@ Redis 解决哈希冲突的方式，就是<mark>链式哈希</mark>。和 JDK7 �
 
 **Redis** 有 5 种基础数据类型，它们分别是：**string(字符串)**、**list(列表)**、**hash(字典)**、**set(集合)** 和 **zset(有序集合)**。
 
-Redis 底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、压缩列表、对象。**
+Redis 底层的数据结构包括：**简单动态数组SDS、链表、字典、跳跃链表、整数集合、快速列表、压缩列表、对象。**
 
 Redis 为了平衡空间和时间效率，针对 value 的具体类型在底层会采用不同的数据结构来实现，其中哈希表和压缩列表是复用比较多的数据结构，如下图展示了对外数据类型和底层数据结构之间的映射关系：
 
-![](https://img.starfish.ink/redis/data-type-structure.jpg)
+![](https://img.starfish.ink/redis/redis-data-type.png)
 
 下面我们具体看下各种数据类型的底层实现和操作。
 
@@ -139,7 +166,13 @@ C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis �
 
   因为 C 语言中的字符串必须符合某种编码（比如 ASCII），并且除了字符串的末尾之外， 字符串里面不能包含空字符， 否则最先被程序读入的空字符将被误认为是字符串结尾 —— 这些限制使得 C 字符串只能保存文本数据， 而不能保存像图片、音频、视频、压缩文件这样的二进制数据
 
-
+> 字符串对象的编码可以使 int、raw 或者 embstr，
+>
+> 当存储的值为整数，且值的大小可以用 long 类型表示时，使用 int 编码。
+>
+> 如果字符串对象保存的事一个字符串值，并且这个字符串的长度 <= 44 字节，采用 embstr 编码，否则使用 raw。
+>
+> 可以通过 `TYPE KEY_NAME` 查看 key 所存储的值的类型验证下。
 
 ### 2、List（列表）
 
@@ -355,7 +388,7 @@ Redis 中的有序集合是通过跳表来实现的，严格点讲，其实还�
 
 位图不是特殊的数据结构，它的内容其实就是普通的字符串，也就是 byte 数组。我们可以使用普通的 get/set 直接获取和设置整个位图的内容，也可以使用位图操作 getbit/setbit 等将 byte 数组看成「位数组」来处理
 
- Redis 的位数组是自动扩展，如果设置了某个偏移位置超出了现有的内容范围，就会自动将位数组进行零扩充。 
+Redis 的位数组是自动扩展，如果设置了某个偏移位置超出了现有的内容范围，就会自动将位数组进行零扩充。 
 
 ![](../../../../picBed/img/20201116155452.gif)
 

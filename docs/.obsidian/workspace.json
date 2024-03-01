@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md",
+                "file": "data-structure-algorithms/soultion/LinkedList-Soultion.md",
                 "mode": "source",
                 "source": false
               }
@@ -102,7 +102,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 216.5
   },
   "right": {
     "id": "4d54828aaab36d9f",
@@ -118,7 +118,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md",
+                "file": "data-structure-algorithms/soultion/LinkedList-Soultion.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -135,7 +135,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md",
+                "file": "data-structure-algorithms/soultion/LinkedList-Soultion.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -158,7 +158,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/Double-Pointer.md"
+                "file": "data-structure-algorithms/soultion/LinkedList-Soultion.md"
               }
             }
           }
@@ -181,6 +181,13 @@
   },
   "active": "264bec0c6c3126ab",
   "lastOpenFiles": [
+    "data-structure-algorithms/data-structure/Linked-List.md",
+    "data-management/Redis/Redis-Datatype.md",
+    "data-management/Redis/ReadRedis.md",
+    "data-management/Redis/Cache-Design.md",
+    "data-management/Redis/Key 寻址算法.md",
+    "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
+    "data-management/README.md",
     "framework/SpringWebFlux/响应式编程.md",
     "data-management/MySQL/MySQL-Storage-Engines.md",
     "data-structure-algorithms/algorithm/Backtracking.md",
@@ -201,9 +208,6 @@
     "data-structure-algorithms/soultion/Math-Solution.md",
     "data-structure-algorithms/soultion/Array-Solution.md",
     "data-structure-algorithms/soultion/DP-Solution.md",
-    "interview/Kafka-FAQ.md",
-    "work/DPA.md",
-    "data-structure-algorithms/Recursion.md",
-    "data-management/Big-Data/Bloom-Filter.md"
+    "interview/Kafka-FAQ.md"
   ]
 }

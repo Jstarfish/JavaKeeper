@@ -909,7 +909,11 @@ server层和InnoDB层之间是如何沟通：
 
 5. 引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。
 
+### 日志执行顺序？
 
+时序上先 undo log，redo log 先 prepare， 再写 binlog，最后再把 redo log commit
+
+![](https://img.starfish.ink/mysql/log-seq.png)
 
 ### 为什么需要记录REDO
 
