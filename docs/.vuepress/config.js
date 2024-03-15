@@ -168,10 +168,10 @@ function genDSASidebar() {
         "complexity",
         "Sort",
         ['algorithm/Binary-Search', '二分查找'],
-      	['Recursion', '递归'],
-        ['Double-Pointer', '双指针'],
-      	['Dynamic-Programming', '动态规划'],
-        ['DFS', 'DFS']
+      	['algorithm/Recursion', '递归'],
+        ['algorithm/Double-Pointer', '双指针'],
+      	['algorithm/Dynamic-Programming', '动态规划'],
+        ['algorithm/DFS', 'DFS']
       ]
     },
     {
