@@ -75,55 +75,68 @@ int binarySearch(int[] nums, int target) {
 
 > 比如说给你有序数组 `nums = [1,2,2,2,3]`，`target` 为 2，此算法返回的索引是 2，没错。但是如果我想得到 `target` 的左侧边界，即索引 1，或者我想得到 `target` 的右侧边界，即索引 3，这样的话此算法是无法处理的。
 >
-> 所以又有了下边两种左右边界的二分。
+> 所以又有了一些含有重复元素，带有边界问题的二分。
 
 ### 寻找左侧边界的二分搜索
 
 ```java
-public int getLeftNums(int[] nums,int target) {
-    int left = 0, right = nums.length - 1;
-    // 搜索区间为 [left, right]
+public static int leftBound(int[] nums, int target) {
+    int left = 0;
+    int right = nums.length - 1;
     while (left <= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] == target) {
-             // 收缩右侧边界
-             right = mid - 1;
-        } else if (nums[mid] > target) {
-            // 搜索区间变为 [left, mid-1]
+        int mid = (right - left) / 2 + left;
+        if (nums[mid] > target) {
             right = mid - 1;
         } else if (nums[mid] < target) {
-            // 搜索区间变为 [mid+1, right]
             left = mid + 1;
+        } else {
+            //mid 是第一个元素，或者前一个元素不等于查找值，锁定
+            if (mid == 0 || nums[mid - 1] != target) return mid;
+            else right = mid - 1;
         }
     }
-    // 判断 target 是否存在于 nums 中，防止数组越界
-    // 此时 target 比所有数都大，返回 -1
-    if (left == nums.length) return -1;
-    // 判断一下 nums[left] 是不是 target
-    return nums[left] == target ? left : -1;
+    return -1;
 }
 ```
-
-> while 终止的条件是 `left == right`，所以返回 left 和 right 是一样的
 
 ### 寻找右侧边界的二分查找
 
 ```java
-public int getRightNums(int[] nums, int target) {
-    int left = 0, right = nums.length - 1;
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] == target) {
-            // 别返回，增大「搜索区间」的左边界，收缩左侧边界，
-            left = mid + 1;
-        } else if (nums[mid] > target) {
+public static int rightBound(int[] nums, int target){
+    int left = 0;
+    int right = nums.length - 1;
+    while(left <= right){
+        int mid = left + (right - left)/2;
+        if(nums[mid] > target){
             right = mid - 1;
-        } else if (nums[mid] < target) {
-					  left = mid + 1;
+        }else if(nums[mid] < target){
+            left = mid +1;
+        }else{
+            if(mid == nums.length - 1 || nums[mid +1] != target) return mid;
+            else left = mid + 1;
         }
     }
-    if (right < 0) return -1;
-    return nums[right] == target ? right : -1;
+    return -1;
+}
+```
+
+### 查找第一个大于等于给定值的元素
+
+```JAVA
+//查找第一个大于等于给定值的元素  1,3,5,7,9 找出第一个大于等于5的元素
+public int firstNum(int[] nums, int target) {
+    int left = 0;
+    int right = nums.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] >= target) {
+            if (mid == 0 || nums[mid - 1] < target) return mid;
+            else right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return -1;
 }
 ```
 
@@ -132,21 +145,20 @@ public int getRightNums(int[] nums, int target) {
 ### [153. 寻找旋转排序数组中的最小值](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
 
 > 已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
-> 若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
-> 若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
+> 若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]        若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
 > 注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
->
-> 给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
->
-> 你必须设计一个时间复杂度为 $O(log n)$ 的算法解决此问题。
->
-> ```
+> 
+>给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
+> 
+>你必须设计一个时间复杂度为 $O(log n)$ 的算法解决此问题。
+> 
+>```
 > 输入：nums = [3,4,5,1,2]
 > 输出：1
 > 解释：原数组为 [1,2,3,4,5] ，旋转 3 次得到输入数组。
 > ```
->
-> ```
+> 
+>```
 > 输入：nums = [11,13,15,17]
 > 输出：11
 > 解释：原数组为 [11,13,15,17] ，旋转 4 次得到输入数组。
@@ -166,9 +178,7 @@ public int getRightNums(int[] nums, int target) {
 > - 如果有目标值 target，那么直接让 arr[mid] 和 target 比较即可。
 > - 如果没有目标值，一般可以考虑 **端点**
 
-![fig1](https://assets.leetcode-cn.com/solution-static/153/1.png)
-
-旋转数组，最小值右侧的元素肯定都小于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
+旋转数组，最小值右侧的元素肯定都小于或等于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
 
 ```java
 public static int findMin(int[] nums) {
@@ -624,6 +634,64 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 
 ### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
+> 给你一个整数数组 `nums` ，找到其中最长严格递增子序列的长度。
+>
+> **子序列** 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，`[3,6,2,7]`是数组 `[0,3,1,6,2,2,7]` 的子序列。
+>
+> ```
+> 输入：nums = [10,9,2,5,3,7,101,18]
+> 输出：4
+> 解释：最长递增子序列是 [2,3,7,101]，因此长度为 4。
+> ```
 
 
-- https://labuladong.gitee.io/algo/2/22/61/
+
+
+
+### [4. 寻找两个正序数组的中位数](https://leetcode.cn/problems/median-of-two-sorted-arrays/)
+
+> 给定两个大小分别为 `m` 和 `n` 的正序（从小到大）数组 `nums1` 和 `nums2`。请你找出并返回这两个正序数组的 **中位数** 。
+>
+> 算法的时间复杂度应该为 `O(log (m+n))` 。
+>
+> ```
+> 输入：nums1 = [1,3], nums2 = [2]
+> 输出：2.00000
+> 解释：合并数组 = [1,2,3] ，中位数 2
+> ```
+
+
+
+
+
+### [35. 搜索插入位置](https://leetcode.cn/problems/search-insert-position/)
+
+> 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
+>
+> ```
+> 输入: nums = [1,3,5,6], target = 2
+> 输出: 1
+> ```
+
+```java
+public int searchInsert(int[] nums, int target) {
+      int left = 0;
+      int right = nums.length - 1;
+  		//注意：特例处理
+      if (nums[left] > target) return 0;
+      if (nums[right] < target) return right + 1;
+      while (left <= right) {
+          int mid = left + (right - left) / 2;
+          if (nums[mid] > target) {
+              right = mid - 1;
+          } else if (nums[mid] < target) {
+              left = mid + 1;
+          } else {
+              return mid;
+          }
+      }
+  		//注意：这里如果没有查到，返回left,也就是需要插入的位置
+      return left;
+  }
+```
+
