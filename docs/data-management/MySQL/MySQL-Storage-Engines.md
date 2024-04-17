@@ -182,13 +182,13 @@ SET default_storage_engine=NDBCLUSTER;
 
  同一个数据库实例的所有表空间都有相同的页大小；默认情况下，表空间中的页大小都为 16KB，当然也可以通过改变 `innodb_page_size` 选项对默认大小进行修改，需要注意的是不同的页大小最终也会导致区大小的不同 
 
-
+对于 16KB 的页来说，连续的 64 个页就是一个区，也就是 1 个区默认占用 1 MB 空间的大小。
 
 #### 数据页结构
 
-页是 InnoDB 存储引擎管理数据的最小磁盘单位，一个页的大小一般是`16KB`。
+页是 InnoDB 存储引擎管理数据的最小磁盘单位，一个页的大小一般是 `16KB`。
 
-`InnoDB`为了不同的目的而设计了许多种不同类型的`页`，比如存放表空间头部信息的页，存放`Insert Buffer`信息的页，存放`INODE`信息的页，存放`undo`日志信息的页等等等等。
+`InnoDB` 为了不同的目的而设计了许多种不同类型的`页`，比如存放表空间头部信息的页，存放 `Insert Buffer` 信息的页，存放 `INODE`信息的页，存放 `undo` 日志信息的页等等等等。
 
  B-Tree 节点就是实际存放表中数据的页面，我们在这里将要介绍页是如何组织和存储记录的；首先，一个 InnoDB 页有以下七个部分：
 
@@ -230,7 +230,7 @@ InnoDB 中用于存储数据的文件总共有两个部分，一是系统表空�
 
 #### 如何存储记录 | InnoDB  行格式
 
-InnoDB 存储引擎和大多数数据库一样，记录是以行的形式存储的，每个 16KB 大小的页中可以存放 2-200 条行记录。
+InnoDB 存储引擎和大多数数据库一样，记录是以行的形式存储的，每个 16KB 大小的页中可以存放多条行记录。
 
 它可以使用不同的行格式进行存储。
 
@@ -240,9 +240,9 @@ InnoDB 早期的文件格式为 `Antelope`，可以定义两种行记录格式�
 
 ![](https://img.starfish.ink/mysql/innodb-row-format.png)
 
-> ???? 与现有的大多数存储引擎一样，InnoDB 使用页作为磁盘管理的最小单位；数据在 InnoDB 存储引擎中都是按行存储的，每个 16KB 大小的页中可以存放 2-7992 行的记录。（至少是2条记录，最多是7992条记录）
+MySQL 5.7 版本支持以上格式的行存储方式。
 
-MySQL 5.7 版本支持以下格式的行存储方式：
+我们可以在创建或修改表的语句中指定行格式：
 
 ```mysql
 CREATE TABLE 表名 (列的信息) ROW_FORMAT=行格式名称
@@ -250,30 +250,39 @@ CREATE TABLE 表名 (列的信息) ROW_FORMAT=行格式名称
 ALTER TABLE 表名 ROW_FORMAT=行格式名称
 ```
 
-`Compact`行记录格式是在 MySQL 5.0 中引入的，其首部是一个非 NULL 变长列长度列表，并且是逆序放置的，其长度为：
+`Compact `行记录格式是在 MySQL 5.0 中引入的，其首部是一个非 NULL 变长列长度列表，并且是逆序放置的，其长度为：
 
 - 若列的长度小于等于 255 字节，用 1 个字节表示；
 - 若列的长度大于 255 字节，用 2 个字节表示。
 
+![Compact row format](https://miro.medium.com/v2/resize:fit:1400/1*wNIUPIn4jo9kKbLvsmSUDQ.png)
+
 变长字段的长度最大不可以超过 2 字节，这是因为 MySQL 数据库中 VARCHAR 类型的最大长度限制为 65535。变长字段之后的第二个部分是 NULL 标志位，该标志位指示了该行数据中某列是否为 NULL 值，有则用 1 表示，NULL 标志位也是不定长的。接下来是记录头部信息，固定占用 5 字节。
 
-`Redundant`是 MySQL 5.0 版本之前 InnoDB 的行记录格式，`Redundant`行记录格式的首部是每一列长度偏移列表，同样是逆序存放的。从整体上看，`Compact`格式的存储空间减少了约 20%，但代价是某些操作会增加 CPU 的使用。
+`Redundant` 是 MySQL 5.0 版本之前 InnoDB 的行记录格式，`Redundant` 行记录格式的首部是每一列长度偏移列表，同样是逆序存放的。从整体上看，`Compact `格式的存储空间减少了约 20%，但代价是某些操作会增加 CPU 的使用。
 
-`Dynamic`和`Compressed`是`Compact`行记录格式的变种，`Compressed`会对存储在其中的行数据会以`zlib`的算法进行压缩，因此对于 BLOB、TEXT、VARCHAR 这类大长度类型的数据能够进行非常有效的存储。
+`Dynamic` 和 `Compressed `是 `Compact `行记录格式的变种，`Compressed `会对存储在其中的行数据会以 `zlib` 的算法进行压缩，因此对于 BLOB、TEXT、VARCHAR 这类大长度类型的数据能够进行非常有效的存储。
+
+> 高版本，比如 8.3 默认使用的是 Dynamic
+>
+> ```sql
+> SELECT @@innodb_default_row_format;
+> ```
 
 
 
 #### 行溢出数据
 
-当 InnoDB 存储极长的 TEXT 或者 BLOB 这类大对象时，MySQL 并不会直接将所有的内容都存放在数据页中。因为 InnoDB 存储引擎使用 B+Tree 组织索引，每个页中至少应该有两条行记录，因此，如果页中只能存放下一条记录，那么InnoDB存储引擎会自动将行数据存放到溢出页中。
+当 InnoDB 存储极长的 TEXT 或者 BLOB 这类大对象时，MySQL 并不会直接将所有的内容都存放在数据页中。因为 InnoDB 存储引擎使用 B+Tree 组织索引，每个页中至少应该有两条行记录，因此，如果页中只能存放下一条记录，那么 InnoDB 存储引擎会自动将行数据存放到溢出页中。
 
-如果我们使用`Compact`或`Redundant`格式，那么会将行数据中的前 768 个字节存储在数据页中，后面的数据会通过指针指向 Uncompressed BLOB Page。
+如果我们使用 `Compact` 或 `Redundant` 格式，那么会将行数据中的前  768  个字节存储在数据页中，后面的数据会通过指针指向 Uncompressed BLOB Page。
 
-但是如果我们使用新的行记录格式`Compressed` 或者`Dynamic`时只会在行记录中保存 20 个字节的指针，实际的数据都会存放在溢出页面中。
+但是如果我们使用新的行记录格式 `Compressed` 或者 `Dynamic` 时只会在行记录中保存 20 个字节的指针，实际的数据都会存放在溢出页面中。
 
 
 
-参考与引用：
+### 参考与引用：
 
+- https://www.linkedin.com/pulse/leverage-innodb-architecture-optimize-django-model-design-bouslama
 - [踏雪无痕-InnoDB存储引擎](https://www.cnblogs.com/chenpingzhao/p/9177324.html) 
 - [MySQL 与 InnoDB 存储引擎总结](https://wingsxdu.com/posts/database/mysql/innodb/)

@@ -23,7 +23,7 @@ MySQL是个啥，就说一句话——**MySQL是一个关系型数据库管理�
 
 
 
-
+![](/Users/starfish/oceanus/picBed/mysql/question-list.png)
 
 
 

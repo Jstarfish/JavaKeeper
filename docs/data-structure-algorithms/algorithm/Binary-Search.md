@@ -259,41 +259,31 @@ public static int findMax(int[] nums) {
 
 ```java
 public static int search(int[] nums,int target) {
-  int n = nums.length;
-  //特例
-  if (n == 0) {
-    return -1;
-  }
-  if (n == 1) {
-    return nums[0] == target ? 0 : -1;
-  }
+      if(nums.length == 0) return -1;
+      if(nums.length == 1) return target == nums[0] ? 0 : -1;
+      int left = 0;
+      int right = nums.length - 1;
+      while(left <= right){
+          int mid = left + (right - left)/2;
+          if(target == nums[mid]) return mid;
+          //左侧有序，注意是小于等于，处理最后只剩两个数的时候
+          if(nums[left] <= nums[mid]){
+              if(nums[left] <= target && target < nums[mid]){
+                  right = mid - 1;
+              }else{
+                  left = mid + 1;
+              }
+          }else{
+              if(nums[mid] < target && target <= nums[right]){
+                  left = mid +1;
+              }else{
+                  right = mid - 1;
+              }
+          }
 
-  int left = 0;
-  int right = nums.length - 1;
-
-  while (left <= right) {
-    int mid = left + (right - left) / 2;
-    if (target == nums[mid]) {
-      return mid;
-    }
-    //左侧有序的话
-    if (nums[0] <= nums[mid]) {
-      if (nums[0] <= target && target < nums[mid]) {
-        right = mid - 1;
-      } else {
-        left = mid + 1;
       }
-    } else {  //右侧有序
-      //注意这里是 n ,不是 right
-      if (nums[mid] < target && target <= nums[n - 1]) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
-    }
+      return -1;
   }
-  return -1;
-}
 ```
 
 
@@ -644,7 +634,9 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 > 解释：最长递增子序列是 [2,3,7,101]，因此长度为 4。
 > ```
 
+**思路**：
 
+- 优先使用动态规划
 
 
 
@@ -660,7 +652,9 @@ public static boolean findNumberIn2DArray(int[][] matrix, int target) {
 > 解释：合并数组 = [1,2,3] ，中位数 2
 > ```
 
+**思路**：
 
+中位数是指将一组数据从小到大排序后，位于中间位置的数值。如果数据集中的元素数量是奇数，中位数就是中间的那个元素；如果是偶数，则中位数是中间两个元素的平均值。
 
 
 

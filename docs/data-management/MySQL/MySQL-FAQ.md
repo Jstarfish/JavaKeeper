@@ -538,6 +538,12 @@ MyISAM引擎的索引文件和数据文件是分离的。**<mark>MyISAM引擎索
 
 
 
+讲一下页分裂
+
+
+
+
+
 ## 五、MySQL查询
 
 > count(*) 和 count(1)和count(列名)区别   ps：这道题说法有点多
@@ -1384,13 +1390,13 @@ long_query_time = 3
   4. 查看结果
 
      ```mysql
-   mysql> show profiles;
+      mysql> show profiles;
      +----------+------------+---------------------------------+
-   | Query_ID | Duration   | Query                           |
+      | Query_ID | Duration   | Query                           |
      +----------+------------+---------------------------------+
-   |        1 | 0.00385450 | show variables like "profiling" |
+      |        1 | 0.00385450 | show variables like "profiling" |
      |        2 | 0.00170050 | show variables like "profiling" |
-   |        3 | 0.00038025 | select * from t_base_user       |
+      |        3 | 0.00038025 | select * from t_base_user       |
      +----------+------------+---------------------------------+
      ```
    ```
