@@ -199,8 +199,6 @@ public static int findMin(int[] nums) {
 }
 ```
 
-
-
 **如果是求旋转数组中的最大值呢**
 
 ```java
@@ -349,41 +347,6 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 }
 ```
 
-两端探索方式（无法保证二分查找对数级的复杂度）
-
-```java
-public int[] query(int[] nums, int target) {
-    // 暴力二分，找到后向找到的结果的两端探索
-    // 确定左区间 [left,mid) 右区间 [mid, right)
-    int length = nums.length;
-    int left = 0;
-    int right = length - 1;
-    while (left <= right) {
-        int mid = (left + right) / 2;
-        if (target == nums[mid]) {
-            // 向两边探索
-            int l = mid;
-            int r = mid;
-            while (l > 0 && nums[l - 1] == target) {
-                l--;
-            }
-            while (r < length - 1 && nums[r + 1] == target) {
-                r++;
-            }
-            return new int[]{l, r};
-        }
-        if (target < nums[mid]) {
-            // 区间左移
-            right = mid - 1;
-        } else {
-            // 区间右移
-            left = mid + 1;
-        }
-    }
-    return new int[]{-1, -1};
-}
-```
-
 
 
 ### [287. 寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number/)
@@ -406,33 +369,34 @@ public int[] query(int[] nums, int target) {
 
 **思路**：
 
+这里二分的不是数组中的数，而是[1,n]中用来度量的数
+
 二分查找的思路是先猜一个数（有效范围 [left..right] 里位于中间的数 mid），然后统计原始数组中 小于等于 mid 的元素的个数 cnt：
 
 如果 cnt 严格大于 mid。根据抽屉原理，重复元素就在区间 [left..mid] 里；否则，重复元素就在区间 [mid + 1..right] 里。
-与绝大多数使用二分查找问题不同的是，这道题正着思考是容易的，即：思考哪边区间存在重复数是容易的，因为有抽屉原理做保证。
 
 > 抽屉原理：把 `10` 个苹果放进 `9` 个抽屉，至少有一个抽屉里至少放 `2` 个苹果。
 
 ```java
 public int findDuplicate(int[] nums) {
-  int len = nums.length;
-  int left = 1;
-  int right = len - 1;
-  while (left < right) {
+  int left = 0;
+  int right = nums.length - 1;
+  while (left <= right) {
     int mid = left + (right - left) / 2;
 
     // nums 中小于等于 mid 的元素的个数
-    int cnt = 0;
+    int count = 0;
     for (int num : nums) {
+      //看这里，是 <= mid，而不是 nums[mid]
       if (num <= mid) {
-        cnt += 1;
+         count += 1;
       }
     }
 
     // 根据抽屉原理，小于等于 4 的个数如果严格大于 4 个，此时重复元素一定出现在 [1..4] 区间里
-    if (cnt > mid) {
+    if (count > mid) {
       // 重复元素位于区间 [left..mid]
-      right = mid;
+      right = mid - 1;
     } else {
       // if 分析正确了以后，else 搜索的区间就是 if 的反面区间 [mid + 1..right]
       left = mid + 1;
@@ -526,99 +490,32 @@ public int findPeakElement(int[] nums) {
 
 **思路**：
 
-站在右上角看。这个矩阵其实就像是一个Binary Search Tree。然后，聪明的大家应该知道怎么做了。
+站在左下角或者右上角看。这个矩阵其实就像是一个Binary Search Tree。然后，聪明的大家应该知道怎么做了。
+
+![](https://img.starfish.ink/data-structure/searchgrid2-solution.jpg)
+
+有序的数组，我们首先应该想到二分
 
 ```java
-public static boolean findNumberIn2DArray(int[][] matrix, int target) {
-
-  if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-    return false;
-  }
-
-  int rows = matrix.length;
-  int columns = matrix[0].length;
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < columns; j++) {
-      if (matrix[i][j] == target) {
-        return true;
+  public boolean searchMatrix(int[][] matrix, int target) {
+      if (matrix == null || matrix.length < 1 || matrix[0].length < 1) {
+          return false;
       }
-    }
+      //行，列
+      int col = matrix[0].length;
+      int row = matrix.length;
+      //从左下角开始，根据大小选择走的方向
+      int x = row - 1, y = 0;
+      while (x >= 0 && y < row) {
+          if (target == matrix[x][y]) return true;
+          else if (target > matrix[x][y]) y++;
+          else x--;
+      }
+      return false;
   }
-  return false;
-}
 ```
 
-如果你写出这样的暴力解法，面试官可能就会反问你了：你还有什么想问的吗？
 
-言归正传，有序的数组，我们首先应该想到二分
-
-```java
-class Solution {
-    public boolean searchMatrix(int[][] matrix, int target) {
-        for (int[] row : matrix) {
-            int index = search(row, target);
-            if (index >= 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int search(int[] nums, int target) {
-        int low = 0, high = nums.length - 1;
-        while (low <= high) {
-            int mid = (high - low) / 2 + low;
-            int num = nums[mid];
-            if (num == target) {
-                return mid;
-            } else if (num > target) {
-                high = mid - 1;
-            } else {
-                low = mid + 1;
-            }
-        }
-        return -1;
-    }
-}
-```
-
-**Z 字形查找**
-
-> 假设arr数组，val，tar如下图所示：
-> 如果我们把二分值定在右上角或者左下角，就可以进行二分。这里以右上角为例，左下角可自行分析：
-> ![图片说明](https://uploadfiles.nowcoder.com/images/20200324/2071677_1585021381982_89033DB5EFA905C7F9FCCA6E59C9BB2C)
-> 1）我么设初始值为右上角元素，arr[0][5] = val，目标tar = arr[3][1]
-> 2）接下来进行二分操作：
-> 3）如果val == target,直接返回
-> 4）如果 tar > val, 说明target在更大的位置，val左边的元素显然都是 < val，间接 < tar，说明第 0 行都是无效的，所以val下移到arr[1][5]
-> 5）如果 tar < val, 说明target在更小的位置，val下边的元素显然都是 > val，间接 > tar，说明第 5 列都是无效的，所以val左移到arr[0][4]
-> 6）继续步骤2）
-
-```java
-public static boolean findNumberIn2DArray(int[][] matrix, int target) {
-
-  if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-    return false;
-  }
-
-  int rows = matrix.length;
-  int columns = matrix[0].length;
-  //右上角坐标
-  int row = 0;
-  int col = columns - 1;
-  while (row < rows && col >= 0) {
-    int num = matrix[row][col];
-    if (num == target) {
-      return true;
-    } else if (target > num) {
-      row++;
-    } else {
-      col--;
-    }
-  }
-  return false;
-}
-```
 
 
 
