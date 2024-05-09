@@ -8,9 +8,11 @@ categories: algorithms
 
 ![](https://img.starfish.ink/algorithm/binary-search-banner.png)
 
-> 二分查找并不简单，Knuth 大佬（发明 KMP 算法的那位）都说二分查找：**思路很简单，细节是魔鬼**。很多人喜欢拿整型溢出的 bug 说事儿，但是二分查找真正的坑根本就不是那个细节问题，而是在于到底要给 `mid` 加一还是减一，while 里到底用 `<=` 还是 `<`。
+> 二分查找【折半查找】，一种简单高效的搜索算法，一般是利用有序数组的特性，通过逐步比较中间元素来快速定位目标值
+>
+> 二分查找并不简单，Knuth 大佬（发明 KMP 算法的那位）都说二分查找：**思路很简单，细节是魔鬼**。比如二分查找让人头疼的细节问题，到底要给 `mid` 加一还是减一，while 里到底用 `<=` 还是 `<`。
 
-### 二分查找基础框架
+## 一、二分查找基础框架
 
 ```java
 int binarySearch(int[] nums, int target) {
@@ -35,6 +37,36 @@ int binarySearch(int[] nums, int target) {
 其中 `...` 标记的部分，就是可能出现细节问题的地方，当你见到一个二分查找的代码时，首先注意这几个地方。
 
 **另外提前说明一下，计算 `mid` 时需要防止溢出**，代码中 `left + (right - left) / 2` 就和 `(left + right) / 2` 的结果相同，但是有效防止了 `left` 和 `right` 太大，直接相加导致溢出的情况。
+
+
+
+## 二、二分查找性能分析
+
+**时间复杂度**：二分查找的时间复杂度为 $O(log n)$​，其中 n 是数组的长度。这是因为每次比较后，搜索范围都会减半，非常高效。
+
+> logn 是一个非常“恐怖”的数量级，即便 n 非常非常大，对应的 logn 也很小。比如 n 等于 2 的 32 次方，这个数很大了吧？大约是 42 亿。也就是说，如果我们在 42 亿个数据中用二分查找一个数据，最多需要比较 32 次。
+
+**空间复杂度**：
+
+- 迭代法：$O(1)$，因为只需要常数级别的额外空间。
+- 递归法：$O(log n)$，因为递归调用会占用栈空间。
+
+**最坏情况**：最坏情况下，目标值位于数组两端或不存在，需要$log n$次比较才能确定。
+
+**二分查找与其他搜索算法的比较**：
+
+- 线性搜索：线性搜索简单，时间复杂度为$O(n)$，但在大规模数据集上效率较低。
+
+- 哈希：哈希在查找上能提供平均$O(1)$的时间复杂度，但需要额外空间存储哈希表，且对数据有序性无要求。
+
+
+
+## 三、刷刷热题
+
+- 二分查找，可以用循环（迭代）实现，也可以用递归实现
+- 二分查找依赖的事顺序表结构（也就是数组）
+- 二分查找针对的是有序数组
+- 数据量太小太大都不是很适用二分（太小直接顺序遍历就够了，太大的话对连续内存空间要求更高）
 
 ### [704. 二分查找](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
 
@@ -168,6 +200,8 @@ public int firstNum(int[] nums, int target) {
 
 升序数组+旋转，仍然是部分有序，考虑用二分查找。
 
+![](https://assets.leetcode-cn.com/solution-static/153/1.png)
+
 > 我们先搞清楚题目中的数组是通过怎样的变化得来的，基本上就是等于将整个数组向右平移
 
 > 这种二分查找难就难在，arr[mid] 跟谁比。
@@ -177,6 +211,9 @@ public int firstNum(int[] nums, int target) {
 >
 > - 如果有目标值 target，那么直接让 arr[mid] 和 target 比较即可。
 > - 如果没有目标值，一般可以考虑 **端点**
+>
+> 如果中值 < 右值，则最小值在左半边，可以收缩右边界。
+> 如果中值 > 右值，则最小值在右半边，可以收缩左边界。
 
 旋转数组，最小值右侧的元素肯定都小于或等于数组中的最后一个元素 `nums[n-1]`，左侧元素都大于 `num[n-1]`
 
@@ -195,6 +232,7 @@ public static int findMin(int[] nums) {
       left = mid + 1;
     }
   }
+  //循环结束条件，left = right，最小值输出nums[left]或nums[right]均可 
   return nums[left];
 }
 ```
@@ -517,6 +555,37 @@ public int findPeakElement(int[] nums) {
 
 
 
+### [35. 搜索插入位置](https://leetcode.cn/problems/search-insert-position/)
+
+> 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
+>
+> ```
+> 输入: nums = [1,3,5,6], target = 2
+> 输出: 1
+> ```
+
+```java
+public int searchInsert(int[] nums, int target) {
+      int left = 0;
+      int right = nums.length - 1;
+  		//注意：特例处理
+      if (nums[left] > target) return 0;
+      if (nums[right] < target) return right + 1;
+      while (left <= right) {
+          int mid = left + (right - left) / 2;
+          if (nums[mid] > target) {
+              right = mid - 1;
+          } else if (nums[mid] < target) {
+              left = mid + 1;
+          } else {
+              return mid;
+          }
+      }
+  		//注意：这里如果没有查到，返回left,也就是需要插入的位置
+      return left;
+  }
+```
+
 
 
 ### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
@@ -552,37 +621,4 @@ public int findPeakElement(int[] nums) {
 **思路**：
 
 中位数是指将一组数据从小到大排序后，位于中间位置的数值。如果数据集中的元素数量是奇数，中位数就是中间的那个元素；如果是偶数，则中位数是中间两个元素的平均值。
-
-
-
-### [35. 搜索插入位置](https://leetcode.cn/problems/search-insert-position/)
-
-> 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
->
-> ```
-> 输入: nums = [1,3,5,6], target = 2
-> 输出: 1
-> ```
-
-```java
-public int searchInsert(int[] nums, int target) {
-      int left = 0;
-      int right = nums.length - 1;
-  		//注意：特例处理
-      if (nums[left] > target) return 0;
-      if (nums[right] < target) return right + 1;
-      while (left <= right) {
-          int mid = left + (right - left) / 2;
-          if (nums[mid] > target) {
-              right = mid - 1;
-          } else if (nums[mid] < target) {
-              left = mid + 1;
-          } else {
-              return mid;
-          }
-      }
-  		//注意：这里如果没有查到，返回left,也就是需要插入的位置
-      return left;
-  }
-```
 
