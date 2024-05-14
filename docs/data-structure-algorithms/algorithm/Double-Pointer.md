@@ -24,8 +24,6 @@ categories: LeetCode
 
 左右指针在数组中其实就是两个索引值，两个指针相向而行或者相背而行
 
-TODO: 一般都是有序数组？或者先排序后？
-
 Javaer 一般这么表示：
 
 ```java
@@ -35,27 +33,7 @@ while(left < right)
   ***
 ```
 
-这两个指针 **相向交替移动**
-
-
-
-> [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
->
-> [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
->
-> [167. 两数之和 II - 输入有序数组](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
->
-> [125. 验证回文串](https://leetcode-cn.com/problems/valid-palindrome/)
->
-> [344. 反转字符串](https://leetcode-cn.com/problems/reverse-string/)
->
-> [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
->
-> [704. 二分查找](https://leetcode-cn.com/problems/binary-search/)
->
-> [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
-
-TODO: 画图对比各个算法
+这两个指针 **相向交替移动**， 看着像二分查找是吧，二分也属于左右指针。
 
 
 
@@ -125,7 +103,7 @@ public void reverseString(char[] s) {
 直接用左右指针套就可以
 
 ```java
-public static int[] towSum(int[] nums, int target) {
+public int[] twoSum(int[] nums, int target) {
   int left = 0;
   int rigth = nums.length - 1;
   while (left < rigth) {
@@ -165,7 +143,7 @@ public static int[] towSum(int[] nums, int target) {
     - nums[right] == nums[right - 1]  移动指针
 
 ```java
-public static List<List<Integer>> threeSum(int[] nums) {
+public List<List<Integer>> threeSum(int[] nums) {
         //存放结果list
         List<List<Integer>> result = new ArrayList<>();
         int length = nums.length;
@@ -216,7 +194,7 @@ public static List<List<Integer>> threeSum(int[] nums) {
 > 解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
 > ```
 >
-> ![img](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
+> ![](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
 
 **思路**：
 
@@ -330,21 +308,11 @@ public static int search(int[] nums, int target) {
 
 ## 二、快慢指针
 
-「快慢指针」，也称为「同步指针」，所谓快慢指针，就是两个指针同向而行，一快一慢
+「快慢指针」，也称为「同步指针」，所谓快慢指针，就是两个指针同向而行，一快一慢。快慢指针处理的大都是链表问题。
 
 ![](https://img.starfish.ink/leetcode/fast-slow-point.png)
 
-> [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
->
-> [142. 环形链表II](https://leetcode-cn.com/problems/linked-list-cycle-ii)
->
-> [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
->
-> [876. 链表的中间结点](https://leetcode-cn.com/problems/middle-of-the-linked-list/)
->
-> [26. 删除有序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
-
-### 环形链表
+### [环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
 
 > 给你一个链表的头节点 head ，判断链表中是否有环。
 >
@@ -382,7 +350,7 @@ public boolean hasCycle(ListNode head) {
 
 
 
-### 环形链表 II
+### [环形链表II](https://leetcode-cn.com/problems/linked-list-cycle-ii)
 
 > 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 `null`。
 >
@@ -395,8 +363,10 @@ public boolean hasCycle(ListNode head) {
 思路：
 
 - 最初，我就把有环理解错了，看题解觉得快慢指针相交的地方就是入环的节点
+
 - 假设环是这样的，slow 指针进入环后，又走了 b 的距离与 fast 相遇
-- ![fig1](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
+
+  ![fig1](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
 
 
 
@@ -473,7 +443,7 @@ public boolean isPalindrome(ListNode head) {
 
 
 
-### [删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+### 删除链表的倒数第 N 个结点
 
 > 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
 >
@@ -594,25 +564,11 @@ public int findLengthOfLCIS(int[] nums) {
 
 有一类数组上的问题，需要使用两个指针变量（我们称为左指针和右指针），同向、交替向右移动完成任务。这样的过程像极了一个窗口在平面上滑动的过程，因此我们将解决这一类问题的算法称为「滑动窗口」问题
 
+![](https://img.starfish.ink/mysql/1*m1WP0k9cHRkcTixpfayOdA.gif)
 
-
-![img](http://img.pkdoutu.com/production/uploads/image/2017/04/04/20170404308618_ZzXJwE.gif)
-
-滑动窗口，就是两个指针齐头并进，好像一个窗口一样，不断往前滑
+滑动窗口，就是两个指针齐头并进，好像一个窗口一样，不断往前滑。
 
 子串问题，几乎都是滑动窗口
-
-> [643. 子数组最大平均数 I](https://leetcode-cn.com/problems/maximum-average-subarray-i/)
->
-> [1052. 爱生气的书店老板](https://leetcode-cn.com/problems/grumpy-bookstore-owner/)
->
-> [3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
->
-> [76. 最小覆盖子串](https://leetcode-cn.com/problems/minimum-window-substring/)
->
-> [424. 替换后的最长重复字符](https://leetcode-cn.com/problems/longest-repeating-character-replacement/)
->
-> 
 
 ```java
 int left = 0, right = 0;
@@ -636,7 +592,7 @@ while (right < s.size()) {
 
 有一类数组上的问题，问我们固定长度的滑动窗口的性质，这类问题还算相对简单。
 
-#### 子数组最大平均数 I
+#### [子数组最大平均数 I（643）](https://leetcode-cn.com/problems/maximum-average-subarray-i/)
 
 > 给定 `n` 个整数，找出平均数最大且长度为 `k` 的连续子数组，并输出该最大平均数。
 >
@@ -675,7 +631,7 @@ public static double getMaxAverage(int[] nums, int k) {
 
 ### 3.2 不定长度的滑动窗口
 
-#### 无重复字符的最长子串
+#### [无重复字符的最长子串（3）](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
 
 > 给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长子串** 的长度。
 >
@@ -714,7 +670,7 @@ public static int lengthOfLongestSubstring(String s){
 
 
 
-#### 最小覆盖子串
+#### [最小覆盖子串（76）](https://leetcode-cn.com/problems/minimum-window-substring/)
 
 > 给你一个字符串 `s` 、一个字符串 `t` 。返回 `s` 中涵盖 `t` 所有字符的最小子串。如果 `s` 中不存在涵盖 `t` 所有字符的子串，则返回空字符串 `""` 。
 >
@@ -727,7 +683,7 @@ public static int lengthOfLongestSubstring(String s){
 
 
 
-#### 替换后的最长重复字符
+#### [替换后的最长重复字符（424）](https://leetcode-cn.com/problems/longest-repeating-character-replacement/)
 
 > 给你一个仅由大写英文字母组成的字符串，你可以将任意位置上的字符替换成另外的字符，总共可最多替换 k 次。在执行上述操作后，找到包含重复字母的最长子串的长度。
 >
