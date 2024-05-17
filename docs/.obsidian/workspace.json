@@ -37,8 +37,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Double-Pointer.md",
-                "mode": "source",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Double-Pointer.md",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Double-Pointer.md",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Double-Pointer.md"
+                "file": "data-management/MySQL/MySQL-Optimization.md"
               }
             }
           }
@@ -193,6 +193,15 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/MySQL/readMySQL.md",
+    "data-management/MySQL/MySQL-FAQ.md",
+    "data-management/MySQL/MySQL-Framework.md",
+    "data-management/MySQL/MySQL-Split.md",
+    "data-management/MySQL/MySQL-Transaction.md",
+    "data-management/MySQL/MySQL-Index.md",
+    "data-management/MySQL/MySQL-count.md",
+    "data-management/MySQL/数据库三范式.md",
+    "data-structure-algorithms/algorithm/Double-Pointer.md",
     "data-structure-algorithms/data-structure/Linked-List.md",
     "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/ReadRedis.md",
@@ -211,15 +220,6 @@
     "data-structure-algorithms/Array.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹",
-    "data-structure-algorithms/Back-Track.md",
-    "data-structure-algorithms/Double-Pointer.md",
-    "data-structure-algorithms/Dynamic-Programming.md",
-    "data-structure-algorithms/soultion/String-Solution.md",
-    "data-structure-algorithms/soultion/LinkedList-Soultion.md",
-    "data-structure-algorithms/soultion/stock-problems.md",
-    "data-structure-algorithms/soultion/Math-Solution.md",
-    "data-structure-algorithms/soultion/Array-Solution.md",
-    "data-structure-algorithms/soultion/DP-Solution.md",
-    "interview/Kafka-FAQ.md"
+    "data-structure-algorithms/Back-Track.md"
   ]
 }
