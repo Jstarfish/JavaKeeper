@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/MySQL/MySQL-Optimization.md",
+                "file": "data-management/MySQL/MySQL-Log.md",
                 "mode": "preview",
                 "source": false
               }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/MySQL/MySQL-Optimization.md",
+                "file": "data-management/MySQL/MySQL-Log.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/MySQL/MySQL-Optimization.md",
+                "file": "data-management/MySQL/MySQL-Log.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/MySQL/MySQL-Optimization.md"
+                "file": "data-management/MySQL/MySQL-Log.md"
               }
             }
           }
@@ -193,6 +193,17 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Optimization.md",
+    "data-structure-algorithms/algorithm/Double-Pointer.md",
+    "data-management/Redis/Redis-MQ.md",
+    "data-management/Redis/Redis-Master-Slave.md",
+    "data-management/Redis/Redis-Lock.md",
+    "data-management/Redis/Redis-IO-Model.md",
+    "data-management/Redis/Redis-Datatype.md",
+    "data-management/Redis/Redis-Database.md",
+    "data-management/Redis/ReadRedis.md",
+    "data-management/Redis/Key 寻址算法.md",
+    "data-management/Redis/Cache-Design.md",
     "data-management/MySQL/readMySQL.md",
     "data-management/MySQL/MySQL-FAQ.md",
     "data-management/MySQL/MySQL-Framework.md",
@@ -201,25 +212,14 @@
     "data-management/MySQL/MySQL-Index.md",
     "data-management/MySQL/MySQL-count.md",
     "data-management/MySQL/数据库三范式.md",
-    "data-structure-algorithms/algorithm/Double-Pointer.md",
     "data-structure-algorithms/data-structure/Linked-List.md",
-    "data-management/Redis/Redis-Datatype.md",
-    "data-management/Redis/ReadRedis.md",
-    "data-management/Redis/Cache-Design.md",
-    "data-management/Redis/Key 寻址算法.md",
     "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
     "data-management/README.md",
     "framework/SpringWebFlux/响应式编程.md",
     "data-management/MySQL/MySQL-Storage-Engines.md",
     "data-structure-algorithms/algorithm/Backtracking.md",
     "data-structure-algorithms/algorithm/未命名.md",
-    "data-structure-algorithms/Leetcode-dynamic-programming.md",
-    "data-structure-algorithms/complexity.md",
-    "data-structure-algorithms/README.md",
-    "data-structure-algorithms/Linked-List.md",
-    "data-structure-algorithms/Array.md",
     "data-structure-algorithms/algorithm",
-    "data-structure-algorithms/未命名文件夹",
-    "data-structure-algorithms/Back-Track.md"
+    "data-structure-algorithms/未命名文件夹"
   ]
 }

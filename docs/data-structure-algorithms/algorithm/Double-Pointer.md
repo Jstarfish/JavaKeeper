@@ -568,7 +568,7 @@ public int findLengthOfLCIS(int[] nums) {
 
 滑动窗口，就是两个指针齐头并进，好像一个窗口一样，不断往前滑。
 
-子串问题，几乎都是滑动窗口
+子串问题，几乎都是滑动窗口。滑动窗口算法技巧的思路，就是维护一个窗口，不断滑动，然后更新答案，该算法的大致逻辑如下：
 
 ```java
 int left = 0, right = 0;
@@ -629,6 +629,20 @@ public static double getMaxAverage(int[] nums, int k) {
 
 
 
+#### [字符串的排列（567）](https://leetcode.cn/problems/permutation-in-string/description/)
+
+> 给你两个字符串 `s1` 和 `s2` ，写一个函数来判断 `s2` 是否包含 `s1` 的排列。如果是，返回 `true` ；否则，返回 `false` 。
+>
+> 换句话说，`s1` 的排列之一是 `s2` 的 **子串** 。
+>
+> ```
+> 输入：s1 = "ab" s2 = "eidbaooo"
+> 输出：true
+> 解释：s2 包含 s1 的排列之一 ("ba").
+> ```
+
+
+
 ### 3.2 不定长度的滑动窗口
 
 #### [无重复字符的最长子串（3）](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
@@ -667,6 +681,33 @@ public static int lengthOfLongestSubstring(String s){
   return result;
 }
 ```
+
+```java
+int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> window = new HashMap<>();
+
+    int left = 0, right = 0;
+    int res = 0; // 记录结果
+    while (right < s.length()) {
+        char c = s.charAt(right);
+        right++;
+        // 进行窗口内数据的一系列更新
+        window.put(c, window.getOrDefault(c, 0) + 1);
+        // 判断左侧窗口是否要收缩
+        while (window.get(c) > 1) {
+            char d = s.charAt(left);
+            left++;
+            // 进行窗口内数据的一系列更新
+            window.put(d, window.get(d) - 1);
+        }
+        // 在这里更新答案
+        res = Math.max(res, right - left);
+    }
+    return res;
+}
+```
+
+
 
 
 
