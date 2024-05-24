@@ -84,37 +84,37 @@ SET GLOBAL general_log = 'ON'
 >
 > 不过不论是什么类型的页面，每当我们从页面中读取或写入数据时，都必须先将其从硬盘上加载到内存中的`buffer pool`中（也就是说内存中的页面其实就是硬盘中页面的一个副本），然后才能对内存中页面进行读取或写入。如果要修改内存中的页面，为了减少磁盘 I/O，修改后的页面并不立即同步到磁盘，而是作为`脏页`继续呆在内存中，等待后续合适时机将其刷新到硬盘（一般是有后台线程异步刷新），将该页刷到磁盘的操作称为 刷脏页 （本句是重点，后面要吃）。
 >
-> > #### 内存缓冲区
+> #### 内存缓冲区
 >>
-> > InnoDB 存储引擎是基于磁盘存储的，并将其中的记录按照页的方式进行管理。由于 CPU 速度与磁盘速度之间的鸿沟，基于磁盘的数据库系统通常使用内存缓冲区技术来提高数据库的整体性能。
-> >
-> > ##### Page Cache
-> >
-> > InnoDB 会将读取过的页缓存在内存中，并采取最近最少使用（Least Recently Used，LRU） 算法将缓冲池作为列表进行管理，以增加缓存命中率。
-> >
-> > InnoDB 对 LRU 算法进行了一定的改进，执行**中点插入策略**，默认前 5/8 为`New Sublist`，存储经常被使用的热点页，后 3/8 为`Old Sublist`。新读入的 page 默认被加在`old Sublist`的头部，如果在运行过程中 `old Sublist` 的数据被访问到了，那么这个页就会被移动到 `New Sublist` 的头部。
-> >
-> > ![](https://img.starfish.ink/mysql/lru-buffer-pool.png)
-> >
-> > 每当 InnoDB 缓存新的数据页时，会优先从 `Free List` 中查找空余的缓存区域，如果不存在，那么就需要从 `LRU List` 淘汰一定的尾部节点。不管数据页位于 `New Sublist` 还是 `Old Sublist`，如果没有被访问到，那么最终都会被移动到 `LRU List` 的尾部作为牺牲者。
-> >
-> > ##### Change Buffer
-> >
-> > Change Buffer 用于记录数据的修改，因为 InnoDB 的辅助索引不同于聚集索引的顺序插入，如果每次修改二级索引都直接写入磁盘，则会有大量频繁的随机 IO。
-> >
-> > InnoDB 从 1.0.x 版本开始引入了 Change Buffer，主要目的是将对**非唯一辅助索引**页的操作缓存下来，如果辅助索引页已经在缓冲区了，则直接修改；如果不在，则先将修改保存到 Change Buffer。当对应辅助索引页读取到缓冲区时，才将 Change Buffer 的数据合并到真正的辅助索引页中，以此减少辅助索引的随机 IO，并达到操作合并的效果。
-> >
-> > ![](https://img.starfish.ink/mysql/innodb-change-buffer.png)
-> >
-> > 在 MySQL 5.5 之前 Change Buffer 其实叫 Insert Buffer，最初只支持 INSERT 操作的缓存，随着支持操作类型的增加，改名为 Change Buffer，现在 InnoDB 存储引擎可以对 INSERT、DELETE、UPDATE 都进行缓冲，对应着：Insert Buffer、Delete Buffer、Purge buffer。
-> >
-> > ##### Double Write Buffer
-> >
-> > 当发生数据库宕机时，可能存储引擎正在写入某个页到表中，而这个页只写了一部分，比如 16KB 的页，只写了前 4KB，之后就发生了宕机。虽然可以通过日志进行数据恢复，但是如果这个页本身已经发生了损坏，再对其进行重新写入是没有意义的。因此 InnoDB 引入 Double Write Buffer 解决数据页的半写问题。
-> >
-> > Double Write Buffer 大小默认为 2M，即 128 个数据页。其中分为两部分，一部分留给`batch write`，提供批量刷新脏页的操作，另一部分是`single page write`，留给用户线程发起的单页刷脏操作。
-> >
-> > 在对缓冲池的脏页进行刷新时，脏页并不是直接写到磁盘，而是会通过`memcpy()`函数将脏页先复制到内存中的 Double Write Buffer 中，如果 Double Write Buffer 写满了，那么就会调用`fsync()`系统调用，一次性将 Double Write Buffer 所有的数据写入到磁盘中，因为这个过程是顺序写入，开销几乎可以忽略。在确保写入成功后，再使用异步 IO 把各个数据页写回自己的表空间中。
+> InnoDB 存储引擎是基于磁盘存储的，并将其中的记录按照页的方式进行管理。由于 CPU 速度与磁盘速度之间的鸿沟，基于磁盘的数据库系统通常使用内存缓冲区技术来提高数据库的整体性能。
+> 
+> ##### Page Cache
+> 
+> InnoDB 会将读取过的页缓存在内存中，并采取最近最少使用（Least Recently Used，LRU） 算法将缓冲池作为列表进行管理，以增加缓存命中率。
+> 
+> InnoDB 对 LRU 算法进行了一定的改进，执行**中点插入策略**，默认前 5/8 为`New Sublist`，存储经常被使用的热点页，后 3/8 为`Old Sublist`。新读入的 page 默认被加在`old Sublist`的头部，如果在运行过程中 `old Sublist` 的数据被访问到了，那么这个页就会被移动到 `New Sublist` 的头部。
+> 
+> ![](https://img.starfish.ink/mysql/lru-buffer-pool.png)
+> 
+> 每当 InnoDB 缓存新的数据页时，会优先从 `Free List` 中查找空余的缓存区域，如果不存在，那么就需要从 `LRU List` 淘汰一定的尾部节点。不管数据页位于 `New Sublist` 还是 `Old Sublist`，如果没有被访问到，那么最终都会被移动到 `LRU List` 的尾部作为牺牲者。
+> 
+> ##### Change Buffer
+> 
+> Change Buffer 用于记录数据的修改，因为 InnoDB 的辅助索引不同于聚集索引的顺序插入，如果每次修改二级索引都直接写入磁盘，则会有大量频繁的随机 IO。
+> 
+> InnoDB 从 1.0.x 版本开始引入了 Change Buffer，主要目的是将对**非唯一辅助索引**页的操作缓存下来，如果辅助索引页已经在缓冲区了，则直接修改；如果不在，则先将修改保存到 Change Buffer。当对应辅助索引页读取到缓冲区时，才将 Change Buffer 的数据合并到真正的辅助索引页中，以此减少辅助索引的随机 IO，并达到操作合并的效果。
+> 
+> ![](https://img.starfish.ink/mysql/innodb-change-buffer.png)
+> 
+> 在 MySQL 5.5 之前 Change Buffer 其实叫 Insert Buffer，最初只支持 INSERT 操作的缓存，随着支持操作类型的增加，改名为 Change Buffer，现在 InnoDB 存储引擎可以对 INSERT、DELETE、UPDATE 都进行缓冲，对应着：Insert Buffer、Delete Buffer、Purge buffer。
+> 
+> ##### Double Write Buffer
+> 
+> 当发生数据库宕机时，可能存储引擎正在写入某个页到表中，而这个页只写了一部分，比如 16KB 的页，只写了前 4KB，之后就发生了宕机。虽然可以通过日志进行数据恢复，但是如果这个页本身已经发生了损坏，再对其进行重新写入是没有意义的。因此 InnoDB 引入 Double Write Buffer 解决数据页的半写问题。
+> 
+> Double Write Buffer 大小默认为 2M，即 128 个数据页。其中分为两部分，一部分留给`batch write`，提供批量刷新脏页的操作，另一部分是`single page write`，留给用户线程发起的单页刷脏操作。
+> 
+> 在对缓冲池的脏页进行刷新时，脏页并不是直接写到磁盘，而是会通过`memcpy()`函数将脏页先复制到内存中的 Double Write Buffer 中，如果 Double Write Buffer 写满了，那么就会调用`fsync()`系统调用，一次性将 Double Write Buffer 所有的数据写入到磁盘中，因为这个过程是顺序写入，开销几乎可以忽略。在确保写入成功后，再使用异步 IO 把各个数据页写回自己的表空间中。
 
 ### 2.1 为什么需要 redo log
 
@@ -144,7 +144,7 @@ SET GLOBAL general_log = 'ON'
 
 具体来说，当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 `redo log`（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
-> DBA 口中的日志先行说的就是这个 WAL 技术。
+> DBA 口中的**日志先行**说的就是这个 WAL 技术。
 >
 > 记录下对磁盘中某某页某某位置数据的修改结果的 redo log，这种日志被称为**物理日志**，可以节省很多磁盘空间。
 >
@@ -194,7 +194,7 @@ MySQL redo日志是一组日志文件，在 MySQL 8.0.30  版本中，MySQL 会�
 
 一个 `redo log block` 固定 `512字节` 大小，由三个部分组成：
 
-- 12 字节的**Block Header**，主要记录一些额外的信息，包括文件信息、log 版本、lsn 等
+- 12 字节的 **Block Header**，主要记录一些额外的信息，包括文件信息、log 版本、lsn 等
 - Block 中剩余的中间 498 个字节就是 REDO 真正内容的存放位置
 
 - Block 末尾是 4 字节的 **Block Tailer**，记录当前 Block 的 Checksum，通过这个值，读取 Log 时可以明确 Block 数据有没有被完整写盘。
@@ -342,7 +342,7 @@ CheckPoint 的意思是检查点，用于推进 Redo Log 的失效。当触发 C
 
 1. 将原始数据读入内存，修改数据的内存副本。
 
-2. 先将内存中 Buffer pool 的脏页写入到 Redo log buffer 当中**记录数据的变化**。然后再将 redo log buffer 当中记录数据变化的日志通过**顺序IO**刷新到磁盘的 redo log file 当中 
+2. 先将内存中 Buffer pool 的脏页写入到 Redo log buffer 当中**记录数据的变化**。然后再将 redo log buffer 当中记录数据变化的日志通过 **顺序IO** 刷新到磁盘的 redo log file 当中 
 
    > 在缓冲池中有一条 Flush 链表用来维护被修改的数据页面，也就是脏页所组成的链表。
 
@@ -881,31 +881,35 @@ mysql> show variables like '%row_limit%';
 
 ### 说下 一条 MySQL 更新语句的执行流程是怎样的吧？
 
-```
+```mysql
 mysql> update t set name='starfish' where salary > 999999;
 ```
 
-server层和InnoDB层之间是如何沟通：
+server 层和 InnoDB 层之间是如何沟通：
 
-1. salary 有二级索引，行器先找引擎取扫描区间的第一行。根据这条二级索引记录中的主键值执行回表操作（即通过聚簇索引的B+树根节点一层一层向下找，直到在叶子节点中找到相应记录），将获取到的聚簇索引记录返回给server层。
-2. server层得到聚簇索引记录后，会看一下更新前的记录和更新后的记录是否一样，如果一样的话就不更新了，如果不一样的话就把更新前的记录和更新后的记录都当作参数传给InnoDB层，让InnoDB真正的执行更新记录的操作
-3. InnoDB收到更新请求后，先更新记录的聚簇索引记录，再更新记录的二级索引记录。最后将更新结果返回给server层
-4. server层继续向InnoDB索要下一条记录，由于已经通过B+树定位到二级索引扫描区间`[999999, +∞)`的第一条二级索引记录，而记录又是被串联成单向链表，所以InnoDB直接通过记录头信息的`next_record`的属性即可获取到下一条二级索引记录。然后通过该二级索引的主键值进行回表操作，获取到完整的聚簇索引记录再返回给server层。
+1. salary 有二级索引，行器先找引擎取扫描区间的第一行。根据这条二级索引记录中的主键值执行回表操作（即通过聚簇索引的B+树根节点一层一层向下找，直到在叶子节点中找到相应记录），将获取到的聚簇索引记录返回给 server 层。
+2. server 层得到聚簇索引记录后，会看一下更新前的记录和更新后的记录是否一样，如果一样的话就不更新了，如果不一样的话就把更新前的记录和更新后的记录都当作参数传给 InnoDB 层，让 InnoDB 真正的执行更新记录的操作
+3. InnoDB 收到更新请求后，先更新记录的聚簇索引记录，再更新记录的二级索引记录。最后将更新结果返回给 server 层
+4. server 层继续向 InnoDB 索要下一条记录，由于已经通过 B+ 树定位到二级索引扫描区间 `[999999, +∞)` 的第一条二级索引记录，而记录又是被串联成单向链表，所以 InnoDB 直接通过记录头信息的 `next_record` 的属性即可获取到下一条二级索引记录。然后通过该二级索引的主键值进行回表操作，获取到完整的聚簇索引记录再返回给 server 层。
 5. 就这样一层一层的处理
 
 具体执行流程：
 
-1. 先在B+树中定位到该记录（这个过程也被称作加锁读），如果该记录所在的页面不在buffer pool里，先将其加载到 buffer pool 里再读取。
+1. 先在 B+ 树中定位到该记录（这个过程也被称作**加锁读**），如果该记录所在的页面不在 buffer pool 里，先将其加载到 buffer pool 里再读取。
 
 2. 首先更新聚簇索引记录。 更新聚簇索引记录时： 
 
-   ① 先向Undo页面写undo日志。不过由于这是在更改页面，所以修改 Undo 页面前需要先记录一下相应的 redo 日志。 
+   ① 先向 Undo 页面写 undo 日志。不过由于这是在更改页面，所以修改 Undo 页面前需要先记录一下相应的 redo 日志。 
 
    ② 将这个更新操作记录到 redo log 里面，此时 redo log 处于 prepare 状态。然后告知执行器执行完成了，随时可以提交事务。
 
+   > 这里可以会有点疑惑。我们可以直接理解成先写 undo 再写 redo，这里修改后的页面并没有加入 buffer pool 的 flush 链表，记录的 redo 日志也没有加入到 redo log buffer。当这个函数执行完后，才会：先将这个过程产生的 redo 日志写入到 redo log buffer，再将这个过程修改的页面加入到 buffer pool 的 flush 链表中。
+
 3. 更新其他的二级索引记录。
 
-4. 记录该语句对应的 binlog 日志，此时记录的binlog并没有刷新到硬盘上的binlog日志文件，在事务提交时才会统一将该事务运行过程中的所有binlog日志刷新到硬盘。
+   > 更新二级索引记录时不会再记录 undo 日志，但由于是在修改页面内容，会先记录相应的 redo 日志。
+
+4. 记录该语句对应的 binlog 日志，此时记录的 binlog 并没有刷新到硬盘上的 binlog 日志文件，在事务提交时才会统一将该事务运行过程中的所有 binlog 日志刷新到硬盘。
 
 5. 引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。
 
@@ -915,7 +919,7 @@ server层和InnoDB层之间是如何沟通：
 
 ![](https://img.starfish.ink/mysql/log-seq.png)
 
-### 为什么需要记录REDO
+### 为什么需要记录 REDO
 
 redo log 是 Innodb 存储引擎层生成的日志，实现了事务中的**持久性**，主要**用于掉电等故障恢复**：
 
