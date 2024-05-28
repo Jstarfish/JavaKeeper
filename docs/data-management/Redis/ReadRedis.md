@@ -1,4 +1,4 @@
-![](https://img.starfish.ink/redis/redis-readme-banner.jpg)
+![img](https://redis.io/wp-content/uploads/2014/05/redis_289_art.png)
 
 
 

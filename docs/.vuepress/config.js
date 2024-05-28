@@ -222,6 +222,7 @@ function genDataManagementSidebar(){
         ['MySQL/MySQL-Log', 'MySQL 日志'],
         ['MySQL/MySQL-Lock', 'MySQL 锁'],
         ['MySQL/MySQL-Select', 'MySQL 查询'],
+        ['MySQL/MySQL-Optimization', 'MySQL 优化'],
         // ['MySQL/数据库三范式', '数据库三范式'],
       ]
     },
