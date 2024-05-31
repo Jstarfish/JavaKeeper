@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/Redis/Redis-Master-Slave.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "mode": "source",
                 "source": false
               }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/Redis/Redis-Master-Slave.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/Redis/Redis-Master-Slave.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/Redis/Redis-Master-Slave.md"
+                "file": "data-management/Redis/Redis-Datatype.md"
               }
             }
           }
@@ -193,6 +193,7 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/Redis/Redis-Master-Slave.md",
     "data-management/MySQL/readMySQL.md",
     "data-management/MySQL/MySQL-Log.md",
     "data-management/Redis/Redis 有用指令.md",
@@ -210,7 +211,6 @@
     "data-management/MySQL/MySQL-Optimization.md",
     "data-structure-algorithms/algorithm/Double-Pointer.md",
     "data-management/Redis/Redis-MQ.md",
-    "data-management/Redis/Redis-Master-Slave.md",
     "data-management/Redis/Key 寻址算法.md",
     "data-management/Redis/Cache-Design.md",
     "data-management/MySQL/MySQL-FAQ.md",

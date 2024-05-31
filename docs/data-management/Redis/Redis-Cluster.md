@@ -30,6 +30,8 @@ Redis 集群刚好解决了上述问题，实现了较为完善的高可用方�
 
 2. **高可用**： 集群支持主从复制和主节点的 **自动故障转移** *（与哨兵类似）*，当任一节点发生故障时，集群仍然可以对外提供服务。
 
+![Redis Cluster Architecture](https://www.mybluelinux.com/img/post/posts/0189/redis-cluster-architecture.webp)
+
 ![](https://img.starfish.ink/redis/redis-cluster-framework.png)
 
 上图展示了 **Redis Cluster** 典型的架构图，集群中的每一个 Redis 节点都 **互相两两相连**，客户端任意 **直连** 到集群中的 **任意一台**，就可以对其他 Redis 节点进行 **读写** 的操作。
@@ -574,7 +576,8 @@ Redis 集群自身实现了高可用。高可用首先需要解决集群部分�
 
 ### 参考与来源
 
-1. https://redis.io/topics/cluster-tutorial
-2. 《Redis 设计与实现》
-3. 《Redis 开发与运维》
-4. https://www.cnblogs.com/kismetv/p/9853040.html
+1. https://www.mybluelinux.com/redis-explained/
+2. https://redis.io/topics/cluster-tutorial
+3. 《Redis 设计与实现》
+4. 《Redis 开发与运维》
+5. https://www.cnblogs.com/kismetv/p/9853040.html
