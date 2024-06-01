@@ -387,11 +387,11 @@ public class RedissonBloomFilterDemo {
 
 ## 参考与感谢
 
-https://www.cs.cmu.edu/~dga/papers/cuckoo-conext2014.pdf
+- https://www.cs.cmu.edu/~dga/papers/cuckoo-conext2014.pdf
 
-http://www.justdojava.com/2019/10/22/bloomfilter/
+- http://www.justdojava.com/2019/10/22/bloomfilter/
 
-https://www.cnblogs.com/cpselvis/p/6265825.html
+- https://www.cnblogs.com/cpselvis/p/6265825.html
 
-https://juejin.im/post/5cc5aa7ce51d456e431adac5
+- https://juejin.im/post/5cc5aa7ce51d456e431adac5
 

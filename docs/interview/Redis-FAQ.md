@@ -1715,15 +1715,129 @@ end
 
 这样的话，当你的数据不断增长，需要更多的Redis服务器时，你需要做的就是仅仅将Redis实例从一台服务迁移到另外一台服务器而已（而不用考虑重新分区的问题）。一旦你添加了另一台服务器，你需要将你一半的Redis实例从第一台机器迁移到第二台机器。
 
-### 什么是 RedLock
-
-Redis 官方站提出了一种权威的基于 Redis 实现分布式锁的方式名叫 Redlock，此种方式比原先的单节点的方法更安全。它可以保证以下特性：
-
-安全特性：互斥访问，即永远只有一个 client 能拿到锁
-避免死锁：最终 client 都可能拿到锁，不会出现死锁的情况，即使原本锁住某资源的 client crash 了或者出现了网络分区
-容错性：只要大部分 Redis 节点存活就可以正常提供服务
 
 
+### redis分布式锁，过期时间怎么定的，如果一个业务执行时间比较长，锁过期了怎么办，怎么保证释放锁的一个原子性，
+
+1. **设定锁的过期时间**
+
+锁的过期时间应该稍长于业务的预期执行时间，但不能太长，以免资源长期被占用。一般可以按照以下步骤设定锁的过期时间：
+
+- **估算业务执行时间**：根据业务逻辑和历史执行数据，估算业务的最长执行时间。
+
+- **加上缓冲时间**：在估算的执行时间基础上加上一定的缓冲时间，确保大多数情况下锁不会在业务完成前过期。
+
+例如，如果某个业务通常在 5 秒内完成，可以设定锁的过期时间为 7 秒。
+
+**2. 处理业务执行时间较长的情况**
+
+对于可能执行时间较长的业务，确保锁在业务完成前不会过期是关键。可以使用“锁续期”机制，定期延长锁的过期时间。
+
+**续期机制实现**
+
+1. **开启一个定时任务**：在获取锁后，开启一个定时任务，每隔一定时间（如过期时间的一半）延长锁的过期时间。
+
+2. **判断锁的持有者**：在续期时，确保当前续期操作仍然是由锁的持有者执行，以防止锁误续期。
+
+   ```java
+   public class RedisLockWithRenewal {
+   
+       private static final String LOCK_KEY = "my_lock";
+       private static final String LOCK_VALUE = "unique_value";
+       private static final int EXPIRE_TIME = 7; // 过期时间为7秒
+   
+       public boolean acquireLock(Jedis jedis) {
+           String result = jedis.set(LOCK_KEY, LOCK_VALUE, "NX", "EX", EXPIRE_TIME);
+           return "OK".equals(result);
+       }
+   
+       public void releaseLock(Jedis jedis) {
+           if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
+               jedis.del(LOCK_KEY);
+           }
+       }
+   
+       public void renewLock(Jedis jedis) {
+           Timer timer = new Timer();
+           timer.schedule(new TimerTask() {
+               @Override
+               public void run() {
+                   if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
+                       jedis.expire(LOCK_KEY, EXPIRE_TIME);
+                       System.out.println("Lock renewed.");
+                   } else {
+                       timer.cancel();
+                   }
+               }
+           }, EXPIRE_TIME * 500, EXPIRE_TIME * 500); // 每 3.5 秒续期一次
+       }
+   
+       public static void main(String[] args) {
+           Jedis jedis = new Jedis("localhost", 6379);
+           RedisLockWithRenewal lock = new RedisLockWithRenewal();
+   
+           if (lock.acquireLock(jedis)) {
+               lock.renewLock(jedis);
+               try {
+                   // 业务逻辑
+                   System.out.println("Lock acquired, performing business logic...");
+                   Thread.sleep(15000); // 模拟长时间业务执行
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               } finally {
+                   lock.releaseLock(jedis);
+                   System.out.println("Lock released.");
+               }
+           } else {
+               System.out.println("Failed to acquire lock.");
+           }
+       }
+   }
+   
+   ```
+
+**注意事项**
+
+- **锁的唯一性**：确保锁的值是唯一的，可以使用 UUID 或业务唯一标识符。
+- **原子性操作**：使用 Redis 的 Lua 脚本保证锁的获取和续期操作的原子性，以防止竞态条件。
+
+
+
+### 你们Redis是集群的么，讲讲RedLock算法 
+
+Redlock 是 Redis 的一种分布式锁算法，用于确保分布式环境中的锁定机制的安全性和可靠性。它是由 Redis 的作者 Salvatore Sanfilippo（antirez）提出的，旨在解决单个 Redis 实例锁在分布式系统中存在的可靠性问题。以下是 Redlock 算法的工作原理和实现步骤：
+
+#### Redlock 算法原理
+
+Redlock 算法依赖于以下假设：
+
+1. 有多个 Redis 实例（通常是 5 个），它们分别运行在不同的节点上。
+2. 客户端会在这些 Redis 实例上请求锁，并使用多数（quorum）机制来决定锁的成功与否。
+
+**实现步骤**
+
+1. **获取当前时间**：
+   - 记录当前的精确时间（毫秒级）。
+2. **尝试在每个 Redis 实例上创建锁**：
+   - 使用相同的 key 和随机生成的 value 尝试在每个 Redis 实例上创建锁。创建锁的命令是 `SET resource_name my_random_value NX PX 30000`，其中 NX 表示仅在 key 不存在时设置，PX 30000 表示锁的过期时间为 30 秒。
+   - 设置一个较短的连接和响应超时时间（如 10 毫秒），确保在网络分区或 Redis 实例故障时不会阻塞太久。
+3. **计算获取锁的总时间**：
+   - 计算从开始到成功获取锁所花费的总时间。假设这个时间为 T。
+4. **验证锁的数量和超时**：
+   - 如果客户端在大多数 Redis 实例（例如 3/5 个实例）上成功创建锁，并且 T 小于锁的有效时间（例如 30 秒），则认为锁创建成功。
+   - 否则，尝试在每个实例上删除该锁（释放锁）。
+5. **使用和释放锁**：
+   - 客户端使用锁完成相关的业务逻辑。
+   - 业务逻辑完成后，客户端需要在每个实例上删除该锁。删除锁的命令是 `EVAL "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end" 1 resource_name my_random_value`，确保只删除自己创建的锁。
+
+#### Redlock 算法的注意事项：
+
+- **多数节点**：客户端必须至少在大多数 Redis 实例上成功获取锁，才能认为获得了分布式锁。
+- **时钟同步**：所有 Redis 服务器的时钟必须同步，以避免由于时钟漂移导致的问题。
+- **网络分区**：在网络分区的情况下，Redlock 算法可能无法保证锁的安全。
+- **锁超时**：客户端必须设置合理的锁超时时间，以避免死锁。
+- **重试机制**：客户端需要实现重试机制，并在重试时等待随机时间，以避免多个客户端同时重试导致的竞争条件。
+- 
 
 ------
 
