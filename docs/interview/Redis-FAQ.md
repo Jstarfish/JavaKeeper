@@ -1,3 +1,13 @@
+---
+title: Redis 面试专场
+date: 2024-05-31
+tags: 
+ - Redis
+categories: Redis
+---
+
+![](https://img.starfish.ink/redis/redis-faq-banner.png)
+
 ## 一、Redis 基础问题
 
 ### Redis是什么

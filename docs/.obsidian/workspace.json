@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md",
+                "file": "interview/MySQL-FAQ.md",
                 "mode": "source",
                 "source": false
               }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md",
+                "file": "interview/MySQL-FAQ.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md",
+                "file": "interview/MySQL-FAQ.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md"
+                "file": "interview/MySQL-FAQ.md"
               }
             }
           }
@@ -193,6 +193,9 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Framework.md",
+    "data-management/MySQL/MySQL-FAQ.md",
+    "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Master-Slave.md",
     "data-management/MySQL/readMySQL.md",
     "data-management/MySQL/MySQL-Log.md",
@@ -200,7 +203,6 @@
     "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Redis-Lock.md",
     "data-management/Redis/Redis-IO-Model.md",
-    "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Database.md",
     "data-management/Redis/Redis-Conf.md",
     "data-management/Redis/Redis-Cluster.md",
@@ -213,8 +215,6 @@
     "data-management/Redis/Redis-MQ.md",
     "data-management/Redis/Key 寻址算法.md",
     "data-management/Redis/Cache-Design.md",
-    "data-management/MySQL/MySQL-FAQ.md",
-    "data-management/MySQL/MySQL-Framework.md",
     "data-management/MySQL/MySQL-Split.md",
     "data-management/MySQL/MySQL-Transaction.md",
     "data-management/MySQL/MySQL-Index.md",
