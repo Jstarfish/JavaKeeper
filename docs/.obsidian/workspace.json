@@ -193,6 +193,8 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Index.md",
+    "interview/MySQL-FAQ.md",
     "data-management/MySQL/MySQL-Framework.md",
     "data-management/MySQL/MySQL-FAQ.md",
     "data-management/Redis/Redis-Datatype.md",
@@ -217,8 +219,6 @@
     "data-management/Redis/Cache-Design.md",
     "data-management/MySQL/MySQL-Split.md",
     "data-management/MySQL/MySQL-Transaction.md",
-    "data-management/MySQL/MySQL-Index.md",
-    "data-management/MySQL/MySQL-count.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

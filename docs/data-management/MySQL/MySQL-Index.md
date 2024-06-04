@@ -297,7 +297,7 @@ InnoDB 的数据文件可以按照表来切分（只需要开启`innodb_file_per
 >
 > 这时候我们就要优先考虑上一段提到的“尽量使用主键查询”原则，直接将这个索引设置为主键，可以避免每次查询需要搜索两棵树。
 
-
+![](https://img.starfish.ink/mysql/MySQL-secondary-index.png)
 
 ## 四、索引策略
 
