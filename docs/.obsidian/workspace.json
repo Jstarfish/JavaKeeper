@@ -37,8 +37,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/MySQL-FAQ.md",
-                "mode": "source",
+                "file": "data-management/MySQL/MySQL-Transaction.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/MySQL-FAQ.md",
+                "file": "data-management/MySQL/MySQL-Transaction.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/MySQL-FAQ.md",
+                "file": "data-management/MySQL/MySQL-Transaction.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/MySQL-FAQ.md"
+                "file": "data-management/MySQL/MySQL-Transaction.md"
               }
             }
           }
@@ -194,13 +194,14 @@
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
     "data-management/MySQL/MySQL-Index.md",
+    "data-management/MySQL/MySQL-Log.md",
+    "data-management/MySQL/MySQL-Select.md",
     "interview/MySQL-FAQ.md",
     "data-management/MySQL/MySQL-Framework.md",
     "data-management/MySQL/MySQL-FAQ.md",
     "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Master-Slave.md",
     "data-management/MySQL/readMySQL.md",
-    "data-management/MySQL/MySQL-Log.md",
     "data-management/Redis/Redis 有用指令.md",
     "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Redis-Lock.md",
@@ -218,7 +219,6 @@
     "data-management/Redis/Key 寻址算法.md",
     "data-management/Redis/Cache-Design.md",
     "data-management/MySQL/MySQL-Split.md",
-    "data-management/MySQL/MySQL-Transaction.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

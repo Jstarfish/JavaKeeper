@@ -11,6 +11,8 @@ categories: MySQL
 > 写在之前：不建议那种上来就是各种面试题罗列，然后背书式的去记忆，对技术的提升帮助很小，对正经面试也没什么帮助，有点东西的面试官深挖下就懵逼了。
 >
 > 个人建议把面试题看作是费曼学习法中的回顾、简化的环节，准备面试的时候，跟着题目先自己讲给自己听，看看自己会满意吗，不满意就继续学习这个点，如此反复，心仪的offer肯定会有的。
+>
+> 当然，大家有遇到过什么样『有趣』『有含量』的题目，欢迎提出来，一起学习~
 
 ## 一、MySQL 架构
 
@@ -163,6 +165,8 @@ InnoDB 设计为支持 ACID 属性（原子性、一致性、隔离性、持久�
 - **写操作性能**：为了保证高效的写操作，InnoDB 设计避免了每次写操作都需要更新元数据的设计，这样可以更好地处理高并发写入。
 - **实际应用**：在实际应用中，行数的精确统计并不是经常需要的操作。大多数情况下，应用程序可以通过索引和其他机制来实现高效的数据访问，而不依赖于 `SELECT COUNT(*)` 的性能。
 
+------
+
 
 
 ## 三、数据类型
@@ -232,8 +236,6 @@ InnoDB 设计为支持 ACID 属性（原子性、一致性、隔离性、持久�
 5. **排序和比较**：`BLOB` 类型的列不能进行排序和比较，因为它们是二进制数据。`TEXT` 类型的列可以进行排序和比较，因为它们是字符数据。
 
 在选择 `BLOB` 还是 `TEXT` 时，需要根据数据的特性和应用场景来决定。如果需要存储非文本的二进制数据，应选择 `BLOB`；如果需要存储大量的文本数据，则应选择 `TEXT`。
-
-
 
 ------
 
@@ -585,19 +587,99 @@ CREATE TABLE example (
 INSERT INTO example (email) VALUES (NULL), (NULL), (NULL);
 ```
 
-
-
 ------
 
 
 
 ## 五、日志
 
-### redo log 和 bin log 区别
+> Mysql 日志其实是各种其他知识模块的基础。
+>
+> MySQL日志文件：用来记录 MySQL 实例对某种条件做出响应时写入的文件，大概可分为：通用查询日志、慢查询日志、错误日志、二进制日志、中继日志、重做日志和回滚日志。
 
-1. redo log 是 InnoDB 引擎特有的；binlog 是 MySQL 的 Server 层实现的，所有引擎都可以使用。
-2. redo log 是物理日志，记录的是“在某个数据页上做了什么修改”；binlog 是逻辑日志，记录的是这个语句的原始逻辑，比如“给 ID=2 这一行的 c 字段加 1 ”。
-3. redo log 是循环写的，空间固定会用完；binlog 是可以追加写入的。“追加写”是指 binlog 文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。
+### 说下 一条 MySQL 更新语句的执行流程是怎样的吧？
+
+1. 先在 B+ 树中定位到该记录（这个过程也被称作**加锁读**），如果该记录所在的页面不在 buffer pool 里，先将其加载到 buffer pool 里再读取。
+
+2. 首先更新聚簇索引记录。 更新聚簇索引记录时： 
+
+   ① 先向 Undo 页面写 undo 日志。不过由于这是在更改页面，所以修改 Undo 页面前需要先记录一下相应的 redo 日志。 
+
+   ② 将这个更新操作记录到 redo log 里面，此时 redo log 处于 prepare 状态。然后告知执行器执行完成了，随时可以提交事务。
+
+   > 这里可以会有点疑惑。我们可以直接理解成先写 undo 再写 redo，这里修改后的页面并没有加入 buffer pool 的 flush 链表，记录的 redo 日志也没有加入到 redo log buffer。当这个函数执行完后，才会：先将这个过程产生的 redo 日志写入到 redo log buffer，再将这个过程修改的页面加入到 buffer pool 的 flush 链表中。
+
+3. 更新其他的二级索引记录。
+
+   > 更新二级索引记录时不会再记录 undo 日志，但由于是在修改页面内容，会先记录相应的 redo 日志。
+
+4. 记录该语句对应的 binlog 日志，此时记录的 binlog 并没有刷新到硬盘上的 binlog 日志文件，在事务提交时才会统一将该事务运行过程中的所有 binlog 日志刷新到硬盘。
+
+5. 引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。
+
+
+
+### MySQL  都有哪些日志，执行顺序是怎么样的？
+
+时序上先 undo log，redo log 先 prepare， 再写 binlog，最后再把 redo log commit
+
+![](https://img.starfish.ink/mysql/log-seq.png)
+
+
+
+### 说说 redo log 、undo log 和 bin log ？
+
+在 MySQL 中，特别是在使用 InnoDB 存储引擎时，`redo log`（重做日志）、`undo log`（回滚日志）和 `binlog`（二进制日志）各自承担着不同的角色：
+
+**1. Redo Log（重做日志）：**
+
+- **目的**：确保事务的持久性。在系统崩溃后，`redo log` 允许恢复未提交的事务更改，保证数据的完整性和一致性。
+- **内容**：记录了事务对数据页所做的物理更改【**物理日志**】，以便在崩溃恢复时重新应用这些更改。
+- **写入时机**：在事务提交时，将更改刷新到磁盘上的 `redo log` 文件中。
+- **大小和循环**：`redo log` 通常配置为固定大小的日志文件，并且可以循环使用。
+- **用途**：**崩溃恢复**，在数据库崩溃后，通过 redo log 恢复到崩溃前的状态，保证数据一致性。
+
+**2. Undo Log（回滚日志）：**
+
+- **目的**：提供事务的原子性和一致性。它允许撤销事务的更改，以保持数据的一致状态。
+- **内容**：记录了事务对数据页所做的更改的逆操作【**逻辑日志**】，使得在事务失败或需要回滚时可以恢复原始数据。
+- **写入时机**：当事务进行修改操作时，`undo log` 会记录这些更改的逆操作，通常在事务提交前就已经写入。
+- **用途**：主要用于 MVCC（多版本并发控制）和事务回滚。
+
+**3. Binlog（二进制日志）：**
+
+- **目的**：记录数据库的所有修改操作，用于数据恢复、主从复制和数据审计。
+- **内容**：记录了所有修改数据的 SQL 语句，如 `INSERT`、`UPDATE` 和 `DELETE`，但不记录 `SELECT` 和 `SHOW` 这类的语句。
+- **写入时机**：在 SQL 语句执行后，根据配置，`binlog` 可以立即或事务提交时写入磁盘。
+- **大小和存储**：`binlog` 文件通常不循环使用，它们会随着时间持续增长，直到通过配置的策略进行清理。
+
+| 特性     | Redo Log               | Undo Log                         | Bin Log                |
+| -------- | ---------------------- | -------------------------------- | ---------------------- |
+| 主要用途 | 崩溃恢复               | 事务回滚、多版本并发控制（MVCC） | 主从复制和数据恢复     |
+| 日志类型 | 物理日志               | 逻辑日志                         | 逻辑日志               |
+| 存储内容 | 页级物理更改           | 数据快照                         | SQL 语句或行级数据变化 |
+| 写入方式 | 循环写入               | 按需写入                         | 追加写入               |
+| 写入时机 | 事务提交时             | 事务操作时                       | 事务提交时             |
+| 大小     | 固定大小               | 可变大小                         | 可变大小               |
+| 作用     | 保证数据一致性和持久性 | 提供事务回滚和一致性读支持       | 实现数据复制和备份     |
+
+
+
+### MySQL 的 binlog 有几种录入格式？分别有什么区别？
+
+`binlog`日志有三种格式，分别为`STATMENT`、`ROW`和`MIXED`。
+
+> 在 `MySQL 5.7.7`之前，默认的格式是`STATEMENT`，`MySQL 5.7.7`之后，默认值是 `ROW`。日志格式通过 `binlog-format` 指定。
+
+- `STATMENT` ：基于 SQL 语句的复制(`statement-based replication, SBR`)，每一条会修改数据的 sql 语句会记录到 binlog 中**。**
+  - 优点：不需要记录每一行的变化，减少了 binlog 日志量，节约了 IO, 从而提高了性能； 
+  - 缺点：在某些情况下会导致主从数据不一致，比如执行`sysdate()`、`slepp()`等。
+
+- `ROW` ：基于行的复制(`row-based replication, RBR`)，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了**。 **
+  - 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题**；**
+  - 缺点：会产生大量的日志，尤其是 `alter table` 的时候会让日志暴涨
+
+- `MIXED` ：基于 STATMENT 和 ROW 两种模式的混合复制(`mixed-based replication, MBR`)，mixed 格式的意思是，MySQL 自己会判断这条 SQL 语句是否可能引起主备不一致，如果有可能，就用 row 格式，否则就用 statement 格式
 
 
 
@@ -614,101 +696,7 @@ INSERT INTO example (email) VALUES (NULL), (NULL), (NULL);
 
 
 
-## 六、MySQL查询
-
-> count(*) 和 count(1)和count(列名)区别   ps：这道题说法有点多
-
-执行效果上：
-
-- count(*)包括了所有的列，相当于行数，在统计结果的时候，不会忽略列值为NULL 
-- count(1)包括了所有列，用1代表代码行，在统计结果的时候，不会忽略列值为NULL 
-- count(列名)只包括列名那一列，在统计结果的时候，会忽略列值为空（这里的空不是指空字符串或者0，而是表示null）的计数，即某个字段值为NULL时，不统计。
-
-执行效率上：
-
-- 列名为主键，count(列名)会比count(1)快 
-- 列名不为主键，count(1)会比count(列名)快
-- 如果表多个列并且没有主键，则 count(1) 的执行效率优于 count(*)
-- 如果有主键，则 select count（主键）的执行效率是最优的 
-- 如果表只有一个字段，则 select count(*) 最优。
-
-
-
-### MySQL中 in和 exists 的区别？
-
-- exists：exists对外表用loop逐条查询，每次查询都会查看exists的条件语句，当exists里的条件语句能够返回记录行时（无论记录行是的多少，只要能返回），条件就为真，返回当前loop到的这条记录；反之，如果exists里的条件语句不能返回记录行，则当前loop到的这条记录被丢弃，exists的条件就像一个bool条件，当能返回结果集则为true，不能返回结果集则为false
-- in：in查询相当于多个or条件的叠加
-
-```mysql
-SELECT * FROM A WHERE A.id IN (SELECT id FROM B);
-SELECT * FROM A WHERE EXISTS (SELECT * from B WHERE B.id = A.id);
-```
-
-**如果查询的两个表大小相当，那么用in和exists差别不大**。 
-
-如果两个表中一个较小，一个是大表，则子查询表大的用exists，子查询表小的用in：
-
-
-
-> UNION和UNION ALL的区别?
-
-UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的SQL语句 字段个数必须一样，而且字段类型要“相容”（一致）；**
-
-- UNION在进行表连接后会筛选掉重复的数据记录（效率较低），而UNION ALL则不会去掉重复的数据记录；
-
-- UNION会按照字段的顺序进行排序，而UNION ALL只是简单的将两个结果合并就返回；
-
-
-
-### SQL执行顺序
-
-- 手写
-
-  ```mysql
-  SELECT DISTINCT <select_list>
-  FROM  <left_table> <join_type>
-  JOIN  <right_table> ON <join_condition>
-  WHERE  <where_condition>
-  GROUP BY  <group_by_list>
-  HAVING <having_condition>
-  ORDER BY <order_by_condition>
-  LIMIT <limit_number>
-  ```
-
-- 机读
-
-  ```mysql
-  FROM  <left_table>
-  ON <join_condition>
-  <join_type> JOIN  <right_table> 
-  WHERE  <where_condition>
-  GROUP BY  <group_by_list>
-  HAVING <having_condition>
-  SELECT
-  DISTINCT <select_list>
-  ORDER BY <order_by_condition>
-  LIMIT <limit_number>
-  ```
-
-- 总结
-
-  ![sql-parse](https://tva1.sinaimg.cn/large/007S8ZIlly1gf3t8jyy81j30s2083wg2.jpg)
-
-  
-
-> mysql 的内连接、左连接、右连接有什么区别？
->
-> 什么是内连接、外连接、交叉连接、笛卡尔积呢？
-
-### Join图
-
-![sql-joins](https://tva1.sinaimg.cn/large/007S8ZIlly1gf3t8novxpj30qu0l4wi7.jpg)
-
-------
-
-
-
-## 七、MySQL 事务
+## 六、MySQL 事务
 
 > 事务的隔离级别有哪些？MySQL的默认隔离级别是什么？
 >
@@ -1079,6 +1067,100 @@ MySQL 从 5.0.3  InnoDB 存储引擎开始支持 XA 协议的分布式事务。�
 一致性保证：一致性由其他三大特性保证、程序代码要保证业务上的一致性
 
 
+
+------
+
+
+
+## 六、MySQL查询
+
+> count(*) 和 count(1)和count(列名)区别   ps：这道题说法有点多
+
+执行效果上：
+
+- count(*)包括了所有的列，相当于行数，在统计结果的时候，不会忽略列值为NULL 
+- count(1)包括了所有列，用1代表代码行，在统计结果的时候，不会忽略列值为NULL 
+- count(列名)只包括列名那一列，在统计结果的时候，会忽略列值为空（这里的空不是指空字符串或者0，而是表示null）的计数，即某个字段值为NULL时，不统计。
+
+执行效率上：
+
+- 列名为主键，count(列名)会比count(1)快 
+- 列名不为主键，count(1)会比count(列名)快
+- 如果表多个列并且没有主键，则 count(1) 的执行效率优于 count(*)
+- 如果有主键，则 select count（主键）的执行效率是最优的 
+- 如果表只有一个字段，则 select count(*) 最优。
+
+
+
+### MySQL中 in和 exists 的区别？
+
+- exists：exists对外表用loop逐条查询，每次查询都会查看exists的条件语句，当exists里的条件语句能够返回记录行时（无论记录行是的多少，只要能返回），条件就为真，返回当前loop到的这条记录；反之，如果exists里的条件语句不能返回记录行，则当前loop到的这条记录被丢弃，exists的条件就像一个bool条件，当能返回结果集则为true，不能返回结果集则为false
+- in：in查询相当于多个or条件的叠加
+
+```mysql
+SELECT * FROM A WHERE A.id IN (SELECT id FROM B);
+SELECT * FROM A WHERE EXISTS (SELECT * from B WHERE B.id = A.id);
+```
+
+**如果查询的两个表大小相当，那么用in和exists差别不大**。 
+
+如果两个表中一个较小，一个是大表，则子查询表大的用exists，子查询表小的用in：
+
+
+
+> UNION和UNION ALL的区别?
+
+UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的SQL语句 字段个数必须一样，而且字段类型要“相容”（一致）；**
+
+- UNION在进行表连接后会筛选掉重复的数据记录（效率较低），而UNION ALL则不会去掉重复的数据记录；
+
+- UNION会按照字段的顺序进行排序，而UNION ALL只是简单的将两个结果合并就返回；
+
+
+
+### SQL执行顺序
+
+- 手写
+
+  ```mysql
+  SELECT DISTINCT <select_list>
+  FROM  <left_table> <join_type>
+  JOIN  <right_table> ON <join_condition>
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
+
+- 机读
+
+  ```mysql
+  FROM  <left_table>
+  ON <join_condition>
+  <join_type> JOIN  <right_table> 
+  WHERE  <where_condition>
+  GROUP BY  <group_by_list>
+  HAVING <having_condition>
+  SELECT
+  DISTINCT <select_list>
+  ORDER BY <order_by_condition>
+  LIMIT <limit_number>
+  ```
+
+- 总结
+
+  ![sql-parse](https://tva1.sinaimg.cn/large/007S8ZIlly1gf3t8jyy81j30s2083wg2.jpg)
+
+  
+
+> mysql 的内连接、左连接、右连接有什么区别？
+>
+> 什么是内连接、外连接、交叉连接、笛卡尔积呢？
+
+### Join图
+
+![sql-joins](https://tva1.sinaimg.cn/large/007S8ZIlly1gf3t8novxpj30qu0l4wi7.jpg)
 
 ------
 
