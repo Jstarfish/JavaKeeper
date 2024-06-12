@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/MySQL/MySQL-Transaction.md",
+                "file": "data-management/MySQL/MySQL-Select.md",
                 "mode": "source",
                 "source": false
               }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/MySQL/MySQL-Transaction.md",
+                "file": "data-management/MySQL/MySQL-Select.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/MySQL/MySQL-Transaction.md",
+                "file": "data-management/MySQL/MySQL-Select.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/MySQL/MySQL-Transaction.md"
+                "file": "data-management/MySQL/MySQL-Select.md"
               }
             }
           }
@@ -193,6 +193,7 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Transaction.md",
     "data-management/MySQL/MySQL-Index.md",
     "data-management/MySQL/MySQL-Log.md",
     "data-management/MySQL/MySQL-Select.md",
@@ -218,7 +219,6 @@
     "data-management/Redis/Redis-MQ.md",
     "data-management/Redis/Key 寻址算法.md",
     "data-management/Redis/Cache-Design.md",
-    "data-management/MySQL/MySQL-Split.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

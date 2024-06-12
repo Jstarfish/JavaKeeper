@@ -8,6 +8,8 @@ categories: MySQL
 
 ![](https://img.starfish.ink/mysql/banner-mysql-select.png)
 
+![The Essential Guide to SQL’s Execution Order](https://www.kdnuggets.com/wp-content/uploads/ferrer_essential_guide_sql_execution_order_1.png)
+
 > `SQL`的全称是`Structured Query Language`，翻译后就是`结构化查询语言`。
 
 ## Order By
@@ -147,13 +149,11 @@ alter table t add index city_user_age(city, name, age);
 
 - 总结
 
-  ![sql-parse](../../_images/mysql/sql-parse.png)
-
-  
+  ![The Essential Guide to SQL’s Execution Order](https://img.starfish.ink/mysql/ferrer_essential_guide_sql_execution_order_6.png)
 
 ### Join图
 
-![sql-joins](../../_images/mysql/sql-joins.jpg)
+![sql-joins](https://img.starfish.ink/mysql/sql-joins.jpg)
 
 ### demo
 
@@ -279,3 +279,9 @@ count() 是一个聚合函数，对于返回的结果集，一行行地判断，
 
 
 按照效率排序的话，count(字段)<count(主键 id)<count(1)≈count(\*)，所以我建议你，尽量使用 count(\*)
+
+
+
+### Reference
+
+- https://www.kdnuggets.com/the-essential-guide-to-sql-execution-order
