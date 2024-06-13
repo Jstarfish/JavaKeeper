@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/MySQL/MySQL-Select.md",
+                "file": "data-management/Redis/ReadRedis.md",
                 "mode": "source",
                 "source": false
               }
@@ -130,7 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/MySQL/MySQL-Select.md",
+                "file": "data-management/Redis/ReadRedis.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/MySQL/MySQL-Select.md",
+                "file": "data-management/Redis/ReadRedis.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +170,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/MySQL/MySQL-Select.md"
+                "file": "data-management/Redis/ReadRedis.md"
               }
             }
           }
@@ -193,10 +193,11 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/Redis/Nosql-Overview.md",
+    "data-management/MySQL/MySQL-Select.md",
     "data-management/MySQL/MySQL-Transaction.md",
     "data-management/MySQL/MySQL-Index.md",
     "data-management/MySQL/MySQL-Log.md",
-    "data-management/MySQL/MySQL-Select.md",
     "interview/MySQL-FAQ.md",
     "data-management/MySQL/MySQL-Framework.md",
     "data-management/MySQL/MySQL-FAQ.md",
@@ -218,7 +219,6 @@
     "data-structure-algorithms/algorithm/Double-Pointer.md",
     "data-management/Redis/Redis-MQ.md",
     "data-management/Redis/Key 寻址算法.md",
-    "data-management/Redis/Cache-Design.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

@@ -254,9 +254,7 @@ function genDataManagementSidebar(){
         ['Big-Data/HBase', 'HBase'],
         ['Big-Data/Phoenix', 'Phoneix']
       ]
-    },
-    
-      'Redis/Cache-Design'
+    }
     
   ];
 }

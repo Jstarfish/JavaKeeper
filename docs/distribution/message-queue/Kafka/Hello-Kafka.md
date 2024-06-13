@@ -8,6 +8,8 @@ categories: Kafka
 
 ![](https://img.starfish.ink/mq/hello-kakfa-banner.png)
 
+
+
 ## 1. Kafka概述
 
 ### 1.1 定义
@@ -73,6 +75,8 @@ Kafka 是一个**分布式**的基于**发布/订阅模式的消息队列**（Me
 
 
 ## 2. Hello Kafka
+
+![overview-of-kafka-architecture](https://images.ctfassets.net/gt6dp23g0g38/4DA2zHan28tYNAV2c9Vd98/b9fca38c23e2b2d16a4c4de04ea6dd3f/Kafka_Internals_004.png)
 
 ### 2.1 动起手来
 

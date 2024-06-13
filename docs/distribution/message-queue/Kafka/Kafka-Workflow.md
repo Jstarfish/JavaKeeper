@@ -8,15 +8,28 @@ categories: Kafka
 
 ![](https://img.starfish.ink/mq/kafka-workflow.jpg)
 
-### 一、Kafka 文件存储机制
+## 一、Kafka 文件存储机制
 
-#### topic构成
+## Kafka Topics
+
+![inline-pic-topic](https://images.ctfassets.net/gt6dp23g0g38/J2Y8oV2hoVWLv8u7sJ2v6/271fa3dde5d47e3a5980ad51fdd8b331/Kafka_Internals_007.png)
 
 **Kafka 中消息是以 topic 进行分类的**，生产者生产消息，消费者消费消息，都是面向 topic 的。
 
-在 Kafka 中，一个 topic 可以分为多个 partition，一个 partition 分为多个 **segment**，每个 segment 对应两个文件：.index 和 .log 文件
 
-![](https://img.starfish.ink/mq/kafka-topic.png)
+
+### Topic 分区
+
+![inline-pic-partition-2](https://images.ctfassets.net/gt6dp23g0g38/ODHQiu10QMZJ4bBbeQcvG/024159856d3361aaac482da28979acf6/Kafka_Internals_009.png)
+
+
+
+Kafka 将每个 Topic 划分为多个分区（Partition），每个分区在磁盘上对应一个日志文件（Log）。为了管理这些日志文件，Kafka 将每个分区的日志文件进一步分为多个段（Segment）。每个段包含一段时间内的消息，并且有两个文件：一个数据文件和一个索引文件。
+
+- **数据文件**：存储实际的消息内容，文件扩展名为 `.log`。
+- **索引文件**：存储消息的偏移量和物理位置，用于快速定位消息，文件扩展名为 `.index`。
+
+![](/Users/starfish/oceanus/picBed/kafka/kafka-topic.png)
 
 **topic 是逻辑上的概念，而 patition 是物理上的概念**，每个 patition 对应一个 log 文件，而 log 文件中存储的就是 producer 生产的数据，patition 生产的数据会被不断的添加到 log 文件的末端，且每条数据都有自己的 offset。
 
@@ -24,33 +37,32 @@ categories: Kafka
 
 
 
-> 问：Kafka 为什么要将 Topic 进行分区
->
-> 答：负载均衡+水平扩展
->
-> Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition 则是物理概念。可以想象，如果 Topic 不进行分区，而将 Topic 内的消息存储于一个 broker，那么关于该 Topic 的所有读写请求都将由这一个 broker 处理，吞吐量很容易陷入瓶颈，这显然是不符合高吞吐量应用场景的。有了 Partition 概念以后，假设一个 Topic 被分为 10 个 Partitions，Kafka 会根据一定的算法将 10 个 Partition 尽可能均匀的分布到不同的 broker（服务器）上，当 producer 发布消息时，producer 客户端可以采用 `random`、`key-hash` 及 `轮询` 等算法选定目标 partition，若不指定，Kafka 也将根据一定算法将其置于某一分区上。Partiton 机制可以极大的提高吞吐量，并且使得系统具备良好的水平扩展能力。
->
-> 在创建 topic 时可以在 `$KAFKA_HOME/config/server.properties` 中指定这个 partition 的数量（如下所示），当然可以在 topic 创建之后去修改 partition 的数量。
->
-> ```properties
-> # The default number of log partitions per topic. More partitions allow greater
-> # parallelism for consumption, but this will also result in more files across
-> # the brokers.
-> num.partitions=3
-> ```
->
-> 在发送一条消息时，可以指定这个消息的 key，producer 根据这个 key 和 partition 机制来判断这个消息发送到哪个partition。partition 机制可以通过指定 producer 的 partition.class 这一参数来指定（即支持自定义），该 class 必须实现 kafka.producer.Partitioner 接口。
->
+### Kafka 为什么要将 Topic 进行分区？
+
+答：负载均衡+水平扩展
+
+Topic 只是逻辑概念，面向的是 producer 和 consumer；而 Partition 则是物理概念。可以想象，如果 Topic 不进行分区，而将 Topic 内的消息存储于一个 broker，那么关于该 Topic 的所有读写请求都将由这一个 broker 处理，吞吐量很容易陷入瓶颈，这显然是不符合高吞吐量应用场景的。有了 Partition 概念以后，假设一个 Topic 被分为 10 个 Partitions，Kafka 会根据一定的算法将 10 个 Partition 尽可能均匀的分布到不同的 broker（服务器）上，当 producer 发布消息时，producer 客户端可以采用 `random`、`key-hash` 及 `轮询` 等算法选定目标 partition，若不指定，Kafka 也将根据一定算法将其置于某一分区上。Partiton 机制可以极大的提高吞吐量，并且使得系统具备良好的水平扩展能力。
+
+在创建 topic 时可以在 `$KAFKA_HOME/config/server.properties` 中指定这个 partition 的数量（如下所示），当然可以在 topic 创建之后去修改 partition 的数量。
+
+```properties
+# The default number of log partitions per topic. More partitions allow greater
+# parallelism for consumption, but this will also result in more files across
+# the brokers.
+num.partitions=3
+```
+
+在发送一条消息时，可以指定这个消息的 key，producer 根据这个 key 和 partition 机制来判断这个消息发送到哪个 partition。partition 机制可以通过指定 producer 的 partition.class 这一参数来指定（即支持自定义），该 class 必须实现 kafka.producer.Partitioner 接口。
 
 
 
-#### 消息存储原理
+### 消息存储原理
 
-由于生产者生产的消息会不断追加到 log 文件末尾，为防止 log 文件过大导致数据定位效率低下，Kafka 采取了**分片**和**索引**机制，将每个 partition 分为多个 segment。每个 segment 对应两个文件——`.index文件 `和 `.log文件`。这些文件位于一个文件夹下，该文件夹的命名规则为：`topic名称+分区序号`。
+由于生产者生产的消息会不断追加到 log 文件末尾，为防止 log 文件过大导致数据定位效率低下，Kafka 采取了**分片**和**索引**机制，将每个 partition 分为多个 segment。每个 segment 对应两个文件——`.index文件`和 `.log文件`。这些文件位于一个文件夹下，该文件夹的命名规则为：`topic名称+分区序号`。
 
 如下，我们创建一个只有一个分区一个副本的 topic
 
-```
+```sh
 > bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic starfish
 ```
 
@@ -113,14 +125,12 @@ log.segment.bytes=1073741824
 00000000000000239430.log
 ```
 
-- 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
+- 每个分区是由多个 Segment 组成，当 Kafka 要写数据到一个 partition 时，它会写入到状态为 active 的 segment 中。如果该 segment 被写满，则一个新的 segment 将会被新建，然后变成新的“active” segment
 - 偏移量：分区中的每一条消息都会被分配的一个连续的 id 值，该值用于唯一标识分区中的每一条消息
 - 每个 Segment 中则保存了真实的消息数据。每个 Segment 对应于一个索引文件与一个日志文件。Segment 文件的生命周期是由 Kafka Server 的配置参数所决定的。比如说，`server.properties` 文件中的参数项 `log.retention.hours=168` 就表示 7 天后删除老的消息文件
 - [稀松索引]：稀松索引可以加快速度，因为 index 不是为每条消息都存一条索引信息，而是每隔几条数据才存一条 index 信息，这样 index 文件其实很小。kafka 在写入日志文件的时候，同时会写索引文件（.index和.timeindex）。默认情况下，有个参数 `log.index.interval.bytes` 限定了在日志文件写入多少数据，就要在索引文件写一条索引，默认是 4KB，写 4kb 的数据然后在索引里写一条索引。
 
-举个栗子：00000000000000170410 的 “.index” 文件和 “.log” 文件的对应的关系，如下图
-
-![](https://img.starfish.ink/mq/60eafc10-cc9b-11e8-b452-15eec1b99303.png)
+举个栗子：00000000000000170410 的 “.index” 文件和 “.log” 文件的对应的关系，如下图![](/Users/starfish/oceanus/picBed/kafka/kafka-segment-log.png)
 
 > 问：为什么不能以 partition 作为存储单位？还要加个 segment？
 >
@@ -134,48 +144,35 @@ log.segment.bytes=1073741824
 
 
 
-下图展示了 Kafka 查找数据的过程：
+消费者从分配到的分区中查找数据过程大概是这样的：
 
-![](https://img.starfish.ink/mq/kafka-segement.jpg)
+1. **定位段文件**：消费者根据要读取的消息的偏移量查找对应的段文件
+2. **使用索引文件查找物理位置**：当消费者请求某个偏移量的消息时，Kafka 会在索引文件中使用二分查找算法快速定位到包含该偏移量消息的日志段
+3. **顺序读取数据文件**：一旦找到消息的物理位置，消费者从段文件的对应位置开始顺序读取消息。顺序读取比随机读取更高效，因为它避免了磁盘的寻道时间。
 
-`.index文件` 存储大量的索引信息，`.log文件` 存储大量的数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址。
+这套机制是建立在 offset 是有序的。索引文件被映射到内存中，所以查找的速度还是很快的。
 
-> 比如：要查找绝对offffset为7的Message：
->
-> 1. 首先是用二分查找确定它是在哪个LogSegment中，自然是在第一个Segment中。 
-> 2. 打开这个Segment的index文件，也是用二分查找找到offffset小于或者等于指定offffset的索引条目中最大的那个offset。自然offset为6的那个索引是我们要找的，通过索引文件我们知道offffset为6的Message在数据文件中的位置为9807。
->
-> 3. 打开数据文件，从位置为9807的那个地方开始顺序扫描直到找到offset为7的那条Message。
->
-> 这套机制是建立在offset是有序的。索引文件被映射到内存中，所以查找的速度还是很快的。
->
-> 一句话，Kafka的Message存储采用了分区(partition)，分段(LogSegment)和稀疏索引这几个手段来达到了高效性。
+一句话，Kafka 的 Message 存储采用了分区(partition)，分段(LogSegment)和稀疏索引这几个手段来达到了高效性。
 
 
 
-### 二、Kafka 生产过程    
+## 二、Kafka 生产过程    
 
-Kafka 生产者用于生产消息。通过前面的内容我们知道，Kafka 的 topic 可以有多个分区，那么生产者如何将这些数据可靠地发送到这些分区？生产者发送数据的不同的分区的依据是什么？针对这两个疑问，这节简单记录下。
+Kafka 生产者用于生产消息。通过前面的内容我们知道，Kafka 的 topic 可以有多个分区，那么生产者如何将这些数据可靠地发送到这些分区？生产者发送数据的不同的分区的依据是什么？
 
-#### 3.2.1 写入流程
+### 2.1 写入流程
 
 producer 写入消息流程如下： 
 
-![](https://img.starfish.ink/mq/640-20230202151727014.jpeg)
+![How to Make Kafka Producer/Consumer Production-Ready | by Shivanshu Goyal |  The Startup | Medium](https://miro.medium.com/v2/resize:fit:1200/1*RQlk_aKjeTlwJn68llhX7A.png)
 
 
 
-1. producer 先从 zookeeper 的 "/brokers/.../state"节点找到该 partition 的 leader
-2. producer 将消息发送给该 leader 
-3. leader 将消息写入本地 log 
-4. followers 从 leader pull 消息，写入本地 log 后向 leader 发送 ACK    
-5. leader 收到所有 ISR 中的 replication 的 ACK 后，增加 HW（high watermark，最后 commit 的 offset）并向 producer 发送 ACK 
-
-#### 2.1 写入方式 
+### 2.2 写入方式 
 
 producer 采用推（push） 模式将消息发布到 broker，每条消息都被追加（append） 到分区（patition） 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 kafka 吞吐率）。
 
-####  2.2 分区（Partition） 
+###  2.3 分区（Partition） 
 
 消息发送时都被发送到一个 topic，其本质就是一个目录，而 topic 是由一些 Partition Logs(分区日志)组成
 
@@ -202,7 +199,77 @@ public ProducerRecord (String topic, V value)
 2. 没有指明 partition 值但有 key 的情况下，将 key 的 hash 值与 topic 的 partition 数进行取余得到 partition 值； 
 3. 既没有 partition 值又没有 key 值的情况下，第一次调用时随机生成一个整数（后面每次调用在这个整数上自增），将这个值与 topic 可用的 partition 总数取余得到 partition 值，也就是常说的 round-robin 算法。  
 
-#### 2.3 副本（Replication）
+![assign-record-to-topic-partition](https://images.ctfassets.net/gt6dp23g0g38/5Qq3ds3kJrtshhvRzZjZyP/44dbea0648c47600604830abf53c531e/Kafka_Internals_017.png)
+
+当生产者准备发送事件记录时，它将使用一个可配置的分区器来确定要分配给记录的主题分区。如果记录有一个键（key），那么默认的分区器将使用键的哈希值来确定正确的分区。这样，任何具有相同键的记录将始终被分配到同一个分区。如果记录没有键，那么将使用一种分区策略来平衡分区中的数据。
+
+
+
+### 写入过程
+
+一次发送一条记录会因为重复的网络请求而效率低下。因此，生产者会将分配给特定分区的记录累积成批次。当使用压缩时，批处理还提供了更有效的压缩效果。
+
+![records-accumulated-into-record-batches](https://images.ctfassets.net/gt6dp23g0g38/4QinkT7rPaVuBNxl7hDjgq/2a3f4a75025fcec086baef7a2d51e463/Kafka_Internals_018.png)
+
+
+
+生产者还可以控制何时应将记录批次排空并发送到代理服务器。这由两个属性控制。一个是通过时间。另一个是通过大小。因此，一旦在这些记录批次中累积了足够的时间或足够的数据，这些记录批次就会被排空，并形成一个生产请求。然后，这个生产请求将被发送到包含分区的领导者代理服务器。
+
+![record-batches-drained-into-produce-requests](https://images.ctfassets.net/gt6dp23g0g38/3hoJH0UikvCaqQbehedxWf/1d8d5556eab57f9c975333506bc06eb7/Kafka_Internals_019.png)
+
+#### Network Thread Adds Request to Queue
+
+![network-thread-adds-request-to-queue](https://images.ctfassets.net/gt6dp23g0g38/7at83emsdcw5xzqGabaWjw/564cdb3a272b62c88e30e2827fb9f305/Kafka_Internals_020.png)
+
+请求首先进入代理服务器的套接字接收缓冲区，然后由池中的网络线程接收。该网络线程将处理该特定客户端请求的整个生命周期。网络线程将从套接字缓冲区读取数据，将其构建成一个生产请求对象，并将其添加到请求队列中。
+
+
+
+#### I/O Thread Verifies and Stores the Batch
+
+![io-thread-verifies-record-batch-and-stores](https://images.ctfassets.net/gt6dp23g0g38/5yYOWLCfh5E9ozctlPTxoc/0a66713c20e98c01bb4e91f385000095/Kafka_Internals_021.png)
+
+接下来，I/O 线程池中的一个线程将从队列中提取请求。I/O 线程将执行一些验证，包括对请求中数据的 CRC 校验。然后，它将把数据追加到分区的物理数据结构中，这被称为提交日志（commit log)。
+
+#### Kafka Physical Storage
+
+![kafka-physical-storage](https://images.ctfassets.net/gt6dp23g0g38/6BStOsjiQRncUJUEXIeo1s/a38554930ab928132ec2244d53efa149/Kafka_Internals_022.png)
+
+在磁盘上，提交日志被组织为一系列段（segments）的集合。每个段由几个文件组成。其中之一是 `.log` 文件，它包含事件数据。另一个是 `.index` 文件，它包含索引结构，该结构将记录的偏移量映射到 `.log` 文件中该记录的位置。
+
+#### Purgatory Holds Requests Until Replicated
+
+![purgatory-holds-requests-being-replicated](https://images.ctfassets.net/gt6dp23g0g38/50DNQZvomT50ZIrqo31F9I/424dfbbc61fa3c999f7a7e6760652a2a/Kafka_Internals_024.png)
+
+由于日志数据不会从页面缓存同步刷新到磁盘，Kafka 依赖于复制到多个代理节点来提供持久性。默认情况下，代理服务器在数据被复制到其他代理之前不会确认生产请求。
+
+为了避免在等待复制步骤完成时占用 I/O 线程，请求对象将被存储在一个类似映射的数据结构中，称为炼狱（purgatory）（这是事物等待的地方）。
+
+一旦请求完全复制，代理将从炼狱中取出请求对象，生成响应对象，并将其放置在响应队列上。
+
+
+
+#### Response Added to Socket
+
+![response-added-to-socket-send-buffer](https://images.ctfassets.net/gt6dp23g0g38/23uvk4KmFEHuMAHcgxHCj5/3eeedaabd5520f9aab2b8f40fb763bcb/Kafka_Internals_025.png)
+
+从响应队列中，网络线程将拾取生成的响应，并将数据发送到套接字发送缓冲区。网络线程还通过等待来自同一客户端的所有响应字节被发送完毕，然后再从响应队列中取出另一个对象，来强制执行来自单个客户端请求的顺序性。
+
+### The Fetch Request
+
+![fetch-requests](https://images.ctfassets.net/gt6dp23g0g38/130jkNPNKOm2I6QizpNtu7/a90e9d3e66da6f98208fe2882f824f5b/Kafka_Internals_026.png)
+
+为了消费记录，消费者客户端向代理发送一个获取请求，指定它想要消费的主题、分区和偏移量。获取请求进入代理的套接字接收缓冲区，由网络线程拾取。网络线程将请求放入请求队列，就像处理生产请求一样。
+
+I/O 线程将采用获取请求中包含的偏移量，并将其与分区段的 `.index` 文件进行比较。这将告诉它需要从相应的 `.log` 文件读取的确切字节范围，以添加到响应对象中。
+
+然而，每次获取记录就发送一个响应，或者更糟糕的是，在没有记录可用时发送响应，这样做将是低效的。为了更高效，可以配置消费者等待最小数量字节的数据，或者在返回获取请求的响应之前等待最长时间。在等待满足这些条件时，获取请求被发送到炼狱。
+
+一旦满足大小或时间要求，代理将从炼狱中取出获取请求，并生成一个响应发送回客户端。其余的处理过程与生产请求相同。
+
+
+
+### 2.4 副本（Replication）
 
 Kafka 是有主题概念的，而每个主题又进一步划分成若干个分区。副本的概念实际上是在分区层级下定义的，每个分区配置有若干个副本。
 
@@ -212,13 +279,15 @@ Kafka 是有主题概念的，而每个主题又进一步划分成若干个分�
 
 为了提高消息的可靠性，Kafka 每个 topic 的 partition 有 N 个副本（replicas），其中 N（大于等于 1）是 topic 的复制因子（replica fator）的个数。**Kafka 通过多副本机制实现故障自动转移**，当 Kafka 集群中出现 broker 失效时，副本机制可保证服务可用。对于任何一个 partition，它的 N 个 replicas 中，其中一个 replica 为 leader，其他都为 follower，leader 负责处理 partition 的所有读写请求，follower 则负责被动地去复制 leader 上的数据。如下图所示，Kafka 集群中有 4 个 broker，某 topic 有 3 个 partition，且复制因子即副本个数也为 3：
 
-![](https://images.gitbook.cn/616acd70-cf9b-11e8-8388-bd48f25029c6)
+![kafka-data-replication](https://images.ctfassets.net/gt6dp23g0g38/HZjoaXOuEc1zteyMcoOww/1ebab125a11552f4e8b8d88e7850f0ad/Kafka_Internals_029.png)
+
+![partition-leader-balancing](https://images.ctfassets.net/gt6dp23g0g38/6P0oOJdQ8gJkU0ib014amg/3074980c72714d158fea435866283388/Kafka_Internals_046.png)
 
 如果 leader 所在的 broker 发生故障或宕机，对应 partition 将因无 leader 而不能处理客户端请求，这时副本的作用就体现出来了：一个新 leader 将从 follower 中被选举出来并继续处理客户端的请求。
 
 
 
-#### 2.4 数据可靠性保证
+#### 2.5 数据可靠性保证
 
 一个 partition 有多个副本（replicas），为了提高可靠性，这些副本分散在不同的 broker 上，由于带宽、读写性能、网络延迟等因素，同一时刻，这些副本的状态通常是不一致的：即 followers 与 leader 的状态不一致。
 
@@ -250,7 +319,9 @@ leader 维护了一个动态的 **in-sync replica set**(ISR)，意为和 leader 
 
 值得注意的是，倘若该副本后面慢慢地追上了 Leader 的进度，那么它是能够重新被加回 ISR 的。这也表明，ISR 是一个动态调整的集合，而非静态不变的。
 
-![](https://static001.geekbang.org/resource/image/df/e0/df4824e3ae53e7aebd03c38d8859aae0.png)
+![leader-follower-isr-list](https://images.ctfassets.net/gt6dp23g0g38/4Llth82ZvCCBqcHfp7v0lH/60e6f507fdccce263d38b6d285e6b143/Kafka_Internals_030.png)
+
+![advancing-the-follower-high-watermark](https://images.ctfassets.net/gt6dp23g0g38/2GtWQTnR5GwuDaUltAxEHM/50dd8e261231d98af4dcae5fc57bc41e/Kafka_Internals_035.png)
 
 leader 发生故障之后，就会从 ISR 中选举新的 leader。（之前还有另一个参数，0.9 版本之后 `replica.lag.max.messages` 参数被移除了）
 
@@ -311,7 +382,7 @@ Kafka 的 ISR 的管理最终都会反馈到 ZooKeeper 节点上，具体位置�
 
 
 
-#### 2.5 Exactly Once 语义
+#### 2.6 Exactly Once 语义
 
 将服务器的 ACK 级别设置为 -1，可以保证 Producer 到 Server 之间不会丢失数据，即 At Least Once 语义。相对的，将服务器 ACK 级别设置为 0，可以保证生产者每条消息只会被发送一次，即 At Most Once语义。
 
@@ -337,54 +408,189 @@ Kafka 的 ISR 的管理最终都会反馈到 ZooKeeper 节点上，具体位置�
 
 
 
-#### 2.6 Kafka 事务
+In this module we’ll look at how the data plane handles data replication. Data replication is a critical feature of Kafka that allows it to provide high durability and availability. We enable replication at the topic level. When a new topic is created we can specify, explicitly or through defaults, how many replicas we want. Then each partition of that topic will be replicated that many times. This number is referred to as the replication factor. With a replication factor of N, in general, we can tolerate N-1 failures, without data loss, and while maintaining availability.
 
-Kafka 从 0.11 版本开始引入了事务支持。事务可以保证 Kafka 在 Exactly Once 语义的基础上，生产和消费可以跨分区和会话，要么全部成功，要么全部失败。
+数据平面如何处理数据复制。数据复制是 Kafka 的一个关键特性，它允许 Kafka 提供高持久性和可用性。我们在主题级别启用复制。当创建新主题时，我们可以明确指定或通过默认设置来指定我们想要的副本数量。然后，该主题的每个分区将被复制指定的次数。这个数字被称为复制因子。使用 N 作为复制因子，通常我们可以容忍 N-1 次故障，而不会丢失数据，同时保持可用性。
 
-##### 2.6.1 Producer事务
+### Leader, Follower, and In-Sync Replica (ISR) List
 
-为了了实现跨分区跨会话的事务，需要引入一个全局唯一的 TransactionID，并将 Producer 获得的 PID 和Transaction ID 绑定。这样当 Producer 重启后就可以通过正在进行的 TransactionID 获得原来的 PID。
+![leader-follower-isr-list](https://images.ctfassets.net/gt6dp23g0g38/4Llth82ZvCCBqcHfp7v0lH/60e6f507fdccce263d38b6d285e6b143/Kafka_Internals_030.png)
 
-为了管理 Transaction，Kafka 引入了一个新的组件 Transaction Coordinator。Producer 就是通过和 Transaction Coordinator 交互获得 Transaction ID 对应的任务状态。Transaction Coordinator 还负责将事务所有写入 Kafka 的一个内部 Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
+一旦主题的所有分区副本被创建，每个分区的一个副本将被指定为领导者副本，持有该副本的代理将成为该分区的领导者。其余的副本将是追随者。生产者将写入领导者副本，追随者将获取数据以与领导者保持同步。消费者通常也从领导者副本获取数据，但它们可以配置为从追随者获取。
 
-设置事务型 Producer 的方法也很简单，满足两个要求即可：
+分区领导者以及所有与领导者同步的追随者将构成同步副本集（ISR）。在理想情况下，所有副本都将是 ISR 的一部分。
 
-- 和幂等性 Producer 一样，开启 enable.idempotence = true。
-- 设置 Producer 端参数 transctional. id。最好为其设置一个有意义的名字。
-
-此外，你还需要在 Producer 代码中做一些调整，如这段代码所示：
-
-```java
-producer.initTransactions();
-try {
-  producer.beginTransaction();
-  producer.send(record1);
-  producer.send(record2);
-  producer.commitTransaction();
-} catch (KafkaException e) {
-  producer.abortTransaction();
-}
-```
-
-
-
-##### 2.6.2 Consumer事务
-
-对 Consumer 而言，事务的保证就会相对较弱，尤其是无法保证 Commit 的消息被准确消费。这是由于Consumer 可以通过 offset 访问任意信息，而且不同的 SegmentFile 生命周期不同，同一事务的消息可能会出现重启后被删除的情况。
-
-> 在 Consumer 端，读取事务型 Producer 发送的消息也是需要一些变更的。修改起来也很简单，设置 isolation.level 参数的值即可。当前这个参数有两个取值：
+> Once the replicas for all the partitions in a topic are created, one replica of each partition will be designated as the leader replica and the broker that holds that replica will be the leader for that partition. The remaining replicas will be followers. Producers will write to the leader replica and the followers will fetch the data in order to keep in sync with the leader. Consumers also, generally, fetch from the leader replica, but they can be configured to fetch from followers.
 >
-> 1. read_uncommitted：这是默认值，表明 Consumer 能够读取到 Kafka 写入的任何消息，不论事务型 Producer 提交事务还是终止事务，其写入的消息都可以读取。很显然，如果你用了事务型 Producer，那么对应的 Consumer 就不要使用这个值。
-> 2. read_committed：表明 Consumer 只会读取事务型 Producer 成功提交事务写入的消息。当然了，它也能看到非事务型 Producer 写入的所有消息。
+> The partition leader, along with all of the followers that have caught up with the leader, will be part of the in-sync replica set (ISR). In the ideal situation, all of the replicas will be part of the ISR.
+
+### Leader Epoch
+
+![leader-epoch](https://images.ctfassets.net/gt6dp23g0g38/1rHc9oqwn8DD94JIQckrXL/a36399e2acc2437810ddaa8a568307ca/Kafka_Internals_031.png)
+
+每个领导者都与一个独特的、单调递增的数字相关联，称为领导者纪元。纪元用于跟踪当这个副本是领导者时完成的工作，每当选出新领导者时，纪元会增加。领导者纪元对于诸如日志协调等事项非常重要，我们很快就会讨论。
+
+> Each leader is associated with a unique, monotonically increasing number called the leader epoch. The epoch is used to keep track of what work was done while this replica was the leader and it will be increased whenever a new leader is elected. The leader epoch is very important for things like log reconciliation, which we’ll discuss shortly.
+
+### Follower Fetch Request
+
+![follower-fetch-request](https://images.ctfassets.net/gt6dp23g0g38/QMNcHw9rAoiFGXj4DnP9I/51ef0ec74b91b1f01a88f8fa3934b2f0/Kafka_Internals_032.png)
+
+每当领导者将其本地日志中的新数据附加时，追随者将向领导者发出获取请求，传入他们需要开始获取的偏移量。
+
+> Whenever the leader appends new data into its local log, the followers will issue a fetch request to the leader, passing in the offset at which they need to begin fetching.
+
+### Follower Fetch Response
+
+![follower-fetch-response](https://images.ctfassets.net/gt6dp23g0g38/7kr6K36N4VF4D5F3gpY71h/10329b5e4b700afdb1aa28a46432fd44/Kafka_Internals_033.png)
+
+领导者将从指定偏移量开始的记录响应获取请求。获取响应还将包括每个记录的偏移量和当前领导者纪元。追随者然后将这些记录附加到他们自己的本地日志中
+
+> The leader will respond to the fetch request with the records starting at the specified offset. The fetch response will also include the offset for each record and the current leader epoch. The followers will then append those records to their own local logs.
+
+### Committing Partition Offsets
+
+![committing-partition-offsets](https://images.ctfassets.net/gt6dp23g0g38/7ADIKF2poAYD0iE1p1hJNF/eff71842eed8637f50d888e27f962343/Kafka_Internals_034.png)
+
+一旦 ISR 中的所有追随者都获取到了特定的偏移量，到该偏移量为止的记录就被认为是已提交的，并且对消费者可用。这由高水位线指定。
+
+领导者通过获取请求中发送的偏移值了解追随者获取的最高偏移量。例如，如果追随者向领导者发送一个获取请求，指定偏移量为 3，领导者知道这个追随者已经提交了所有到偏移量 3 的记录。一旦所有追随者都达到了偏移量 3，领导者将相应地推进高水位线。
+
+> Once all of the followers in the ISR have fetched up to a particular offset, the records up to that offset are considered committed and are available for consumers. This is designated by the high watermark.
+
+> The leader is made aware of the highest offset fetched by the followers through the offset value sent in the fetch requests. For example, if a follower sends a fetch request to the leader that specifies offset 3, the leader knows that this follower has committed all records up to offset 3. Once all of the followers have reached offset 3, the leader will advance the high watermark accordingly.
+
+### Advancing the Follower High Watermark
+
+![advancing-the-follower-high-watermark](https://images.ctfassets.net/gt6dp23g0g38/2GtWQTnR5GwuDaUltAxEHM/50dd8e261231d98af4dcae5fc57bc41e/Kafka_Internals_035.png)
+
+反过来，领导者使用获取响应来通知追随者当前的高水位线。由于这个过程是异步的，追随者的高水位线通常会落后于领导者实际持有的高水位线。
+
+> The leader, in turn, uses the fetch response to inform followers of the current high watermark. Because this process is asynchronous, the followers’ high watermark will typically lag behind the actual high watermark held by the leader.
+
+### Handling Leader Failure
+
+![handling-leader-failure](https://images.ctfassets.net/gt6dp23g0g38/4gmUY2HRzEEgtWX4aYO5RK/92c1cd987a80a083e0903ab21bb7a6e6/Kafka_Internals_036.png)
+
+如果领导者失败，或者由于其他原因我们需要选择一个新的领导者，ISR 中的一个代理将被选为新的领导者。领导者选举和通知受影响的追随者的过程由控制平面处理。数据平面重要的是在这个过程中没有数据丢失。这就是为什么新的领导者只能从 ISR 中选择，除非主题特别配置为允许选择不同步的副本。我们知道 ISR 中的所有副本都与最新的提交偏移量保持最新。
+
+一旦选出新领导者，领导者纪元将增加，新领导者将开始接受生产请求。
+
+> If a leader fails, or if for some other reason we need to choose a new leader, one of the brokers in the ISR will be chosen as the new leader. The process of leader election and notification of affected followers is handled by the control plane. The important thing for the data plane is that no data is lost in the process. That is why a new leader can only be selected from the ISR, unless the topic has been specifically configured to allow replicas that are not in sync to be selected. We know that all of the replicas in the ISR are up to date with the latest committed offset.
+
+Once a new leader is elected, the leader epoch will be incremented and the new leader will begin accepting produce requests.
+
+### Temporary Decreased High Watermark
+
+![temporary-decreased-high-watermark](https://images.ctfassets.net/gt6dp23g0g38/Kr5GipOTKKo9KojdSmREF/a230a16ec35d8887e91cff2ddeb29e00/Kafka_Internals_037.png)
+
+当新领导者当选时，其高水位线可能小于实际的高水位线。如果发生这种情况，任何偏移量在当前领导者的高水位线和实际高水位线之间的获取请求将触发可重试的 OFFSET_NOT_AVAILABLE 错误。消费者将继续尝试获取，直到高水位线更新，此时处理将正常继续。
+
+> When a new leader is elected, its high watermark could be less than the actual high watermark. If this happens, any fetch requests for an offset that is between the current leader’s high watermark and the actual will trigger a retriable OFFSET_NOT_AVAILABLE error. The consumer will continue trying to fetch until the high watermark is updated, at which point processing will continue as normal.
+
+### Partition Replica Reconciliation
+
+![partition-replica-reconciliation](https://images.ctfassets.net/gt6dp23g0g38/1MCX2GxiBgktyO7kPgSBGu/f0e8800cd5c4d66ec23243795b5597f5/Kafka_Internals_038.png)
+
+在新领导者选举后立即，一些副本可能有未提交的记录与新领导者不同步。这就是为什么领导者的高水位线还不是当前的。它不能是，直到它知道每个追随者已经赶上到哪个偏移量。我们不能前进，直到这个问题得到解决。这是通过一个称为副本协调的过程完成的。协调的第一步是在不同步的追随者发送获取请求时开始的。在我们的示例中，请求显示追随者正在获取的偏移量高于其当前纪元的高水位线。
+
+> Immediately after a new leader election, it is possible that some replicas may have uncommitted records that are out of sync with the new leader. This is why the leader's high watermark is not current yet. It can’t be until it knows the offset that each follower has caught up to. We can’t move forward until this is resolved. This is done through a process called replica reconciliation. The first step in reconciliation begins when the out-of-sync follower sends a fetch request. In our example, the request shows that the follower is fetching an offset that is higher than the high watermark for its current epoch.
+
+### Fetch Response Informs Follower of Divergence
+
+![partition-replica-reconciliation](https://images.ctfassets.net/gt6dp23g0g38/1MCX2GxiBgktyO7kPgSBGu/1087c6850f64d0e30a86f97f8ac6f77a/Kafka_Internals_039.png)
+
+当领导者收到获取请求时，它将检查自己的日志，并确定所请求的偏移量对于该纪元无效。然后，它将向追随者发送响应，告诉它该纪元应该以哪个偏移量结束。领导者让追随者执行清理工作。
+
+> When the leader receives the fetch request it will check it against its own log and determine that the offset being requested is not valid for that epoch. It will then send a response to the follower telling it what offset that epoch should end at. The leader leaves it to the follower to perform the cleanup.
+
+### Follower Truncates Log to Match Leader Log
+
+![follower-truncates-log-to-match-leader-log](https://images.ctfassets.net/gt6dp23g0g38/2SLCk6ccSIlkvPjrKq2YCi/492556be995fa402bd06e20cc24a6964/Kafka_Internals_040.png)
+
+追随者将使用获取响应中的信息来截断多余的数据，以便与领导者同步。
+
+The follower will use the information in the fetch response to truncate the extraneous data so that it will be in sync with the leader.
+
+### Subsequent Fetch with Updated Offset and Epoch
+
+![subsequent-fetch-with-updated-offset-and-epoch](https://images.ctfassets.net/gt6dp23g0g38/aYcacWtuT1gnS6RCQRxaa/5b2760f264a6fd99b29c16a03d030b03/Kafka_Internals_041.png)
+
+现在，追随者可以再次发送获取请求，但这次使用正确的偏移量。
+
+Now the follower can send that fetch request again, but this time with the correct offset.
+
+### Follower 102 Reconciled
+
+![follower-102-reconciled](https://images.ctfassets.net/gt6dp23g0g38/5rtqIUVT29SGB5vharEdcE/ed09090d7e99d57752e001dfc8758d56/Kafka_Internals_042.png)
+
+然后，领导者将响应从该偏移量开始的新记录，包括新的领导者纪元。
+
+The leader will then respond with the new records since that offset includes the new leader epoch.
+
+### Follower 102 Acknowledges New Records
+
+![follower-102-acknowledges-new-records](https://images.ctfassets.net/gt6dp23g0g38/10rKaHrv3sJxZ9CxmYwL9w/b3a8d28f7b99a4b8cee79fe9a1b7697e/Kafka_Internals_043.png)
+
+当追随者再次获取时，它传递的偏移量将告知领导者它已经赶上，领导者将能够增加高水位线。此时，领导者和追随者已完全协调，但我们仍然处于副本不足的状态，因为并非所有副本都在 ISR 中。根据配置，我们可以在此状态下操作，但这当然不理想。
+
+When the follower fetches again, the offset that it passes will inform the leader that it has caught up and the leader will be able to increase the high watermark. At this point the leader and follower are fully reconciled, but we are still in an under replicated state because not all of the replicas are in the ISR. Depending on configuration, we can operate in this state, but it’s certainly not ideal.
+
+### Follower 101 Rejoins the Cluster
+
+![follower-101-rejoins-the-cluster](https://images.ctfassets.net/gt6dp23g0g38/slWIzdKdFUuiEwK1BAG4E/cd88e602396e4bcdacad99487ea4387f/Kafka_Internals_044.png)
+
+过一段时间，希望不久，失败的副本代理将重新上线。然后，它将经历我们刚刚描述的相同协调过程。一旦完成协调并赶上新领导者，它将被重新添加到 ISR，我们将回到快乐的地方。
+
+At some point, hopefully soon, the failed replica broker will come back online. It will then go through the same reconciliation process that we just described. Once it is done reconciling and is caught up with the new leader, it will be added back to the ISR and we will be back in our happy place.
+
+### Handling Failed or Slow Followers
+
+![handling-failed-or-slow-followers](https://images.ctfassets.net/gt6dp23g0g38/1T8pQOyW8YcUj64phgAYW5/c550c246504f246faab3f172f2f073a0/Kafka_Internals_045.png)
+
+显然，当领导者失败时，这是一个更大的问题，但我们也需要处理追随者失败以及运行缓慢的追随者。领导者监视其追随者的进度。如果自追随者上次完全赶上以来，经过了可配置的时间量，领导者将从同步副本集中移除该追随者。这允许领导者推进高水位线，以便消费者可以继续消费当前数据。如果追随者重新上线或以其他方式赶上领导者，那么它将被重新添加到 ISR。
+
+Obviously when a leader fails, it’s a bigger deal, but we also need to handle follower failures as well as followers that are running slow. The leader monitors the progress of its followers. If a configurable amount of time elapses since a follower was last fully caught up, the leader will remove that follower from the in-sync replica set. This allows the leader to advance the high watermark so that consumers can continue consuming current data. If the follower comes back online or otherwise gets its act together and catches up to the leader, then it will be added back to the ISR.
+
+### Partition Leader Balancing
+
+![partition-leader-balancing](https://images.ctfassets.net/gt6dp23g0g38/6P0oOJdQ8gJkU0ib014amg/3074980c72714d158fea435866283388/Kafka_Internals_046.png)
+
+正如我们所看到的，包含领导者副本的代理比追随者副本做了更多的工作。因此，最好不要在单个代理上拥有不成比例的领导者副本数量。为了防止这种情况，Kafka 有首选副本的概念。创建主题时，每个分区的第一个副本被指定为首选副本。由于 Kafka 已经努力在可用代理之间均匀分配分区，这将通常导致领导者的良好平衡。
+
+由于各种原因进行领导者选举时，领导者可能会出现在非首选副本上，这可能导致不平衡。因此，Kafka 会定期检查领导者副本是否不平衡。它使用可配置的阈值来确定这一点。如果确实发现不平衡，它将执行领导者重新平衡，以使领导者回到其首选副本上。
+
+As we’ve seen, the broker containing the leader replica does a bit more work than the follower replicas. Because of this it’s best not to have a disproportionate number of leader replicas on a single broker. To prevent this Kafka has the concept of a preferred replica. When a topic is created, the first replica for each partition is designated as the preferred replica. Since Kafka is already making an effort to evenly distribute partitions across the available brokers, this will usually result in a good balance of leaders.
+
+As leader elections occur for various reasons, the leaders might end up on non-preferred replicas and this could lead to an imbalance. So, Kafka will periodically check to see if there is an imbalance in leader replicas. It uses a configurable threshold to make this determination. If it does find an imbalance it will perform a leader rebalance to get the leaders back on their preferred replicas.
 
 
 
 
-### 三、Broker 保存消息
+
+
+
+
+
+## 三、Broker 保存消息
+
+Kafka 集群中的功能分为数据平面和控制平面。控制平面负责管理集群中的所有元数据。数据平面处理我们写入和读取 Kafka 的实际数据。
+
+![kafka-manages-data-and-metadata-separately](https://images.ctfassets.net/gt6dp23g0g38/6dIHZmyFufygLqoOZl9NK8/568033253444bede095afcea83924c44/Kafka_Internals_015.png)
+
+
+
+
+
+
+
+![inside-the-apache-kafka-broker](https://images.ctfassets.net/gt6dp23g0g38/39R8M25VXtbor8PP0Uv5Zh/1ed96b8c15b8c8ddf81f1e0ab02e5b77/Kafka_Internals_016.png)
 
 #### 3.1 存储方式 
 
-物理上把 topic 分成一个或多个 partition（对应 server.properties 中的 num.partitions=3 配置），每个 partition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文件）。    
+物理上把 topic 分成一个或多个 partition（对应 server.properties 中的 num.partitions=3 配置），每个 partition 物理上对应一个文件夹（该文件夹存储该 patition 的所有消息和索引文件）。   
+
+![kafka-physical-storage](https://images.ctfassets.net/gt6dp23g0g38/6BStOsjiQRncUJUEXIeo1s/a38554930ab928132ec2244d53efa149/Kafka_Internals_022.png) 
 
 #### 3.2 存储策略 
 
@@ -396,7 +602,7 @@ try {
 
 
 
-### 四、Kafka 消费过程 
+## 四、Kafka 消费过程 
 
 **Kafka 消费者采用 pull 拉模式从 broker 中消费数据**。与之相对的 push（推）模式很难适应消费速率不同的消费者，因为消息发送速率是由 broker 决定的。它的目标是尽可能以最快速度传递消息，但是这样很容易造成 consumer 来不及处理消息。而 pull 模式则可以根据 consumer 的消费能力以适当的速率消费消息。
 
@@ -521,7 +727,53 @@ Kafka 提供的再平衡策略主要有三种：`Round Robin`，`Range` 和 `Sti
 
 
 
+
+
+#### 2.7 Kafka 事务
+
+Kafka 从 0.11 版本开始引入了事务支持。事务可以保证 Kafka 在 Exactly Once 语义的基础上，生产和消费可以跨分区和会话，要么全部成功，要么全部失败。
+
+##### 2.6.1 Producer事务
+
+为了了实现跨分区跨会话的事务，需要引入一个全局唯一的 TransactionID，并将 Producer 获得的 PID 和Transaction ID 绑定。这样当 Producer 重启后就可以通过正在进行的 TransactionID 获得原来的 PID。
+
+为了管理 Transaction，Kafka 引入了一个新的组件 Transaction Coordinator。Producer 就是通过和 Transaction Coordinator 交互获得 Transaction ID 对应的任务状态。Transaction Coordinator 还负责将事务所有写入 Kafka 的一个内部 Topic，这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
+
+设置事务型 Producer 的方法也很简单，满足两个要求即可：
+
+- 和幂等性 Producer 一样，开启 enable.idempotence = true。
+- 设置 Producer 端参数 transctional. id。最好为其设置一个有意义的名字。
+
+此外，你还需要在 Producer 代码中做一些调整，如这段代码所示：
+
+```java
+producer.initTransactions();
+try {
+  producer.beginTransaction();
+  producer.send(record1);
+  producer.send(record2);
+  producer.commitTransaction();
+} catch (KafkaException e) {
+  producer.abortTransaction();
+}
+```
+
+
+
+##### 2.6.2 Consumer事务
+
+对 Consumer 而言，事务的保证就会相对较弱，尤其是无法保证 Commit 的消息被准确消费。这是由于Consumer 可以通过 offset 访问任意信息，而且不同的 SegmentFile 生命周期不同，同一事务的消息可能会出现重启后被删除的情况。
+
+> 在 Consumer 端，读取事务型 Producer 发送的消息也是需要一些变更的。修改起来也很简单，设置 isolation.level 参数的值即可。当前这个参数有两个取值：
+>
+> 1. read_uncommitted：这是默认值，表明 Consumer 能够读取到 Kafka 写入的任何消息，不论事务型 Producer 提交事务还是终止事务，其写入的消息都可以读取。很显然，如果你用了事务型 Producer，那么对应的 Consumer 就不要使用这个值。
+> 2. read_committed：表明 Consumer 只会读取事务型 Producer 成功提交事务写入的消息。当然了，它也能看到非事务型 Producer 写入的所有消息。
+
+
+
 ## 参考与来源：
+
+- https://developer.confluent.io/courses/architecture/get-started/  文章配图均来自该教程
 
 - 尚硅谷Kafka教学
 

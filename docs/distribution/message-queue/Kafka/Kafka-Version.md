@@ -24,7 +24,7 @@ categories: Kafka
 
 Kafka 的版本命名，这么长一串，其实呢，前面的版本号是编译 Kafka 源代码的 Scala 编译器版本，真正的版本号其实是后边的 `3.1.0`，
 
-> Kafka 服务器端的代码完全由 Scala 语言编写，Scala 同时支持面向对象编程和函数式编程，用 Scala 写成的源代码编译之后也是普通的“.class”文件，因此我们说 Scala 是 JVM 系的语言，它的很多设计思想都是为人称道的。
+> Apache Kafka 的服务端核心代码最初是用 Scala 编写的，但近年来，代码库中有越来越多的部分被重写为 Java。
 
 ![](https://img.starfish.ink/mq/kafka-tags.png)
 
