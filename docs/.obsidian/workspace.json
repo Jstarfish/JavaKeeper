@@ -37,7 +37,19 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/Redis/ReadRedis.md",
+                "file": "data-management/MySQL/MySQL-Lock.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "c7c1397df03f59cc",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "data-management/MySQL/MySQL-Lock.md",
                 "mode": "source",
                 "source": false
               }
@@ -56,7 +68,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -130,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/Redis/ReadRedis.md",
+                "file": "data-management/MySQL/MySQL-Lock.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/Redis/ReadRedis.md",
+                "file": "data-management/MySQL/MySQL-Lock.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/Redis/ReadRedis.md"
+                "file": "data-management/MySQL/MySQL-Lock.md"
               }
             }
           }
@@ -191,8 +203,9 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e24a131a4a8c13f9",
+  "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
+    "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Nosql-Overview.md",
     "data-management/MySQL/MySQL-Select.md",
     "data-management/MySQL/MySQL-Transaction.md",
@@ -205,7 +218,6 @@
     "data-management/Redis/Redis-Master-Slave.md",
     "data-management/MySQL/readMySQL.md",
     "data-management/Redis/Redis 有用指令.md",
-    "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Redis-Lock.md",
     "data-management/Redis/Redis-IO-Model.md",
     "data-management/Redis/Redis-Database.md",
