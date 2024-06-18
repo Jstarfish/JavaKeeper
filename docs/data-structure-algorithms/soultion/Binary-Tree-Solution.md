@@ -79,14 +79,15 @@ public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
   //用LinkedList 实现类
   Queue<TreeNode> queue = new LinkedList<TreeNode>();
   queue.offer(treeNode);
-  // 从上到下遍历二叉树的每一层
+  // 当队列不为空时，遍历每一层
   while (!queue.isEmpty()) {
     int size = queue.size();
     List<Integer> currentList = new ArrayList<>();
     // 从左到右遍历每一层的每个节点
     for (int i = 0; i < size; i++) {
+      //取出队头元素
       TreeNode node = queue.poll();
-      // 将下一层节点放入队列no
+      // 将下一层节点放入队列
       if (node.left != null) {
         queue.offer(node.left);
       }
@@ -186,7 +187,32 @@ public boolean check(TreeNode left,TreeNode right){
 >      返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
 >      注意：两结点之间的路径长度是以它们之间边的数目表示。
 
+思路：**每一条二叉树的「直径」长度，就是一个节点的左右子树的最大深度之和**
 
+```java
+int maxDiameter = 0;
+
+public int diameterOfBinaryTree(TreeNode root) {
+    traverse(root);
+    return maxDiameter;
+}
+
+//辅助函数
+public int traverse(TreeNode root) {
+    //Base Case
+    if (root == null) {
+        return 0;
+    }
+    //Height of left、right subtree
+    int leftMax = traverse(root.left);
+    int rightMax = traverse(root.right);
+    int diameter = leftMax + rightMax;
+    //Update Diameter
+    maxDiameter = Math.max(maxDiameter, diameter);
+    //Return current subtree height
+    return Math.max(leftMax, rightMax) + 1;
+}
+```
 
 
 
