@@ -49,8 +49,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/MySQL/MySQL-Lock.md",
-                "mode": "source",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/MySQL/MySQL-Lock.md",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/MySQL/MySQL-Lock.md",
+                "file": "data-management/MySQL/MySQL-Optimization.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/MySQL/MySQL-Lock.md"
+                "file": "data-management/MySQL/MySQL-Optimization.md"
               }
             }
           }
@@ -205,6 +205,7 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Lock.md",
     "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Nosql-Overview.md",
     "data-management/MySQL/MySQL-Select.md",
@@ -230,7 +231,6 @@
     "data-management/MySQL/MySQL-Optimization.md",
     "data-structure-algorithms/algorithm/Double-Pointer.md",
     "data-management/Redis/Redis-MQ.md",
-    "data-management/Redis/Key 寻址算法.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

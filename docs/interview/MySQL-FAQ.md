@@ -8,7 +8,7 @@ categories: MySQL
 
 ![](https://img.starfish.ink/common/faq-banner.png)
 
-> 写在之前：不建议那种上来就是各种面试题罗列，然后背书式的去记忆，对技术的提升帮助很小，对正经面试也没什么帮助，有点东西的面试官深挖下就懵逼了。
+> 写在之前：不建议背书式的去记忆面试题，对技术的提升帮助很小，对正经面试也没什么帮助，准备面试的过程还是要把各个知识点真懂了，然后再连成线。
 >
 > 个人建议把面试题看作是费曼学习法中的回顾、简化的环节，准备面试的时候，跟着题目先自己讲给自己听，看看自己会满意吗，不满意就继续学习这个点，如此反复，心仪的offer肯定会有的。
 >
@@ -987,14 +987,6 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
 ## 八、MySQL 锁机制
 
-> - 数据库的乐观锁和悲观锁。
-> - 隔离级别与锁的关系
-> - 按照锁的粒度分，数据库锁有哪些呢？锁机制与InnoDB锁算法
-> - 从锁的类别角度讲，MySQL都有哪些锁呢？
-> - MySQL中InnoDB引擎的行锁是怎么实现的？
-> - 什么是死锁？怎么解决？
-> - MySQL 遇到过死锁问题吗，你是如何解决的？
-
 锁是计算机协调多个进程或线程并发访问某一资源的机制。
 
 在数据库中，除传统的计算资源（如CPU、RAM、I/O等）的争用以外，数据也是一种供许多用户共享的资源。数据库锁定机制简单来说，就是数据库为了保证数据的一致性，而使各种共享资源在被并发访问变得有序所设计的一种规则。
@@ -1061,7 +1053,9 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
 
 
-#### 锁模式(InnoDB有三种行锁的算法)
+### MySQL中InnoDB引擎的行锁是怎么实现的？
+
+>  锁模式(InnoDB有三种行锁的算法)
 
 - **记录锁(Record Locks)**： 单个行记录上的锁。对索引项加锁，锁定符合条件的行。其他事务不能修改和删除加锁项； 
 
@@ -1082,16 +1076,10 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
   InnoDB 也会对这个“间隙”加锁，这种锁机制就是所谓的间隙锁。
 
-  > 如下表，初始化插入了 6 个记录，这就产生了 7 个间隙。
-  >
-  > ![](https://static001.geekbang.org/resource/image/e7/61/e7f7ca0d3dab2f48c588d714ee3ac861.png)
-  >
-  > 这样，当你执行 select * from t where d=5 for update 的时候，就不止是给数据库中已有的 6 个记录加上了行锁，还同时加了 7 个间隙锁。这样就确保了无法再插入新的记录。
-
   对索引项之间的“间隙”加锁，锁定记录的范围（对第一条记录前的间隙或最后一条将记录后的间隙加锁），不包含索引项本身。其他事务不能在锁范围内插入数据，这样就防止了别的事务新增幻影行。 
-
+  
   间隙锁基于非唯一索引，它锁定一段范围内的索引记录。间隙锁基于下面将会提到的`Next-Key Locking` 算法，请务必牢记：**使用间隙锁锁住的是一个区间，而不仅仅是这个区间中的每一条数据**。
-
+  
   ```mysql
   SELECT * FROM table WHERE id BETWEN 1 AND 10 FOR UPDATE;
   ```
@@ -1099,12 +1087,44 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
   即所有在`（1，10）`区间内的记录行都会被锁住，所有id 为 2、3、4、5、6、7、8、9 的数据行的插入会被阻塞，但是 1 和 10 两条记录行并不会被锁住。
 
   GAP 锁的目的，是为了防止同一事务的两次当前读，出现幻读的情况
-
+  
 - **临键锁(Next-key Locks)**： **临键锁**，是**记录锁与间隙锁的组合**，它的封锁范围，既包含索引记录，又包含索引区间。(临键锁的主要目的，也是为了避免**幻读**(Phantom Read)。如果把事务的隔离级别降级为RC，临键锁则也会失效。)
 
   Next-Key 可以理解为一种特殊的**间隙锁**，也可以理解为一种特殊的**算法**。通过**临建锁**可以解决幻读的问题。 每个数据行上的非唯一索引列上都会存在一把临键锁，当某个事务持有该数据行的临键锁时，会锁住一段左开右闭区间的数据。需要强调的一点是，<mark>`InnoDB` 中行级锁是基于索引实现的，临键锁只与非唯一索引列有关，在唯一索引列（包括主键列）上不存在临键锁</mark>。
 
   对于行的查询，都是采用该方法，主要目的是解决幻读的问题。
+
+
+
+### MySQL 隔离级别与锁的关系？
+
+在 MySQL 中，隔离级别和锁的关系紧密相关，不同的隔离级别通过使用不同的锁机制来控制事务间的并发行为，确保数据的一致性和隔离性。以下是 MySQL 四种隔离级别与锁的关系：
+
+1. **读未提交（Read Uncommitted）**
+
+- 锁机制：最低级别，不使用锁，允许读取未提交的数据。
+- 并发性：高。
+- 数据一致性：低，可能导致脏读。
+
+2. **读已提交（Read Committed）**
+
+- 锁机制：读取时使用共享锁（S Lock），更新时使用排他锁（X Lock）。
+- 并发性：中等。
+- 数据一致性：避免脏读，但可能发生不可重复读。
+
+3. **可重复读（Repeatable Read）**
+
+- 锁机制：读取时使用共享锁（S Lock），更新时使用排他锁（X Lock），并使用间隙锁（Gap Lock）防止幻读。
+- 并发性：较低。
+- 数据一致性：避免脏读和不可重复读，但在默认设置下防止幻读。
+
+4. **串行化（Serializable）**
+
+- 锁机制：事务间完全隔离，所有读取和写入都使用表级锁或行级锁，确保完全隔离。
+- 并发性：最低。
+- 数据一致性：最高，避免所有并发问题。
+
+选择适当的隔离级别和锁机制，可以在数据一致性和系统并发性之间找到最佳平衡。
 
 
 
@@ -1125,7 +1145,7 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
 
 
-#### 加锁机制
+### 数据库的乐观锁和悲观锁？
 
 **乐观锁与悲观锁是两种并发控制的思想，可用于解决丢失更新问题** 
 
@@ -1135,9 +1155,7 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
 
 
-
-
-### select for update有什么含义，会锁表还是锁行还是其他
+### select for update有什么含义，会锁表还是锁行还是其他？
 
 for update 仅适用于 InnoDB，且必须在事务块(BEGIN/COMMIT)中才能生效。在进行事务操作时，通过“for update”语句，MySQL  会对查询结果集中每行数据都添加排他锁，其他线程对该记录的更新与删除操作都会阻塞。排他锁包含行锁、表锁。
 
@@ -1181,25 +1199,31 @@ SELECT * FROM products WHERE id LIKE '3' FOR UPDATE;
 
 
 
-### 数据库的乐观锁和悲观锁？
-
-
-
-### MySQL中InnoDB引擎的行锁是怎么实现的？
-
-### MySQL 间隙锁有没有了解?
-
-
-
 ### 死锁有没有了解，写一段会造成死锁的 sql 语句?
 
+死锁是指两个或多个事务在等待彼此持有的资源，从而导致所有事务都无法继续执行的情况。在 MySQL 中，死锁通常发生在并发更新相同的资源时。
+
+```mysql
+START TRANSACTION;
+UPDATE table_name SET column_a = 1 WHERE id = 1;
+-- 这里事务 1 锁定了 id = 1 的记录
+UPDATE table_name SET column_b = 2 WHERE id = 2;
+-- 等待事务 2 释放 id = 2 的锁
+```
+
+```mysql
+START TRANSACTION;
+UPDATE table_name SET column_b = 2 WHERE id = 2;
+-- 这里事务 2 锁定了 id = 2 的记录
+UPDATE table_name SET column_a = 1 WHERE id = 1;
+-- 等待事务 1 释放 id = 1 的锁
+```
 
 
-### 死锁发生了如何解决，MySQL 有没有提供什么机制去解决死锁
+
+### 死锁发生了如何解决，MySQL 有没有提供什么机制去解决死锁？
 
 > MySQL 遇到过死锁问题吗，你是如何解决的？
-
-### 死锁
 
 **死锁产生**：
 
@@ -1224,23 +1248,7 @@ SELECT * FROM products WHERE id LIKE '3' FOR UPDATE;
 
 
 
-**MyISAM 避免死锁**：
-
-- 在自动加锁的情况下，MyISAM 总是一次获得 SQL 语句所需要的全部锁，所以 MyISAM 表不会出现死锁。
-
-**InnoDB 避免死锁**：
-
-- 为了在单个 InnoDB 表上执行多个并发写入操作时避免死锁，可以在事务开始时通过为预期要修改的每个元祖（行）使用`SELECT ... FOR UPDATE`语句来获取必要的锁，即使这些行的更改语句是在之后才执行的。
-- 在事务中，如果要更新记录，应该直接申请足够级别的锁，即排他锁，而不应先申请共享锁、更新时再申请排他锁，因为这时候当用户再申请排他锁时，其他事务可能又已经获得了相同记录的共享锁，从而造成锁冲突，甚至死锁
-- 如果事务需要修改或锁定多个表，则应在每个事务中以相同的顺序使用加锁语句。 在应用中，如果不同的程序会并发存取多个表，应尽量约定以相同的顺序来访问表，这样可以大大降低产生死锁的机会
-- 通过`SELECT ... LOCK IN SHARE MODE` 获取行的读锁后，如果当前事务再需要对该记录进行更新操作，则很有可能造成死锁。
-- 改变事务隔离级别
-
-如果出现死锁，可以用 `show engine innodb status; `命令来确定最后一个死锁产生的原因。返回结果中包括死锁相关事务的详细信息，如引发死锁的 SQL 语句，事务已经获得的锁，正在等待什么锁，以及被回滚的事务等。据此可以分析死锁产生的原因和改进措施。
-
-
-
-### 如何尽可能避免死锁
+### 如何尽可能避免死锁？
 
 1. 合理的设计索引，区分度高的列放到组合索引前面，使业务 SQL 尽可能通过索引`定位更少的行，减少锁竞争`。
 2. 调整业务逻辑 SQL 执行顺序， 避免 update/delete 长时间持有锁的 SQL 在事务前面。
@@ -1252,25 +1260,13 @@ SELECT * FROM products WHERE id LIKE '3' FOR UPDATE;
 
 
 
-### InnoDB 如何手动锁表
-
-LOCK TABLES table_name read local; 将当前表设置为只读，不能进行插入或更新操作。
-
-UNLOCK TABLES;锁住表了，使用UNLOCK进行释放。
-
-
-
-### InnoDB 引擎的行锁是通过加在什么上完成(或称实现) 的?
-
-InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MySQL 与 Oracle 不同，后者是通过在数据块中对相应数据行加锁来实现的。InnoDB 这 种行锁实现特点意味着:只有通过索引条件检索数据，InnoDB 才使用行级 锁，否则，InnoDB 将使用表锁!
-
 ------
 
 
 
 ## 九、MySQL 调优
 
-> 日常工作中你是怎么优化SQL的？
+> 
 >
 > SQL优化的一般步骤是什么，怎么看执行计划（explain），如何理解其中各个字段的含义？
 >
@@ -1278,9 +1274,9 @@ InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MyS
 >
 > 一条sql执行过长的时间，你如何优化，从哪些方面入手？
 >
-> 什么是最左前缀原则？什么是最左匹配原则？
+> 
 
-### 影响  mysql 的性能因素
+### 影响  mysql 的性能因素有哪些?
 
 - 业务需求对MySQL的影响(合适合度)
 
@@ -1304,15 +1300,74 @@ InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MyS
 
 
 
+### 日常工作中你是怎么优化SQL的？
+
+优化SQL的日常工作可以从以下几个方面进行：
+
+1. **索引优化**
+
+- **创建索引**：为频繁查询的列创建合适的索引，特别是主键和外键列。
+- **使用覆盖索引**：通过索引来满足查询需求，避免回表查询。
+- **删除冗余索引**：清理不常用或重复的索引，以减少维护开销。
+
+2. **查询优化**
+
+- **避免选择所有列**：只选择需要的列，避免使用 `SELECT *`。
+- **使用合适的SQL语法**：如使用 `JOIN` 替代子查询，避免N+1查询问题。
+- **优化WHERE子句**：使用索引列进行过滤，避免在过滤条件中进行函数运算或转换。
+
+3. **数据库结构优化**
+
+- **规范化与反规范化**：根据实际需求选择合适的数据库设计，平衡数据冗余和查询性能。
+- **分区表**：对于大表，使用分区技术来提升查询和维护性能。
+
+4. **缓存机制**
+
+- **应用层缓存**：如Memcached或Redis，缓存频繁访问的数据，减少数据库负载。
+- **数据库缓存**：合理设置数据库缓存参数，优化数据库内存使用。
+
+5. **SQL分析与监控**
+
+- **执行计划分析**：使用 `EXPLAIN` 分析SQL的执行计划，了解查询的执行步骤和时间。
+- **慢查询日志**：启用慢查询日志，找出并优化执行时间较长的SQL语句。
+- **性能监控工具**：如使用New Relic、APM等工具，持续监控数据库性能。
+
+6. **事务控制**
+
+- **减少事务范围**：尽量缩小事务的范围和持续时间，避免长时间锁定资源。
+- **合理设置隔离级别**：根据业务需求选择合适的事务隔离级别，平衡并发性和数据一致性。
+
+7. **数据库参数调整**
+
+- **调整连接池**：合理设置数据库连接池大小，避免过多连接导致资源争用。
+- **优化数据库配置**：根据硬件资源和业务需求，调整数据库内存、缓存、IO等参数。
+
+通过以上方法，可以有效地优化SQL性能，提高数据库的响应速度和稳定性。持续关注数据库的运行情况，并根据实际需求进行调整，是保持数据库高效运行的关键。
+
+
+
+### 什么是最左前缀原则？什么是最左匹配原则？
+
+**最左前缀原则** 和 **最左匹配原则** 是在使用索引时的两个相关概念，它们通常与复合索引（即在多个列上创建的索引）的使用相关：
+
+1. **最左前缀原则**：
+   - 当使用复合索引时，最左前缀原则指的是查询优化器只会使用复合索引中最左边的列（或前几列）来查找数据。
+   - 这意味着，如果要利用复合索引，查询条件中必须包含最左边的列。如果查询条件不包含最左边的列，那么索引将不会被使用，或者不会完全被使用。
+2. **最左匹配原则**：
+   - 最左匹配原则是指在复合索引中，只有当前面的列匹配后，才能继续向后匹配。换句话说，只有当前一个列的值已经确定，才能利用下一个列的索引。
+   - 例如，如果你有一个 (`col1`, `col2`, `col3`) 的复合索引，那么只有当 `col1` 的值确定后，`col2` 的索引才会被使用；同样，只有当 `col1` 和 `col2` 的值都确定后，`col3` 的索引才会被使用。
+
+
+
 ### 性能分析
 
-#### MySQL Query Optimizer
+**MySQL Query Optimizer**
 
 1. MySQL 中有专门负责优化 SELECT 语句的优化器模块，主要功能：通过计算分析系统中收集到的统计信息，为客户端请求的 Query 提供他认为最优的执行计划（他认为最优的数据检索方式，但不见得是 DBA 认为是最优的，这部分最耗费时间）
 
 2. 当客户端向 MySQL 请求一条 Query，命令解析器模块完成请求分类，区别出是 SELECT 并转发给 MySQL Query Optimizer 时，MySQL Query Optimizer 首先会对整条 Query 进行优化，处理掉一些常量表达式的预算，直接换算成常量值。并对 Query 中的查询条件进行简化和转换，如去掉一些无用或显而易见的条件、结构调整等。然后分析 Query 中的 Hint 信息（如果有），看显示 Hint 信息是否可以完全确定该 Query 的执行计划。如果没有 Hint 或 Hint 信息还不足以完全确定执行计划，则会读取所涉及对象的统计信息，根据 Query 进行写相应的计算分析，然后再得出最后的执行计划。
 
-#### MySQL常见瓶颈
+**MySQL常见瓶颈**
 
 - CPU：CPU 在饱和的时候一般发生在数据装入内存或从磁盘上读取数据时候
 
@@ -1320,7 +1375,7 @@ InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MyS
 
 - 服务器硬件的性能瓶颈：top，free，iostat 和 vmstat 来查看系统的性能状态
 
-#### 性能下降SQL慢 执行时间长 等待时间长 原因分析
+**性能下降SQL慢 执行时间长 等待时间长 原因分析**
 
 - 查询语句写的烂
 - 索引失效（单值、复合）
@@ -1329,11 +1384,13 @@ InnoDB 行锁是通过给索引上的索引项加锁来实现的，这一点 MyS
 
 
 
-#### MySQL常见性能分析手段
+### MySQL常见性能分析手段？
 
 在优化 MySQL 时，通常需要对数据库进行分析，常见的分析手段有**慢查询日志**，**EXPLAIN 分析查询**，**profiling分析**以及**show命令查询系统状态及系统变量**，通过定位分析性能的瓶颈，才能更好的优化数据库系统的性能。
 
-#####  性能瓶颈定位 
+
+
+###  性能瓶颈定位 
 
 我们可以通过 show 命令查看 MySQL 状态及变量，找到系统的瓶颈：
 
@@ -1353,229 +1410,95 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 
 
-##### Explain(执行计划)
+### Explain(执行计划)
 
-是什么：使用 **Explain** 关键字可以模拟优化器执行 SQL 查询语句，从而知道 MySQL 是如何处理你的 SQL 语句的。分析你的查询语句或是表结构的性能瓶颈
-
-能干吗：
-- 表的读取顺序
-- 数据读取操作的操作类型
-- 哪些索引可以使用
-- 哪些索引被实际使用
-- 表之间的引用
-- 每张表有多少行被优化器查询
-
-怎么玩：
-
-- Explain + SQL语句
-- 执行计划包含的信息（如果有分区表的话还会有**partitions**）
-
-![expalin](https://tva1.sinaimg.cn/large/007S8ZIlly1gf2hsjk9zcj30kq01adfn.jpg)
+使用 **Explain** 关键字可以模拟优化器执行 SQL 查询语句，从而知道 MySQL 是如何处理你的 SQL 语句的。分析你的查询语句或是表结构的性能瓶颈
 
 各字段解释
 
-- <mark>**id**</mark>（select 查询的序列号，包含一组数字，表示查询中执行select子句或操作表的顺序）
+- <mark>**id**</mark>（select 查询的序列号，包含一组数字，表示查询中执行 select 子句或操作表的顺序）
 
   - id 相同，执行顺序从上往下
-  - id 全不同，如果是子查询，id 的序号会递增，id 值越大优先级越高，越先被执行
-  - id 部分相同，执行顺序是先按照数字大的先执行，然后数字相同的按照从上往下的顺序执行
+  - id 不同，如果是子查询，id 的序号会递增，id 值越大优先级越高，越先被执行
+  - id 相同不同，同时存在，相同的属于一组，从上往下执行
 
-- <mark> **select_type**</mark>（查询类型，用于区别普通查询、联合查询、子查询等复杂查询）
+- <mark> **select_type**</mark>（查询的类型，用于区别普通查询、联合查询、子查询等复杂查询）
 
   - **SIMPLE** ：简单的 select 查询，查询中不包含子查询或 UNION
   - **PRIMARY**：查询中若包含任何复杂的子部分，最外层查询被标记为 PRIMARY
-  - **SUBQUERY**：在select或where列表中包含了子查询
-  - **DERIVED**：在 from 列表中包含的子查询被标记为 DERIVED，MySQL会递归执行这些子查询，把结果放在临时表里
-  - **UNION**：若第二个select出现在UNION之后，则被标记为UNION，若UNION包含在from子句的子查询中，外层select将被标记为DERIVED
-  - **UNION RESULT**：从UNION表获取结果的select
+  - **SUBQUERY**：在 select 或 where 列表中包含了子查询
+  - **DERIVED**：在 from 列表中包含的子查询被标记为 DERIVED，mysql 会递归执行这些子查询，把结果放在临时表里
+  - **UNION**：若第二个 select 出现在 UNION 之后，则被标记为 UNION，若 UNION 包含在 from 子句的子查询中，外层 select 将被标记为 DERIVED
+  - **UNION RESULT**：从 UNION 表获取结果的 select
 
 - <mark> **table**</mark>（显示这一行的数据是关于哪张表的）
 
-- <mark> **type**</mark>（显示查询使用了那种类型，从最好到最差依次排列	**system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL** ）
+- <mark> **partitions**</mark>（匹配的分区信息，高版本才有的）
+
+- <mark> **type**</mark>（显示查询使用了那种类型，从最好到最差依次排列 **system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL** ）
 
   - system：表只有一行记录（等于系统表），是 const 类型的特例，平时不会出现
   - const：表示通过索引一次就找到了，const 用于比较 primary key 或 unique 索引，因为只要匹配一行数据，所以很快，如将主键置于 where 列表中，mysql 就能将该查询转换为一个常量
   - eq_ref：唯一性索引扫描，对于每个索引键，表中只有一条记录与之匹配，常见于主键或唯一索引扫描
   - ref：非唯一性索引扫描，范围匹配某个单独值得所有行。本质上也是一种索引访问，他返回所有匹配某个单独值的行，然而，它可能也会找到多个符合条件的行，多以他应该属于查找和扫描的混合体
-  - range：只检索给定范围的行，使用一个索引来选择行。key列显示使用了哪个索引，一般就是在你的where语句中出现了between、<、>、in等的查询，这种范围扫描索引比全表扫描要好，因为它只需开始于索引的某一点，而结束于另一点，不用扫描全部索引
-  - index：Full Index Scan，index于ALL区别为index类型只遍历索引树。通常比ALL快，因为索引文件通常比数据文件小。（**也就是说虽然all和index都是读全表，但index是从索引中读取的，而all是从硬盘中读的**）
-  - ALL：Full Table Scan，将遍历全表找到匹配的行
+  - ref_or_null：当对普通二级索引进行等值匹配查询，该索引列的值也可以是`NULL`值时，那么对该表的访问方法就可能是ref_or_null
+  - index_merge: 在某些场景下可以使用`Intersection`、`Union`、`Sort-Union`这三种索引合并的方式来执行查询
+  - range：只检索给定范围的行，使用一个索引来选择行。key 列显示使用了哪个索引，一般就是在你的 where 语句中出现了between、<、>、in等的查询，这种范围扫描索引比全表扫描要好，因为它只需开始于索引的某一点，而结束于另一点，不用扫描全部索引
+  - index：Full Index Scan，index 于 ALL 区别为 index 类型只遍历索引树。通常比 ALL 快，因为索引文件通常比数据文件小。（**也就是说虽然 all 和 index 都是读全表，但 index 是从索引中读取的，而 all 是从硬盘中读的**）
+  - all：Full Table Scan，将遍历全表找到匹配的行
 
-  tip: 一般来说，得保证查询至少达到range级别，最好到达ref
+  > 一般来说，得保证查询至少达到 range 级别，最好到达 ref
 
 - <mark> **possible_keys**</mark>（显示可能应用在这张表中的索引，一个或多个，查询涉及到的字段若存在索引，则该索引将被列出，但不一定被查询实际使用）
 
 - <mark> **key**</mark> 
 
-  - 实际使用的索引，如果为 NULL，则没有使用索引
+  - 实际使用的索引，如果为NULL，则没有使用索引
 
-  - **查询中若使用了覆盖索引，则该索引和查询的 select 字段重叠，仅出现在key列表中**
-
-![explain-key](https://tva1.sinaimg.cn/large/007S8ZIlly1gf2hsty7iaj30nt0373yb.jpg)
+  - **查询中若指定了使用了覆盖索引，则该索引和查询的 select 字段重叠，仅出现在 key 列表中**![](https://img.starfish.ink/mysql/explain-key.png)
 
 - <mark> **key_len**</mark>
 
   - 表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。在不损失精确性的情况下，长度越短越好
-  - key_len显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的
+  - key_len 显示的值为索引字段的最大可能长度，并非实际使用长度，即 key_len 是根据表定义计算而得，不是通过表内检索出的
 
-- <mark> **ref**</mark> （显示索引的哪一列被使用了，如果可能的话，是一个常数。哪些列或常量被用于查找索引列上的值）
+- <mark> **ref**</mark> （显示索引的哪一列被使用了，如果可能的话，是一个常数。哪些列或常量被用于查找索引列上的值）![](https://img.starfish.ink/mysql/explain-ref.png)
 
 - <mark> **rows**</mark> （根据表统计信息及索引选用情况，大致估算找到所需的记录所需要读取的行数）
 
+- <mark> **filtered**</mark>（某个表经过搜索条件过滤后剩余记录条数的百分比）
+
 - <mark> **Extra**</mark>（包含不适合在其他列中显示但十分重要的额外信息）
 
-  1. <font color=red>using filesort</font>: 说明mysql会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。mysql中无法利用索引完成的排序操作称为“文件排序”。常见于order by和group by语句中
+  额外信息有好几十个，我们看几个常见的
 
-  2. <font color=red>Using temporary</font>：使用了临时表保存中间结果，mysql在对查询结果排序时使用临时表。常见于排序order by和分组查询group by。
+  1. <font color=red>`using filesort`</font>：说明 MySQL 会对数据使用一个外部的索引排序，不是按照表内的索引顺序进行读取。MySQL 中无法利用索引完成的排序操作称为“文件排序”![](https://img.starfish.ink/mysql/explain-extra-using-filesort.png)
 
-  3. <font color=red>using index</font>：表示相应的select操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现using where，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作
+  2. <font color=red>`Using temporary`</font>：使用了临时表保存中间结果，比如去重、排序之类的，比如我们在执行许多包含`DISTINCT`、`GROUP BY`、`UNION`等子句的查询过程中，如果不能有效利用索引来完成查询，`MySQL`很有可能寻求通过建立内部的临时表来执行查询。![](https://img.starfish.ink/mysql/explain-extra-using-tmp.png)
 
-  4. using where：使用了where过滤
+  3. <font color=red>`using index`</font>：表示相应的 select 操作中使用了覆盖索引，避免访问了表的数据行，效率不错，如果同时出现 `using where`，表明索引被用来执行索引键值的查找；否则索引被用来读取数据而非执行查找操作![](https://img.starfish.ink/mysql/explain-extra-using-index.png)
 
-  5. using join buffer：使用了连接缓存
+  4. `using where`：当某个搜索条件需要在`server层`进行判断时![](https://img.starfish.ink/mysql/explain-extra-using-where.png)
 
-  6. impossible where：where子句的值总是false，不能用来获取任何元祖
+  5. `using join buffer`：使用了连接缓存![](https://img.starfish.ink/mysql/explain-extra-using-join-buffer.png)
 
-  7. select tables optimized away：在没有group by子句的情况下，基于索引优化操作或对于MyISAM存储引擎优化COUNT(*)操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化
+  6. `impossible where`：where 子句的值总是 false，不能用来获取任何元祖![](https://img.starfish.ink/mysql/explain-extra-impossible-where.png)
 
-  8. distinct：优化distinct操作，在找到第一匹配的元祖后即停止找同样值的动作
+  7. `Using index condition` : 查询使用了索引，但是查询条件不能完全由索引本身来满足![](https://img.starfish.ink/mysql/explain-extra-using-index-condition.png)
 
-     
+     `Using index condition `通常出现在以下几种情况：
 
-**case**:
+     - **索引条件下推（Index Condition Pushdown, ICP）**：这是 MySQL 的一个优化策略，它将查询条件的过滤逻辑“下推”到存储引擎层，而不是在服务器层处理。这样可以减少从存储引擎检索的数据量，从而提高查询效率。
+     - **部分索引**：当查询条件只涉及索引的一部分列时，MySQL 可以使用索引来快速定位到满足条件的行，但是可能需要回表（即访问表的实际数据行）来检查剩余的条件。
+     - **复合索引**：在使用复合索引（即索引包含多个列）的情况下，如果查询条件只匹配索引的前几列，那么剩余的列可能需要通过 `Using index condition` 来进一步过滤。
 
-![explain-demo](https://tva1.sinaimg.cn/large/007S8ZIlly1gf2hszmc0lj30lc05w75c.jpg)
+  8. `select tables optimized away`：在没有group by子句的情况下，基于索引优化操作或对于MyISAM存储引擎优化COUNT(*)操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化
 
-1. 第一行（执行顺序4）：id列为1，表示是union里的第一个select，select_type列的primary表示该查询为外层查询，table列被标记为\<derived3>，表示查询结果来自一个衍生表，其中derived3中3代表该查询衍生自第三个select查询，即id为3的select。【select d1.name......】
-
-2. 第二行（执行顺序2）：id为3，是整个查询中第三个select的一部分。因查询包含在from中，所以为derived。【select id,name from t1 where other_column=''】
-3. 第三行（执行顺序3）：select列表中的子查询select_type为subquery，为整个查询中的第二个select。【select id from t3】
-4. 第四行（执行顺序1）：select_type为union，说明第四个select是union里的第二个select，最先执行【select name,id from t2】
-5. 第五行（执行顺序5）：代表从union的临时表中读取行的阶段，table列的<union1,4>表示用第一个和第四个select的结果进行union操作。【两个结果union操作】
+  9. `distinct`：优化distinct操作，在找到第一匹配的元祖后即停止找同样值的动作
 
 
 
-##### 慢查询日志
-
-MySQL 的慢查询日志是 MySQL 提供的一种日志记录，它用来记录在 MySQL 中响应时间超过阈值的语句，具体指运行时间超过 `long_query_time` 值的 SQL，则会被记录到慢查询日志中。
-
-- `long_query_time` 的默认值为10，意思是运行10秒以上的语句
-- 默认情况下，MySQL数据库没有开启慢查询日志，需要手动设置参数开启
-
-**查看开启状态**
-
-```mysql
-SHOW VARIABLES LIKE '%slow_query_log%'
-```
-
-**开启慢查询日志**
-
-- 临时配置：
-
-```mysql
-mysql> set global slow_query_log='ON';
-mysql> set global slow_query_log_file='/var/lib/mysql/hostname-slow.log';
-mysql> set global long_query_time=2;
-```
-
-​	也可 set 文件位置，系统会默认给一个缺省文件 host_name-slow.log
-
-​	使用 set 操作开启慢查询日志只对当前数据库生效，如果 MySQL 重启则会失效。
-
-- 永久配置
-
-  修改配置文件 my.cnf 或 my.ini，在[mysqld]一行下面加入两个配置参数
-
-```mysql
-[mysqld]
-slow_query_log = ON
-slow_query_log_file = /var/lib/mysql/hostname-slow.log
-long_query_time = 3
-```
-
-注：log-slow-queries 参数为慢查询日志存放的位置，一般这个目录要有 MySQL 的运行帐号的可写权限，一般都将这个目录设置为 MySQL 的数据存放目录；long_query_time=2 中的 2 表示查询超过两秒才记录；在my.cnf或者 my.ini 中添加 log-queries-not-using-indexes 参数，表示记录下没有使用索引的查询。
-
-可以用 `select sleep(4)` 验证是否成功开启。
-
-在生产环境中，如果手工分析日志，查找、分析SQL，还是比较费劲的，所以MySQL提供了日志分析工具**mysqldumpslow**。
-
-通过 mysqldumpslow --help 查看操作帮助信息
-
-- 得到返回记录集最多的10个SQL
-
-  `mysqldumpslow -s r -t 10 /var/lib/mysql/hostname-slow.log`
-
-- 得到访问次数最多的10个SQL
-
-  `mysqldumpslow -s c -t 10 /var/lib/mysql/hostname-slow.log`
-
-- 得到按照时间排序的前10条里面含有左连接的查询语句
-
-  `mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/hostname-slow.log`
-
-- 也可以和管道配合使用
-
-  `mysqldumpslow -s r -t 10 /var/lib/mysql/hostname-slow.log | more`
-
-**也可使用 pt-query-digest 分析 RDS MySQL 慢查询日志**
-
-
-
-##### Show Profile 分析查询
-
-通过慢日志查询可以知道哪些 SQL 语句执行效率低下，通过 explain 我们可以得知 SQL 语句的具体执行情况，索引使用等，还可以结合`Show Profile`命令查看执行状态。
-
-- Show Profile 是 MySQL 提供可以用来分析当前会话中语句执行的资源消耗情况。可以用于  SQL 的调优的测量
-
-- 默认情况下，参数处于关闭状态，并保存最近15次的运行结果
-
-- 分析步骤
-
-  1. 是否支持，看看当前的mysql版本是否支持
-
-     ```mysql
-     mysql>Show  variables like 'profiling';  --默认是关闭，使用前需要开启
-     ```
-
-  2. 开启功能，默认是关闭，使用前需要开启
-
-     ```mysql
-     mysql>set profiling=1;  
-     ```
-
-  3. 运行SQL
-
-  4. 查看结果
-
-     ```mysql
-      mysql> show profiles;
-     +----------+------------+---------------------------------+
-      | Query_ID | Duration   | Query                           |
-     +----------+------------+---------------------------------+
-      |        1 | 0.00385450 | show variables like "profiling" |
-     |        2 | 0.00170050 | show variables like "profiling" |
-      |        3 | 0.00038025 | select * from t_base_user       |
-     +----------+------------+---------------------------------+
-     ```
-  
-  5. 诊断SQL，show profile cpu,block io for query  id(上一步前面的问题SQL数字号码)
-  6. 日常开发需要注意的结论
-  
-     - converting HEAP to MyISAM 查询结果太大，内存都不够用了往磁盘上搬了。
-  
-     - create tmp table 创建临时表，这个要注意
-  
-     - Copying to tmp table on disk   把内存临时表复制到磁盘
-  
-     - locked
-
-
-
-> 查询中哪些情况不会使用索引？
-
-### 性能优化
-
-#### 索引优化
+### 索引优化？
 
 1. 全值匹配我最爱
 
@@ -1603,7 +1526,7 @@ long_query_time = 3
 
 
 
-#### 建索引的几大原则
+### 建索引的几大原则
 
 1. 最左前缀匹配原则，非常重要的原则，mysql 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如 `a = 1 and b = 2 and c > 3 and d = 4` 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。
 2. =和in可以乱序，比如 `a = 1 and b = 2 and c = 3`  建立(a,b,c)索引可以任意顺序，mysql 的查询优化器会帮你优化成索引可以识别的形式。
@@ -1613,126 +1536,15 @@ long_query_time = 3
 
 
 
-**一般性建议**
+### 一条sql执行过长的时间，你如何优化，从哪些方面？
 
-- 对于单键索引，尽量选择针对当前 query 过滤性更好的索引
-
-- 在选择组合索引的时候，当前 query 中过滤性最好的字段在索引字段顺序中，位置越靠前越好
-
-- 在选择组合索引的时候，尽量选择可以能够包含当前 query 中的 where 字句中更多字段的索引
-
-- 尽可能通过分析统计信息和调整 query 的写法来达到选择合适索引的目的
-
-- 少用 Hint 强制索引
-
-  
-
-#### 查询优化
-
-##### 为查询缓存优化你的查询
-
-大多数的 MySQL 服务器都开启了查询缓存。这是提高性最有效的方法之 一，而且这是被 MySQL 的数据库引擎处理的。当有很多相同的查询被执行了多次的时候，这些查询结果会被放到一个缓存中，这样，后续的相同的查询就不用操作表而直接访问缓存结果了。
-
-这里最主要的问题是，对于程序员来说，这个事情是很容易被忽略的。因为，我们某些查询语句会让 MySQL 不使用缓存。请看下面的示例:
-
-![](https://tva1.sinaimg.cn/large/e6c9d24ely1h3b1ms39aaj218605u75x.jpg)
-
-上面两条 SQL 语句的差别就是 CURDATE() ，MySQL 的查询缓存对这个函数不起作用。
-
-所以，像 NOW() 和 RAND() 或是其它的诸如此类的 SQL 函数都不会开启查询缓存，因为这些函数的返回是会不定的易变的。所以，你所需要的就是 用一个变量来代替 MySQL 的函数，从而开启缓存。
-
-
-
-##### 永远小标驱动大表（小的数据集驱动大的数据集）
-
-```mysql
-slect * from A where id in (select id from B)`等价于
-#等价于
-select id from B
-select * from A where A.id=B.id
-```
-
-当 B 表的数据集必须小于 A 表的数据集时，用 in 优于 exists
-
-```mysql
-select * from A where exists (select 1 from B where B.id=A.id)
-#等价于
-select * from A
-select * from B where B.id = A.id`
-```
-
-当 A 表的数据集小于 B 表的数据集时，用 exists 优于用 in
-
-注意：A 表与 B 表的 ID 字段应建立索引。
-
-
-
-##### order by 关键字优化
-
-- order by 子句，尽量使用 Index 方式排序，避免使用 FileSort 方式排序
-
-- MySQL 支持两种方式的排序，FileSort 和 Index，Index效率高，它指 MySQL 扫描索引本身完成排序，FileSort 效率较低；
-
-  > https://blog.csdn.net/yangyu112654374/article/details/4251624  看个例子
-
-- ORDER BY 满足两种情况，会使用 Index 方式排序；
-  - ORDER BY 语句使用索引最左前列 
-  -   使用 where 子句与 ORDER BY 子句条件列组合满足索引最左前列
-  
-- 尽可能在索引列上完成排序操作，遵照建索引的最左前缀
-
-- 如果不在索引列上，filesort 有两种算法，mysql 就要启动双路排序和单路排序
-  - 双路排序：MySQL 4.1之前是使用双路排序，字面意思就是两次扫描磁盘，最终得到数据
-  - 单路排序：从磁盘读取查询需要的所有列，按照 order by 列在 buffer 对它们进行排序，然后扫描排序后的列表进行输出，效率高于双路排序
-  
-- 优化策略
-
-  - 增大 sort_buffer_size 参数的设置
-  - 增大 max_lencth_for_sort_data 参数的设置
-
-
-
-##### GROUP BY 关键字优化
-
-- group by 实质是先排序后进行分组，遵照索引建的最佳左前缀
-- 当无法使用索引列，增大 `max_length_for_sort_data` 参数的设置，增大 `sort_buffer_size` 参数的设置
-- where 高于 having，能写在 where 限定的条件就不要去 having 限定了
-
-
-
-#### 数据类型优化
-
-MySQL 支持的数据类型非常多，选择正确的数据类型对于获取高性能至关重要。不管存储哪种类型的数据，下面几个简单的原则都有助于做出更好的选择。
-
-- 更小的通常更好：一般情况下，应该尽量使用可以正确存储数据的最小数据类型。
-
-  简单就好：简单的数据类型通常需要更少的CPU周期。例如，整数比字符操作代价更低，因为字符集和校对规则（排序规则）使字符比较比整型比较复杂。
-
-- 尽量避免NULL：通常情况下最好指定列为NOT NULL
-
-
-
-### 说一下大表的优化方案
-
-https://blog.csdn.net/u011516972/article/details/89098732
-
-
-
-**一条sql执行过长的时间，你如何优化，从哪些方面？**
-
-> 1、查看sql是否涉及多表的联表或者子查询，如果有，看是否能进行业务拆分，相关字段冗余或者合并成临时表（业务和算法的优化）
->
-> 2、涉及连表的查询，是否能进行分表查询，单表查询之后的结果进行字段整合
->
-> 3、如果以上两种都不能操作，非要连表查询，那么考虑对相对应的查询条件做索引。加快查询速度
->
-> 4、针对数量大的表进行历史表分离（如交易流水表）
->
-> 5、数据库主从分离，读写分离，降低读写针对同一表同时的压力，至于主从同步，mysql有自带的binlog实现 主从同步
->
-> 6、explain分析sql语句，查看执行计划，分析索引是否用上，分析扫描行数等等
->
-> 7、查看mysql执行日志，看看是否有其他方面的问题
+1. 查看sql是否涉及多表的联表或者子查询，如果有，看是否能进行业务拆分，相关字段冗余或者合并成临时表（业务和算法的优化）
+2. 涉及连表的查询，是否能进行分表查询，单表查询之后的结果进行字段整合
+3. 如果以上两种都不能操作，非要连表查询，那么考虑对相对应的查询条件做索引。加快查询速度
+4. 针对数量大的表进行历史表分离（如交易流水表）
+5. 数据库主从分离，读写分离，降低读写针对同一表同时的压力，至于主从同步，mysql有自带的binlog实现 主从同步
+6. explain分析sql语句，查看执行计划，分析索引是否用上，分析扫描行数等等
+7. 查看mysql执行日志，看看是否有其他方面的问题
 
 
 
@@ -1742,11 +1554,13 @@ https://blog.csdn.net/u011516972/article/details/89098732
 
 ## 十、分区、分表、分库
 
-### MySQL分区
+### MySQL分区？
 
 一般情况下我们创建的表对应一组存储文件，使用`MyISAM`存储引擎时是一个`.MYI`和`.MYD`文件，使用`Innodb`存储引擎时是一个`.ibd`和`.frm`（表结构）文件。
 
 当数据量较大时（一般千万条记录级别以上），MySQL的性能就会开始下降，这时我们就需要将数据分散到多组存储文件，保证其单个文件的执行效率
+
+MySQL分区是一种数据库优化技术，通过将表的数据划分为更小、更易管理的部分，来提高查询性能和管理效率。下面是关于MySQL分区的一些关键点，适合在面试中讨论：
 
 **能干嘛**
 
@@ -1756,37 +1570,69 @@ https://blog.csdn.net/u011516972/article/details/89098732
 - 分割数据能够有多个不同的物理文件路径
 - 高效的保存历史数据
 
-**怎么玩**
-
-首先查看当前数据库是否支持分区
-
-- MySQL5.6以及之前版本：  
-
-  ```mysql
-  SHOW VARIABLES LIKE '%partition%';
-  ```
-
-- MySQL5.6：
-
-  ```mysql
-  show plugins;
-  ```
-
 **分区类型及操作**
 
-- **RANGE分区**：基于属于一个给定连续区间的列值，把多行分配给分区。mysql将会根据指定的拆分策略，,把数据放在不同的表文件上。相当于在文件上,被拆成了小块.但是,对外给客户的感觉还是一张表，透明的。
+- **RANGE分区**：基于属于一个给定连续区间的列值，把多行分配给分区。mysql将会根据指定的拆分策略，把数据放在不同的表文件上。相当于在文件上,被拆成了小块.但是,对外给客户的感觉还是一张表，透明的。
 
   按照 range 来分，就是每个库一段连续的数据，这个一般是按比如**时间范围**来的，比如交易表啊，销售表啊等，可以根据年月来存放数据。可能会产生热点问题，大量的流量都打在最新的数据上了。
 
   range 来分，好处在于说，扩容的时候很简单。
 
-- **LIST分区**：类似于按RANGE分区，每个分区必须明确定义。它们的主要区别在于，LIST分区中每个分区的定义和选择是基于某列的值从属于一个值列表集中的一个值，而RANGE分区是从属于一个连续区间值的集合。
+  ```mysql
+  CREATE TABLE sales (
+      id INT,
+      amount DECIMAL(10,2),
+      sale_date DATE
+  )
+  PARTITION BY RANGE (YEAR(sale_date)) (
+      PARTITION p0 VALUES LESS THAN (2000),
+      PARTITION p1 VALUES LESS THAN (2005),
+      PARTITION p2 VALUES LESS THAN (2010),
+      PARTITION p3 VALUES LESS THAN MAXVALUE
+  );
+  ```
 
-- **HASH分区**：基于用户定义的表达式的返回值来进行选择的分区，该表达式使用将要插入到表中的这些行的列值进行计算。这个函数可以包含MySQL 中有效的、产生非负整数值的任何表达式。
+- **LIST分区**：按列表划分，类似于RANGE分区，但使用的是明确的值列表。
+
+  它们的主要区别在于，LIST分区中每个分区的定义和选择是基于某列的值从属于一个值列表集中的一个值，而RANGE分区是从属于一个连续区间值的集合。
+
+  ```mysql
+  CREATE TABLE customers (
+      id INT,
+      name VARCHAR(50),
+      country VARCHAR(50)
+  )
+  PARTITION BY LIST (country) (
+      PARTITION p0 VALUES IN ('USA', 'Canada'),
+      PARTITION p1 VALUES IN ('UK', 'France'),
+      PARTITION p2 VALUES IN ('Germany', 'Italy')
+  );
+  ```
+
+- **HASH分区**：按哈希算法划分，将数据根据某个列的哈希值均匀分布到不同的分区中。
 
   hash 分发，好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表 
 
-- **KEY分区**：类似于按HASH分区，区别在于KEY分区只支持计算一列或多列，且MySQL服务器提供其自身的哈希函数。必须有一列或多列包含整数值。
+  ```mysql
+  CREATE TABLE orders (
+      id INT,
+      order_date DATE,
+      customer_id INT
+  )
+  PARTITION BY HASH(id) PARTITIONS 4;
+  ```
+
+- **KEY分区**：类似于HASH分区，但使用MySQL内部的哈希函数。
+
+  ```mysql
+  CREATE TABLE logs (
+      id INT,
+      log_date DATE
+  )
+  PARTITION BY KEY(id) PARTITIONS 4;
+  ```
+
+  
 
 **看上去分区表很帅气，为什么大部分互联网还是更多的选择自己分库分表来水平扩展咧？**
 
@@ -1796,23 +1642,15 @@ https://blog.csdn.net/u011516972/article/details/89098732
 
 
 
-> 随着业务的发展，业务越来越复杂，应用的模块越来越多，总的数据量很大，高并发读写操作均超过单个数据库服务器的处理能力怎么办？
-
-这个时候就出现了**数据分片**，数据分片指按照某个维度将存放在单一数据库中的数据分散地存放至多个数据库或表中。数据分片的有效手段就是对关系型数据库进行分库和分表。
-
-区别于分区的是，分区一般都是放在单机里的，用的比较多的是时间范围分区，方便归档。只不过分库分表需要代码实现，分区则是mysql内部实现。分库分表和分区并不冲突，可以结合使用。
-
-
-
 ### 如何确定分库还是分表？
 
 > 针对“如何确定分库还是分表？”的问题，你要结合具体的场景。
 
-#### 何时分表
+**何时分表**
 
 当数据量过大造成事务执行缓慢时，就要考虑分表，因为减少每次查询数据总量是解决数据查询缓慢的主要原因。你可能会问：“查询可以通过主从分离或缓存来解决，为什么还要分表？”但这里的查询是指事务中的查询和更新操作。
 
-#### 何时分库
+**何时分库**
 
 为了应对高并发，一个数据库实例撑不住，即单库的性能无法满足高并发的要求，就把并发请求分散到多个实例中去（这种应对高并发的思路我之前也说过）。
 
@@ -1824,17 +1662,17 @@ https://blog.csdn.net/u011516972/article/details/89098732
 
 
 
-### MySQL分库
+### MySQL分库?
 
-#### 为什么要分库?
+**为什么要分库?**
 
 数据库集群环境后都是多台 slave，基本满足了读取操作;  但是写入或者说大数据、频繁的写入操作对 master 性能影响就比较大，这个时候，单库并不能解决大规模并发写入的问题，所以就会考虑分库。
 
-#### 分库是什么？   
+**分库是什么？**   
 
 一个库里表太多了，导致了海量数据，系统性能下降，把原本存储于一个库的表拆分存储到多个库上， 通常是将表按照功能模块、关系密切程度划分出来，部署到不同库上。
 
-#### 分库的优点：
+**分库的优点：**
 
 - 减少增量数据写入时的锁对查询的影响
 
@@ -1844,7 +1682,7 @@ https://blog.csdn.net/u011516972/article/details/89098732
 
 
 
-### MySQL分表
+### MySQL分表?
 
 分表有两种分割方式，一种垂直拆分，另一种水平拆分。
 
@@ -1862,18 +1700,6 @@ https://blog.csdn.net/u011516972/article/details/89098732
   - 还可根据时间放入不同的表，比如：article_201601，article_201602。
   - 按热度拆分，高点击率的词条生成各自的一张表，低热度的词条都放在一张大表里，待低热度的词条达到一定的贴数后，再把低热度的表单独拆分成一张表。
   - 根据ID的值放入对应的表，第一个表user_0000，第二个100万的用户数据放在第二 个表user_0001中，随用户增加，直接添加用户表就行了。
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1geuibkd9mjj31ns0u0aj1.jpg)
-
-
-
-
-
-**分库分表后的难题**
-
-分布式事务的问题，数据的完整性和一致性问题。
-
-数据操作维度问题：用户、交易、订单各个不同的维度，用户查询维度、产品数据分析维度的不同对比分析角度。 跨库联合查询的问题，可能需要两次查询 跨节点的count、order by、group by以及聚合函数问题，可能需要分别在各个节点上得到结果后在应用程序端进行合并 额外的数据管理负担，如：访问数据表的导航定位 额外的数据运算压力，如：需要在多个节点执行，然后再合并计算程序编码开发难度提升，没有太好的框架解决，更多依赖业务看如何分，如何合，是个难题。
 
 
 
@@ -1902,6 +1728,8 @@ https://blog.csdn.net/u011516972/article/details/89098732
 - 百度 （Uidgenerator）
 
 - 美团（Leaf）
+
+------
 
 
 

@@ -68,14 +68,15 @@ public void postorder(TreeNode root, List<Integer> res) {
 > 输出：[[3],[9,20],[15,7]]
 > ```
 
-BFS 的思想
+思路：BFS 的思想
 
 ```java
 public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
-  if (treeNode == null) {
-    return null;
-  }
   List<List<Integer>> res = new ArrayList<>();
+  if (treeNode == null) {
+    return res;
+  }
+
   //用LinkedList 实现类
   Queue<TreeNode> queue = new LinkedList<TreeNode>();
   queue.offer(treeNode);
