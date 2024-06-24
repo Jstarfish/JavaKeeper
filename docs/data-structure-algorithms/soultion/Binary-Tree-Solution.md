@@ -175,48 +175,6 @@ public boolean check(TreeNode left,TreeNode right){
 
 
 
-### [ 二叉树的直径（543）](https://leetcode-cn.com/problems/diameter-of-binary-tree/)
-
-> 给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
->
->               1
->              / \
->             2   3
->            / \     
->           4   5   
->      
->      返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
->      注意：两结点之间的路径长度是以它们之间边的数目表示。
-
-思路：**每一条二叉树的「直径」长度，就是一个节点的左右子树的最大深度之和**
-
-```java
-int maxDiameter = 0;
-
-public int diameterOfBinaryTree(TreeNode root) {
-    traverse(root);
-    return maxDiameter;
-}
-
-//辅助函数
-public int traverse(TreeNode root) {
-    //Base Case
-    if (root == null) {
-        return 0;
-    }
-    //Height of left、right subtree
-    int leftMax = traverse(root.left);
-    int rightMax = traverse(root.right);
-    int diameter = leftMax + rightMax;
-    //Update Diameter
-    maxDiameter = Math.max(maxDiameter, diameter);
-    //Return current subtree height
-    return Math.max(leftMax, rightMax) + 1;
-}
-```
-
-
-
 ### [ 二叉树的最大深度（104）](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
 
 > 给定一个二叉树，找出其最大深度。
@@ -246,6 +204,48 @@ public static int maxDepth(TreeNode root) {
     int rightHeight = maxDepth(root.right);
     return Math.max(leftHeight, rightHeight) + 1;
   }
+}
+```
+
+
+
+### [ 二叉树的直径（543）](https://leetcode-cn.com/problems/diameter-of-binary-tree/)
+
+> 给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+>
+>            1
+>           / \
+>          2   3
+>         / \     
+>        4   5   
+>
+>   返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
+>   注意：两结点之间的路径长度是以它们之间边的数目表示。
+
+思路：**每一条二叉树的「直径」长度，就是一个节点的左右子树的最大深度之和**
+
+```java
+int maxDiameter = 0;
+
+public int diameterOfBinaryTree(TreeNode root) {
+    traverse(root);
+    return maxDiameter;
+}
+
+//辅助函数
+public int traverse(TreeNode root) {
+    //Base Case
+    if (root == null) {
+        return 0;
+    }
+    //Height of left、right subtree
+    int leftMax = traverse(root.left);
+    int rightMax = traverse(root.right);
+    int diameter = leftMax + rightMax;
+    //Update Diameter
+    maxDiameter = Math.max(maxDiameter, diameter);
+    //Return current subtree height
+    return Math.max(leftMax, rightMax) + 1;
 }
 ```
 
@@ -583,6 +583,40 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 > 输出：false
 > 解释：根节点的值是 5 ，但是右子节点的值是 4 。
 > ```
+
+思路：二叉搜索树「中序遍历」得到的值构成的序列一定是升序的。
+
+所以在中序遍历的时候实时检查当前节点的值是否大于前一个中序遍历到的节点的值即可
+
+`min` 和 `max` 用于记录当前节点可以拥有的值的范围。`Long.MIN_VALUE` 和 `Long.MAX_VALUE` 分别表示可能的最小值和最大值，用于初始化调用。
+
+请注意，为了避免在比较时发生整数溢出，这里使用 `long` 类型来定义最小和最大值。如果节点值超出了 `int` 类型的范围，这种方法仍然有效。
+
+```java
+  // 辅助函数，用于递归验证
+  public boolean isValidBST(TreeNode root, long min, long max) {
+      // 空树是有效的 BST
+      if (root == null) {
+          return true;
+      }
+
+      // 当前节点的值必须在 min 和 max 之间
+      if (root.val <= min || root.val >= max) {
+          return false;
+      }
+
+      // 递归地验证左子树和右子树
+      // 左子树的所有节点都必须小于当前节点的值
+      // 右子树的所有节点都必须大于当前节点的值
+      return isValidBST(root.left, min, root.val) && 
+             isValidBST(root.right, root.val, max);
+  }
+
+  // 验证搜索二叉树的接口
+  public boolean isValidBST(TreeNode root) {
+      return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+  }
+```
 
 
 

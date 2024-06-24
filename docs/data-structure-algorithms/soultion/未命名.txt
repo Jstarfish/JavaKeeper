@@ -1,0 +1,590 @@
+// 定义变量
+dt = args.get("dt")
+device_id = args.get("device_id")
+device_type = args.get("device_type")
+inner_perf = args.get("inner_perf")
+msxf_type = args.get("msxf_type")
+expid = args.get("expid")
+rta_dt_19025_ql = args.get("rta_dt_19025_ql")
+advertiser = args.get("advertiser")
+merge_v4_type6 = args.get("merge_v4_type6")
+merge_v4_type2 = args.get("merge_v4_type2")
+merge_v5_type1 = args.get("merge_v5_type1")
+age = args.get("age")
+class_tree = args.get("class_tree")
+ms_ks_type4_v1 = args.get("ms_ks_type4_v1")
+ms_yz_type5_v1 = args.get("ms_yz_type5_v1")
+ms_yz_type11_v1 = args.get("ms_yz_type11_v1")
+merge_v1_type14_2_bai = args.get("merge_v1_type14_2_bai")
+is_reg = args.get("is_reg")
+merge_v6_type6 = args.get("merge_v6_type6")
+merge_v6_type1 = args.get("merge_v6_type1")
+merge_v6_type2 = args.get("merge_v6_type2")
+merge_v1_type4 = args.get("merge_v1_type4")
+merge_v1_type11 = args.get("merge_v1_type11")
+
+// 默认输出值
+group = -1
+advertiser = "kuaishou"
+rta_id = "19025"
+decision_result = "accept"
+final_result = -1
+date_out = 3
+weight = 1
+refuse_flag = []
+score_flag = null
+
+// 缺省值
+expid = (expid == null) ? 999 : expid
+msxf_type = (msxf_type == null) ? 999 : msxf_type
+
+// 异常的情况，设置观察开关为1
+monitor_type = null
+if (msxf_type == null) {
+    monitor_type = 1
+}
+if (device_id == null || dt == null || expid == null || device_type == null || inner_perf == null) {
+    monitor_type = 1
+}
+
+// 分组
+if (expid >= 10000 && expid <= 10004) {
+    group = 5
+}
+if ((expid >= 10005 && expid <= 10009) || expid == null) {
+    group = 6
+}
+
+// 缺省输入值
+msxf_type = (msxf_type == null) ? 999 : msxf_type
+ms_ks_type4_v1 = (ms_ks_type4_v1 == null) ? 999 : ms_ks_type4_v1
+ms_yz_type5_v1 = (ms_yz_type5_v1 == null) ? 999 : ms_yz_type5_v1
+ms_yz_type11_v1 = (ms_yz_type11_v1 == null) ? 999 : ms_yz_type11_v1
+age = (age == null) ? 999 : age
+class_tree = (class_tree == null) ? 999 : class_tree
+is_reg = (is_reg == null) ? 999 : is_reg
+merge_v1_type14_2_bai = (merge_v1_type14_2_bai == null) ? 999 : merge_v1_type14_2_bai
+merge_v4_type6 = (merge_v4_type6 == null) ? 999 : merge_v4_type6
+merge_v4_type2 = (merge_v4_type2 == null) ? 999 : merge_v4_type2
+merge_v5_type1 = (merge_v5_type1 == null) ? 999 : merge_v5_type1
+merge_v6_type6 = (merge_v6_type6 == null) ? 999 : merge_v6_type6
+merge_v6_type1 = (merge_v6_type1 == null) ? 999 : merge_v6_type1
+merge_v6_type2 = (merge_v6_type2 == null) ? 999 : merge_v6_type2
+merge_v1_type4 = (merge_v1_type4 == null) ? 999 : merge_v1_type4
+merge_v1_type11 = (merge_v1_type11 == null) ? 999 : merge_v1_type11
+
+// 模型分推送查得判断
+if (msxf_type == 1 && dt != null) {
+    decision_result = "accept"
+    final_result = -2
+    weight = 0.91
+    date_out = 3
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && ((merge_v4_type6 >= 0 && group == 5) || (merge_v6_type6 >= 0 && group == 6))) {
+    decision_result = "accept"
+    final_result = 400
+    weight = 0.91
+    date_out = 60
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && ((merge_v4_type6 == -999 && group == 5) || (merge_v6_type6 == -999 && group == 6))) {
+    decision_result = "accept"
+    final_result = -1
+    weight = 0.79
+    date_out = 3
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && merge_v4_type6 >= 0 && group == 5 && age == -999) {
+    decision_result = "accept"
+    final_result = 700
+    weight = 0.69
+    date_out = 60
+}
+
+// G5:划分层次
+// 低龄
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 0 && age <= 4 && merge_v4_type6 >= 0 && merge_v4_type6 <= 0.25 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 7
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 0 && age <= 4 && merge_v4_type6 > 0.25 && merge_v4_type6 <= 0.35 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 8
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 0 && age <= 4 && merge_v4_type6 > 0.35 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 9
+}
+// 高龄
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 4 && merge_v4_type6 >= 0 && merge_v4_type6 <= 0.25 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 77
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 4 && merge_v4_type6 > 0.25 && merge_v4_type6 <= 0.35 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 88
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && age > 4 && merge_v4_type6 > 0.35 && group == 5) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 0
+    final_result = 99
+}
+
+// G5-低龄-bid
+if (final_result == 7) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v5_type1 > 0.25 && merge_v5_type1 <= 0.4) {
+        weight = 0.81
+        final_result = 3111
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7) {
+        weight = 0.88
+        final_result = 3111
+    }
+}
+if (final_result == 8) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v5_type1 >= 0 && merge_v5_type1 <= 0.35) {
+        weight = 1.01
+        final_result = 3121
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.39) {
+        weight = 1.01
+        final_result = 3111
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 > 0.39 && ms_yz_type5_v1 <= 0.55) {
+        weight = 0.99
+        final_result = 3121
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 > 0.55) {
+        weight = 0.97
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 >= 0 && ms_ks_type4_v1 <= 0.29) {
+        weight = 0.88
+        final_result = 1111
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 > 0.29 && ms_ks_type4_v1 <= 0.55) {
+        weight = 0.89
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 == -999) {
+        weight = 1.01
+        final_result = 3311
+    }
+}
+if (final_result == 9) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v5_type1 >= 0 && merge_v5_type1 <= 0.4) {
+        weight = 1.02
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.39) {
+        weight = 0.89
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 > 0.39 && ms_yz_type5_v1 <= 0.55) {
+        weight = 0.91
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 > 0.55) {
+        weight = 1.06
+        final_result = 3131
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 >= 0 && ms_ks_type4_v1 <= 0.29) {
+        weight = 1.05
+        final_result = 1131
+    }
+    if (merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1
+> 0.55 && ms_ks_type4_v1) {
+        weight = 0.89
+        final_result = 3331
+    }
+}
+// 高龄
+if (final_result == 88) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.5 && ms_ks_type4_v1 >= 0 && ms_ks_type4_v1 <= 0.25) {
+        weight = 1.09
+        final_result = 1112
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.5 && ms_ks_type4_v1 == -999) {
+        weight = 0.66
+        final_result = 3312
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 >= 0 && ms_ks_type4_v1 <= 0.25) {
+        weight = 1.1
+        final_result = 1312
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 > 0.25) {
+        weight = 0.74
+        final_result = 3232
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 == -999) {
+        weight = 0.87
+        final_result = 3312
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 > 0.5) {
+        weight = 0.72
+        final_result = 1332
+    }
+}
+if (final_result == 99) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.6) {
+        weight = 0.86
+        final_result = 3132
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 == -999) {
+        weight = 0.91
+        final_result = 3132
+    }
+    if (merge_v5_type1 > 0.3 && ms_yz_type5_v1 > 0.6 && ms_ks_type4_v1 > 0.25) {
+        weight = 0.66
+        final_result = 1122
+    }
+}
+// G5-低龄-refuse
+if (final_result == 7 && (merge_v5_type1 <= 0.25 || merge_v5_type1 > 0.7)) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA_AR")
+}
+if (final_result == 8 && merge_v5_type1 > 0.7) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA2_AR3")
+}
+if (final_result == 8 && merge_v5_type1 > 0.35 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && ms_ks_type4_v1 > 0.55) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA2_AR3")
+}
+if (final_result == 9 && merge_v5_type1 > 0.7) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA3_AR3")
+}
+if (final_result == 9 && merge_v5_type1 > 0.4 && merge_v5_type1 <= 0.7 && ms_yz_type5_v1 == -999 && (ms_ks_type4_v1 > 0.29 && ms_ks_type4_v1 <= 0.55 || ms_ks_type4_v1 == -999)) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA3_AR3")
+}
+// G5-高龄-refuse
+if (final_result == 77) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA")
+}
+if (final_result == 88 && merge_v5_type1 <= 0.3) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA2_AR1_H")
+}
+if (final_result == 88 && merge_v5_type1 > 0.3 && ms_yz_type5_v1 >= 0 && ms_yz_type5_v1 <= 0.5 && ms_ks_type4_v1 > 0.25) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA2_AR2_H")
+}
+if (final_result == 99 && merge_v5_type1 <= 0.3) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA3_AR1_H")
+}
+if (final_result == 99 && merge_v5_type1 > 0.3 && ms_yz_type5_v1 > 0.6 && (ms_ks_type4_v1 == -999 || ms_ks_type4_v1 <= 0.25)) {
+    decision_result = 'refuse'
+    date_out = 60
+    weight = 0
+    final_result = 999
+    refuse_flag.add("AD_OUT_SA3_AR3_H")
+}
+
+// G6:划分层次
+if (msxf_type == 1 && date_in_60_19025 == -60 && group == 6 && age > 0 && age <= 4) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 74
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && group == 6 && age > 4) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 1
+    final_result = 84
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && group == 6 && age == -999) {
+    decision_result = 'accept'
+    date_out = 60
+    weight = 0.62
+    final_result = 94
+}
+// G6-bid
+if (final_result == 74) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v1_type4 > 0.2 && merge_v1_type4 <= 0.4 && merge_v6_type1 > 0.25 && merge_v6_type1 <= 0.45) {
+        weight = 0.78
+        final_result = 1111
+    }
+    if (merge_v1_type4 > 0.2 && merge_v1_type4 <= 0.4 && merge_v6_type1 > 0.45) {
+        weight = 1.1
+        final_result = 3131
+    }
+    if (merge_v1_type4 > 0.4 && merge_v1_type4 <= 0.55 && merge_v6_type1 >= 0 && merge_v6_type1 <= 0.3) {
+        weight = 0.93
+        final_result = 1111
+    }
+    if (merge_v1_type4 > 0.4 && merge_v1_type4 <= 0.55 && merge_v6_type1 > 0.3 && merge_v6_type1 <= 0.45) {
+        weight = 0.82
+        final_result = 1111
+    }
+    if (merge_v1_type4 > 0.4 && merge_v1_type4 <= 0.55 && merge_v6_type1 > 0.45) {
+        weight = 1.08
+        final_result = 3331
+    }
+    if (merge_v1_type4 > 0.55 && merge_v6_type1 >= 0 && merge_v6_type1 <= 0.45) {
+        weight = 1.02
+        final_result = 3111
+    }
+    if (merge_v1_type4 > 0.55 && merge_v6_type1 > 0.45) {
+        weight = 1.06
+        final_result = 3331
+    }
+    if (merge_v1_type4 == -999 && merge_v1_type14_2_bai >= 0 && merge_v1_type14_2_bai <= 0.075) {
+        weight = 0.72
+        final_result = 1311
+    }
+    if (merge_v1_type4 == -999 && merge_v1_type14_2_bai > 0.075 && merge_v1_type14_2_bai <= 0.25) {
+        weight = 0.62
+        final_result = 3311
+    }
+    if (merge_v1_type4 == -999 && merge_v1_type14_2_bai > 0.25) {
+        weight = 0.66
+        final_result = 1311
+    }
+}
+if (final_result == 84) {
+    decision_result = 'accept'
+    date_out = 60
+    if (merge_v1_type11 >= 0 && merge_v1_type11 <= 0.2 && merge_v6_type2 > 0.2 && merge_v6_type2 <= 0.35) {
+        weight = 0.98
+        final_result = 3332
+    }
+    if (merge_v1_type11 >= 0 && merge_v1_type11 <= 0.2 && merge_v6_type2 > 0.35 && merge_v6_type2 <= 0.5) {
+        weight = 1.02
+        final_result = 3132
+    }
+    if (merge_v1_type11 >= 0 && merge_v1_type11 <= 0.2 && merge_v6_type2 > 0.5) {
+        weight = 1.1
+        final_result = 3132
+    }
+    if (merge_v1_type11 > 0.2 && merge_v1_type11 <= 0.35 && merge_v6_type2 > 0.2 && merge_v6_type2 <= 0.35) {
+        weight = 0.97
+        final_result = 3132
+    }
+    if (merge_v1_type11 > 0.2 && merge_v1_type11 <= 0.35 && merge_v6_type2 > 0.35 && merge_v6_type2 <= 0.5) {
+        weight = 0.99
+        final_result = 3132
+    }
+    if (merge_v1_type11 > 0.2 && merge_v1_type11 <= 0.35 && merge_v6_type2 > 0.5) {
+        weight = 1.06
+        final_result = 3332
+    }
+    if (merge_v1_type11 > 0.35 && merge_v1_type11 <= 0.83 && merge_v6_type2 > 0.2 && merge_v6_type2 <= 0.35) {
+        weight = 0.68
+        final_result = 1312
+    }
+    if (merge_v1_type11 > 0.35 && merge_v1_type11 <= 0.83 && merge_v6_type2 > 0.35 && merge_v6_type2 <= 0.5) {
+        weight = 0.94
+        final_result = 1112
+    }
+    if (merge_v1_type11 > 0.35 && merge_v1_type11 <= 0.83 && merge_v6_type2 > 0.5) {
+        weight = 0.98
+        final_result = 1112
+    }
+    if (merge_v1_type11 >= 0 && merge_v1_type11 <= 0.83 && merge_v6_type2 == -999) {
+        weight = 1.07
+        final_result = 3132
+    }
+    if (merge_v1_type11 > 0.83 && merge_v1_type14_2_bai >= 0 && merge_v1_type14_2_bai <= 0.075) {
+        weight = 0.62
+        final_result = 1112
+    }
+    if (merge_v1_type11 > 0.83 && merge_v1_type14_2_bai > 0.075 && merge_v1_type14_2_bai <= 0.25) {
+        weight = 0.58
+        final_result = 1112
+    }
+}
+
+// G6-refuse
+if (msxf_type == 1 && date_in_60_19025 == -60 && group == 6 && age > 0 && age <= 4) {
+    if (merge_v6_type6 > 0 && merge_v6_type6 <= 0.125 && (merge_v6_type1 >= 0 && merge_v6_type1 <= 0.65 || merge_v6_type1 > 0.75)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.125 && merge_v6_type6 <= 0.175 && (merge_v6_type1 >= 0 && merge_v6_type1 <= 0.5 || merge_v6_type1 > 0.75)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.175 && merge_v6_type6 <= 0.225 && (merge_v6_type1 > 0.25 && merge_v6_type1 <= 0.555 || merge_v6_type1 > 0.65)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.225 && merge_v6_type6 <= 0.275 && (merge_v6_type1 > 0.2 && merge_v6_type1 <= 0.4 || merge_v6_type1 > 0.5)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.275 && merge_v6_type6 <= 0.475 && (merge_v6_type1 > 0.2 && merge_v6_type1 <= 0.4 || merge_v6_type1 > 0.6)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.475 && merge_v6_type6 <= 0.525 && (merge_v6_type1 >= 0 && merge_v6_type1 <= 0.3 || merge_v6_type1 > 0.6)) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.525 && merge_v6_type6 <= 0.875 && merge_v6_type1 >= 0 && merge_v6_type1 <= 0.15) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v1_type4 >= 0 && merge_v1_type4 <= 0.2) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v1_type4 > 0.2 && merge_v1_type4 <= 0.4 && merge_v6_type1 >= 0 && merge_v6_type1 <= 0.25) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_LA2_AR_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v1_type4 == -999 && merge_v1_type14_2_bai == -999) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_QUA_AGE_L')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+}
+if (msxf_type == 1 && date_in_60_19025 == -60 && group == 6 && age > 4) {
+    if (merge_v6_type6 > 0 && merge_v6_type6 <= 0.075 && merge_v6_type1 > 0.6 && merge_v6_type1 <= 0.7) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.075 && merge_v6_type6 <= 0.125 && merge_v6_type1 >= 0.4 && merge_v6_type1 <= 0.6) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.125 && merge_v6_type6 <= 0.325 && merge_v6_type1 > 0.2 && merge_v6_type1 <= 0.5) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.325 && merge_v6_type6 <= 0.575 && merge_v6_type1 > 0.2 && merge_v6_type1 <= 0.35) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.575 && merge_v6_type6 <= 0.675 && merge_v6_type1 > 0.25 && merge_v6_type1 <= 0.35) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v6_type6 > 0.725 && merge_v6_type1 >= 0 && merge_v6_type1 <= 0.3) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v1_type11 >= 0 && merge_v1_type11 <= 0.83 && merge_v6_type2 >= 0 && merge_v6_type2 <= 0.2) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_SL_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+    if (merge_v1_type11 > 0.83 && merge_v1_type14_2_bai > 0.25) {
+        decision_result = 'refuse'
+        refuse_flag.add('AD_OUT_QUA_AGE_H')
+        date_out = 60
+        weight = 0
+        final_result = 999
+    }
+}
+
+// 内部规则拒绝
+if (inner_perf == 1) {
+    decision_result = "refuse"
+    final_result = 999
+    weight = 0
+    date_out = 3
+    refuse_flag.add("AD_IN")
+}
