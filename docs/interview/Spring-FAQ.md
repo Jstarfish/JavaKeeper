@@ -1,6 +1,33 @@
-# Spring 面试集
+---
+title: Spring 面试集
+date: 2022-06-31
+tags: 
+ - MySQL
+categories: Spring
+---
 
-> 基于Spring Framework 4.x 总结的常见面试题，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
+![](https://img.starfish.ink/common/faq-banner.png)
+
+> 写在之前：不建议背书式的去记忆面试题，对技术的提升帮助很小，对正经面试也没什么帮助，准备面试的过程还是要把各个知识点真懂了，然后再连成线。
+>
+> 个人建议把面试题看作是费曼学习法中的回顾、简化的环节，准备面试的时候，跟着题目先自己讲给自己听，看看自己会满意吗，不满意就继续学习这个点，如此反复，心仪的offer肯定会有的。
+>
+> 当然，大家有遇到过什么样『有趣』『有含量』的题目，欢迎提出来，一起学习~
+
+> 本文基于Spring Framework 4.x 总结的常见面试题，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
+
+> - 什么是 Spring Boot？
+> - 为什么要用 Spring Boot？
+> - Spring Boot 的核心配置文件有哪几个？它们的区别是什么？
+> - Spring Boot 的配置文件有哪几种格式？它们有什么区别？
+> - Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
+> - 开启 Spring Boot 特性有哪几种方式？
+> - Spring Boot 需要独立的容器运行吗？
+> - 运行 Spring Boot 有哪几种方式？
+> - Spring Boot 自动配置原理是什么？
+> - Spring Boot 的目录结构是怎样的？
+> - mysql隔离级别和spring的tranction隔离级别不一致，以哪个为准？
+> - http请求header都包含什么？
 
 ## 一、一般问题
 
@@ -18,8 +45,8 @@
 
 - Dependency Injection(DI) 方法使得构造器和 JavaBean properties 文件中的依赖关系一 目了然。
 - 与 EJB 容器相比较，IoC 容器更加趋向于轻量级。这样一来 IoC 容器在有限的内存和 CPU 资源的情况下进行应用程序的开发和发布就变得十分有利。
-- Spring 并没有闭门造车，Spring 利用了已有的技术比如 ORM 框架、logging 框架、J2EE、Q uartz和JDK Timer，以及其他视图技术。
-- Spring 框架是按照模块的形式来组织的。由包和类的编号就可以看出其所属的模块，开发者仅 仅需要选用他们需要的模块即可。
+- Spring 并没有闭门造车，Spring 利用了已有的技术比如 ORM 框架、logging 框架、J2EE、Quartz和JDK Timer，以及其他视图技术。
+- Spring 框架是按照模块的形式来组织的。由包和类的编号就可以看出其所属的模块，开发者仅仅需要选用他们需要的模块即可。
 -  要测试一项用 Spring 开发的应用程序十分简单，因为测试相关的环境代码都已经囊括在框架中 了。更加简单的是，利用 JavaBean 形式的 POJO 类，可以很方便的利用依赖注入来写入测试 数据。
 - Spring 的 Web 框架亦是一个精心设计的 Web MVC 框架，为开发者们在 web 框架的选择上 提供了一个除了主流框架比如 Struts、过度设计的、不流行 web 框架的以外的有力选项。
 - Spring 提供了一个便捷的事务管理接口，适用于小型的本地事物处理(比如在单 DB 的环境 下)和复杂的共同事物处理(比如利用 JTA 的复杂 DB 环境)。
@@ -38,10 +65,6 @@
 
 
 
-### Spring模块
-
-![spring overview](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8npk820uj30k00f0q3x.jpg)
-
 ### 简述 AOP 和 IOC 概念
 
 AOP：Aspect Oriented Program, 面向(方面)切面的编程;Filter(过滤器)也是一种 AOP. AOP 是一种新的 方法论, 是对传统 OOP(Object-OrientedProgramming, 面向对象编程) 的补充. AOP 的主要编程对象是切面(aspect),而切面模块化横切关注点.可以举例通过事务说明.
@@ -58,21 +81,35 @@ IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将
 
 ### 什么是 Spring IOC 容器？
 
-Spring 框架的核心是 Spring 容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。Spring 容器使用依赖注入来管理组成应用程序的组件。容器通过读取提供的配置元数据来接收对象进行实例化，配置和组装的指令。该元数据可以通过 XML，Java 注解或 Java 代码提供。
+Spring IoC（Inverse of Control，控制反转）容器是Spring框架的核心组件，它负责管理应用程序中的对象（称为Bean）。IoC容器通过控制反转的方式，将组件的创建、配置和依赖关系管理从应用程序代码中分离出来，由容器来处理。
 
-![container magic](https://tva1.sinaimg.cn/large/007S8ZIlly1gi8npp9px7j30du088743.jpg)
+IoC容器的主要功能包括：
+
+1. **依赖注入（DI）**：IoC容器能够自动注入Bean的依赖项，而不需要手动创建或查找这些依赖项。
+2. **配置管理**：IoC容器使用配置元数据（如XML、注解或Java配置类）来创建和管理Bean。
+3. **Bean生命周期管理**：IoC容器管理Bean的整个生命周期，包括实例化、初始化、使用和销毁。
+4. **作用域控制**：IoC容器支持不同的Bean作用域，如单例（Singleton）、原型（Prototype）、请求（Request）、会话（Session）等。
+5. **依赖关系解析**：IoC容器能够解析Bean之间的依赖关系，并根据配置自动组装这些Bean。
+6. **事件发布和监听**：IoC容器支持事件驱动模型，允许Bean发布事件和监听其他Bean的事件。
+7. **类型转换和数据绑定**：IoC容器提供类型转换服务，能够将配置数据绑定到Bean的属性上。
+8. **自动装配**：IoC容器能够根据Bean的类型和名称自动装配依赖关系，减少显式配置的需要。
+9. **扩展点**：IoC容器提供了多个扩展点，如BeanFactoryPostProcessor和BeanPostProcessor，允许开发者自定义容器的行为。
+
+通过使用Spring IoC容器，开发者可以专注于业务逻辑的实现，而不必关心对象的创建和依赖管理，从而提高代码的可维护性、可测试性和灵活性。
 
 
 
 ### 什么是依赖注入？
 
-**依赖注入（DI,Dependency Injection）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。这就需要一种机制用来激活相应的组件以提供特定的功能，所以**依赖注入是控制反转的基础**。否则如果在组件不受框架控制的情况下，框架又怎么知道要创建哪个组件？
+**IOC（控制反转）**:
 
-依赖注入有以下三种实现方式：
+- 控制反转指的是将对象的创建和它们的依赖关系的管理从应用程序代码中移交给外部容器。传统的面向对象编程中，对象是通过 `new` 关键字创建的，并在创建时直接指定其依赖对象。而在 IOC 中，对象的创建和依赖关系由容器负责。
 
-1. 构造器注入
-2. Setter方法注入（属性注入）
-3. 接口注入
+**DI（依赖注入）**:
+
+- 依赖注入是实现控制反转的一种方式。依赖注入有多种实现方式，包括构造器注入、setter 方法注入和字段注入等。Spring 容器通过配置文件（XML 或 Java 配置类）或者注解，将对象的依赖注入到对象中。
+
+  **依赖注入（DI,Dependency Injection）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。
 
 
 
