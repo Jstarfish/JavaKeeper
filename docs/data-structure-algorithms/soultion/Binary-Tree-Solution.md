@@ -384,6 +384,47 @@ public int numTrees(int n) {
 
 
 
+## 深度优先
+
+> 给定一个二叉树的 **根节点** `root`，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+>
+> **示例 1:**
+>
+> ![img](https://assets.leetcode.com/uploads/2021/02/14/tree.jpg)
+>
+> ```
+> 输入: [1,2,3,null,5,null,4]
+> 输出: [1,3,4]
+> ```
+>
+> **示例 2:**
+>
+> ```
+> 输入: [1,null,3]
+> 输出: [1,3]
+> ```
+
+思路：   使用深度优先遍历递归，一边遍历需要一边记录树的深度。先遍历右子树，当右子树有值的时候，肯定使用右子树的值，右子树遍历完后遍历左子树，对于左子树，只有当左子树的高度超过了当前结果长度时，才进行记录
+
+```java
+public List<Integer> rightSideView(TreeNode root) {
+    List<Integer> list = new ArrayList<Integer>();
+    rightSideView(root,list,0);
+    return list;
+}
+
+private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
+    if(root ==null) return ;
+    if(currentLevel>=list.size()){
+        list.add(root.val);
+    }
+    rightSideView(root.right,list,currentLevel+1);
+    rightSideView(root.left,list,currentLevel+1);
+}
+```
+
+
+
 ## 构造二叉树
 
 > [654. 最大二叉树（中等）](https://leetcode-cn.com/problems/maximum-binary-tree/)

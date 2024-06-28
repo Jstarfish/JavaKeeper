@@ -49,7 +49,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "distribution/message-queue/Kafka/Kafka-Version.md",
+                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
                 "mode": "preview",
                 "source": false
               }
@@ -126,7 +126,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 216.5
+    "width": 200
   },
   "right": {
     "id": "4d54828aaab36d9f",
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "distribution/message-queue/Kafka/Kafka-Version.md",
+                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "distribution/message-queue/Kafka/Kafka-Version.md",
+                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "distribution/message-queue/Kafka/Kafka-Version.md"
+                "file": "data-structure-algorithms/data-structure/Binary-Tree.md"
               }
             }
           }
@@ -205,6 +205,9 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
+    "distribution/message-queue/Kafka/Kafka-Workflow.md",
+    "distribution/message-queue/Kafka/Kafka-Producer.md",
+    "distribution/message-queue/Kafka/Kafka-Version.md",
     "data-management/MySQL/MySQL-Optimization.md",
     "data-management/MySQL/MySQL-Lock.md",
     "data-management/Redis/ReadRedis.md",
@@ -228,9 +231,6 @@
     "data-management/Redis/reproduce/Key 寻址算法.md",
     "data-management/Redis/reproduce/Cache-Design.md",
     "data-management/MySQL/MySQL-Schema~.md",
-    "data-management/MySQL/reproduce/MySQL-count.md",
-    "data-structure-algorithms/algorithm/Double-Pointer.md",
-    "data-management/Redis/Redis-MQ.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
