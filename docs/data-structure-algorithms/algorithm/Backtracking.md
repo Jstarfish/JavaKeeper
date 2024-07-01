@@ -16,10 +16,6 @@ categories: Algorithm
 
 # 回溯算法
 
-
-
-
-
 ## 基本思想
 
 **回溯法** 采用试错的思想，它尝试分步的去解决一个问题。
@@ -61,29 +57,18 @@ categories: Algorithm
 以下是回溯算法的一般伪代码：
 
 ```java
+result = []
 function backtrack(solution, candidates):  //入参可以理解为 路径, 选择列表
     if solution 是一个完整解:  //满足结束条件
-        process(solution)  # 处理当前完整解
+        result.add(solution)  // 处理当前完整解
         return
     for candidate in candidates:
         if candidate 满足约束条件:
-            solution.add(candidate)  # 扩展解
-            backtrack(solution, new_candidates)  # 递归调用
-            solution.remove(candidate)  # 回溯
+            solution.add(candidate)  // 扩展解
+            backtrack(solution, new_candidates)  // 递归调用
+            solution.remove(candidate)  // 回溯,撤销选择
 
-result = []
-function backtrack(路径, 选择列表):
-    if 满足结束条件:
-        result.add(路径)
-        return
-    
-    for 选择 in 选择列表:
-        做选择
-        backtrack(路径, 选择列表) // 递归调用
-        撤销选择
 ```
-
-
 
 
 
@@ -103,8 +88,6 @@ function backtrack(路径, 选择列表):
 > ```
 
 思路：
-
-![17. 电话号码的字母组合](https://code-thinking-1253855093.file.myqcloud.com/pics/20201123200304469.png)
 
 图中可以看出遍历的深度，就是输入"23"的长度，而叶子节点就是我们要收集的结果，输出["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]。
 
@@ -134,4 +117,28 @@ function backtrack(路径, 选择列表):
 > ```
 > 输入：nums = [1,2,3]
 > 输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+> ```
+
+
+
+
+
+
+
+> 按照国际象棋的规则，皇后可以攻击与之处在同一行或同一列或同一斜线上的棋子。
+>
+> **n 皇后问题** 研究的是如何将 `n` 个皇后放置在 `n×n` 的棋盘上，并且使皇后彼此之间不能相互攻击。
+>
+> 给你一个整数 `n` ，返回所有不同的 **n 皇后问题** 的解决方案。
+>
+> 每一种解法包含一个不同的 **n 皇后问题** 的棋子放置方案，该方案中 `'Q'` 和 `'.'` 分别代表了皇后和空位。
+>
+> **示例 1：**
+>
+> ![img](https://assets.leetcode.com/uploads/2020/11/13/queens.jpg)
+>
+> ```
+> 输入：n = 4
+> 输出：[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+> 解释：如上图所示，4 皇后问题存在两个不同的解法。
 > ```
