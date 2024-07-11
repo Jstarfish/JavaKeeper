@@ -49,7 +49,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
+                "file": "data-management/Redis/Redis-Database.md",
                 "mode": "preview",
                 "source": false
               }
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
+                "file": "data-management/Redis/Redis-Database.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/data-structure/Binary-Tree.md",
+                "file": "data-management/Redis/Redis-Database.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/data-structure/Binary-Tree.md"
+                "file": "data-management/Redis/Redis-Database.md"
               }
             }
           }
@@ -205,32 +205,32 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
+    "data-management/Redis/Redis-Datatype.md",
+    "data-management/Redis/Redis-Database.md",
+    "data-management/Redis/Redis-Cluster.md",
+    "data-management/Redis/Redis 有用指令.md",
+    "data-management/Redis/ReadRedis.md",
+    "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
+    "data-management/Redis/reproduce/Key 寻址算法.md",
+    "data-management/Redis/reproduce/Cache-Design.md",
+    "data-management/Redis/Redis-Conf.md",
+    "data-management/Redis/Redis-Transaction.md",
+    "data-management/Redis/Redis-Persistence.md",
+    "data-management/Redis/Redis-Sentinel.md",
+    "data-management/Redis/Redis-Master-Slave.md",
+    "data-management/Redis/Redis-IO-Model.md",
+    "data-management/MySQL/MySQL-Transaction.md",
+    "interview/MySQL-FAQ.md",
+    "data-structure-algorithms/data-structure/Binary-Tree.md",
+    "interview/Micro-Services.md",
+    "interview/虽然面试成功很大程度上  取决于你对面试官的问题是否能做到对答如流，但别忘了，并不是说你回答出全部问题就能  拿到 offer，更重要的一点是要比别的候选者回答得更出彩。因.md",
+    "interview/未命名.md",
     "distribution/message-queue/Kafka/Kafka-Workflow.md",
     "distribution/message-queue/Kafka/Kafka-Producer.md",
     "distribution/message-queue/Kafka/Kafka-Version.md",
     "data-management/MySQL/MySQL-Optimization.md",
     "data-management/MySQL/MySQL-Lock.md",
-    "data-management/Redis/ReadRedis.md",
     "data-management/Redis/Nosql-Overview.md",
-    "data-management/MySQL/MySQL-Select.md",
-    "data-management/MySQL/MySQL-Transaction.md",
-    "data-management/MySQL/MySQL-Index.md",
-    "data-management/MySQL/MySQL-Log.md",
-    "interview/MySQL-FAQ.md",
-    "data-management/MySQL/MySQL-Framework.md",
-    "data-management/MySQL/MySQL-FAQ.md",
-    "data-management/Redis/Redis-Datatype.md",
-    "data-management/Redis/Redis-Master-Slave.md",
-    "data-management/MySQL/readMySQL.md",
-    "data-management/Redis/Redis 有用指令.md",
-    "data-management/Redis/Redis-Lock.md",
-    "data-management/Redis/Redis-IO-Model.md",
-    "data-management/Redis/Redis-Database.md",
-    "data-management/Redis/Redis-Conf.md",
-    "data-management/Redis/Redis-Cluster.md",
-    "data-management/Redis/reproduce/Key 寻址算法.md",
-    "data-management/Redis/reproduce/Cache-Design.md",
-    "data-management/MySQL/MySQL-Schema~.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
