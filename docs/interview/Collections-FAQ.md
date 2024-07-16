@@ -1,13 +1,23 @@
-# 「直击面试」—— Java 集合，你肯定也会被问到这些
+---
+title: 「直击面试」—— Java 集合，你肯定也会被问到这些
+date: 2021-05-31
+tags: 
+ - Java
+categories: Java
+---
+
+![](https://img.starfish.ink/common/faq-banner.png)
 
 > 文章收录在 GitBook [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
-
-作为一位小菜 ”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合，所以整理下 Java 集合面试题
-
-![](https://i02piccdn.sogoucdn.com/fe487f455e5b1eb6)
-
-> 说说常见的集合有哪些吧？
 >
+> 作为一位小菜 ”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合，所以整理下 Java 集合面试题
+>
+> ![](https://i02piccdn.sogoucdn.com/fe487f455e5b1eb6)
+
+
+
+
+
 > HashMap说一下，其中的Key需要重写hashCode()和equals()吗？
 >
 > HashMap中key和value可以为null吗？允许几个为null呀？
@@ -22,9 +32,7 @@
 
 面向对象语言对事物的体现都是以对象的形式，所以为了方便对多个对象的操作，需要将对象进行存储，集合就是存储对象最常用的一种方式，也叫容器。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdp03vldkkg30hv0gzwet.gif)
-
-
+![img](https://www.runoob.com/wp-content/uploads/2014/01/2243690-9cd9c896e0d512ed.gif)
 
 从上面的集合框架图可以看到，Java 集合框架主要包括两种类型的容器
 
@@ -45,7 +53,7 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 
 
-## 说说常用的集合有哪些吧？
+### 说说常用的集合有哪些吧？
 
 > Collection 有什么子接口、有哪些具体的实现
 
@@ -58,7 +66,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 
 
 
-## ArrayList 和 Vector 的区别
+### ArrayList 和 Vector 的区别
 
 相同点：
 
@@ -119,7 +127,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 
     
 
-## ArrayList 与 LinkedList 区别
+### ArrayList 与 LinkedList 区别
 
 - 是否保证线程安全： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
 - **底层数据结构**： Arraylist 底层使用的是 Object 数组；LinkedList 底层使用的是**双向循环链表**数据结构；
@@ -132,7 +140,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 
 
 
-高级工程师的我，可不得看看源码，具体分析下：
+高级工程师的我，可不得看看源码，具体分析下吗：
 
 - ArrayList 工作原理其实很简单，底层是动态数组，每次创建一个 ArrayList 实例时会分配一个初始容量（没有指定初始容量的话，默认是 10），以 add 方法为例，如果没有指定初始容量，当执行 add 方法，先判断当前数组是否为空，如果为空则给保存对象的数组分配一个最小容量，默认为 10。当添加大容量元素时，会先增加数组的大小，以提高添加的效率；
 
@@ -153,7 +161,7 @@ public class LinkedList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 ```
 
-### 构造器
+#### 构造器
 
 ArrayList 提供了 3 个构造器，①无参构造器 ②带初始容量构造器 ③参数为集合构造器
 
@@ -204,7 +212,7 @@ private static class Node<E> {
 }
 ```
 
-### 插入
+#### 插入
 
 **ArrayList**:
 
@@ -358,7 +366,7 @@ void linkBefore(E e, Node<E> succ) {
 }
 ```
 
-### 获取
+#### 获取
 
 **ArrayList** 的 get() 方法很简单，就是在数组中返回指定位置的元素即可，所以效率很高
 
@@ -380,22 +388,20 @@ public E get(int index) {
 }
 ```
 
-------
 
 
-
-## Hash冲突及解决办法
+### Hash冲突及解决办法
 
 解决哈希冲突的方法一般有：开放定址法、链地址法（拉链法）、再哈希法、建立公共溢出区等方法。
 
-> - 开放定址法：从发生冲突的那个单元起，按照一定的次序，从哈希表中找到一个空闲的单元。然后把发生冲突的元素存入到该单元的一种方法。开放定址法需要的表长度要大于等于所需要存放的元素。
-> - 链接地址法（拉链法）：是将哈希值相同的元素构成一个同义词的单链表，并将单链表的头指针存放在哈希表的第i个单元中，查找、插入和删除主要在同义词链表中进行。（链表法适用于经常进行插入和删除的情况）
-> - 再哈希法：就是同时构造多个不同的哈希函数： Hi = RHi(key)   i= 1,2,3 … k; 当H1 = RH1(key)  发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间
-> - 建立公共溢出区：将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区
+- 开放定址法：从发生冲突的那个单元起，按照一定的次序，从哈希表中找到一个空闲的单元。然后把发生冲突的元素存入到该单元的一种方法。开放定址法需要的表长度要大于等于所需要存放的元素。
+- 链接地址法（拉链法）：是将哈希值相同的元素构成一个同义词的单链表，并将单链表的头指针存放在哈希表的第i个单元中，查找、插入和删除主要在同义词链表中进行。（链表法适用于经常进行插入和删除的情况）
+- 再哈希法：就是同时构造多个不同的哈希函数： Hi = RHi(key)   i= 1,2,3 … k; 当H1 = RH1(key)  发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间
+- 建立公共溢出区：将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区
 
 
 
-## HashMap的底层实现
+### HashMap的底层实现
 
 > 什么时候会使用HashMap？他有什么特点？
 >
@@ -425,15 +431,11 @@ HashMap 在 JDK 7 和 JDK8 中的实现方式略有不同。分开记录。
 
 5. table：Entry 数组。我们都知道 HashMap 内部存储 key/value 是通过 Entry 这个介质来实现的。而 table 就是 Entry 数组。
 
-### JDK1.7 实现
+#### JDK1.7 实现
 
 JDK1.7 中 HashMap 由 **数组+链表** 组成（**“链表散列”** 即数组和链表的结合体），数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的（HashMap 采用 **“拉链法也就是链地址法”** 解决冲突），如果定位到的数组位置不含链表（当前 entry 的 next 指向 null ），那么对于查找，添加等操作很快，仅需一次寻址即可；如果定位到的数组包含链表，对于添加操作，其时间复杂度依然为 $O(1)$，因为最新的 Entry 会插入链表头部，即需要简单改变引用链即可，而对于查找操作来讲，此时就需要遍历链表，然后通过 key 对象的 equals 方法逐一比对查找。
 
 > 所谓 **“拉链法”** 就是将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx45a2fbbj31dz0oaacx.jpg)
-
-#### 源码解析
 
 ##### 构造方法
 
@@ -476,7 +478,7 @@ public HashMap(Map<? extends K, ? extends V> m) {
 }
 ```
 
-HashMap 的前 3 个构造方法最后都会去调用 `HashMap(int initialCapacity, float loadFactor)` 。在其内部去设置初始容量和加载因子。而最后的 `init()` 是空方法，主要给子类实现，比如LinkedHashMap。
+HashMap 的前 3 个构造方法最后都会去调用 `HashMap(int initialCapacity, float loadFactor)` 。在其内部去设置初始容量和加载因子。而最后的 `init()` 是空方法，主要给子类实现，比如 LinkedHashMap。
 
 ##### put() 方法
 
@@ -576,8 +578,6 @@ void createEntry(int hash, K key, V value, int bucketIndex) {
 
 最后的 `createEntry()` 方法就说明了当 hash 冲突时，采用的拉链法来解决 hash 冲突的，并且是把新元素插入到单链表的表头。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx45xr0x5j31hl0u0ncd.jpg)
-
 ##### get() 方法
 
 ```java
@@ -612,15 +612,11 @@ final Entry<K,V> getEntry(Object key) {
 }
 ```
 
-### JDK1.8 实现
+#### JDK1.8 实现
 
 JDK 1.7 中，如果哈希碰撞过多，拉链过长，极端情况下，所有值都落入了同一个桶内，这就退化成了一个链表。通过 key 值查找要遍历链表，效率较低。 JDK1.8 在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以减少搜索时间。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx468uknnj31650ogjth.jpg)
-
 TreeMap、TreeSet 以及 JDK1.8 之后的 HashMap 底层都用到了红黑树。红黑树就是为了解决二叉查找树的缺陷，因为二叉查找树在某些情况下会退化成一个线性结构。
-
-#### 源码解析
 
 ##### 构造方法
 
@@ -672,33 +668,7 @@ static int indexFor(int h, int length) { //jdk1.7的源码，jdk1.8没有提取�
 
 HashMap 定位数组索引位置，直接决定了 hash 方法的离散性能。Hash 算法本质上就是三步：**取key的hashCode值、高位运算、取模运算**。
 
-![hash](https://tva1.sinaimg.cn/large/007S8ZIlly1gdwv5m4g4sj30ga09cdfy.jpg)
 
-> 为什么要这样呢？
-
-### HashMap 的长度为什么是 2 的幂次方?
-
-目的当然是为了减少哈希碰撞，使 table 里的数据分布的更均匀。
-
-1. HashMap 中桶数组的大小 length 总是 2 的幂，此时，`h & (table.length -1)` 等价于对 length 取模 `h%length`。但取模的计算效率没有位运算高，所以这是一个优化。假设 `h = 185`，`table.length-1 = 15(0x1111)`，其实散列真正生效的只是低 4bit 的有效位，所以很容易碰撞。
-
-   ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx46gac50j30m8037mxf.jpg)
-
-2. 图中的 hash 是由键的 hashCode 产生。计算余数时，由于 n 比较小，hash 只有低 4 位参与了计算，高位的计算可以认为是无效的。这样导致了计算结果只与低位信息有关，高位数据没发挥作用。为了处理这个缺陷，我们可以把上图中的 hash 高 4 位数据与低 4 位数据进行异或运算，即 `hash ^ (hash >>> 4)`。通过这种方式，让高位数据与低位数据进行异或，以此加大低位信息的随机性，变相的让高位数据参与到计算中。此时的计算过程如下：
-
-   ![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx46jwezjj30m804cjrw.jpg)
-
-   在 Java 中，hashCode 方法产生的 hash 是 int 类型，32 位宽。前16位为高位，后16位为低位，所以要右移16位，即 `hash ^ (hash >>> 16)` 。这样还增加了 hash 的复杂度，进而影响 hash 的分布性。
-
-**HashMap 的长度为什么是 2 的幂次方？**
-
-为了能让 HashMap 存取高效，尽量减少碰撞，也就是要尽量把数据分配均匀，Hash值的范围是 -2147483648 到 2147483647，前后加起来有 40 亿的映射空间，只要哈希函数映射的比较均匀松散，一般应用是很难出现碰撞的，但一个问题是 40 亿的数组内存是放不下的。所以这个散列值是不能直接拿来用的。用之前需要先对数组长度取模运算，得到余数才能用来存放位置也就是对应的数组小标。这个数组下标的计算方法是 `(n-1)&hash`，n 代表数组长度。
-
-这个算法应该如何设计呢？
-
-我们首先可能会想到采用%取余的操作来实现。但是，重点来了。
-
-**取余操作中如果除数是2的幂次则等价于其除数减一的与操作**，也就是说 `hash%length=hash&(length-1)`，但前提是 length 是 2 的 n 次方，并且采用 & 运算比 % 运算效率高，这也就解释了 HashMap 的长度为什么是 2 的幂次方。
 
 ##### get() 方法
 
@@ -735,8 +705,6 @@ final Node<K,V> getNode(int hash, Object key) {
 ```
 
 ##### put() 方法
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdx470vyzej311c0u0120.jpg)
 
 ```java
 public V put(K key, V value) {
@@ -902,14 +870,6 @@ final Node<K,V>[] resize() {
   return newTab;
 }
 ```
-
-### HashMap的扩容操作是怎么实现的？
-
-1. 在 jdk1.8 中，resize 方法是在 HashMap 中的键值对大于阀值时或者初始化时，就调用 resize 方法进行扩容；
-2. 每次扩展的时候，都是扩展 2 倍；
-3. 扩展后 Node 对象的位置要么在原位置，要么移动到原偏移量两倍的位置。
-
-在 `putVal()` 中，我们看到在这个函数里面使用到了2次 `resize()` 方法，`resize()` 方法表示在进行第一次初始化时会对其进行扩容，或者当该数组的实际大小大于其扩容阈值（第一次为0.75 * 16 = 12），这个时候在扩容的同时也会伴随的桶上面的元素进行重新分发，这也是JDK1.8版本的一个优化的地方，在1.7中，扩容之后需要重新去计算其Hash值，根据Hash值对其进行分发，但在1.8 版本中，则是根据在同一个桶的位置中进行判断(e.hash & oldCap)是否为0，重新进行hash分配后，该元素的位置要么停留在原始位置，要么移动到原始位置+增加的数组大小这个位置上
 
 
 
@@ -1131,31 +1091,69 @@ final Node<K,V> untreeify(HashMap<K,V> map) {
 
 
 
+### HashMap 的长度为什么是 2 的幂次方?
+
+`HashMap` 中的数组（通常称为"桶"数组）长度设计为2的幂次方有几个原因，这些设计选择主要是为了减少哈希碰撞，使 table 里的数据分布的更均匀：
+
+1. **快速取模运算**：HashMap 中桶数组的大小 length 总是 2 的幂，此时，`h & (table.length -1)` 等价于对 length 取模 `h%length`。但取模的计算效率没有位运算高，所以这是一个优化。
+2. **减少哈希碰撞**：使用2的幂次方作为数组长度可以使得元素在数组中分布更加均匀，这减少了哈希碰撞的可能性。哈希碰撞是指两个或多个键具有相同的哈希码，因此具有相同的数组索引。
+3. **动态扩容**：`HashMap`在需要扩容时，通常会增加到当前容量的两倍。如果当前容量已经是2的幂次方，增加到两倍后仍然是2的幂次方，这使得扩容操作可以保持数组长度的2的幂次方特性。
+4. **避免数据迁移**：当数组长度为2的幂次方时，当进行扩容和重新哈希时，可以通过简单的位运算来确定元素在新数组中的位置，而不需要重新计算哈希码，这减少了数据迁移的工作量。
+5. **空间利用率**：2的幂次方长度的数组可以提供较高的空间利用率，尤其是在负载因子（load factor）固定的情况下。
+6. **简单实现**：使用2的幂次方长度简化了`HashMap`的实现，因为不需要处理取模运算中的负数和大于等于当前容量的情况。
+
+
+
+### HashMap的扩容操作是怎么实现的？
+
+`HashMap`的扩容操作是其核心功能之一，确保了即使在大量数据插入时也能保持较好的性能。以下是`HashMap`扩容操作的一般步骤：
+
+1. **满足扩容条件**：当`HashMap`中的元素数量达到负载因子（`loadFactor`）与当前容量（`capacity`）的乘积时，会触发扩容。
+2. **计算新容量**：新容量通常是当前容量的2倍。例如，如果当前容量是16，那么扩容后的新容量将会是32。
+3. **创建新的数组**：为新容量创建一个新的内部数组（通常是一个`Node[]`数组），这个数组的长度是2的幂次方。
+4. **重新计算哈希**：遍历旧数组中的每个`Node`，对每个`Node`重新计算其在新数组中的索引位置。
+5. **迁移元素**：将旧数组中的每个`Node`迁移到新数组的正确位置。由于新数组的大小是旧数组的2倍，所以需要重新计算每个`Node`的哈希值与新数组大小的模来确定新位置。
+6. **处理哈希冲突**：在迁移过程中，可能会遇到哈希冲突的情况，即两个或多个`Node`需要迁移到新数组的同一位置。这时，需要将它们链接成链表或放入同一个树结构中。
+7. **更新引用**：更新`HashMap`中的相关属性，如`size`和`modCount`，并丢弃旧数组，将新数组设置为当前数组。
+8. **优化性能**：扩容操作可能会影响性能，因为它涉及到大量的数据迁移。为了避免性能瓶颈，`HashMap`在设计时采用了一些优化措施，如使用高效的位运算替代取模运算。
+9. **并发扩容**：在并发环境下，`HashMap`的扩容操作需要同步处理，以避免多线程同时修改数据结构。
+10. **触发重新平衡**：在某些情况下，扩容操作可能需要触发树结构的重新平衡，如果`HashMap`中的链表长度超过了一定的阈值（默认为8），链表可能会被转换成红黑树。
+
+在Java 8中，`HashMap`在链表长度超过一定阈值时会将链表转换为红黑树，以减少搜索时间，提高性能。扩容过程中，如果链表已经转换为树，迁移操作会稍微复杂，因为需要递归地处理树中的每个节点。
+
+扩容是一个昂贵的操作，因为它涉及到数组的复制和所有现有元素的重新分配。因此，合理地选择初始容量和负载因子对于优化性能非常重要。
+
+> 在 `putVal()` 中，我们看到在这个函数里面使用到了2次 `resize()` 方法，`resize()` 方法表示在进行第一次初始化时会对其进行扩容，或者当该数组的实际大小大于其扩容阈值（第一次为0.75 * 16 = 12），这个时候在扩容的同时也会伴随的桶上面的元素进行重新分发，这也是JDK1.8版本的一个优化的地方，在1.7中，扩容之后需要重新去计算其Hash值，根据Hash值对其进行分发，但在1.8 版本中，则是根据在同一个桶的位置中进行判断(e.hash & oldCap)是否为0，重新进行hash分配后，该元素的位置要么停留在原始位置，要么移动到原始位置+增加的数组大小这个位置上
+
+
+
 ### 为什么JDK1.8中HashMap从头插入改成尾插入
 
 JDK1.7中扩容时，每个元素的rehash之后，都会插入到新数组对应索引的链表头，所以这就导致原链表顺序为A->B->C，扩容之后，rehash之后的链表可能为C->B->A，元素的顺序发生了变化。在并发场景下，**扩容时**可能会出现循环链表的情况。而JDK1.8从头插入改成尾插入元素的顺序不变，避免出现循环链表的情况
 
-![](https://tva1.sinaimg.cn/large/e6c9d24ely1h38x7ejwejj20u00bjmxd.jpg)
-
 > 在扩容时，头插法会改变链表中元素原本的顺序，以至于在并发场景下导致链表成环的问题，而尾插法，在扩容时会保持链表元素原本的顺序，就不会出现链表成环的问题
 >
-> ### 死循环执行步骤1
+> ##### 死循环执行步骤1
 >
 > 死循环是因为并发 HashMap 扩容导致的，并发扩容的第一步，线程 T1 和线程 T2 要对 HashMap 进行扩容操作，此时 T1 和 T2 指向的是链表的头结点元素 A，而 T1 和 T2 的下一个节点，也就是 T1.next 和 T2.next 指向的是 B 节点，如下图所示：
 >
-> ![](https://tva1.sinaimg.cn/large/e6c9d24ely1h38x6z1svnj20ps0ingm2.jpg)
+> ![img](https://img-blog.csdnimg.cn/img_convert/21ab5fa8f105b73911414b6e6a9a1f28.png)
 >
-> ### 死循环执行步骤2
+> ##### 死循环执行步骤2
 >
 > 死循环的第二步操作是，线程 T2 时间片用完进入休眠状态，而线程 T1 开始执行扩容操作，一直到线程 T1 扩容完成后，线程 T2 才被唤醒，扩容之后的场景如下图所示：图片从上图可知线程 T1 执行之后，因为是头插法，所以 HashMap 的顺序已经发生了改变，但线程 T2 对于发生的一切是不可知的，所以它的指向元素依然没变，如上图展示的那样，T2 指向的是 A 元素，T2.next 指向的节点是 B 元素。
 >
-> ### 死循环执行步骤3
+> ![img](https://img-blog.csdnimg.cn/img_convert/be1ebde01da54db6ee94924dabd6c4eb.png)
+>
+> ##### 死循环执行步骤3
 >
 > 当线程 T1 执行完，而线程 T2 恢复执行时，死循环就建立了，如下图所示：
 >
-> ![](https://tva1.sinaimg.cn/large/e6c9d24ely1h38x6gq48cj20rw0iwwew.jpg)
+> ![img](https://img-blog.csdnimg.cn/img_convert/accc3d620b9ed98a1e7bb89222e10f44.png)
 >
 > 因为 T1 执行完扩容之后 B 节点的下一个节点是 A，而 T2 线程指向的首节点是 A，第二个节点是 B，这个顺序刚好和 T1 扩完容完之后的节点顺序是相反的。T1 执行完之后的顺序是 B 到 A，而 T2 的顺序是 A 到 B，这样 A 节点和 B 节点就形成死循环了，这就是 HashMap 死循环导致的原因。
+
+
 
 ### HashMap 为什么线程不安全
 
@@ -1185,8 +1183,6 @@ void transfer(Entry[] newTable, boolean rehash) {
     }  
 ```
 
-具体原因如上题
-
 
 
 ### HashMap：JDK1.7 VS JDK1.8
@@ -1205,14 +1201,6 @@ JDK1.8主要解决或优化了以下问题：
 | 存放数据的规则           | 无冲突时，存放数组；冲突时，存放链表                         | 无冲突时，存放数组；冲突 & 链表长度 < 8：存放单链表；冲突 & 链表长度 > 8：树化并存放红黑树 |
 | 插入数据方式             | 头插法（先将原位置的数据移到后1位，再插入数据到该位置）      | 尾插法（直接插入到链表尾部/红黑树）                          |
 | 扩容后存储位置的计算方式 | 全部按照原来方法进行计算（即hashCode ->> 扰动函数 ->> (h&length-1)） | 按照扩容后的规律计算（即扩容后的位置=原位置 or 原位置 + 旧容量 |
-
-------
-
-
-
-## Hashtable
-
-Hashtable 和 HashMap 都是散列表，也是用”拉链法“实现的哈希表。保存数据和 JDK7 中的 HashMap 一样，是 Entity 对象，只是 Hashtable 中的几乎所有的 public 方法都是 synchronized 的，而有些方法也是在内部通过 synchronized 代码块来实现，效率肯定会降低。且 put() 方法不允许空值。
 
 
 
@@ -1236,7 +1224,7 @@ Hashtable 和 HashMap 都是散列表，也是用”拉链法“实现的哈希�
 
 
 
-#### 了解过 LinkedHashMap、TreeMap 吗
+#### 了解过 LinkedHashMap、TreeMap 吗?
 
 LinkedHashMap属于HashMap的子类，与HashMap的区别在于LinkedHashMap保存了记录插入的顺序。TreeMap 实现了 SortedMap接口，TreeMap 有能力对插入的记录根据 key 排序，默认按照升序排序，也可以自定义比较项，在使用 TreeMap 的时候，key 应当实现 Comparable。
 
@@ -1245,24 +1233,26 @@ LinkedHashMap属于HashMap的子类，与HashMap的区别在于LinkedHashMap保�
 > - LinkedHashMap 通常提供的是遍历顺序符合插入顺序，它的实现是通过为条目（键值对）维护一个双向链表。注意，通过特定构造函数，我们可以创建反映访问顺序的实例，所谓的 put、get、compute 等，都算作“访问”。
 > - 对于 TreeMap，它的整体顺序是由键的顺序关系决定的，通过 Comparator 或 Comparable（自然顺序）来决定。
 
-## ConcurrentHashMap
 
-HashMap 在多线程情况下，在 put 的时候，插入的元素超过了容量（由负载因子决定）的范围就会触发扩容操作，就是 resize，这个会重新将原数组的内容重新 hash 到新的扩容数组中，在多线程的环境下，存在同时其他的元素也在进行 put 操作，如果 hash 值相同，可能出现同时在同一数组下用链表表示，造成**闭环**，导致在 get 时会出现死循环，所以 HashMap 是线程不安全的。(可参考：https://www.jianshu.com/p/e2f75c8cce01）
+
+### ConcurrentHashMap
+
+HashMap 在多线程情况下，在 put 的时候，插入的元素超过了容量（由负载因子决定）的范围就会触发扩容操作，就是 resize，这个会重新将原数组的内容重新 hash 到新的扩容数组中，在多线程的环境下，存在同时其他的元素也在进行 put 操作，如果 hash 值相同，可能出现同时在同一数组下用链表表示，造成**闭环**，导致在 get 时会出现死循环，所以 HashMap 是线程不安全的。
 
 Hashtable，是线程安全的，它在所有涉及到多线程操作的都加上了 synchronized 关键字来锁住整个 table，这就意味着所有的线程都在竞争一把锁，在多线程的环境下，它是安全的，但是无疑是效率低下的。
 
-### JDK1.7 实现
+#### JDK1.7 实现
 
 Hashtable 容器在竞争激烈的并发环境下表现出效率低下的原因，是因为所有访问 Hashtable 的线程都必须竞争同一把锁，那假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，这就是 ConcurrentHashMap 所使用的锁分段技术。
 
 在 JDK1.7 版本中，ConcurrentHashMap 的数据结构是由一个 Segment 数组和多个 HashEntry 组成。Segment 数组的意义就是将一个大的 table 分割成多个小的 table 来进行加锁。每一个 Segment 元素存储的是 HashEntry 数组+链表，这个和 HashMap 的数据存储结构一样。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/concurrenthashmap-1.7-segment.jpg)
+![图片](https://segmentfault.com/img/remote/1460000023016233)
 
 ConcurrentHashMap 类中包含两个静态内部类 HashEntry 和 Segment。
 HashEntry 用来封装映射表的键值对，Segment 用来充当锁的角色，每个 Segment 对象守护整个散列映射表的若干个桶。每个桶是由若干个 HashEntry 对象链接起来的链表。一个 ConcurrentHashMap 实例中包含由若干个 Segment 对象组成的数组。每个 Segment 守护着一个 HashEntry 数组里的元素，当对 HashEntry 数组的数据进行修改时，必须首先获得它对应的 Segment 锁。
 
-#### Segment 类
+##### Segment 类
 
 Segment 类继承于 ReentrantLock 类，从而使得 Segment 对象能充当可重入锁的角色。一个 Segment 就是一个子哈希表，Segment 里维护了一个 HashEntry 数组，并发环境下，对于不同 Segment 的数据进行操作是不用考虑锁竞争的。
 
@@ -1323,7 +1313,7 @@ static final class Segment<K,V> extends ReentrantLock implements Serializable {
 }
 ```
 
-#### HashEntry 类
+##### HashEntry 类
 
 HashEntry 是目前最小的逻辑处理单元。一个 ConcurrentHashMap 维护一个 Segment 数组，一个 Segment 维护一个 HashEntry 数组。
 
@@ -1337,7 +1327,7 @@ static final class HashEntry<K,V> {
 }
 ```
 
-#### ConcurrentHashMap 类
+##### ConcurrentHashMap 类
 
 默认的情况下，每个 ConcurrentHashMap 类会创建16个并发的 segment，每个 segment 里面包含多个 Hash表，每个 Hash 链都是由 HashEntry 节点组成的。
 
@@ -1395,7 +1385,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
 }
 ```
 
-#### put() 方法
+##### put() 方法
 
 1. **定位segment并确保定位的Segment已初始化**
 2. **调用 Segment的 put 方法。**
@@ -1417,7 +1407,7 @@ public V put(K key, V value) {
 }
 ```
 
-#### get() 方法
+##### get() 方法
 
 **get方法无需加锁，由于其中涉及到的共享变量都使用volatile修饰，volatile可以保证内存可见性，所以不会读取到过期数据**
 
@@ -1441,15 +1431,15 @@ public V get(Object key) {
 }
 ```
 
-### JDK1.8  实现
+#### JDK1.8  实现
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/others/concurrenthashmap-1.8.jpg)
+![img](https://img-blog.csdnimg.cn/20190510233258311.jpg)
 
 ConcurrentHashMap 在 JDK8 中进行了巨大改动，光是代码量就从1000多行增加到6000行！1.8 摒弃了`Segment`(锁段)的概念，采用了 `CAS + synchronized` 来保证并发的安全性。
 
 可以看到，和 HashMap 1.8 的数据结构很像。底层数据结构改变为采用**数组+链表+红黑树**的数据形式。
 
-#### 和HashMap1.8相同的一些地方
+##### 和HashMap1.8相同的一些地方
 
 - 底层数据结构一致
 - HashMap初始化是在第一次put元素的时候进行的，而不是init
@@ -1465,7 +1455,7 @@ static final int spread(int h) {
 }
 ```
 
-#### 一些关键属性
+##### 一些关键属性
 
 ```java
 private static final int MAXIMUM_CAPACITY = 1 << 30; //数组最大大小 同HashMap
@@ -1521,7 +1511,7 @@ private transient volatile long baseCount;
 private transient volatile int sizeCtl;
 ```
 
-#### put() 方法
+##### put() 方法
 
 1. 首先会判断 key、value是否为空，如果为空就抛异常！
 2. `spread()`方法获取hash，减小hash冲突
@@ -1616,7 +1606,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 
 我们可以发现 JDK8 中的实现也是**锁分离**的思想，只是锁住的是一个Node，而不是JDK7中的Segment，而锁住Node之前的操作是无锁的并且也是线程安全的，建立在之前提到的原子操作上。
 
-#### get() 方法
+##### get() 方法
 
 get方法无需加锁，由于其中涉及到的共享变量都使用volatile修饰，volatile可以保证内存可见性，所以不会读取到过期数据
 
@@ -1689,7 +1679,7 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 
 
-## Java快速失败（fail-fast）和安全失败（fail-safe）区别
+### Java快速失败（fail-fast）和安全失败（fail-safe）区别
 
 ### 快速失败（fail—fast）
 
@@ -1746,7 +1736,7 @@ public void remove() {
 
 
 
-## Iterator 和 Enumeration 区别
+### Iterator 和 Enumeration 区别
 
 在 Java 集合中，我们通常都通过 “Iterator(迭代器)” 或 “Enumeration(枚举类)” 去遍历集合。
 
@@ -1779,7 +1769,7 @@ public interface Iterator<E> {
 
 
 
-## Comparable 和 Comparator 接口有何区别？
+### Comparable 和 Comparator 接口有何区别？
 
 Java 中对集合对象或者数组对象排序，有两种实现方式：
 
@@ -1817,29 +1807,22 @@ Java 中对集合对象或者数组对象排序，有两种实现方式：
 
 - 实现 Comparable 接口要重写 compareTo 方法, 在 compareTo 方法里面实现比较。一个已经实现Comparable 的类的对象或数据，可以通过 **Collections.sort(list) 或者 Arrays.sort(arr)**实现排序。通过 **Collections.sort(list,Collections.reverseOrder())** 对list进行倒序排列。
 
-  ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdzefrcjolj30ui0u0dm0.jpg)
-
 - 实现Comparator需要重写 compare 方法
 
-  ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdzefws30uj311s0t643v.jpg)
 
 
 
-## HashSet
+### HashSet
 
 HashSet 是用来存储没有重复元素的集合类，并且它是无序的。HashSet 内部实现是基于 HashMap ，实现了 Set 接口。
 
 从 HahSet 提供的构造器可以看出，除了最后一个 HashSet 的构造方法外，其他所有内部就是去创建一个 HashMap 。没有其他的操作。而最后一个构造方法不是 public 的，所以不对外公开。
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdzeqxhvj3j311s0ka787.jpg)
 
 
 
 ### HashSet如何检查重复
 
 HashSet 的底层其实就是 HashMap，只不过我们 **HashSet 是实现了 Set 接口并且把数据作为 K 值，而 V 值一直使用一个相同的虚值来保存**，HashMap的 K 值本身就不允许重复，并且在 HashMap 中如果 K/V 相同时，会用新的 V 覆盖掉旧的 V，然后返回旧的 V。
-
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gdzeyvg5h0j311s0jen0n.jpg)
 
 
 
@@ -1853,11 +1836,7 @@ HashSet 的底层其实就是 HashMap，只不过我们 **HashSet 是实现了 S
 
 
 
-<img src="https://static01.imgkr.com/temp/ef920406f7274d06a9b203b6b03e3171.png" style="zoom:50%;" />
-
-
-
-## References
+### References
 
 所有内容都是基于源码阅读和各种大佬之前总结的知识整理而来，输入并输出，奥利给。
 

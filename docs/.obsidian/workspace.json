@@ -49,7 +49,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/Redis/Redis-Database.md",
+                "file": "interview/JVM-FAQ.md",
                 "mode": "preview",
                 "source": false
               }
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-management/Redis/Redis-Database.md",
+                "file": "interview/JVM-FAQ.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-management/Redis/Redis-Database.md",
+                "file": "interview/JVM-FAQ.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/Redis/Redis-Database.md"
+                "file": "interview/JVM-FAQ.md"
               }
             }
           }
@@ -205,8 +205,8 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
-    "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Database.md",
+    "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Cluster.md",
     "data-management/Redis/Redis 有用指令.md",
     "data-management/Redis/ReadRedis.md",
