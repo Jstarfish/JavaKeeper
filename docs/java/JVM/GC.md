@@ -12,7 +12,7 @@ Java 相比 C/C++ 最显著的特点便是引入了自动垃圾回收 ，它解�
 
 ### 回顾下 JVM 内存区域
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfwrx0a1jqj30ol0ck754.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/d37207e632cd193510c4713b1db551924c2d36.png)
 
 
 
@@ -30,11 +30,11 @@ String ref = new String("Java");
 
 以上代码 ref1 引用了右侧定义的对象，所以引用次数是 1
 
-![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl9gdbf2mj307803adfn.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/36620eb50bc2337a78a525cc3e139c029255f0.png)
 
 如果在上述代码后面添加一个 ref = null，则由于对象没被引用，引用次数置为 0，由于不被任何变量引用，此时即被回收，动图如下
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl9gicofzg307204cglg.gif)
+![](https://dl-harmonyos.51cto.com/images/202212/18eb87f042f7160d0d39383a1e82528e775cb1.gif)
 
 看起来用引用计数确实没啥问题了，不过它无法解决一个主要的问题：**循环引用**！啥叫循环引用
 
@@ -63,7 +63,7 @@ public class TestRC {
 
 按步骤一步步画图
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6b79565j30rj0bejrk.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/6610b0168edd882e5ed921e4eef6daf9c5d378.png)
 
 到了第三步，虽然 a，b 都被置为 null 了，但是由于之前它们指向的对象互相指向了对方（引用计数都为 1），所以无法回收，也正是由于无法解决循环引用的问题，所以主流的 Java 虚拟机都没有选用引用计数法来管理内存。
 
@@ -85,7 +85,7 @@ public class TestRC {
 
 现代虚拟机基本都是采用这种算法来判断对象是否存活，可达性算法的原理是以一系列叫做  **GC Root**  的对象为起点出发，引出它们指向的下一个节点，再以下个节点为起点，引出此节点指向的下一个结点。。。（这样通过 GC Root 串成的一条线就叫引用链），直到所有的结点都遍历完毕，如果相关对象不在任意一个以 **GC Root** 为起点的引用链中，则这些对象会被判断为「垃圾」,会被 GC 回收。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6bl1kifj30jk0b60t0.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/c89f360980bd1793f756862748b88614ca44a7.png)
 
 如图示，如果用可达性算法即可解决上述循环引用的问题，因为从**GC Root** 出发没有到达 a,b，所以 a，b 可回收
 
@@ -156,7 +156,7 @@ public class Test {
 
 当调用 Java 方法时，虚拟机会创建一个栈桢并压入 Java 栈，而当它调用的是本地方法时，虚拟机会保持 Java 栈不变，不会在 Java 栈祯中压入新的祯，虚拟机只是简单地动态连接并直接调用指定的本地方法。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl6ihuav7j30di0caq3j.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/23a7586494ad8a59df60500df2b64936a33572.png)
 
 ```java
 JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(JNIEnv *env, jobject instance，jstring jmsg) {
@@ -206,7 +206,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 1. 先根据可达性算法**标记**出相应的可回收对象（图中黄色部分）
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl79uspovj30ck07tt8n.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/f7a858709c100d56d5122606c0a18d51fa3b8e.png)
 
 2. 对可回收的对象进行回收操作起来确实很简单，也不用做移动数据的操作，那有啥问题呢？仔细看上图，没错，内存碎片！假如我们想在上图中的堆中分配一块需要**连续内存**占用 4M 或 5M 的区域，显然是会失败，怎么解决呢，如果能把上面未使用的 2M， 2M，1M 内存能连起来就能连成一片可用空间为 5M 的区域即可，怎么做呢?
 
@@ -214,7 +214,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 把堆等分成两块区域, A 和 B，区域 A 负责分配对象，区域 B 不分配，对区域 A 使用以上所说的标记法把存活的对象标记出来，然后把区域 A 中存活的对象都复制到区域 B（存活对象都依次**紧邻排列**）最后把 A 区对象全部清理掉释放出空间，这样就解决了内存碎片的问题了。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfws4ow2i1j31gn0q075y.jpg)
+![](https://dl-harmonyos.51cto.com/images/202212/c731dc529a180c970ab3849232c06fae11d56d.png)
 
 不过复制算法的缺点很明显，比如给堆分配了 500M 内存，结果只有 250M 可用，空间平白无故减少了一半！这肯定是不能接受的！另外每次回收也要把存活对象移动到另一半，效率低下（我们可以想想删除数组元素再把非删除的元素往一端移，效率显然堪忧）
 
@@ -222,7 +222,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 前面两步和标记清除法一样，不同的是它在标记清除法的基础上添加了一个整理的过程 ，即将所有的存活对象都往一端移动，紧邻排列（如图示），再清理掉另一端的所有区域，这样的话就解决了内存碎片的问题。
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYUzM1aWN4MTltaWIzZFpDRW0zZk9kbHcyY2xZYldUSnRoVTVpYm45WnRjOGtRdWFvc3hPYWNoUVd3LzY0MA?x-oss-process=image/format,png)
+![](https://dl-harmonyos.51cto.com/images/202212/c5a4a0054791c5339646160ea1f1ccc03a4818.png)
 
 但是缺点也很明显：每进一次垃圾清除都要频繁地移动存活的对象，效率十分低下。
 
@@ -230,13 +230,13 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 分代收集算法整合了以上算法，综合了这些算法的优点，最大程度避免了它们的缺点，所以是现代虚拟机采用的首选算法，与其说它是算法，倒不是说它是一种策略，因为它是把上述几种算法整合在了一起，为啥需要分代收集呢，来看一下对象的分配有啥规律
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X2pwZy9PeXdleXNDU2VMVXJZcVBpY2pWd2p1TUNoUHJQaWNOSGRYRjFmRXJWTmlhTHJ3ZW5NdVJGcHhOTE03a0pVSkdocVlnMWljUnpiaEVXT3lwWmZpY3F5eUdiaWFIdy82NDA?x-oss-process=image/format,png)
+![](https://dl-harmonyos.51cto.com/images/202212/74acec408804279b3d42517a39878d08efa77f.jpg)
 
 *如图示：纵轴代表已分配的字节，而横轴代表程序运行时间*
 
 由图可知，大部分的对象都很短命，都在很短的时间内都被回收了（IBM 专业研究表明，一般来说，98% 的对象都是朝生夕死的，经过一次 Minor GC 后就会被回收），所以分代收集算法根据**对象存活周期的不同**将堆分成新生代和老生代（Java8 以前还有个永久代），默认比例为 1 : 2，新生代又分为 Eden 区， from Survivor 区（简称S0），to Survivor 区(简称 S1)，三者的比例为 `8: 1 : 1`，这样就可以根据新老生代的特点选择最合适的垃圾回收算法，我们把新生代发生的 GC 称为 Young GC（也叫 Minor GC），老年代发生的 GC 称为 Old GC。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2yeeoz8j30aj04mglm.jpg)
+![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/74ab84b02f3754a4a10605675df0c59a6ce4ab.png)
 
 *画外音：思考一下，新生代为啥要分这么多区？*
 
@@ -248,27 +248,23 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 由以上的分析可知，大部分对象在很短的时间内都会被回收，对象一般分配在 Eden 区
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2y9r7vsj30qk07kgls.jpg)
+![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/5116f2039552d5d4ed23789b7cc86ffa62247a.png)
 
-当 Eden 区将满时，触发 Minor GC![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2ynwz4oj30q007wmxf.jpg)
+当 Eden 区将满时，触发 Minor GC!![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/535f4cf00d99ad7495a3963baebe4d8481c205.png)
 
 我们之前怎么说来着，大部分对象在短时间内都会被回收，所以经过 Minor GC 后只有少部分对象会存活，它们会被移到 S0 区（这就是为啥空间大小  `Eden: S0: S1 = 8:1:1`，Eden 区远大于 S0，S1 的原因，因为在 Eden 区触发的 Minor GC 把大部对象（接近98%）都回收了，只留下少量存活的对象，此时把它们移到 S0 或 S1 绰绰有余）同时对象年龄加一（对象的年龄即发生 Minor GC 的次数），最后把 Eden 区对象全部清理以释放出空间，如下
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gdc2z7ahusg30hr09l0v2.gif)
+![看完这篇垃圾回收，和面试官扯皮没问题了](https://dl-harmonyos.51cto.com/images/202212/a2e29f7447f1c3aac22916ea7c2aabd1dea1e9.gif)
 
-当触发下一次 Minor GC 时，会把 Eden 区的存活对象和 S0（或S1） 中的存活对象（S0 或 S1 中的存活对象经过每次 Minor GC 都可能被回收）一起移到 S1（Eden 和 S0 的存活对象年龄+1）, 同时清空 Eden 和 S0 的空间。![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zeh8bvg30hq09h76r.gif)
+当触发下一次 Minor GC 时，会把 Eden 区的存活对象和 S0（或S1） 中的存活对象（S0 或 S1 中的存活对象经过每次 Minor GC 都可能被回收）一起移到 S1（Eden 和 S0 的存活对象年龄+1）, 同时清空 Eden 和 S0 的空间。![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/97280d7105a02be986e3552ff90ef295b13529.gif)
 
 若再触发下一次 Minor GC，则重复上一步，只不过此时变成了从 Eden，S1 区将存活对象复制到 S0 区，每次垃圾回收，S0，S1 角色互换，都是从 Eden ，S0(或S1) 将存活对象移动到 S1(或S0)。也就是说在 Eden 区的垃圾回收我们采用的是**复制算法**，<mark>因为在 Eden 区分配的对象大部分在 Minor GC 后都消亡了，只剩下极少部分存活对象，S0，S1 区域也比较小，所以最大限度地降低了复制算法造成的对象频繁拷贝带来的开销</mark>。
 
-> 新生代采用的复制算法，其实是优化后的复制算法，即在复制算法的基础上，使用三个分区（Eden/S0/S1）进行处理
->
-> ![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjl7jk4257j30i2093mxu.jpg)
->
-> 
+
 
 **2、对象何时晋升老年代**
 
-- 当对象的年龄达到了我们设定的阈值，则会从S0（或S1）晋升到老年代![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zt5evgg30hs0axgnj.gif)
+- 当对象的年龄达到了我们设定的阈值，则会从S0（或S1）晋升到老年代![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/c1b3566218e225dae99945839dc3fa01bea3ba.gif)
 
   如图示：年龄阈值设置为 15（默认为15岁）， 当发生下一次 Minor GC 时，S0 中有个对象年龄达到 15，达到我们的设定阈值，晋升到老年代！
 
@@ -286,7 +282,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 什么是 STW ？所谓的 STW，即在 GC（minor GC 或 Full GC）期间，只有垃圾回收器线程在工作，其他工作线程则被挂起。
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gdc2zzpdzfj30tk0go3zo.jpg)
+![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/d39094014a05d6db78370782eca38f2f38b6db.png)
 
 *画外音：为啥在垃圾收集期间其他工作线程会被挂起？想象一下，你一边在收垃圾，另外一群人一边丢垃圾，垃圾能收拾干净吗。*
 
@@ -318,7 +314,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 1. `System.gc()` 方法的调用
 
-   此方法的调用是建议 JVM 进行 Full GC，虽然只是建议而非一定，但很多情况下它会触发 Full GC，从而增加Full GC 的频率，也即增加了间歇性停顿的次数。强烈影响系建议能不使用此方法就别使用，让虚拟机自己去管理它的内存，可通过通过 -XX:+ DisableExplicitGC 来禁止 RMI 调用 System.gc。
+   此方法的调用是建议 JVM 进行 Full GC，虽然只是建议而非一定，但很多情况下它会触发 Full GC，从而增加Full GC 的频率，也即增加了间歇性停顿的次数。强烈建议能不使用此方法就别使用，让虚拟机自己去管理它的内存，可通过通过 -XX:+ DisableExplicitGC 来禁止 RMI 调用 System.gc。
 
 2. 老年代空间不足
 
@@ -337,7 +333,7 @@ JNIEXPORT void JNICALL Java_com_pecuyu_jnirefdemo_MainActivity_newStringNative(J
 
 如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的具体实现。Java 虚拟机规范并没有规定垃圾收集器应该如何实现，因此一般来说不同厂商，不同版本的虚拟机提供的垃圾收集器实现可能会有差别，一般会给出参数来让用户根据应用的特点来组合各个年代使用的收集器，主要有以下垃圾收集器
 
-![](https://img3.sycdn.imooc.com/5bd714800001b3fc07070485.jpg)
+![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/f8c72c72318c032f5e802774787b4cfa9b940f.png)
 
 - 在新生代工作的垃圾回收器：Serial、ParNew、ParallelScavenge
 - 在老年代工作的垃圾回收器：CMS、Serial Old(MSC)、Parallel Old
@@ -355,7 +351,7 @@ Serial 收集器是工作在新生代的，**单线程的垃圾收集器**，单
 
 #### ParNew 收集器
 
-ParNew 收集器是 Serial 收集器的多线程版本，除了使用多线程，其他像收集算法、STW、对象分配规则、回收策略与 Serial 收集器完全一样，在底层上，这两种收集器也共用了相当多的代码，它的垃圾收集过程如下![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlbr6leplj30mk0fsab9.jpg)
+ParNew 收集器是 Serial 收集器的多线程版本，除了使用多线程，其他像收集算法、STW、对象分配规则、回收策略与 Serial 收集器完全一样，在底层上，这两种收集器也共用了相当多的代码，它的垃圾收集过程如下![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/d80fe3083c3264766921433926400276041c00.png)
 
 ParNew 主要工作在 Server 模式，我们知道服务端如果接收的请求多了，响应时间就很重要了，多线程可以让垃圾回收得更快，也就是减少了 STW 时间，能提升响应时间，所以是许多运行在 Server 模式下的虚拟机的首选新生代收集器，另一个与性能无关的原因是因为除了 Serial  收集器，**只有它能与 CMS 收集器配合工作**，CMS 是一个划时代的垃圾收集器，是真正意义上的**并发收集器**，它第一次实现了垃圾收集线程与用户线程（基本上）同时工作，它采用的是传统的 GC 收集器代码框架，与 Serial，ParNew 共用一套代码框架，所以能与这两者一起配合工作，而后文提到的 Parallel Scavenge 与 G1 收集器没有使用传统的 GC 收集器代码框架，而是另起炉灶独立实现的，另外一些收集器则只是共用了部分的框架代码，所以无法与 CMS 收集器一起配合工作。
 
@@ -432,7 +428,7 @@ G1 收集器是面向服务端的垃圾收集器，被称为驾驭一切的垃�
 
 为什么 G1 能建立可预测的停顿模型呢，主要原因在于 G1 对堆空间的分配与传统的垃圾收集器不一样，传统的内存分配就像我们前文所述，是连续的，分成新生代，老年代，新生代又分 Eden，S0，S1,如下
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gjlcc0ggtsj30cc04twem.jpg)
+![看完这篇垃圾回收，和面试官扯皮没问题了-鸿蒙开发者社区](https://dl-harmonyos.51cto.com/images/202212/e3876dc9892d4d6b6c90814065700c28618baf.png)
 
 而 G1 各代的存储地址不是连续的，每一代都使用了 n 个不连续的大小相同的 Region，每个 Region 占有一块连续的虚拟内存地址，如图示
 

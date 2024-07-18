@@ -1371,9 +1371,33 @@ JDK1.8 主要解决或优化了以下问题：
 
 
 
-#### 了解过 LinkedHashMap、TreeMap 吗?
+### 了解过 LinkedHashMap、TreeMap 吗?
 
-LinkedHashMap属于HashMap的子类，与HashMap的区别在于LinkedHashMap保存了记录插入的顺序。TreeMap 实现了 SortedMap接口，TreeMap 有能力对插入的记录根据 key 排序，默认按照升序排序，也可以自定义比较项，在使用 TreeMap 的时候，key 应当实现 Comparable。
+#### LinkedHashMap
+
+`LinkedHashMap` 是 `HashMap` 的子类，除了具有 `HashMap` 的所有功能外，还维护了一个双向链表，以确保插入顺序（或访问顺序）。这种顺序特性使得 `LinkedHashMap` 在某些特定场景下非常有用。
+
+1. **顺序保证**:
+   - 维护了键值对的插入顺序（默认）或访问顺序（可选）。
+   - 插入顺序：按照键值对插入到 `LinkedHashMap` 的顺序进行遍历。
+   - 访问顺序：按照键值对被访问的顺序进行遍历。
+2. **实现**:
+   - 基于哈希表和双向链表。哈希表提供快速的查找、插入和删除操作，而双向链表维护元素的顺序。
+3. **时间复杂度**:
+   - 所有基本操作（插入、删除、查找）的时间复杂度为 O(1)。
+4. **允许 `null` 键和值**:
+   - 与 `HashMap` 一样，`LinkedHashMap` 允许一个 `null` 键和多个 `null` 值。
+
+#### TreeMap
+
+`TreeMap` 是 `NavigableMap` 接口(实现了 SortedMap)的实现，基于红黑树的数据结构提供有序的键值对存储。它按键的自然顺序或指定的比较器顺序进行排序。
+
+1. **有序性**: 按键的自然顺序或自定义比较器顺序对键值对进行排序。
+2. **实现**: 基于红黑树。红黑树是一种自平衡二叉搜索树，保证了插入、删除和查找操作的对数时间复杂度。
+3. **时间复杂度**: 所有基本操作（插入、删除、查找）的时间复杂度为 $O(log n)$。
+4. **不允许 `null` 键**:
+   - 键必须是可比较的，且不允许为 `null`。
+   - 允许 `null` 值。
 
 > 虽然 LinkedHashMap 和 TreeMap 都可以保证某种顺序，但二者还是非常不同的。
 >
@@ -1968,13 +1992,7 @@ Java 中对集合对象或者数组对象排序，有两种实现方式：
 
 ### HashSet
 
-HashSet 是用来存储没有重复元素的集合类，并且它是无序的。HashSet 内部实现是基于 HashMap ，实现了 Set 接口。
-
-从 HahSet 提供的构造器可以看出，除了最后一个 HashSet 的构造方法外，其他所有内部就是去创建一个 HashMap 。没有其他的操作。而最后一个构造方法不是 public 的，所以不对外公开。
-
-
-
-### HashSet如何检查重复
+HashSet 是用来存储没有重复元素的集合类，并且它是无序的。
 
 HashSet 的底层其实就是 HashMap，只不过我们 **HashSet 是实现了 Set 接口并且把数据作为 K 值，而 V 值一直使用一个相同的虚值来保存**，HashMap的 K 值本身就不允许重复，并且在 HashMap 中如果 K/V 相同时，会用新的 V 覆盖掉旧的 V，然后返回旧的 V。
 

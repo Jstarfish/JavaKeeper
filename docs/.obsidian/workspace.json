@@ -49,7 +49,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/JVM-FAQ.md",
+                "file": "java/JVM/Runtime-Data-Areas.md",
                 "mode": "preview",
                 "source": false
               }
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/JVM-FAQ.md",
+                "file": "java/JVM/Runtime-Data-Areas.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/JVM-FAQ.md",
+                "file": "java/JVM/Runtime-Data-Areas.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/JVM-FAQ.md"
+                "file": "java/JVM/Runtime-Data-Areas.md"
               }
             }
           }
@@ -205,6 +205,10 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
+    "java/JVM/对象的创建.md",
+    "interview/Ability-FAQ.md",
+    "interview/Untitled.md",
+    "interview/JVM-FAQ.md",
     "data-management/Redis/Redis-Database.md",
     "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Cluster.md",
@@ -227,10 +231,6 @@
     "interview/未命名.md",
     "distribution/message-queue/Kafka/Kafka-Workflow.md",
     "distribution/message-queue/Kafka/Kafka-Producer.md",
-    "distribution/message-queue/Kafka/Kafka-Version.md",
-    "data-management/MySQL/MySQL-Optimization.md",
-    "data-management/MySQL/MySQL-Lock.md",
-    "data-management/Redis/Nosql-Overview.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
