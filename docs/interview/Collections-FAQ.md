@@ -12,23 +12,8 @@ categories: Java
 >
 > 作为一位小菜 ”一面面试官“，面试过程中，我肯定会问 Java 集合的内容，同时作为求职者，也肯定会被问到集合，所以整理下 Java 集合面试题
 >
-> ![](https://i02piccdn.sogoucdn.com/fe487f455e5b1eb6)
 
 
-
-
-
-> HashMap说一下，其中的Key需要重写hashCode()和equals()吗？
->
-> HashMap中key和value可以为null吗？允许几个为null呀？
->
-> HashMap线程安全吗?ConcurrentHashMap和hashTable有什么区别？ 
->
-> List和Set说一下，现在有一个ArrayList，对其中的所有元素按照某一属性大小排序，应该怎么做？
->
-> ArrayList 和 Vector 的区别
->
-> list 可以删除吗，遍历的时候可以删除吗，为什么
 
 面向对象语言对事物的体现都是以对象的形式，所以为了方便对多个对象的操作，需要将对象进行存储，集合就是存储对象最常用的一种方式，也叫容器。
 
@@ -87,9 +72,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 
 - 性能：Vector 存在 synchronized 的锁等待情况、需要等待释放锁这个过程、所以性能相对较差
 
-- 扩容大小：ArrayList 在底层数组不够用时在原来的基础上扩展 0.5 倍，Vector 默认是扩展 1 倍
-
-  扩容机制，扩容方法其实就是新创建一个数组，然后将旧数组的元素都复制到新数组里面。其底层的扩容方法都在 **grow()** 中（基于JDK8）
+- 扩容大小：ArrayList 在底层数组不够用时在原来的基础上扩展 0.5 倍，Vector 默认是扩展 1 倍扩容机制，扩容方法其实就是新创建一个数组，然后将旧数组的元素都复制到新数组里面。其底层的扩容方法都在 **grow()** 中（基于JDK8）
 
   - ArrayList 的 grow()，在满足扩容条件时、ArrayList以**1.5** 倍的方式在扩容（oldCapacity >> **1** ，右移运算，相当于除以 2，结果为二分之一的 oldCapacity）
 
@@ -107,7 +90,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
     ```
-
+  
   - Vector 的 grow()，Vector 比 ArrayList多一个属性，扩展因子capacityIncrement，可以扩容大小。当扩容容量增量大于**0**时、新数组长度为原数组长度**+**扩容容量增量、否则新数组长度为原数组长度的**2**倍
 
     ```java
@@ -124,7 +107,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
     ```
-
+  
     
 
 ### ArrayList 与 LinkedList 区别
@@ -398,6 +381,158 @@ public E get(int index) {
 - 链接地址法（拉链法）：是将哈希值相同的元素构成一个同义词的单链表，并将单链表的头指针存放在哈希表的第i个单元中，查找、插入和删除主要在同义词链表中进行。（链表法适用于经常进行插入和删除的情况）
 - 再哈希法：就是同时构造多个不同的哈希函数： Hi = RHi(key)   i= 1,2,3 … k; 当H1 = RH1(key)  发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间
 - 建立公共溢出区：将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区
+
+
+
+
+
+### HashMap说一下，其中的Key需要重写hashCode()和equals()吗？
+
+在使用 `HashMap` 时，键（Key）需要重写 `hashCode()` 和 `equals()` 方法，这是确保 `HashMap` 正确运作的关键。下面是详细的解释：
+
+**1、`hashCode()` 方法**
+
+`hashCode()` 方法的作用是返回对象的哈希码，这是一个整数值，用于确定对象在哈希表中的存储位置。`HashMap` 使用键的哈希码来快速查找存储桶（bucket）。
+
+- **一致性**: 同一个对象多次调用 `hashCode()` 方法应该返回相同的值，只要对象的状态没有改变。
+- **相等性**: 如果两个对象根据 `equals()` 方法相等，那么它们的 `hashCode()` 值也必须相等。
+
+```java
+public class Key {
+    private int id;
+    private String name;
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
+}
+```
+
+**2、`equals()` 方法**
+
+`equals()` 方法的作用是确定两个对象是否“逻辑上”相等。`HashMap` 使用这个方法来比较键，以确保在哈希码相同时正确处理键冲突。
+
+- **自反性**: 对于任何非空引用值 `x`，`x.equals(x)` 必须返回 `true`。
+- **对称性**: 对于任何非空引用值 `x` 和 `y`，如果 `x.equals(y)` 返回 `true`，那么 `y.equals(x)` 也必须返回 `true`。
+- **传递性**: 对于任何非空引用值 `x`、`y` 和 `z`，如果 `x.equals(y)` 返回 `true`，并且 `y.equals(z)` 返回 `true`，那么 `x.equals(z)` 也必须返回 `true`。
+- **一致性**: 对于任何非空引用值 `x` 和 `y`，只要对象的状态没有改变，多次调用 `x.equals(y)` 应返回相同的结果。
+- **非空性**: 对于任何非空引用值 `x`，`x.equals(null)` 必须返回 `false`。
+
+```java
+public class Key {
+    private int id;
+    private String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Key key = (Key) o;
+
+        if (id != key.id) return false;
+        return name != null ? name.equals(key.name) : key.name == null;
+    }
+}
+```
+
+**3、 `HashMap` 的工作原理**
+
+`HashMap` 基于哈希表的原理存储数据。每个键值对通过键的哈希码找到对应的存储桶，然后根据 `equals()` 方法确定是否存在相同的键。
+
+- **插入**: `HashMap` 使用键的 `hashCode()` 找到存储桶，然后使用 `equals()` 方法检查是否存在相同的键。如果存在，则更新值；否则，插入新键值对。
+- **查找**: `HashMap` 使用键的 `hashCode()` 找到存储桶，然后使用 `equals()` 方法确定是否存在匹配的键。
+- **删除**: `HashMap` 使用键的 `hashCode()` 找到存储桶，然后使用 `equals()` 方法确定是否存在匹配的键，找到后删除。
+
+**4、为什么需要重写 `hashCode()` 和 `equals()` 方法**
+
+如果不重写 `hashCode()` 和 `equals()` 方法，默认实现会使用对象的内存地址来计算哈希码和比较对象。这将导致逻辑上相等的对象（例如内容相同的两个实例）具有不同的哈希码，无法正确存储和查找。
+
+综合上述两个方法的完整示例：
+
+```java
+public class Key {
+    private int id;
+    private String name;
+
+    public Key(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Key key = (Key) o;
+
+        if (id != key.id) return false;
+        return name != null ? name.equals(key.name) : key.name == null;
+    }
+}
+```
+
+在 `HashMap` 中，键需要重写 `hashCode()` 和 `equals()` 方法，以确保对象可以正确地存储和检索。这两个方法共同保证了键的唯一性和查找的高效性，避免了逻辑上相等但哈希码不同的对象导致的存储和查找问题。
+
+实际开发中，好像也很少用对象当 Key 去存储。
+
+
+
+### 两个对象值相同 (x.equals(y) == true)，但却可有不同的 hash code，这句话对不对?
+
+正确 
+
+如果此对象重写了equals方法，那么可能出现这两个对象的equals相同，而hashcode不同。因此可以说它是对的。 但是，如果此对象继承Object，没有重写equals方法，那么就使用Object的equals方法，Object对象的equals方法默认是用==实现的，那么如果equals相同，hashcode一定相同。
+
+```java
+public class EqualsTest {
+    public static void main(String[] args) {
+        A a = new A();
+        B b = new B();
+        System.out.println(a.equals(b));   //true
+        System.out.println(a.hashCode() + "," + b.hashCode());	//1086865489,452372241
+    }
+}
+
+class A {
+    @Override
+    public boolean equals(Object obj) {
+        return true;
+    }
+}
+
+class B {
+}
+
+```
+
+
+
+### HashMap中key和value可以为null吗？允许几个为null呀？
+
+在Java的`HashMap`中：
+
+1. **键（Key）可以为`null`**：
+   - `HashMap`允许一个键为`null`。当使用`null`作为键时，这个键总是被存储在`HashMap`的第0个桶（bucket）中。
+2. **值（Value）可以为`null`**：
+   - `HashMap`同样允许值为`null`。你可以将任何键映射为`null`值。
+3. **允许的`null`数量**：
+   - 在`HashMap`中，**只有一个键可以是`null`**。因为`HashMap`内部使用键的`hashCode()`来确定键值对的存储位置，而`null`的`hashCode()`值为0。如果允许多个`null`键，它们将无法区分，从而导致键的唯一性被破坏。
+4. **对性能的影响**：
+   - 虽然`HashMap`允许键或值为`null`，但频繁使用`null`键可能会影响性能。因为所有`null`键的哈希值相同，它们会被放在同一个桶中，这可能导致该桶的链表或树结构过长，从而影响查找效率。
 
 
 
@@ -1129,6 +1264,25 @@ final Node<K,V> untreeify(HashMap<K,V> map) {
 
 ### 为什么JDK1.8中HashMap从头插入改成尾插入
 
+在Java 8中，`HashMap`的插入策略从头部插入（head insertion）改为尾部插入（tail insertion），这一改变主要是为了提高并发环境下的性能和安全性。以下是具体原因：
+
+1. **避免数据覆盖**：
+   - 在并发环境下，如果多个线程尝试同时插入元素，使用头插入可能会导致数据覆盖问题。例如，两个线程可能同时计算出同一个桶的位置，并尝试将各自的节点插入到链表的头部，从而覆盖彼此的数据。
+2. **减少ABA问题**：
+   - ABA问题是并发编程中的一个常见问题，指的是一个变量的值先后变为A、B和A。在头插入策略下，如果一个节点被插入到链表头部，而后被删除，然后又有一个新节点被插入，它们的哈希值相同，可能会导致不可预见的行为。尾插入策略有助于减少这种问题。
+3. **提高扩容时的元素迁移效率**：
+   - 当`HashMap`需要扩容时，现有的键值对需要重新计算哈希值并迁移到新的桶中。在尾插入策略下，新插入的节点总是在链表的尾部，因此在扩容时，只需要遍历链表即可将元素顺序迁移到新桶中，而不需要重新计算每个元素的哈希值。
+4. **优化迭代器的稳定性**：
+   - 在Java 8中，`HashMap`的迭代器使用弱一致性视图，即迭代器只能保证在迭代开始时的快照是一致的。尾插入策略有助于提高迭代器的稳定性，因为新插入的元素总是位于链表尾部，不会影响已经遍历过的元素。
+5. **减少循环引用**：
+   - 在某些特定情况下，头插入可能导致循环引用的问题。尾插入策略通过在链表尾部插入新元素，有助于减少这种问题。
+6. **提高缓存友好性**：
+   - 尾插入策略有助于提高缓存的局部性，因为新元素总是被添加到最近使用的位置附近，这可以提高CPU缓存的命中率，从而提升性能。
+7. **简化实现**：
+   - 尾插入策略在实现上更简单，因为它不需要考虑在链表头部插入时可能发生的覆盖问题。
+
+通过这些改变，Java 8中的`HashMap`在处理并发操作和扩容时更加稳定和高效。这些优化使得`HashMap`在实际应用中更加健壮，尤其是在面对大量数据和高并发场景时。
+
 JDK1.7中扩容时，每个元素的rehash之后，都会插入到新数组对应索引的链表头，所以这就导致原链表顺序为A->B->C，扩容之后，rehash之后的链表可能为C->B->A，元素的顺序发生了变化。在并发场景下，**扩容时**可能会出现循环链表的情况。而JDK1.8从头插入改成尾插入元素的顺序不变，避免出现循环链表的情况
 
 > 在扩容时，头插法会改变链表中元素原本的顺序，以至于在并发场景下导致链表成环的问题，而尾插法，在扩容时会保持链表元素原本的顺序，就不会出现链表成环的问题
@@ -1157,37 +1311,30 @@ JDK1.7中扩容时，每个元素的rehash之后，都会插入到新数组对�
 
 ### HashMap 为什么线程不安全
 
-1. put 的时候导致的多线程数据不一致。
-    这个问题比较好想象，比如有两个线程 A 和 B，首先 A 希望插入一个 key-value 对到 HashMap 中，首先计算记录所要落到的桶的索引坐标，然后获取到该桶里面的链表头结点，此时线程 A 的时间片用完了，而此时线程 B 被调度得以执行，和线程 A 一样执行，只不过线程 B 成功将记录插到了桶里面，假设线程 A 插入的记录计算出来的桶索引和线程 B 要插入的记录计算出来的桶索引是一样的，那么当线程 B 成功插入之后，线程 A 再次被调度运行时，它依然持有过期的链表头但是它对此一无所知，以至于它认为它应该这样做，如此一来就覆盖了线程 B 插入的记录，这样线程 B 插入的记录就凭空消失了，造成了数据不一致的行为。
+`HashMap` 在 Java 中是非线程安全的，这意味着多个线程同时修改 `HashMap` 时可能会导致不可预知的行为。以下是 `HashMap` 线程不安全的主要原因：
 
-2. 另外一个比较明显的线程不安全的问题是 HashMap 的 get 操作可能因为 resize 而引起死循环（cpu100%），具体分析如下：
+1. **并发修改导致的数据不一致**：当多个线程同时尝试修改 `HashMap`（例如添加或删除键值对）时，可能会导致内部数据结构的状态不一致。
+2. **结构损坏**：`HashMap` 在进行扩容和重新哈希时，如果多个线程同时操作，可能会导致数组的结构被破坏，从而引发 `ConcurrentModificationException` 或其他异常。
+3. **数据覆盖**：在多线程环境中，一个线程可能在另一个线程正在更新 `HashMap` 时读取数据，导致读取到部分更新的数据或丢失更新。
+4. **死循环**：在 Java 8 之前的 `HashMap` 实现中，如果多个线程同时进行结构修改（如扩容），可能会导致死循环。
+5. **链表循环**：在 Java 8 之前的 `HashMap` 中，如果链表（用于解决哈希冲突）在多线程环境中被破坏，可能会形成循环链表，导致无限循环。
+6. **扩容竞争**：当 `HashMap` 需要扩容时，多个线程可能会同时尝试触发扩容操作，导致竞争条件，从而影响性能和数据一致性。
+7. **迭代器失效**：在迭代 `HashMap` 的过程中，如果其他线程修改了 `HashMap`，迭代器可能会失效，抛出 `ConcurrentModificationException`。
+8. **快速失败（fail-fast）**：Java 8 中的 `HashMap` 使用了快速失败迭代器，这意味着如果检测到 `HashMap` 在迭代过程中被修改，迭代器会立即抛出异常，以防止不可预知的行为。
+9. **缺乏同步机制**：`HashMap` 没有内置的同步机制来控制并发访问，这与 `Hashtable` 或 `ConcurrentHashMap` 不同，后者提供了线程安全的实现。
 
-   下面的代码是resize的核心内容：
+为了在多线程环境中安全地使用 `HashMap`，可以采取以下措施：
 
-```java
-void transfer(Entry[] newTable, boolean rehash) {  
-        int newCapacity = newTable.length;  
-        for (Entry<K,V> e : table) {  
-  
-            while(null != e) {  
-                Entry<K,V> next = e.next;           
-                if (rehash) {  
-                    e.hash = null == e.key ? 0 : hash(e.key);  
-                }  
-                int i = indexFor(e.hash, newCapacity);   
-                e.next = newTable[i];  
-                newTable[i] = e;  
-                e = next;  
-            } 
-        }  
-    }  
-```
+- **使用 `Collections.synchronizedMap()`**： 将 `HashMap` 包装为线程安全的 `Map`，但这会降低并发性能。
+- **使用 `ConcurrentHashMap`**： 这是专为高并发环境设计的线程安全 `HashMap` 实现。
+- **限制 `HashMap` 的访问**： 确保对 `HashMap` 的访问在单个线程中进行，或通过外部同步机制（如 `synchronized` 块）来控制访问。
+- **使用 `CopyOnWriteHashMap`**： 在某些读多写少的场景下，可以使用 `CopyOnWriteHashMap`，这是一种通过复制数据来实现线程安全的 `HashMap`。
 
 
 
 ### HashMap：JDK1.7 VS JDK1.8
 
-JDK1.8主要解决或优化了以下问题：
+JDK1.8 主要解决或优化了以下问题：
 
 - resize 扩容优化
 - 引入了红黑树，目的是避免单条链表过长而影响查询效率
@@ -1638,37 +1785,44 @@ public V get(Object key) {
 
 
 
-### 两个对象值相同 (x.equals(y) == true)，但却可有不同的 hash code，这句话对不对?
+> 
+>
+> `ConcurrentHashMap` 是 Java 中一个线程安全的哈希表实现，它在不同版本的 Java 中有一些显著的变化。以下是 JDK 1.7 和 JDK 1.8 中 `ConcurrentHashMap` 的主要区别：
+>
+> **1. 锁结构**
+>
+> - **JDK 1.7**：基于 `Segment` + `HashEntry` 数组实现。`Segment` 是 `ReentrantLock` 的子类，内部维护了一个 `HashEntry` 数组。每个 `Segment` 相当于一个小的 `HashMap`，并且每个 `Segment` 可以独立加锁，实现了分段锁技术。
+> - **JDK 1.8**：摒弃了 `Segment`，采用 `synchronized` + `CAS` + `Node` + `Unsafe` 的实现。锁的粒度从段锁缩小为节点锁，提高了并发性能。
+>
+> **2. 数据结构**
+>
+> - **JDK 1.7**：使用 `Segment` 数组和 `HashEntry` 数组。`HashEntry` 类似于 `HashMap` 中的节点，存储键值对数据。
+> - **JDK 1.8**：使用 `Node` 数组，节点可以是链表或红黑树。当链表长度超过8个时，链表会转换为红黑树，以提高查找效率。
+>
+> **3. `put()` 方法的执行流程**
+>
+> - **JDK 1.7**：需要进行两次定位，先定位 `Segment`，再定位 `HashEntry`。使用自旋锁和锁膨胀机制进行加锁，整个 `put` 操作期间都持有锁。
+> - **JDK 1.8**：只需要一次定位，采用 `CAS` + `synchronized` 的机制。如果对应下标处没有节点，说明没有发生哈希冲突，此时直接通过 `CAS` 进行插入。若失败，则使用 `synchronized` 进行加锁插入。
+>
+> **4. `get()` 方法**
+>
+> - **JDK 1.7**：通过两次哈希定位到 `Segment` 和 `HashEntry`，然后遍历链表进行查找。由于 `value` 变量被 `volatile` 修饰，保证了内存可见性。
+> - **JDK 1.8**：通过一次哈希定位到 `Node`，然后遍历链表或红黑树进行查找。`value` 变量同样被 `volatile` 修饰，保证了内存可见性。
+>
+> **5. `size()` 方法**
+>
+> - **JDK 1.7**：采用类似于乐观锁的机制，先是不加锁直接进行统计，最多执行三次，如果前后两次计算的结果一样，则直接返回。若超过了三次，则对每一个 `Segment` 进行加锁后再统计。
+> - **JDK 1.8**：维护一个 `baseCount` 属性用来记录节点数量，每次进行 `put` 操作之后都会 `CAS` 自增 `baseCount`。部分元素的变化个数保存在 `CounterCell` 数组中，实现如下。
+>
+> **6. 引入红黑树**
+>
+> - **JDK 1.8**：引入了红黑树结构，用降低哈希冲突严重的场景的时间复杂度。当链表长度超过8个时，链表会转换为红黑树。
+>
+> 通过这些改进，JDK 1.8 中的 `ConcurrentHashMap` 在并发性能和内存利用率方面都有显著提升。
 
-正确 
-
-如果此对象重写了equals方法，那么可能出现这两个对象的equals相同，而hashcode不同。因此可以说它是对的。 但是，如果此对象继承Object，没有重写equals方法，那么就使用Object的equals方法，Object对象的equals方法默认是用==实现的，那么如果equals相同，hashcode一定相同。
-
-```java
-public class EqualsTest {
-    public static void main(String[] args) {
-        A a = new A();
-        B b = new B();
-        System.out.println(a.equals(b));   //true
-        System.out.println(a.hashCode() + "," + b.hashCode());	//1086865489,452372241
-    }
-}
-
-class A {
-    @Override
-    public boolean equals(Object obj) {
-        return true;
-    }
-}
-
-class B {
-}
-
-```
 
 
-
-### Hashtable 和 ConcurrentHashMap 的区别
+### Hashtable 和 ConcurrentHashMap 的区别？
 
 ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方式上不同。
 
@@ -1681,7 +1835,7 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 ### Java快速失败（fail-fast）和安全失败（fail-safe）区别
 
-### 快速失败（fail—fast）
+**快速失败（fail—fast）**
 
 在用迭代器遍历一个集合对象时，如果遍历过程中对集合对象的内容进行了修改（增加、删除、修改），则会抛出 `ConcurrentModificationException`。
 
@@ -1691,7 +1845,7 @@ ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方
 
 场景：`java.util` 包下的集合类都是快速失败的，不能在多线程下发生并发修改（迭代过程中被修改）。
 
-### 安全失败（fail—safe）
+**安全失败（fail—safe）**
 
 采用安全失败机制的集合容器，在遍历时不是直接在集合内容上访问的，而是先复制原有集合内容，在拷贝的集合上进行遍历。
 
@@ -1837,8 +1991,6 @@ HashSet 的底层其实就是 HashMap，只不过我们 **HashSet 是实现了 S
 
 
 ### References
-
-所有内容都是基于源码阅读和各种大佬之前总结的知识整理而来，输入并输出，奥利给。
 
 - https://www.javatpoint.com/java-arraylist
 
