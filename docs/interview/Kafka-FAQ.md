@@ -6,6 +6,8 @@ tags:
 categories: Interview
 ---
 
+![](https://img.starfish.ink/common/faq-banner.png)
+
 > Kafak 知识是对分布式，或者直接说是中间件、消息队列考察点的必问内容
 
 ## 一、概念性问题
