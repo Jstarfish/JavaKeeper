@@ -205,8 +205,9 @@
   },
   "active": "c7c1397df03f59cc",
   "lastOpenFiles": [
-    "interview/networks-interview.md",
+    "interview/GC-FAQ.md",
     "java/JVM/GC.md",
+    "interview/networks-interview.md",
     "java/JVM/Runtime-Data-Areas.md",
     "java/JVM/对象的创建.md",
     "interview/Ability-FAQ.md",
@@ -230,7 +231,6 @@
     "interview/MySQL-FAQ.md",
     "data-structure-algorithms/data-structure/Binary-Tree.md",
     "interview/Micro-Services.md",
-    "interview/虽然面试成功很大程度上  取决于你对面试官的问题是否能做到对答如流，但别忘了，并不是说你回答出全部问题就能  拿到 offer，更重要的一点是要比别的候选者回答得更出彩。因.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
