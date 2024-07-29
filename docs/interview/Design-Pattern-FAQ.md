@@ -1,3 +1,13 @@
+---
+title: 「直击面试」—— 设计模式
+date: 2023-05-31
+tags: 
+ - 设计模式
+categories: 设计模式
+---
+
+![](https://img.starfish.ink/common/faq-banner.png)
+
 > 使用UML类图画出原型模式核心角色
 >
 > 原型设计模式的深拷贝和浅拷贝是什么，并写出深拷贝的两种方式的源码(重写 clone 方法实现深拷贝、使用序列化来实现深拷贝 

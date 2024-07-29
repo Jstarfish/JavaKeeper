@@ -1,3 +1,13 @@
+---
+title: ZooKeeper 面试集
+date: 2023-06-31
+tags: 
+ - ZooKeeper
+categories: Interview
+---
+
+![](https://img.starfish.ink/common/faq-banner.png)
+
 ## 谈下你对 Zookeeper 的认识？ 
 
 ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服务。它是一个为分布式应用提供一致性服务的软件，提供的功能包括：配置维护、域名服务、分布式同步、组服务等。

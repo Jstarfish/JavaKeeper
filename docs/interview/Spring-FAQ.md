@@ -127,6 +127,82 @@ Spring 提供了一种使用 ControllerAdvice 处理异常的非常有用的方�
 
 
 
+### Spring Boot 启动流程？
+
+Spring Boot 是一个基于 Spring 框架的快速开发框架，它简化了基于 Spring 的应用开发过程，提供了自动配置、微服务支持、监控等功能。Spring Boot 的启动流程主要包括以下几个步骤：
+
+1. **初始化SpringApplication**：创建一个`SpringApplication`实例，它负责启动整个Spring Boot应用。
+
+2. **运行SpringApplication.run()**：调用`run()`方法开始启动流程。这个方法会触发Spring Boot的自动配置机制。
+
+3. **加载应用类**：SpringApplication会查找主类（带有`@SpringBootApplication`注解的类），这个类通常包含了应用的主要配置。
+
+   > 主启动类被标注为 `@SpringBootApplication`，这是一个复合注解，包括 `@SpringBootConfiguration`、`@EnableAutoConfiguration` 和 `@ComponentScan`，它们分别负责配置类声明、启用自动配置和包扫描。
+
+4. **创建并配置ApplicationContext**：SpringApplication会创建一个`ApplicationContext`，它是Spring应用的核心，负责管理Bean的生命周期和依赖注入。
+
+5. **执行Bean定义的加载**：Spring Boot会加载所有的Bean定义，包括`@Component`、`@Service`、`@Repository`、`@Controller`等注解的类。
+
+6. **自动配置**：Spring Boot的自动配置会根据类路径上的库、Bean的定义以及各种属性来决定配置哪些Bean。
+
+   > `@EnableAutoConfiguration` 注解启用自动配置，通过读取 `META-INF/spring.factories` 文件，自动配置类会被加载并应用
+
+7. **注册所有的Bean**：将所有配置好的Bean注册到`ApplicationContext`中。
+
+8. **调用所有的ApplicationListener**：Spring Boot会调用所有注册的事件监听器，这些监听器可以对Spring的生命周期事件做出响应。
+
+9. **刷新ApplicationContext**：调用`ApplicationContext.refresh()`方法，完成Bean的创建和初始化。
+
+10. **运行所有的@PostConstruct注解的方法**：在Bean初始化之后，Spring会调用所有带有`@PostConstruct`注解的方法。
+
+11. **调用所有的CommandLineRunner和ApplicationRunner**：如果应用中定义了`CommandLineRunner`或`ApplicationRunner`接口的实现，Spring Boot会在这时调用它们。
+
+12. **应用启动完成**：所有上述步骤完成后，Spring Boot应用就启动完成了，可以对外提供服务。
+
+这个流程是Spring Boot启动的大致概述，具体的实现细节可能会根据不同版本的Spring Boot有所差异。
+
+
+
+### `CommandLineRunner`或`ApplicationRunner`接口区别
+
+`CommandLineRunner` 和 `ApplicationRunner` 是 Spring Boot 提供的两个接口，用于在 Spring Boot 应用启动完成后运行特定代码。这两个接口的主要区别在于它们的 `run` 方法的参数类型。
+
+1. **CommandLineRunner**：
+
+   - `CommandLineRunner`接口包含一个`run`方法，其参数是`String... args`，即命令行参数的数组。
+
+   - 这个接口适合于命令行工具或需要访问命令行参数的应用场景。
+
+     ```java
+     @Component
+     public class MyCommandLineRunner implements CommandLineRunner {
+         @Override
+         public void run(String... args) throws Exception {
+             // 可以访问命令行参数args
+         }
+     }
+     ```
+
+2. **ApplicationRunner**：
+
+   - `ApplicationRunner`接口同样包含一个`run`方法，但其参数是`ApplicationArguments`类型的实例。
+
+   - `ApplicationArguments`提供了更多关于命令行参数的高级处理能力，例如能够区分选项和非选项参数，或者获取所有的选项值等。
+
+   - 这个接口适合于需要更细致控制命令行参数解析的应用场景。
+
+     ```java
+     @Component
+     public class MyApplicationRunner implements ApplicationRunner {
+         @Override
+         public void run(ApplicationArguments args) throws Exception {
+             // 使用ApplicationArguments来处理命令行参数
+         }
+     }
+     ```
+
+两者都是在Spring应用的`ApplicationContext`完全初始化之后，且所有的`@PostConstruct`注解的方法执行完毕后调用的。选择使用哪一个接口取决于你的具体需求，如果你只需要简单的命令行参数，`CommandLineRunner`可能就足够了。如果你需要更复杂的参数解析功能，那么`ApplicationRunner`会是更好的选择。在Spring Boot应用中，你可以同时使用这两个接口，它们并不互相排斥。
+
 
 
 ## 二、依赖注入
@@ -489,13 +565,13 @@ public class AnotherExampleBean implements InitializingBean {
 
 > Spring Bean生命周期回调——初始化回调和销毁回调方法
 
-实现 Bean 初始化回调和销毁回调各有三种方法，一是实现接口方法，二是在XML配置，三是使用注解
+**实现 Bean 初始化回调和销毁回调各有三种方法**，一是实现接口方法，二是在XML配置，三是使用注解
 
 - 使用注解 `@PostConstruct` 和 `@PreDestroy`
 - 实现  `InitializingBean` 和 `DisposableBean` 接口
 - XML 中配置 `init-method` 和 `destroy-method`
 
-在一个 bean 中，如果配置了多种生命周期回调机制，会按照上边从上到下的次序调用
+在一个 bean 中，如果配置了多种生命周期回调机制，会按照上边从上到下的次序调用，其实还有 实现 `BeanPostProcessor` 接口、实现 `SmartLifecycle` 接口、实现 `ApplicationListener` 接口监听上下文事件
 
 
 

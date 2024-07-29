@@ -1,3 +1,13 @@
+---
+title: RPC 面试专场
+date: 2024-05-31
+tags: 
+ - RPC
+categories: RPC
+---
+
+![](https://img.starfish.ink/redis/redis-faq-banner.png)
+
 ### 什么是 RPC ？
 
 - RPC (Remote Procedure Call)即**远程过程调用**，是分布式系统常见的一种通信方法。它允许程序调用另一个地址空间（通常是共享网络的另一台机器上）的过程或函数，而不用程序员显式编码这个远程调用的细节。
