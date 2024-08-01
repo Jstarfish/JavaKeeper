@@ -119,6 +119,25 @@ categories: JUC
 
 
 
+### 哪些场景需要额外注意线程安全问题？
+
+1. **共享资源访问**：当多个线程访问同一个可变对象或变量时，需要确保线程安全，防止数据不一致。
+2. 依赖时序的操作
+3. **可变对象的并发修改**：如果一个对象的状态可以被多个线程修改，需要同步访问以避免竞态条件。
+4. **集合的并发操作**：向集合添加、删除或修改元素时，如果集合是共享的，需要使用线程安全的集合类或同步机制。
+5. **静态字段和单例模式**：静态字段和单例实例可能被多个线程访问，需要特别注意初始化和访问的线程安全。
+6. **并发数据结构操作**：使用如`ConcurrentHashMap`等并发集合时，虽然提供了更好的线程安全性，但在某些复合操作上仍需注意同步。
+7. **资源池管理**：连接池、线程池等资源池的使用，需要确保资源的分配和释放是线程安全的。
+8. **锁的使用**：在使用锁（如`synchronized`或`ReentrantLock`）时，需要避免死锁、活锁和资源耗尽等问题。
+9. **原子操作**：对于需要原子性的操作，如计数器递增，需要使用原子变量类（如`AtomicInteger`）。
+10. **可见性问题**：确保一个线程对变量的修改对其他线程是可见的，可以通过volatile关键字或synchronized块来实现。
+11. **并发异常处理**：在处理异常时，需要确保资源的释放和状态的恢复不会影响线程安全。
+12. **发布-订阅模式**：在事件驱动的架构中，事件的发布和订阅需要同步，以避免事件处理的竞态条件。
+
+在设计系统时，应该始终考虑到线程安全问题，并采用适当的同步机制和并发工具来避免这些问题。此外，编写单元测试和集成测试时，也应该考虑到多线程环境下的行为。
+
+
+
 ### 什么是上下文切换?
 
 多线程编程中一般线程的个数都大于 CPU 核心的个数，而一个 CPU 核心在任意时刻只能被一个线程使用，为了让这些线程都能得到有效执行，CPU 采取的策略是为每个线程分配时间片并轮转的形式。当一个线程的时间片用完的时候就会重新处于就绪状态让给其他线程使用，这个过程就属于一次上下文切换。
@@ -146,18 +165,6 @@ Linux 相比与其他操作系统（包括其他类 Unix 系统）有很多的�
 当我们在 Java 程序中创建一个线程，它就被称为用户线程。将一个用户线程设置为守护线程的方法就是在调用 **start()**方法之前，调用对象的 `setDamon(true)` 方法。一个守护线程是在后台执行并且不会阻止 JVM 终止的 线程，守护线程的作用是为其他线程的运行提供便利服务。当没有用户线程在 运行的时候，**JVM** 关闭程序并且退出。一个守护线程创建的子线程依然是守护线程。
 
 守护线程的一个典型例子就是垃圾回收器。
-
-
-
-### 如何在 Windows 和 Linux 上查找哪个线程 cpu 利用率最高？
-
-windows上面用任务管理器看，linux下可以用 top 这个工具看。
-
-1. 找出 cpu 耗用厉害的进程pid， 终端执行top命令，然后按下shift+p 查找出cpu利用最厉害的pid号
-2. 根据上面第一步拿到的pid号，top -H -p pid 。然后按下shift+p，查找出cpu利用率最厉害的线程号，比如top -H -p 1328
-3. 将获取到的线程号转换成16进制，去百度转换一下就行
-4. 使用jstack工具将进程信息打印输出，jstack pid号 > /tmp/t.dat，比如jstack 31365 > /tmp/t.dat
-5. 编辑/tmp/t.dat文件，查找线程号对应的信息
 
 
 
@@ -198,14 +205,14 @@ Java 线程在运行的生命周期中的指定时刻只可能处于下面 6 种
 
 - 两者最主要的区别在于：**sleep 方法没有释放锁，而 wait 方法释放了锁** 。
 - 两者都可以暂停线程的执行。
-- wait 通常被用于线程间交互/通信，sleep 通常被用于暂停执行。
-- wait() 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 `notify()` 或者 `notifyAll()` 方法。`sleep()` 方法执行完成后，线程会自动苏醒。或者可以使用 `wait(long timeout)` 超时后线程会自动苏醒。
+- `wait ()`通常被用于线程间交互/通信（wait 方法必须在 synchronized 保护的代码中使用），sleep 通常被用于暂停执行。
+- `wait()` 方法被调用后，线程不会自动苏醒，需要别的线程调用同一个对象上的 `notify()` 或者 `notifyAll()` 方法。`sleep()` 方法执行完成后，线程会自动苏醒。或者可以使用 `wait(long timeout)` 超时后线程会自动苏醒。
 
-**yield()**
-yield() 方法和 sleep() 方法类似，也不会释放“锁标志”，区别在于，它没有参数，即 yield() 方法只是使当前线程重新回到可执行状态，所以执行 yield() 的线程有可能在进入到可执行状态后马上又被执行，另外 yield() 方法只能使同优先级或者高优先级的线程得到执行机会，这也和 sleep() 方法不同。
-
-**join()**
-join() 方法会使当前线程等待调用 join() 方法的线程结束后才能继续执行
+> **yield()**
+> yield() 方法和 sleep() 方法类似，也不会释放“锁标志”，区别在于，它没有参数，即 yield() 方法只是使当前线程重新回到可执行状态，所以执行 yield() 的线程有可能在进入到可执行状态后马上又被执行，另外 yield() 方法只能使同优先级或者高优先级的线程得到执行机会，这也和 sleep() 方法不同。
+>
+> **join()**
+> join() 方法会使当前线程等待调用 join() 方法的线程结束后才能继续执行
 
 
 
@@ -239,6 +246,76 @@ public static void main(String[] args) {
 }
 }
 ```
+
+> 其实基本的就两种：实现 Runnable 接口 和 继承 Thread 类
+>
+> 线程池和Callable 也是可以创建线程的，但是它们本质上也是通过前两种基本方式实现的线程创建
+
+
+
+### 如何正确停止线程？
+
+通常情况下，我们不会手动停止一个线程，而是允许线程运行到结束，然后让它自然停止。但是依然会有许多特殊的情况需要我们提前停止线程，比如：用户突然关闭程序，或程序运行出错重启等。
+
+在 Java 中，正确停止线程通常涉及到线程的协作和适当的关闭机制。由于Java没有提供直接停止线程的方法（如`stop()`方法已经被废弃，因为它太危险，容易造成数据不一致等问题），以下是一些常见的正确停止线程的方法：
+
+1. **使用标志位**：使用标志位是停止线程的常见方法。在这种方法中，线程会定期检查一个标志位，如果标志位指示线程应该停止，那么线程会自行结束。
+
+   ```java
+   private volatile boolean stopRunning = false;
+   
+   public void stopThread() {
+       this.stopRunning = true;
+   }
+   
+   public void run() {
+       while (!stopRunning) {
+           // 执行任务
+       }
+       // 清理资源
+   }
+   ```
+
+2. **中断状态（Interruption）**：使用线程的中断机制来优雅地停止线程。当需要停止线程时，调用`Thread.interrupt()`方法；在线程的执行过程中，检查中断状态，如果被中断，则退出。
+
+   ```JAVA
+   // 在其他线程中调用此方法来中断线程
+   thread.interrupt();
+   
+   // 在目标线程中检查中断状态
+   public void run() {
+       try {
+           while (!Thread.currentThread().isInterrupted()) {
+               // 执行任务
+           }
+       } catch (InterruptedException e) {
+           // 线程被中断，可以选择重置中断状态或退出
+           Thread.currentThread().interrupt();
+       } finally {
+           // 清理资源
+       }
+   }
+   ```
+
+3. **使用ExecutorService**：使用`ExecutorService`可以更容易地控制线程的生命周期。调用`shutdown()`方法开始关闭，调用`shutdownNow()`可以尝试立即停止所有正在执行的任务。
+
+   ```java
+   ExecutorService executorService = Executors.newSingleThreadExecutor();
+   Future<?> future = executorService.submit(() -> {
+       // 执行任务
+   });
+   
+   // 请求关闭线程池，不再接受新任务，尝试完成已提交的任务
+   executorService.shutdown();
+   
+   // 尝试立即停止所有正在执行的任务列表，返回未完成的任务列表
+   List<Runnable> notCompleted = executorService.shutdownNow();
+   
+   // 等待线程池关闭，直到所有任务完成后
+   executorService.awaitTermination(60, TimeUnit.SECONDS);
+   ```
+
+   **使用 `Future.cancel()`**： `ExecutorService` 启动的话，也可以使用 `Future.cancel()` 方法来停止线程。
 
 
 
@@ -341,7 +418,21 @@ public static void main(String[] args) {
 
 
 
-### synchronized 关键字
+### 你知道哪几种锁？分别有什么特点？
+
+根据分类标准我们把锁分为以下 7 大类别，分别是：
+
+- 偏向锁/轻量级锁/重量级锁：偏向锁/轻量级锁/重量级锁，这三种锁特指 synchronized 锁的状态，通过在对象头中的 mark word 来表明锁的状态。
+- 可重入锁/非可重入锁：可重入锁指的是线程当前已经持有这把锁了，能在不释放这把锁的情况下，再次获取这把锁
+- 共享锁/独占锁：共享锁指的是我们同一把锁可以被多个线程同时获得，而独占锁指的就是，这把锁只能同时被一个线程获得。我们的读写锁，就最好地诠释了共享锁和独占锁的理念。读写锁中的读锁，是共享锁，而写锁是独占锁。
+- 公平锁/非公平锁：公平锁的公平的含义在于如果线程现在拿不到这把锁，那么线程就都会进入等待，开始排队，在等待队列里等待时间长的线程会优先拿到这把锁，有先来先得的意思。而非公平锁就不那么“完美”了，它会在一定情况下，忽略掉已经在排队的线程，发生插队现象
+- 悲观锁/乐观锁：
+- 自旋锁/非自旋锁：自旋锁的理念是如果线程现在拿不到锁，并不直接陷入阻塞或者释放 CPU 资源，而是开始利用循环，不停地尝试获取锁，这个循环过程被形象地比喻为“自旋”
+- 可中断锁/不可中断锁：synchronized 关键字修饰的锁代表的是不可中断锁，一旦线程申请了锁，就没有回头路了，只能等到拿到锁以后才能进行其他的逻辑处理。而我们的 ReentrantLock 是一种典型的可中断锁
+
+
+
+### synchronized 关键字?
 
 > synchoronized的底层是怎么实现的？
 >
@@ -541,7 +632,7 @@ DCL 版本的单例模式就用到了volatile，因为 DCL 也不一定是线程
 
 步骤 2 和 3 不存在数据依赖关系，如果虚拟机存在指令重排序优化，则步骤 2和 3 的顺序是无法确定的
 
-一句话：在需要保证原子性的场景，不要使用 volatile。
+一句话：<mark>在需要保证原子性的场景，不要使用 volatile</mark>。
 
 
 
@@ -725,15 +816,165 @@ Process finished with exit code 0
 
 
 
+### 哲学家就餐问题？
+
+> 这题我刚毕业那会，遇见过一次，笔试题
+>
+> 哲学家就餐问题（The Dining Philosophers Problem）是计算机科学中经典的同步问题之一，由 Edsger Dijkstra 于 1965 年提出。问题描述如下：
+>
+> - 有五个哲学家围坐在圆桌旁，每个哲学家前面有一盘意大利面。
+>
+> - 在每两位哲学家之间有一只叉子（共五只叉子）。
+>
+> - 哲学家需要两只叉子才能吃意大利面。
+>
+> - 哲学家可以进行两个动作：思考和吃饭。
+>
+> - 当哲学家思考时，他们不占用任何叉子；当哲学家准备吃饭时，他们必须先拿起左右两边的叉子。
+>
+>   ![1226. 哲学家进餐- 力扣（LeetCode）](https://img.starfish.ink/algorithm/philosopher.jpeg)
+
+问题的关键在于如何避免死锁（Deadlock），确保每个哲学家都有机会吃饭，同时也要避免资源饥饿（Starvation）
+
+**解决方案**
+
+对于这个问题我们该如何解决呢？有多种解决方案，这里我们讲讲其中的几种。前面我们讲过，要想解决死锁问题，只要破坏死锁四个必要条件的任何一个都可以。
+
+**1. 服务员检查**
+
+第一个解决方案就是引入服务员检查机制。比如我们引入一个服务员，当每次哲学家要吃饭时，他需要先询问服务员：我现在能否去拿筷子吃饭？此时，服务员先判断他拿筷子有没有发生死锁的可能，假如有的话，服务员会说：现在不允许你吃饭。这是一种解决方案。
+
+```java
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class DiningPhilosophers {
+    private final Lock[] forks = new ReentrantLock[5];
+    private final Semaphore waiter = new Semaphore(4);
+
+    public DiningPhilosophers() {
+        for (int i = 0; i < forks.length; i++) {
+            forks[i] = new ReentrantLock();
+        }
+    }
+
+    public void dine(int philosopher) throws InterruptedException {
+        waiter.acquire();
+
+        int leftFork = philosopher;
+        int rightFork = (philosopher + 1) % 5;
+
+        forks[leftFork].lock();
+        forks[rightFork].lock();
+
+        try {
+            eat(philosopher);
+        } finally {
+            forks[leftFork].unlock();
+            forks[rightFork].unlock();
+            waiter.release();
+        }
+    }
+
+    private void eat(int philosopher) throws InterruptedException {
+        System.out.println("Philosopher " + philosopher + " is eating");
+        Thread.sleep(1000);  // Simulate eating
+        System.out.println("Philosopher " + philosopher + " finished eating");
+    }
+
+    public static void main(String[] args) {
+        DiningPhilosophers dp = new DiningPhilosophers();
+        for (int i = 0; i < 5; i++) {
+            final int philosopher = i;
+            new Thread(() -> {
+                try {
+                    dp.dine(philosopher);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+        }
+    }
+}
+
+```
+
+**2. 领导调节**
+
+基于死锁**检测和恢复策略**，可以引入一个领导，这个领导进行定期巡视。如果他发现已经发生死锁了，就会剥夺某一个哲学家的筷子，让他放下。这样一来，由于这个人的牺牲，其他的哲学家就都可以吃饭了。这也是一种解决方案。
+
+**3. 改变一个哲学家拿筷子的顺序**
+
+我们还可以利用**死锁避免**策略，那就是从逻辑上去避免死锁的发生，比如改变其中一个哲学家拿筷子的顺序。我们可以让 4 个哲学家都先拿左边的筷子再拿右边的筷子，但是**有一名哲学家与他们相反，他是先拿右边的再拿左边的**，这样一来就不会出现循环等待同一边筷子的情况，也就不会发生死锁了。
+
+```java
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class DiningPhilosophers {
+    private final Lock[] forks = new ReentrantLock[5];
+
+    public DiningPhilosophers() {
+        for (int i = 0; i < forks.length; i++) {
+            forks[i] = new ReentrantLock();
+        }
+    }
+
+    public void dine(int philosopher) throws InterruptedException {
+        int leftFork = philosopher;
+        int rightFork = (philosopher + 1) % 5;
+
+        if (philosopher % 2 == 0) {
+            forks[leftFork].lock();
+            forks[rightFork].lock();
+        } else {
+            forks[rightFork].lock();
+            forks[leftFork].lock();
+        }
+
+        try {
+            eat(philosopher);
+        } finally {
+            forks[leftFork].unlock();
+            forks[rightFork].unlock();
+        }
+    }
+
+    private void eat(int philosopher) throws InterruptedException {
+        System.out.println("Philosopher " + philosopher + " is eating");
+        Thread.sleep(1000);  // Simulate eating
+        System.out.println("Philosopher " + philosopher + " finished eating");
+    }
+
+    public static void main(String[] args) {
+        DiningPhilosophers dp = new DiningPhilosophers();
+        for (int i = 0; i < 5; i++) {
+            final int philosopher = i;
+            new Thread(() -> {
+                try {
+                    dp.dine(philosopher);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+        }
+    }
+}
+
+```
+
+
+
 ### 何谓悲观锁与乐观锁?
 
 - **悲观锁**
 
-  总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿 数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁(共享资 源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线 程)。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。Java 中 synchronized 和 ReentrantLock 等独占锁就是悲观锁思想的实现。
+  总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿 数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁(共享资 源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程)。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。Java 中 synchronized 和 ReentrantLock 等独占锁就是悲观锁思想的实现。
 
 - **乐观锁**
 
-  总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和 CAS 算法实现。乐观锁适用于多读的应用类型，这样可以提 高吞吐量，像数据库提供的类似于 **write_condition** 机制，其实都是提供的乐 观锁。在 Java 中 java.util.concurrent.atomic 包下面的原子变量类就是使用了 乐观锁的一种实现方式 **CAS** 实现的。
+  总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和 CAS 算法实现。乐观锁适用于多读的应用类型，这样可以提 高吞吐量，像数据库提供的类似于 **write_condition** 机制，其实都是提供的乐 观锁。在 Java 中 `java.util.concurrent.atomic` 包下面的原子变量类就是使用了 乐观锁的一种实现方式 **CAS** 实现的。
 
 **两种锁的使用场景**
 
@@ -741,9 +982,17 @@ Process finished with exit code 0
 
 
 
+### 对比公平和非公平的优缺点
+
+公平锁的优点在于各个线程公平平等，每个线程等待一段时间后，都有执行的机会，而它的缺点就在于整体执行速度更慢，吞吐量更小，相反非公平锁的优势就在于整体执行速度更快，吞吐量更大，但同时也可能产生线程饥饿问题，也就是说如果一直有线程插队，那么在等待队列中的线程可能长时间得不到运行
+
+
+
 ##  三、同步工具类
 
 **`CountDownLatch`**
+
+![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/Cgq2xl5h8oSAKLBQAABld2EcD7Q385.png)
 
 - 用于等待其他线程完成操作。
 
@@ -765,15 +1014,28 @@ Process finished with exit code 0
 
 ## 四、JMM篇
 
-> 
->
 > 指令重排
 >
 > 内存屏障
 >
 > 单核CPU有可见性问题吗
 
-### 谈谈 Java 内存模型
+### 为什么需要 JMM（Java Memory Model，Java 内存模型）？
+
+为了理解 Java 内存模型的作用，我们首先就来回顾一下从 Java 代码到最终执行的 CPU 指令的大致流程：
+
+- 最开始，我们编写的 Java 代码，是 *.java 文件；
+- 在编译（包含词法分析、语义分析等步骤）后，在刚才的 *.java 文件之外，会多出一个新的 Java 字节码文件（*.class）；
+- JVM 会分析刚才生成的字节码文件（*.class），并根据平台等因素，把字节码文件转化为具体平台上的**机器指令；**
+- 机器指令则可以直接在 CPU 上运行，也就是最终的程序执行。
+
+所以程序最终执行的效果会依赖于具体的处理器，而不同的处理器的规则又不一样，不同的处理器之间可能差异很大，因此同样的一段代码，可能在处理器 A 上运行正常，而在处理器 B 上运行的结果却不一致。同理，在没有 JMM 之前，不同的 JVM 的实现，也会带来不一样的“翻译”结果。
+
+所以 Java 非常需要一个标准，来让 Java 开发者、编译器工程师和 JVM 工程师能够达成一致。达成一致后，我们就可以很清楚的知道什么样的代码最终可以达到什么样的运行效果，让多线程运行结果可以预期，这个标准就是 JMM**，**这就是需要 JMM 的原因。
+
+
+
+### 谈谈 Java 内存模型？
 
 Java 虚拟机规范中试图定义一种「 **Java 内存模型**」来**屏蔽掉各种硬件和操作系统的内存访问差异**，以实现**让 Java 程序在各种平台下都能达到一致的内存访问效果**
 
@@ -829,23 +1091,42 @@ Happen-before 关系，是 Java 内存模型中保证多线程操作可见性的
 
 
 
-## 五、原子操作
+## 五、原子操作篇
 
-> Atomic~CAS篇
+在编程中，具备原子性的操作被称为原子操作。原子操作是指一系列的操作，要么全部发生，要么全部不发生，不会出现执行一半就终止的情况。
+
+> 下面我们举一个不具备原子性的例子，比如 i++ 这一行代码在 CPU 中执行时，可能会从一行代码变为以下的 3 个指令：
 >
-> **`java.util.concurrent.atomic` 包**
+> - 第一个步骤是读取；
+> - 第二个步骤是增加；
+> - 第三个步骤是保存。
 >
-> - `AtomicInteger`、`AtomicLong`、`AtomicReference` 等。
+> 这就说明 i++ 是不具备原子性的，同时也证明了 i++ 不是线程安全的
+
+Java 中的以下几种操作是具备原子性的，属于原子操作：
+
+- 除了 long 和 double 之外的基本类型（int、byte、boolean、short、char、float）的读/写操作，都天然的具备原子性；
+- 所有引用 reference 的读/写操作；
+- 加了 volatile 后，所有变量的读/写操作（包含 long 和 double）。这也就意味着 long 和 double 加了 volatile 关键字之后，对它们的读写操作同样具备原子性；
+- 在 java.concurrent.Atomic 包中的一部分类的一部分方法是具备原子性的，比如 AtomicInteger 的 incrementAndGet 方法。
+
+> 在 Java 中，`long` 和 `double` 变量的原子性取决于具体的硬件和 JVM 实现，但通常情况下，对 `long` 和 `double` 类型变量的读和写操作不是原子的。这是因为 `long` 和 `double` 在 JVM 中占用 64 位，而在 32 位的 JVM 实现中，对 64 位的操作可能需要分两步进行：每次操作 32 位。因此，如果没有额外的同步措施，多个线程可能会看到部分更新的值，这会导致数据不一致。
 >
-> **CAS（Compare And Swap）**
->
-> - CAS 的原理、优缺点。
->
-> CAS 知道吗，如何实现？
-> 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
-> CAS 底层原理，谈谈你对 UnSafe 的理解？
-> AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
-> CAS 有什么缺点吗？ 如何规避 ABA 问题？
+> **实际开发中**，目前各种平台下的主流虚拟机的实现中，几乎都会把 64 位数据的读写操作作为原子操作来对待，因此我们在编写代码时一般不需要为了避免读到“半个变量”而把 long 和 double 声明为 volatile 的
+
+**原子类的作用**和锁有类似之处，是为了保证并发情况下线程安全。不过原子类相比于锁，有一定的优势：
+
+- 粒度更细：原子变量可以把竞争范围缩小到变量级别，通常情况下，锁的粒度都要大于原子变量的粒度。
+- 效率更高：除了高度竞争的情况之外，使用原子类的效率通常会比使用同步互斥锁的效率更高，因为原子类底层利用了 CAS 操作，不会阻塞线程。
+
+| 类型                               | 具体类                                                       |
+| :--------------------------------- | :----------------------------------------------------------- |
+| Atomic* 基本类型原子类             | AtomicInteger、AtomicLong、AtomicBoolean                     |
+| Atomic*Array 数组类型原子类        | AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray    |
+| Atomic*Reference 引用类型原子类    | AtomicReference、AtomicStampedReference、AtomicMarkableReference |
+| Atomic*FieldUpdater 升级类型原子类 | AtomicIntegerfieldupdater、AtomicLongFieldUpdater、AtomicReferenceFieldUpdater |
+| Adder 累加器                       | LongAdder、DoubleAdder                                       |
+| Accumulator 积累器                 | LongAccumulator、DoubleAccumulator                           |
 
 
 
@@ -899,15 +1180,7 @@ Java 虚拟机又提供了一个轻量级的同步机制——volatile，但是 
 
 
 
-### **Atomic**？
-
-AtomicBoolean、AtomicInteger、tomicIntegerArray、AtomicReference、AtomicStampedReference
-
-常用方法：
-
-addAndGet(int)、getAndIncrement()、compareAndSet(int, int)
-
-### **CAS**？
+### CAS 知道吗，如何实现？
 
 - CAS：全称 `Compare and swap`，即**比较并交换**，它是一条 **CPU 同步原语**。 是一种硬件对并发的支持，针对多处理器操作而设计的一种特殊指令，用于管理对共享数据的并发访问。 
 - CAS 是一种无锁的非阻塞算法的实现。 
@@ -917,15 +1190,33 @@ addAndGet(int)、getAndIncrement()、compareAndSet(int, int)
   - 要修改的更新值 B 
 - 当且仅当 V 的值等于 A 时，CAS 通过原子方式用新值 B 来更新 V 的 值，否则不会执行任何操作（他的功能是判断内存某个位置的值是否为预期值，如果是则更改为新的值，这个过程是原子的。）
 - 缺点
-  - 循环时间长，开销很大
-  - 只能保证一个共享变量的原子操作
+  - 自旋时间过长：由于单次 CAS 不一定能执行成功，所以 **CAS 往往是配合着循环来实现的**，有的时候甚至是死循环，不停地进行重试，直到线程竞争不激烈的时候，才能修改成功
+  - 只能保证一个共享变量的原子操作：不能灵活控制线程安全的范围，我们不能针对多个共享变量同时进行 CAS 操作，因为这多个变量之间是独立的，简单的把原子操作组合到一起，并不具备原子性
   - ABA 问题（用 AtomicReference 避免）
 
-### Unsafe
+### CAS 底层原理，谈谈你对 UnSafe 的理解？
 
 CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方法。调用 Unsafe 类中的 CAS 方法， JVM 会帮助我们实现出 CAS 汇编指令。
 
 是 CAS 的核心类，由于 Java 方法无法直接访问底层系统，需要通过本地（native）方法来访问，UnSafe 相当于一个后门，UnSafe 类中的所有方法都是 native 修饰的，也就是说该类中的方法都是直接调用操作系统底层资源执行相应任务。 
+
+
+
+### 讲一讲AtomicInteger，为什么要用 CAS 而不是 synchronized？
+
+AtomicInteger 的ABA问题，能说一下吗，原子更新引用知道吗？
+
+### 为什么高并发下 LongAdder 比 AtomicLong 效率更高？
+
+LongAdder 引入了分段累加的概念，内部一共有两个参数参与计数：第一个叫作 base，它是一个变量，第二个是 Cell[] ，是一个数组。
+
+其中的 base 是用在竞争不激烈的情况下的，可以直接把累加结果改到 base 变量上。
+
+那么，当竞争激烈的时候，就要用到我们的 Cell[] 数组了。一旦竞争激烈，各个线程会分散累加到自己所对应的那个 Cell[] 数组的某一个对象中，而不会大家共用同一个。
+
+这样一来，LongAdder 会把不同线程对应到不同的 Cell 上进行修改，降低了冲突的概率，这是一种分段的理念，提高了并发性，这就和 Java 7 的 ConcurrentHashMap 的 16 个 Segment 的思想类似。
+
+竞争激烈的时候，LongAdder 会通过计算出每个线程的 hash 值来给线程分配到不同的 Cell 上去，每个 Cell 相当于是一个独立的计数器，这样一来就不会和其他的计数器干扰，Cell 之间并不存在竞争关系，所以在自加的过程中，就大大减少了刚才的 flush 和 refresh，以及降低了冲突的概率，这就是为什么 LongAdder 的吞吐量比 AtomicLong 大的原因，本质是空间换时间，因为它有多个计数器同时在工作，所以占用的内存也要相对更大一些。
 
 
 
@@ -953,17 +1244,12 @@ CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方
 
 > **池化技术相比大家已经屡见不鲜了，线程池、数据库连接池、Http 连接池等等都是对这个思想的应用。池化技术的思想主要是为了减少每次获取资源的消耗，提高对资源的利用率。**
 
+如果每个任务都创建一个线程会带来哪些问题：
+
+1. 第一点，反复创建线程系统开销比较大，每个线程创建和销毁都需要时间，如果任务比较简单，那么就有可能导致创建和销毁线程消耗的资源比线程执行任务本身消耗的资源还要大。
+2. 第二点，过多的线程会占用过多的内存等资源，还会带来过多的上下文切换，同时还会导致系统不稳定。
+
 线程池是一种基于池化思想管理线程的工具。
-
-线程池解决的核心问题就是资源管理问题。在并发环境下，系统不能够确定在任意时刻中，有多少任务需要执行，有多少资源需要投入。这种不确定性将带来以下若干问题：
-
-1. 频繁申请/销毁资源和调度资源，将带来额外的消耗，可能会非常巨大。
-2. 对资源无限申请缺少抑制手段，易引发系统资源耗尽的风险。
-3. 系统无法合理管理内部的资源分布，会降低系统的稳定性。
-
-为解决资源分配这个问题，线程池采用了“池化”思想。
-
-
 
 线程池做的工作主要是控制运行的线程数量，处理过程中将任务放入队列，然后在线程创建后启动这些任务，如果线程数量超过了最大数量，超出数量的线程排队等候，等其他线程执行完毕，再从队列中取出任务来执行。
 
@@ -988,7 +1274,7 @@ CAS 并发原语体现在 Java 语言中的 `sum.misc.Unsafe` 类中的各个方
 
 
 
-### 线程池的几个重要参数
+### 线程池的几个重要参数？
 
 常用的构造线程池方法其实最后都是通过 **ThreadPoolExecutor** 实例来创建的，且该构造器有 7 大参数。
 
@@ -1032,7 +1318,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 
 
-### 线程池工作原理
+### 线程池工作原理？
 
 ![Java线程池实现原理及其在美团业务中的实践- 美团技术团队](https://p0.meituan.net/travelcube/77441586f6b312a54264e3fcf5eebe2663494.png)
 
@@ -1062,7 +1348,9 @@ public ThreadPoolExecutor(int corePoolSize,
    - 如果当前运行的线程数大于 corePoolSize，那么这个线程就被停掉
    - 所以线程池的所有任务完成后它**最终会收缩到 corePoolSize 的大小**
 
-
+>在线程池中，同一个线程可以从 BlockingQueue 中不断提取新任务来执行，其核心原理在于线程池对 Thread 进行了封装，并不是每次执行任务都会调用 Thread.start() 来创建新线程，而是让每个线程去执行一个“循环任务”，在这个“循环任务”中，不停地检查是否还有任务等待被执行，如果有则直接去执行这个任务，也就是调用任务的 run 方法，把 run 方法当作和普通方法一样的地位去调用，相当于把每个任务的 run() 方法串联了起来，所以线程数量并不增加。
+>
+>
 
 ### Java线程池，5核心、10最大、20队列，第6个任务来了是什么状态？第26个任务来了是什么状态？队列满了以后执行队列的任务是从队列头 or 队尾取？核心线程和非核心线程执行结束后，谁先执行队列里的任务？
 
@@ -1100,45 +1388,6 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 
 
-### 合理配置线程池你是如何考虑的？（创建多少个线程合适）
-
-首先要考虑到 CPU 核心数，那么在 Java 中如何获取核心线程数？
-
-可以使用 `Runtime.getRuntime().availableProcessor()` 方法来获取（可能不准确，作为参考）
-
-在确认了核心数后，再去判断是 CPU 密集型任务还是 IO 密集型任务：
-
-- **CPU 密集型任务**：CPU密集型也叫计算密集型，这种类型大部分状况下，CPU使用时间远高于I/O耗时。有许多计算要处理、许多逻辑判断，几乎没有I/O操作的任务就属于 CPU 密集型。
-
-  CPU 密集任务只有在真正的多核 CPU 上才可能得到加速（通过多线程）
-
-  而在单核 CPU 上，无论开几个模拟的多线程该任务都不可能得到加速，因为 CPU 总的运算能力就那些。
-
-  如果是 CPU 密集型任务，频繁切换上下线程是不明智的，此时应该设置一个较小的线程数
-
-  一般公式：**CPU 核数 + 1 个线程的线程池**
-
-  为什么 +1 呢？
-
-  《Java并发编程实战》一书中给出的原因是：**即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。**
-
-- **IO 密集型任务**：与之相反，IO 密集型则是系统运行时，大部分时间都在进行 I/O 操作，CPU 占用率不高。比如像 MySQL 数据库、文件的读写、网络通信等任务，这类任务**不会特别消耗 CPU 资源，但是 IO 操作比较耗时，会占用比较多时间**。
-
-  在单线程上运行 IO 密集型的任务会导致浪费大量的 CPU 运算能力浪费在等待。
-
-  所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费调的阻塞时间。
-
-  IO 密集型时，大部分线程都阻塞，故需要多配置线程数：
-
-  参考公式： CPU 核数/（1- 阻塞系数）   阻塞系数在 0.8~0.9 之间
-
-  比如 8 核 CPU：8/（1 -0.9）= 80个线程数
-
-
-  这个其实没有一个特别适用的公式，肯定适合自己的业务，美团给出了个**动态更新**的逻辑，可以看看
-
-
-
 ### 执行execute()方法和submit()方法的区别是什么呢？
 
 1. **execute()方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功与否；**
@@ -1173,7 +1422,19 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 
 
+### 线程池常用的阻塞队列有哪些？
+
+![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/Cgq2xl3nUryAJBkpAAA0_WFSrB8184.png)
+
+- 对于 FixedThreadPool 和 SingleThreadExector 而言，它们使用的阻塞队列是容量为 Integer.MAX_VALUE 的 LinkedBlockingQueue，可以认为是无界队列
+- SynchronousQueue，对应的线程池是 CachedThreadPool。线程池 CachedThreadPool 的最大线程数是 Integer 的最大值，可以理解为线程数是可以无限扩展的
+- DelayedWorkQueue，它对应的线程池分别是 ScheduledThreadPool 和 SingleThreadScheduledExecutor，这两种线程池的最大特点就是可以延迟执行任务。DelayedWorkQueue 的特点是内部元素并不是按照放入的时间排序，而是会按照延迟的时间长短对任务进行排序，内部采用的是“堆”的数据结构
+
+
+
 ### 如何创建线程池？
+
+> 为什么不应该自动创建线程池？
 
 《阿里巴巴Java开发手册》中强制线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险
 
@@ -1181,6 +1442,55 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 >
 > - **FixedThreadPool 和 SingleThreadExecutor** ： 允许请求的队列长度为 Integer.MAX_VALUE ，可能堆积大量的请求，从而导致OOM。
 > - **CachedThreadPool 和 ScheduledThreadPool** ： 允许创建的线程数量为 Integer.MAX_VALUE ，可能会创建大量线程，从而导致OOM。
+
+
+
+### 合理配置线程池你是如何考虑的？（创建多少个线程合适）
+
+首先要考虑到 CPU 核心数，那么在 Java 中如何获取核心线程数？
+
+可以使用 `Runtime.getRuntime().availableProcessor()` 方法来获取（可能不准确，作为参考）
+
+在确认了核心数后，再去判断是 CPU 密集型任务还是 IO 密集型任务：
+
+- **CPU 密集型任务**：CPU密集型也叫计算密集型，这种类型大部分状况下，CPU使用时间远高于I/O耗时。有许多计算要处理、许多逻辑判断，几乎没有I/O操作的任务就属于 CPU 密集型。
+
+  CPU 密集任务只有在真正的多核 CPU 上才可能得到加速（通过多线程）
+
+  而在单核 CPU 上，无论开几个模拟的多线程该任务都不可能得到加速，因为 CPU 总的运算能力就那些。
+
+  如果是 CPU 密集型任务，频繁切换上下线程是不明智的，此时应该设置一个较小的线程数
+
+  一般公式：**CPU 核数 + 1 个线程的线程池**
+
+  为什么 +1 呢？
+
+  《Java并发编程实战》一书中给出的原因是：**即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。**
+
+  > 比如加密、解密、压缩、计算等一系列需要大量耗费 CPU 资源的任务，因为计算任务非常重，会占用大量的 CPU 资源，所以这时 CPU 的每个核心工作基本都是满负荷的，而我们又设置了过多的线程，每个线程都想去利用 CPU 资源来执行自己的任务，这就会造成不必要的上下文切换，此时线程数的增多并没有让性能提升，反而由于线程数量过多会导致性能下降。
+
+- **IO 密集型任务**：与之相反，IO 密集型则是系统运行时，大部分时间都在进行 I/O 操作，CPU 占用率不高。比如像 MySQL 数据库、文件的读写、网络通信等任务，这类任务**不会特别消耗 CPU 资源，但是 IO 操作比较耗时，会占用比较多时间**。
+
+  在单线程上运行 IO 密集型的任务会导致浪费大量的 CPU 运算能力浪费在等待。
+
+  所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费调的阻塞时间。
+
+  IO 密集型时，大部分线程都阻塞，故需要多配置线程数：
+
+  参考公式： CPU 核数/（1- 阻塞系数）   阻塞系数在 0.8~0.9 之间
+
+  比如 8 核 CPU：8/（1 -0.9）= 80个线程数
+
+
+  这个其实没有一个特别适用的公式，肯定适合自己的业务，美团给出了个**动态更新**的逻辑，可以看看
+
+> 《Java并发编程实战》的作者 Brain Goetz 推荐的计算方法：
+>
+> ```undefined
+> 线程数 = CPU 核心数 *（1+平均等待时间/平均工作时间）
+> ```
+>
+> 太少的线程数会使得程序整体性能降低，而过多的线程也会消耗内存等其他资源，所以如果想要更准确的话，可以进行压测，监控 JVM 的线程情况以及 CPU 的负载情况，根据实际情况衡量应该创建的线程数，合理并充分利用资源。
 
 
 
@@ -1236,15 +1546,11 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 ## 七、AQS篇
 
-### AQS 介绍
-
-AQS的全称为（AbstractQueuedSynchronizer），这个类在java.util.concurrent.locks包下面。
+AQS的全称为（AbstractQueuedSynchronizer），这个类在 `java.util.concurrent.locks` 包下面。
 
 AQS是一个用来构建锁和同步器的框架，使用AQS能简单且高效地构造出应用广泛的大量的同步器，比如我们提到的ReentrantLock，Semaphore，其他的诸如ReentrantReadWriteLock，SynchronousQueue，FutureTask 等等皆是基于 AQS 的。当然，我们自己也能利用 AQS 非常轻松容易地构造出符合我们自己需求的同步器。
 
 ### AQS 原理分析
-
-AQS 原理这部分参考了部分博客，在5.2节末尾放了链接。
 
 > 在面试中被问到并发知识的时候，大多都会被问到“请你说一下自己对于AQS原理的理解”。下面给大家一个示例供大家参加，面试不是背题，大家一定要加入自己的思想，即使加入不了自己的思想也要保证自己能够通俗的讲出来而不是背出来。
 
@@ -1455,6 +1761,8 @@ public class CyclieBarrierDemo {
 
 
 #### Semaphore
+
+![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/Cgq2xl5fiViAS1xOAADHimTjAp0576.png)
 
 信号量主要用于两个目的，一个是用于多个共享资源的互斥使用，另一个用于并发线程数的控制。
 
@@ -1733,6 +2041,16 @@ public class ConcurrentLinkedQueue<E> extends AbstractQueue<E>
 
 
 
+### ThreadLocal 是用来解决共享资源的多线程访问的问题吗？
+
+不是，ThreadLocal 并不是用来解决共享资源问题的。
+
+虽然 ThreadLocal 确实可以用于解决多线程情况下的线程安全问题，但其资源并不是共享的，而是每个线程独享的。
+
+如果我们把放到 ThreadLocal 中的资源用 static 修饰，让它变成一个共享资源的话，那么即便使用了 ThreadLocal，同样也会有线程安全问题
+
+### ThreadLocal原理？
+
 当使用 ThreadLocal 维护变量时，其为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立的改变自己的副本，而不会影响其他线程对应的副本。
 
 ThreadLocal 内部实现机制：
@@ -1740,10 +2058,6 @@ ThreadLocal 内部实现机制：
 - 每个线程内部都会维护一个类似 HashMap 的对象，称为 ThreadLocalMap，里边会包含若干了 Entry（K-V 键值对），相应的线程被称为这些 Entry 的属主线程；
 - Entry 的 Key 是一个 ThreadLocal 实例，Value 是一个线程特有对象。Entry 的作用即是：为其属主线程建立起一个 ThreadLocal 实例与一个线程特有对象之间的对应关系；
 - Entry 对 Key 的引用是弱引用；Entry 对 Value 的引用是强引用。
-
-
-
-### ThreadLocal原理？
 
 从 `Thread`类源代码入手。
 
@@ -1831,6 +2145,8 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 
 
+
+
 ## 八、并发工具
 
 ### ForkJoinPool 
@@ -1842,6 +2158,8 @@ ForkJoinPool 是 Java 并行计算框架中的一部分，主要用于执行大�
 ##### ForkJoinPool 的工作原理是什么？
 
 ForkJoinPool 的核心工作原理是工作窃取（work-stealing）算法。每个工作线程都有一个双端队列（deque），线程从头部取任务执行。当某个线程完成了自己的任务队列后，它可以从其他线程的队列尾部窃取任务执行，从而保持高效的并行处理。
+
+工作窃取算法可以最大限度地保持工作线程的忙碌，减少空闲线程的数量，提高 CPU 使用率。
 
 ##### 如何使用 ForkJoinPool 来并行处理任务？
 
@@ -1952,10 +2270,6 @@ public class ExceptionHandlingTask extends RecursiveTask<Integer> {
 - `RecursiveTask<V>`：用于有返回值的并行任务。必须实现 `compute()` 方法，并返回计算结果。
 - `RecursiveAction`：用于没有返回值的并行任务。必须实现 `compute()` 方法，但不返回结果。
 
-##### ForkJoinPool 是如何实现工作窃取的？
-
-ForkJoinPool 使用双端队列（deque）来实现工作窃取。每个工作线程都有自己的任务队列，从队列的头部获取任务。当一个线程的任务队列为空时，它可以从其他线程的队列尾部窃取任务执行。工作窃取算法可以最大限度地保持工作线程的忙碌，减少空闲线程的数量，提高 CPU 使用率。
-
 ##### ForkJoinPool 的并行度（parallelism level）是什么？
 
 ForkJoinPool 的并行度指的是可同时运行的工作线程数。可以在创建 ForkJoinPool 时指定并行度：
@@ -2058,6 +2372,34 @@ CAS 实现了区别于 sychronized 同步锁的一种乐观锁，当多个线程
 **Atomic** 包提供了一系列原子类。这些类可以保证多线程环境下，当某个 线程在执行atomic的方法时，不会被其他线程打断，而别的线程就像自旋锁一 样，一直等到该方法执行完成，才由 JVM 从等待队列中选择一个线程执行。 Atomic 类在软件层面上是非阻塞的，它的原子性其实是在硬件层面上借助相关 的指令来保证的。
 
 
+
+### 如何在 Windows 和 Linux 上查找哪个线程 cpu 利用率最高？
+
+windows上面用任务管理器看，linux下可以用 top 这个工具看。
+
+1. 找出 cpu 耗用厉害的进程pid， 终端执行top命令，然后按下shift+p 查找出cpu利用最厉害的pid号
+2. 根据上面第一步拿到的pid号，top -H -p pid 。然后按下shift+p，查找出cpu利用率最厉害的线程号，比如top -H -p 1328
+3. 将获取到的线程号转换成16进制，去百度转换一下就行
+4. 使用jstack工具将进程信息打印输出，jstack pid号 > /tmp/t.dat，比如jstack 31365 > /tmp/t.dat
+5. 编辑/tmp/t.dat文件，查找线程号对应的信息
+
+
+
+### Java有哪几种实现生产者消费者模式的方法？
+
+1. **使用`wait()`和`notify()`方法**：
+
+   - 利用Java的同步机制，生产者在缓冲区满时调用`wait()`挂起，消费者在缓冲区空时调用`wait()`挂起。相应地，生产者在放入商品后调用`notifyAll()`唤醒消费者，消费者在取出商品后调用`notifyAll()`唤醒生产者。
+
+2. **使用`ReentrantLock`和`Condition`**：
+
+   - `ReentrantLock`提供了更灵活的锁机制，`Condition`可以用来替代`wait()`和`notify()`，提供更细粒度的控制。
+
+3. **使用`BlockingQueue`**：
+
+   - `java.util.concurrent.BlockingQueue`是一个线程安全的队列，其已经实现了生产者-消费者模式。当队列为满时，`put()`操作将阻塞；当队列为空时，`take()`操作将阻塞。
+
+   
 
 ### 写出 **3** 条你遵循的多线程最佳实践
 
