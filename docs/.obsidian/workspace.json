@@ -47,15 +47,8 @@
             "id": "c7c1397df03f59cc",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Untitled.canvas",
-                "viewState": {
-                  "x": 0,
-                  "y": 0,
-                  "zoom": 0
-                }
-              }
+              "type": "empty",
+              "state": {}
             }
           },
           {
@@ -64,7 +57,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Untitled.md",
+                "file": "data-structure-algorithms/algorithm/DFS.md",
                 "mode": "source",
                 "source": false
               }
@@ -157,7 +150,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Untitled.md",
+                "file": "data-structure-algorithms/algorithm/DFS.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -174,7 +167,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Untitled.md",
+                "file": "data-structure-algorithms/algorithm/DFS.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -197,7 +190,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Untitled.md"
+                "file": "data-structure-algorithms/algorithm/DFS.md"
               }
             }
           }
@@ -220,6 +213,10 @@
   },
   "active": "f02bfed475530fbe",
   "lastOpenFiles": [
+    "data-management/MySQL/MySQL-Select.md",
+    "java/JVM/Runtime-Data-Areas.md",
+    "java/JVM/JVM-Java.md",
+    "java/JVM/Java-Object.md",
     "Untitled.canvas",
     "Untitled.md",
     "2024-08-05.md",
@@ -230,7 +227,6 @@
     "interview/MyBatis-FAQ~.md",
     "interview/GC-FAQ.md",
     "interview/networks-interview.md",
-    "java/JVM/Runtime-Data-Areas.md",
     "java/JVM/对象的创建.md",
     "interview/Ability-FAQ.md",
     "interview/Untitled.md",
@@ -244,8 +240,6 @@
     "data-management/Redis/reproduce/Key 寻址算法.md",
     "data-management/Redis/reproduce/Cache-Design.md",
     "data-management/Redis/Redis-Conf.md",
-    "data-management/Redis/Redis-Transaction.md",
-    "data-management/Redis/Redis-Persistence.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

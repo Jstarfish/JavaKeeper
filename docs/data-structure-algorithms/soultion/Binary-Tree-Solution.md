@@ -71,7 +71,7 @@ public void postorder(TreeNode root, List<Integer> res) {
 思路：BFS 的思想
 
 ```java
-public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
+public static List<List<Integer>> levelOrder(TreeNode treeNode) {
   List<List<Integer>> res = new ArrayList<>();
   if (treeNode == null) {
     return res;
@@ -80,7 +80,7 @@ public static List<List<Integer>> levelOrder5(TreeNode treeNode) {
   //用LinkedList 实现类
   Queue<TreeNode> queue = new LinkedList<TreeNode>();
   queue.offer(treeNode);
-  // 当队列不为空时，遍历每一层
+  // 当队列不为空时，从上到下遍历二叉树的每一层
   while (!queue.isEmpty()) {
     int size = queue.size();
     List<Integer> currentList = new ArrayList<>();
@@ -199,11 +199,10 @@ public boolean check(TreeNode left,TreeNode right){
 public static int maxDepth(TreeNode root) {
   if (root == null) {
     return 0;
-  } else {
+  } 
     int leftHeight = maxDepth(root.left);
     int rightHeight = maxDepth(root.right);
     return Math.max(leftHeight, rightHeight) + 1;
-  }
 }
 ```
 
@@ -241,10 +240,11 @@ public int traverse(TreeNode root) {
     //Height of left、right subtree
     int leftMax = traverse(root.left);
     int rightMax = traverse(root.right);
+    //后续位置计算直径和最大直径
     int diameter = leftMax + rightMax;
     //Update Diameter
     maxDiameter = Math.max(maxDiameter, diameter);
-    //Return current subtree height
+    //返回当前节点深度
     return Math.max(leftMax, rightMax) + 1;
 }
 ```
@@ -313,7 +313,6 @@ public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
 思路：用层序遍历的思想
 
 ```java
-public class Connect_116 {
   public Node connect(Node root) {
     if (root == null) {
       return null;
@@ -342,69 +341,74 @@ public class Connect_116 {
 
 
 
-### [不同的二叉搜索树（96）](https://leetcode-cn.com/problems/unique-binary-search-trees/)
+### [二叉树展开为链表（114）](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/)
 
-> 给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
+> 给你二叉树的根结点 `root` ，请你将它展开为一个单链表：
 >
->  ![img](https://assets.leetcode.com/uploads/2021/01/18/uniquebstn3.jpg)
+> - 展开后的单链表应该同样使用 `TreeNode` ，其中 `right` 子指针指向链表中下一个结点，而左子指针始终为 `null` 。
+> - 展开后的单链表应该与二叉树 [**先序遍历**](https://baike.baidu.com/item/先序遍历/6442839?fr=aladdin) 顺序相同。
+>
+> ![](https://assets.leetcode.com/uploads/2021/01/14/flaten.jpg)
 >
 > ```
->输入：n = 3
-> 输出：5
->```
-> 
+> 输入：root = [1,2,5,3,4,null,6]
+> 输出：[1,null,2,null,3,null,4,null,5,null,6]
 > ```
-> 输入：n = 1
-> 输出：1
->```
 
-思路：动态规划 https://leetcode-cn.com/problems/unique-binary-search-trees/solution/shou-hua-tu-jie-san-chong-xie-fa-dp-di-gui-ji-yi-h/
-
-- 如果整数1 ~ n中的 k 作为根节点值，则 1 ~ k-1 会去构建左子树，k+1 ~ n 会去构建右子树。
-- 左子树出来的形态有 a 种，右子树出来的形态有 bb 种，则整个树的形态有 a * b 种。
-  - 以 k 为根节点的 BST 种类数 = 左子树 BST 种类数 * 右子树 BST 种类数
-  - 就好比，左手有编号1/2/3的手环，右手有编号5/6/7的手环，那搭配就有9种
-- 问题变成：不同的 k 之下，等号右边的乘积，进行累加。
+思路：![](https://labuladong.online/algo/images/二叉树系列/2.jpeg)
 
 ```java
-public int numTrees(int n) {
-  int[] dp = new int[n + 1];
+  // 定义：将以 root 为根的树拉平为链表
+  public void flatten(TreeNode root) {
+      // base case
+      if (root == null) return;
 
-  dp[0] = 1;
-  dp[1] = 1;
+      // 利用定义，把左右子树拉平
+      flatten(root.left);
+      flatten(root.right);
 
-  for (int i = 2; i <= n; i++) {
-    for (int j = 1; j < i; j++) {
-      dp[i] += dp[j - 1] * dp[i - j];
-    }
+      // *** 后序遍历位置 ***
+      // 1、左右子树已经被拉平成一条链表
+      TreeNode left = root.left;
+      TreeNode right = root.right;
+
+      // 2、将左子树作为右子树
+      root.left = null;
+      root.right = left;
+
+      // 3、将原先的右子树接到当前右子树的末端
+      TreeNode p = root;
+      while (p.right != null) {
+          p = p.right;
+      }
+      p.right = right;
+
   }
-  return dp[n];
-}
 ```
 
 
 
 ## 深度优先
 
+### [二叉树的右视图（199）](https://leetcode.cn/problems/binary-tree-right-side-view/)
+
 > 给定一个二叉树的 **根节点** `root`，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
->
-> **示例 1:**
 >
 > ![img](https://assets.leetcode.com/uploads/2021/02/14/tree.jpg)
 >
 > ```
-> 输入: [1,2,3,null,5,null,4]
+>输入: [1,2,3,null,5,null,4]
 > 输出: [1,3,4]
 > ```
->
-> **示例 2:**
->
-> ```
-> 输入: [1,null,3]
-> 输出: [1,3]
-> ```
+> 
 
-思路：   使用深度优先遍历递归，一边遍历需要一边记录树的深度。先遍历右子树，当右子树有值的时候，肯定使用右子树的值，右子树遍历完后遍历左子树，对于左子树，只有当左子树的高度超过了当前结果长度时，才进行记录
+**思路**：  我们对树进行深度优先搜索，在搜索过程中，我们总是先访问右子树。那么对于每一层来说，我们在这层见到的第一个结点一定是最右边的结点。
+
+这样一来，我们可以存储在每个深度访问的第一个结点，一旦我们知道了树的层数，就可以得到最终的结果数组。
+
+![](https://assets.leetcode-cn.com/solution-static/199/fig1.png)
+
+使用深度优先遍历递归，一边遍历需要一边记录树的深度。先遍历右子树，当右子树有值的时候，肯定使用右子树的值，右子树遍历完后遍历左子树，对于左子树，只有当左子树的高度超过了当前结果长度时，才进行记录
 
 ```java
 public List<Integer> rightSideView(TreeNode root) {
@@ -426,16 +430,6 @@ private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
 
 
 ## 构造二叉树
-
-> [654. 最大二叉树（中等）](https://leetcode-cn.com/problems/maximum-binary-tree/)
->
-> [105. 从前序与中序遍历序列构造二叉树（中等）](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
->
-> [106. 从中序与后序遍历序列构造二叉树（中等）](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
->
-> [889. 根据前序和后序遍历构造二叉树（中等）](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/)
-
-
 
 ### [最大二叉树（654）](https://leetcode-cn.com/problems/maximum-binary-tree/)
 
@@ -594,7 +588,7 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 
 ## 二叉搜索树
 
-### [96. 不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees/)
+### [不同的二叉搜索树（96）](https://leetcode-cn.com/problems/unique-binary-search-trees/)
 
 > 给你一个整数 `n` ，求恰由 `n` 个节点组成且节点值从 `1` 到 `n` 互不相同的 **二叉搜索树** 有多少种？返回满足题意的二叉搜索树的种数。
 >
@@ -604,6 +598,30 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 > 输入：n = 3
 > 输出：5
 > ```
+
+思路：动态规划 https://leetcode-cn.com/problems/unique-binary-search-trees/solution/shou-hua-tu-jie-san-chong-xie-fa-dp-di-gui-ji-yi-h/
+
+- 如果整数1 ~ n中的 k 作为根节点值，则 1 ~ k-1 会去构建左子树，k+1 ~ n 会去构建右子树。
+- 左子树出来的形态有 a 种，右子树出来的形态有 bb 种，则整个树的形态有 a * b 种。
+  - 以 k 为根节点的 BST 种类数 = 左子树 BST 种类数 * 右子树 BST 种类数
+  - 就好比，左手有编号1/2/3的手环，右手有编号5/6/7的手环，那搭配就有9种
+- 问题变成：不同的 k 之下，等号右边的乘积，进行累加。
+
+```java
+public int numTrees(int n) {
+  int[] dp = new int[n + 1];
+
+  dp[0] = 1;
+  dp[1] = 1;
+
+  for (int i = 2; i <= n; i++) {
+    for (int j = 1; j < i; j++) {
+      dp[i] += dp[j - 1] * dp[i - j];
+    }
+  }
+  return dp[n];
+}
+```
 
 
 
