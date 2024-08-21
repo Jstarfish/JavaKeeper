@@ -431,6 +431,8 @@ private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
 
 ## 构造二叉树
 
+**二叉树的构造问题一般都是使用「分解问题」的思路：构造整棵树 = 根节点 + 构造左子树 + 构造右子树**。
+
 ### [最大二叉树（654）](https://leetcode-cn.com/problems/maximum-binary-tree/)
 
 > 给定一个不重复的整数数组 nums 。 最大二叉树 可以用下面的算法从 nums 递归地构建:
@@ -464,30 +466,31 @@ private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
 最大二叉树：二叉树的根是数组 nums 中的最大元素。 左子树是通过数组中最大值左边部分递归构造出的最大二叉树。 右子树是通过数组中最大值右边部分递归构造出的最大二叉树。
 
 ```java
-public TreeNode constructMaximumBinaryTree(int[] nums){
-  return build(nums,0,nums.length - 1);
+public TreeNode constructMaximumBinaryTree(int[] nums) {
+    return build( 0, nums.length - 1,nums);
 }
 
-private TreeNode build(int[] nums, int l, int r) {
-  //找到终止条件
-  if (l > r) {
-    return null;
+private TreeNode build(int low, int high, int[] nums) {
+  if (low > high) {
+     return null;
   }
 
-  //找出数组中最大索引
-  int max = Integer.MIN_VALUE;
-  int maxIndex = l;
-  for (int i = l; i <= r; i++) {
-    if (max < nums[l]) {
-      max = nums[l];
-      maxIndex = i;
-    }
+  //找出最大值和对应的索引位置
+  int index = -1, maxVal = Integer.MIN_VALUE;
+  //遍历是从本次 low 到 hign 即可
+  for (int i = low; i <= high; i++) {
+     if (nums[i] > maxVal) {
+        maxVal = nums[i];
+        index = i;
+     }
   }
-  //构建结果树
-  TreeNode root = new TreeNode(nums[maxIndex]);
-  build(nums, l, maxIndex - 1);
-  build(nums, maxIndex + 1, r);
+
+  //构造根节点、递归调用左右两边数据构造左、右子树
+  TreeNode root = new TreeNode(maxVal);
+  root.left = build(low, index - 1, nums);
+  root.right = build(index + 1, high,nums);
   return root;
+
 }
 ```
 
@@ -506,7 +509,7 @@ private TreeNode build(int[] nums, int l, int r) {
 
 思路：前序遍历的第一个值 `preorder[0]` 就是根节点的值
 
-![img](https://labuladong.gitee.io/algo/images/%e4%ba%8c%e5%8f%89%e6%a0%91%e7%b3%bb%e5%88%972/4.jpeg)
+![img](https://labuladong.online/algo/images/二叉树系列2/4.jpeg)
 
 ```java
 private Map<Integer,Integer> indexMap;
@@ -557,7 +560,48 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 > 输出：[3,9,20,null,null,15,7]
 > ```
 
+![](https://labuladong.online/algo/images/二叉树系列2/6.jpeg)
 
+```java
+class Solution {
+    // 存储 inorder 中值到索引的映射
+    HashMap<Integer, Integer> valToIndex = new HashMap<>();
+
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        for (int i = 0; i < inorder.length; i++) {
+            valToIndex.put(inorder[i], i);
+        }
+        return build(inorder, 0, inorder.length - 1,
+                    postorder, 0, postorder.length - 1);
+    }
+
+    // build 函数的定义：
+    // 后序遍历数组为 postorder[postStart..postEnd]，
+    // 中序遍历数组为 inorder[inStart..inEnd]，
+    // 构造二叉树，返回该二叉树的根节点 
+    TreeNode build(int[] inorder, int inStart, int inEnd,
+                int[] postorder, int postStart, int postEnd) {
+
+        if (inStart > inEnd) {
+            return null;
+        }
+        // root 节点对应的值就是后序遍历数组的最后一个元素
+        int rootVal = postorder[postEnd];
+        // rootVal 在中序遍历数组中的索引
+        int index = valToIndex.get(rootVal);
+        // 左子树的节点个数
+        int leftSize = index - inStart;
+        TreeNode root = new TreeNode(rootVal);
+        // 递归构造左右子树
+        root.left = build(inorder, inStart, index - 1,
+                            postorder, postStart, postStart + leftSize - 1);
+        
+        root.right = build(inorder, index + 1, inEnd,
+                            postorder, postStart + leftSize, postEnd - 1);
+        return root;
+    }
+}
+```
 
 
 
@@ -584,48 +628,132 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 
 这样就和前两道解法相似了
 
-
-
-## 二叉搜索树
-
-### [不同的二叉搜索树（96）](https://leetcode-cn.com/problems/unique-binary-search-trees/)
-
-> 给你一个整数 `n` ，求恰由 `n` 个节点组成且节点值从 `1` 到 `n` 互不相同的 **二叉搜索树** 有多少种？返回满足题意的二叉搜索树的种数。
->
-> ![img](https://assets.leetcode.com/uploads/2021/01/18/uniquebstn3.jpg)
->
-> ```
-> 输入：n = 3
-> 输出：5
-> ```
-
-思路：动态规划 https://leetcode-cn.com/problems/unique-binary-search-trees/solution/shou-hua-tu-jie-san-chong-xie-fa-dp-di-gui-ji-yi-h/
-
-- 如果整数1 ~ n中的 k 作为根节点值，则 1 ~ k-1 会去构建左子树，k+1 ~ n 会去构建右子树。
-- 左子树出来的形态有 a 种，右子树出来的形态有 bb 种，则整个树的形态有 a * b 种。
-  - 以 k 为根节点的 BST 种类数 = 左子树 BST 种类数 * 右子树 BST 种类数
-  - 就好比，左手有编号1/2/3的手环，右手有编号5/6/7的手环，那搭配就有9种
-- 问题变成：不同的 k 之下，等号右边的乘积，进行累加。
-
 ```java
-public int numTrees(int n) {
-  int[] dp = new int[n + 1];
+class Solution {
+    // 存储 postorder 中值到索引的映射
+    HashMap<Integer, Integer> valToIndex = new HashMap<>();
 
-  dp[0] = 1;
-  dp[1] = 1;
-
-  for (int i = 2; i <= n; i++) {
-    for (int j = 1; j < i; j++) {
-      dp[i] += dp[j - 1] * dp[i - j];
+    public TreeNode constructFromPrePost(int[] preorder, int[] postorder) {
+        for (int i = 0; i < postorder.length; i++) {
+            valToIndex.put(postorder[i], i);
+        }
+        return build(preorder, 0, preorder.length - 1,
+                    postorder, 0, postorder.length - 1);
     }
-  }
-  return dp[n];
+
+    // 定义：根据 preorder[preStart..preEnd] 和 postorder[postStart..postEnd]
+    // 构建二叉树，并返回根节点。
+    TreeNode build(int[] preorder, int preStart, int preEnd,
+                   int[] postorder, int postStart, int postEnd) {
+        if (preStart > preEnd) {
+            return null;
+        }
+        if (preStart == preEnd) {
+            return new TreeNode(preorder[preStart]);
+        }
+
+        // root 节点对应的值就是前序遍历数组的第一个元素
+        int rootVal = preorder[preStart];
+        // root.left 的值是前序遍历第二个元素
+        // 通过前序和后序遍历构造二叉树的关键在于通过左子树的根节点
+        // 确定 preorder 和 postorder 中左右子树的元素区间
+        int leftRootVal = preorder[preStart + 1];
+        // leftRootVal 在后序遍历数组中的索引
+        int index = valToIndex.get(leftRootVal);
+        // 左子树的元素个数
+        int leftSize = index - postStart + 1;
+
+        // 先构造出当前根节点
+        TreeNode root = new TreeNode(rootVal);
+        // 递归构造左右子树
+        // 根据左子树的根节点索引和元素个数推导左右子树的索引边界
+        root.left = build(preorder, preStart + 1, preStart + leftSize,
+                postorder, postStart, index);
+        root.right = build(preorder, preStart + leftSize + 1, preEnd,
+                postorder, index + 1, postEnd - 1);
+
+        return root;
+    }
 }
 ```
 
 
 
-### [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/)
+## 二叉搜索树
+
+二叉搜索树（Binary Search Tree，后文简写 BST）的特性：
+
+1、对于 BST 的每一个节点 `node`，左子树节点的值都比 `node` 的值要小，右子树节点的值都比 `node` 的值大。
+
+2、对于 BST 的每一个节点 `node`，它的左侧子树和右侧子树都是 BST。
+
+
+
+
+
+### [二叉搜索树中第 K 小的元素（230）](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)
+
+> 给定一个二叉搜索树的根节点 `root` ，和一个整数 `k` ，请你设计一个算法查找其中第 `k` 小的元素（从 1 开始计数）。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/01/28/kthtree1.jpg)
+>
+> ```
+> 输入：root = [3,1,4,null,2], k = 1
+> 输出：1
+> ```
+
+**从做算法题的角度来看 BST，除了它的定义，还有一个重要的性质：BST 的中序遍历结果是有序的（升序）**。
+
+也就是说，如果输入一棵 BST，以下代码可以将 BST 中每个节点的值升序打印出来：
+
+```java
+void traverse(TreeNode root) {
+    if (root == null) return;
+    traverse(root.left);
+    // 中序遍历代码位置
+    print(root.val);
+    traverse(root.right);
+}
+```
+
+该题题解：
+
+```java
+class Solution {
+    int kthSmallest(TreeNode root, int k) {
+        // 利用 BST 的中序遍历特性
+        traverse(root, k);
+        return res;
+    }
+
+    // 记录结果
+    int res = 0;
+    // 记录当前元素的排名
+    int rank = 0;
+    void traverse(TreeNode root, int k) {
+        if (root == null) {
+            return;
+        }
+        traverse(root.left, k);
+
+        // 中序代码位置
+        rank++;
+        if (k == rank) {
+            // 找到第 k 小的元素
+            res = root.val;
+            return;
+        }
+
+        traverse(root.right, k);
+    }
+}
+```
+
+
+
+
+
+### [验证二叉搜索树（98）](https://leetcode-cn.com/problems/validate-binary-search-tree/)
 
 > 给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
 >
@@ -679,7 +807,98 @@ public int numTrees(int n) {
 
 
 
-### [538. 把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/)
+### [二叉搜索树中的搜索（700）](https://leetcode.cn/problems/search-in-a-binary-search-tree/)
+
+> 给定二叉搜索树（BST）的根节点 `root` 和一个整数值 `val`。
+>
+> 你需要在 BST 中找到节点值等于 `val` 的节点。 返回以该节点为根的子树。 如果节点不存在，则返回 `null` 。
+
+```java
+TreeNode searchBST(TreeNode root, int target) {
+    if (root == null) {
+        return null;
+    }
+    // 去左子树搜索
+    if (root.val > target) {
+        return searchBST(root.left, target);
+    }
+    // 去右子树搜索
+    if (root.val < target) {
+        return searchBST(root.right, target);
+    }
+    // 当前节点就是目标值
+    return root;
+}
+```
+
+
+
+### [二叉搜索树中的插入操作（701）](https://leetcode.cn/problems/insert-into-a-binary-search-tree/)
+
+> 给定二叉搜索树（BST）的根节点 `root` 和要插入树中的值 `value` ，将值插入二叉搜索树。 返回插入后二叉搜索树的根节点。 输入数据 **保证** ，新值和原始二叉搜索树中的任意节点值都不同。
+>
+> **注意**，可能存在多种有效的插入方式，只要树在插入后仍保持为二叉搜索树即可。 你可以返回 **任意有效的结果**。
+
+```java
+public TreeNode insertIntoBST(TreeNode root, int val) {
+    if (root == null) {
+        // 找到空位置插入新节点
+        return new TreeNode(val);
+    }
+
+    // 去右子树找插入位置
+    if (root.val < val) {
+        root.right = insertIntoBST(root.right, val);
+    }
+    // 去左子树找插入位置
+    if (root.val > val) {
+        root.left = insertIntoBST(root.left, val);
+    }
+    // 返回 root，上层递归会接收返回值作为子节点
+    return root;
+}
+```
+
+
+
+### [不同的二叉搜索树（96）](https://leetcode-cn.com/problems/unique-binary-search-trees/)
+
+> 给你一个整数 `n` ，求恰由 `n` 个节点组成且节点值从 `1` 到 `n` 互不相同的 **二叉搜索树** 有多少种？返回满足题意的二叉搜索树的种数。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/01/18/uniquebstn3.jpg)
+>
+> ```
+> 输入：n = 3
+> 输出：5
+> ```
+
+思路：动态规划 https://leetcode-cn.com/problems/unique-binary-search-trees/solution/shou-hua-tu-jie-san-chong-xie-fa-dp-di-gui-ji-yi-h/
+
+- 如果整数1 ~ n中的 k 作为根节点值，则 1 ~ k-1 会去构建左子树，k+1 ~ n 会去构建右子树。
+- 左子树出来的形态有 a 种，右子树出来的形态有 bb 种，则整个树的形态有 a * b 种。
+  - 以 k 为根节点的 BST 种类数 = 左子树 BST 种类数 * 右子树 BST 种类数
+  - 就好比，左手有编号1/2/3的手环，右手有编号5/6/7的手环，那搭配就有9种
+- 问题变成：不同的 k 之下，等号右边的乘积，进行累加。
+
+```java
+public int numTrees(int n) {
+  int[] dp = new int[n + 1];
+
+  dp[0] = 1;
+  dp[1] = 1;
+
+  for (int i = 2; i <= n; i++) {
+    for (int j = 1; j < i; j++) {
+      dp[i] += dp[j - 1] * dp[i - j];
+    }
+  }
+  return dp[n];
+}
+```
+
+
+
+### [把二叉搜索树转换为累加树（538）](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/)
 
 > 给出二叉 搜索 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
 >
