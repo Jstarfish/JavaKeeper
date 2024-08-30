@@ -206,35 +206,76 @@ public class BinarySearchTree<E extends Comparable<E>>{
 **1.中序遍历：当到达某个节点时，先访问左子节点，再输出该节点，最后访问右子节点。**
 
 ```java
-public void inOrder(TreeNode<E> cursor){
-    if(cursor == null) return;
-    inOrder(cursor.getLeft());
-    System.out.println(cursor.getData());
-    inOrder(cursor.getRight());
+/* 中序遍历 */
+void inOrder(TreeNode root) {
+    if (root == null)
+        return;
+    // 访问优先级：左子树 -> 根节点 -> 右子树
+    inOrder(root.left);
+    list.add(root.val);
+    inOrder(root.right);
 }
 ```
 
 **2. 前序遍历：当到达某个节点时，先输出该节点，再访问左子节点，最后访问右子节点。**
 
 ```java
-public void preOrder(TreeNode<E> cursor){
-    if(cursor == null) return;
-    System.out.println(cursor.getData());
-    inOrder(cursor.getLeft());
-    inOrder(cursor.getRight());
+/* 前序遍历 */
+void preOrder(TreeNode root) {
+    if (root == null)
+        return;
+    // 访问优先级：根节点 -> 左子树 -> 右子树
+    list.add(root.val);
+    preOrder(root.left);
+    preOrder(root.right);
 }
 ```
 
 **3. 后序遍历：当到达某个节点时，先访问左子节点，再访问右子节点，最后输出该节点。**
 
 ```java
-public void postOrder(TreeNode<E> cursor){
-    if(cursor == null) return;
-    inOrder(cursor.getLeft());
-    inOrder(cursor.getRight());
-    System.out.println(cursor.getData());
+/* 后序遍历 */
+void postOrder(TreeNode root) {
+    if (root == null)
+        return;
+    // 访问优先级：左子树 -> 右子树 -> 根节点
+    postOrder(root.left);
+    postOrder(root.right);
+    list.add(root.val);
 }
 ```
+
+前序、中序和后序遍历都属于深度优先遍历（depth-first traversal），也称深度优先搜索（depth-first search, DFS），它体现了一种“先走到尽头，再回溯继续”的遍历方式。
+
+**深度优先遍历就像是绕着整棵二叉树的外围“走”一圈**，在每个节点都会遇到三个位置，分别对应前序遍历、中序遍历和后序遍历。
+
+![](https://www.hello-algo.com/chapter_tree/binary_tree_traversal.assets/binary_tree_dfs.png)
+
+**4. 层序遍历：**层序遍历（level-order traversal）从顶部到底部逐层遍历二叉树，并在每一层按照从左到右的顺序访问节点。
+
+层序遍历本质上属于广度优先遍历（breadth-first traversal），也称广度优先搜索（breadth-first search, BFS），它体现了一种“一圈一圈向外扩展”的逐层遍历方式。
+
+```java
+/* 层序遍历 */
+List<Integer> levelOrder(TreeNode root) {
+    // 初始化队列，加入根节点
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.add(root);
+    // 初始化一个列表，用于保存遍历序列
+    List<Integer> list = new ArrayList<>();
+    while (!queue.isEmpty()) {
+        TreeNode node = queue.poll(); // 队列出队
+        list.add(node.val);           // 保存节点值
+        if (node.left != null)
+            queue.offer(node.left);   // 左子节点入队
+        if (node.right != null)
+            queue.offer(node.right);  // 右子节点入队
+    }
+    return list;
+}
+```
+
+
 
 #### 2. 树的搜索：
 

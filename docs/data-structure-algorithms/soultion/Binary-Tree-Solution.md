@@ -1,7 +1,5 @@
 > 我们在做二叉树题目时候，第一想到的应该是用 **递归** 来解决。
 
-
-
 ### 前、中、后序遍历
 
 ### [二叉树的前序遍历（144）](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
@@ -68,7 +66,9 @@ public void postorder(TreeNode root, List<Integer> res) {
 > 输出：[[3],[9,20],[15,7]]
 > ```
 
-思路：BFS 的思想
+**思路**：BFS 的思想。
+
+借助一个队列，首先将二叉树的根结点入队，然后访问出队结点并出队，如果有左孩子结点，左孩子结点也入队；如果有右孩子结点，右孩子结点也入队。然后访问出队结点并出队，直到队列为空为止.
 
 ```java
 public static List<List<Integer>> levelOrder(TreeNode treeNode) {
@@ -117,7 +117,7 @@ public static List<List<Integer>> levelOrder(TreeNode treeNode) {
 >    ```
 >    
 
-思路：翻转整棵树其实就是交换每个节点的左右子节点，**只要把二叉树上的每一个节点的左右子节点进行交换，最后的结果就是完全翻转之后的二叉树**
+**思路**：翻转整棵树其实就是交换每个节点的左右子节点，**只要把二叉树上的每一个节点的左右子节点进行交换，最后的结果就是完全翻转之后的二叉树**
 
 ```java
 public static TreeNode invertTree(TreeNode root) {
@@ -148,7 +148,7 @@ public static TreeNode invertTree(TreeNode root) {
 >    ![](https://assets.leetcode.com/uploads/2021/02/19/symtree1.jpg)
 >    
 
-思路：递归的思想，画个图左右左右比较
+**思路**：递归的思想，画个图左右左右比较
 
 ```java
 public boolean isSymmetric(TreeNode root){
@@ -291,10 +291,10 @@ public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
 >
 > ```
 > struct Node {
->   int val;
->   Node *left;
->   Node *right;
->   Node *next;
+>     int val;
+>     Node *left;
+>     Node *right;
+>     Node *next;
 > }
 > ```
 >
@@ -689,8 +689,6 @@ class Solution {
 
 
 
-
-
 ### [二叉搜索树中第 K 小的元素（230）](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)
 
 > 给定一个二叉搜索树的根节点 `root` ，和一个整数 `k` ，请你设计一个算法查找其中第 `k` 小的元素（从 1 开始计数）。
@@ -748,8 +746,6 @@ class Solution {
     }
 }
 ```
-
-
 
 
 
@@ -943,7 +939,7 @@ public int numTrees(int n) {
 
 
 
-### [124. 二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
+### [二叉树中的最大路径和（124）](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
 
 > 路径 被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
 >
@@ -976,6 +972,31 @@ public int numTrees(int n) {
 > 输出：3
 > 解释：节点 5 和节点 1 的最近公共祖先是节点 3 。
 > ```
+
+**思路：** 
+
+- 两个节点的最近公共祖先其实就是这两个节点向根节点的「延长线」的交汇点
+
+- **如果一个节点能够在它的左右子树中分别找到**`p`**和**`q`**，则该节点为**`LCA`**节点**
+
+- 若 root 是 p,q 的 最近公共祖先 ，则只可能为以下情况之一：
+
+  - p 和 q 在 root 的子树中，且分列 root 的 异侧（即分别在左、右子树中）；
+  - p=root ，且 q 在 root 的左或右子树中；
+  - q=root ，且 p 在 root 的左或右子树中；![Picture2.png](https://pic.leetcode-cn.com/1599885247-mgYjRv-Picture2.png)
+
+  
+
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    if(root == null || root == p || root == q) return root;
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
+    if(left == null) return right;
+    if(right == null) return left;
+    return root;
+}
+```
 
 
 

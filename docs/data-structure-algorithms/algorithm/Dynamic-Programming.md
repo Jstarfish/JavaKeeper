@@ -228,9 +228,15 @@ public int fib(int n) {
 那要解决一个动态规划问题的大概步骤，就围绕这三要素展开：
 
 1. **划分阶段：**分析题目可以用动态规划解决，那就先看这个问题如何划分成各个子问题
+
 2. **状态定义**：也有叫选择状态的，其实就是定义子问题，我理解其实就是看求解的结果，我们一般用数组来存储子问题结果，所以状态我们一般定义为 $dp[i]$，表示规模为 i 的问题的解，$dp[i-1]$ 就是规模为 i-1 的子问题的解
+
 3. **确定决策并写出状态转移方程：**听名字就觉得牛逼的一步，肯定也是最难的一步，其实就是我们从 f(1)、f(2)、f(3) ...  f(n-1) 一步步递推出 f(n) 的表达式，也就是说，dp[n] 一定会和 dp[n-1], dp[n-2]....存在某种关系的，这一步就是找出数组元素的关系式，比如斐波那契数列的关系式 $dp[n] = dp[n-1] + dp[n-2]$
+
+   > 一般来说函数的参数就是状态转移中会变化的量，也就是上面说到的「状态」；函数的返回值就是题目要求我们计算的
+
 4. **找出初始值（包括边界条件）：**既然状态转移方程式写好了，但是还需要一个**支点**来撬动它进行不断的计算下去，比如斐波那契数列中的 f(1)=1，f(2)=1，就是初始值
+
 5. **优化**：思考有没有可以优化的点
 
 
@@ -294,8 +300,6 @@ for 状态1 in 状态1的所有取值：
 > 我想的是 f(n) = f(n-1) + 1，从上往下的算，留出一级，肯定只能是爬 1 级这一种，所以
 >
 > f(5) = f(4) + 1 .......
-
-。。。![](http://img.pkdoutu.com/production/uploads/image/2019/08/21/20190821348574_pZnwku.gif)
 
 这不是上一节的斐波那契数列吗？？？？？ 
 
@@ -375,7 +379,7 @@ public int climbStairs(int n) {
 4. **输出结果**：转移方程只是保存了当前元素的最大和，我们要求的是最终的那个最大值，所以需要从 dp[i] 中找到最大值返回
 
 ```java
-public int maxSubArray3(int[] nums) {
+public int maxSubArray(int[] nums) {
     //特判
     if (nums == null || nums.length == 0) {
         return 0;
@@ -427,18 +431,11 @@ public int maxSubArray(int[] nums) {
 >      偷窃到的最高金额 = 1 + 3 = 4 。
 > ```
 > 
-> ```
->输入：[2,7,9,3,1]
-> 输出：12
->解释：偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。
->      偷窃到的最高金额 = 2 + 9 + 1 = 12 。
-> ```
 > 
-> 
-> 提示：
+>提示：
 > 
 >0 <= nums.length <= 100
->0 <= nums[i] <= 400
+> 0 <= nums[i] <= 400
 
 #### 分析题目
 
@@ -548,7 +545,7 @@ public int rob(int[] nums) {
 
 4. **输出结果**：由于数组是从下标 0 开始算起的，所以 $dp[m - 1][n - 1]$ 才是我们要的结果
 
-![](../../../picBed/img/20200922154004.png)
+![](https://img.starfish.ink/algorithm/uniquePaths.png)
 
 ```java
 public int uniquePaths(int m, int n) {
@@ -640,12 +637,12 @@ public int uniquePaths(int m, int n) {
 4. **输出结果**： $dp[amout]$ 
 
 ```java
-public static int coinChange(int[] coins, int amount) {
+public int coinChange(int[] coins, int amount) {
     //定义数组
     int[] dp = new int[amount + 1];
 
     int max = amount + 1;
-    // 初始化每个值为 amount+1，这样当最终求得的 dp[amount] 为 amount+1 时，说明问题无解
+    // 初始化每个值为 amount+1，这样当最终求得的 dp[amount] 为 amount+1 时，说明问题无解, 或者初始化一个特殊值
     Arrays.fill(dp, max);
 
     //初始值
@@ -739,8 +736,6 @@ public static int dp(int[] prices) {
 
 ![img](https://writings.sh/assets/images/posts/algorithm-longest-palindromic-substring/longest-palindromic-substring-dp-2-2.jpeg)
 
-
-
 首先，单个字符就形成一个回文串，所以，所有 `dp[i][i] = true` 。
 
 ![img](https://writings.sh/assets/images/posts/algorithm-longest-palindromic-substring/longest-palindromic-substring-dp-2-3.jpeg)
@@ -801,8 +796,6 @@ public String longestPalindrome_1(String s) {
 
 
 
-
-
 ### 8、数字三角形问题
 
 ```
@@ -856,23 +849,7 @@ class Solution{
 
 
 
-## Reference
-
-- http://netedu.xauat.edu.cn/jpkc/netedu/jpkc/ycx/kcjy/kejian/pdf/05.pdf
-
-- https://leetcode-cn.com/circle/article/lxC3ZB/
-
-- https://labuladong.gitbook.io/algo/dong-tai-gui-hua-xi-lie/dong-tai-gui-hua-xiang-jie-jin-jie
-
-- https://www.zhihu.com/question/39948290
-
-- https://zhuanlan.zhihu.com/p/26743197
-
-- https://writings.sh/post/algorithm-longest-palindromic-substrings
-
-
-
-
+## 番外篇
 
 ### 动态规划与其它算法的关系
 
@@ -1002,4 +979,20 @@ for i = 1, ..., n
   股票系列
 
   
+
+
+
+## Reference
+
+- http://netedu.xauat.edu.cn/jpkc/netedu/jpkc/ycx/kcjy/kejian/pdf/05.pdf
+
+- https://leetcode-cn.com/circle/article/lxC3ZB/
+
+- https://labuladong.gitbook.io/algo/dong-tai-gui-hua-xi-lie/dong-tai-gui-hua-xiang-jie-jin-jie
+
+- https://www.zhihu.com/question/39948290
+
+- https://zhuanlan.zhihu.com/p/26743197
+
+- https://writings.sh/post/algorithm-longest-palindromic-substrings
 
