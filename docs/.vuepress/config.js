@@ -178,7 +178,7 @@ function genDSASidebar() {
       title: "刷题",
       collapsable: true,
       children: [
-      	['soultion/binary-tree', '二叉树'],
+      	['soultion/Binary-Tree-Solution', '二叉树'],
       	['soultion/Array-Solution', '数组'],
       	['soultion/String-Solution', '字符串'],
       	['soultion/LinkedList-Soultion', '链表'],
@@ -361,9 +361,7 @@ function genInterviewSidebar(){
     ['RPC-FAQ', 'RPC 部分'],
     ['MyBatis-FAQ', 'MyBatis 部分'],
     ['Spring-FAQ', 'Spring 部分'],
-    ['SpringBoot-FAQ', 'Spring Boot 部分'],
     ['Design-Pattern-FAQ', '设计模式部分'],
-    ['Tomcat-FAQ', 'Tomcat 部分'],
     ['Elasticsearch-FAQ', 'Elasticsearch 部分'],
   ];
 }

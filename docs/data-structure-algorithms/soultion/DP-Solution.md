@@ -4,6 +4,43 @@
 
 ## 子序列问题
 
+一旦涉及到子序列和最值，那几乎可以肯定，**考察的是动态规划技巧，时间复杂度一般都是 O(n^2)**
+
+两种思路
+
+**1、第一种思路模板是一个一维的 dp 数组**
+
+```
+int n = array.length;
+int[] dp = new int[n];
+
+for (int i = 1; i < n; i++) {
+    for (int j = 0; j < i; j++) {
+        dp[i] = 最值(dp[i], dp[j] + ...)
+    }
+}
+
+```
+
+**2、第二种思路模板是一个二维的 dp 数组**：
+
+```java
+int n = arr.length;
+int[][] dp = new dp[n][n];
+
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+        if (arr[i] == arr[j]) 
+            dp[i][j] = dp[i][j] + ...
+        else
+            dp[i][j] = 最值(...)
+    }
+}
+
+```
+
+
+
 ### [最长上升子序列_300](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
 
 > 给定一个无序的整数数组，找到其中最长上升子序列的长度。
@@ -20,24 +57,22 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 
 这种题目看懂需要看动图
 
-![img](https://labuladong.gitee.io/algo/images/%e6%9c%80%e9%95%bf%e9%80%92%e5%a2%9e%e5%ad%90%e5%ba%8f%e5%88%97/gif1.gif)
+![img](https://labuladong.online/algo/images/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/gif1.gif)
 
 ```java
  public static int getLengthOfLIS(int[] nums) {
 
-   int len = nums.length;
-   if (len < 2) {
-     return len;
-   }
-
-   int[] dp = new int[len];
+   int[] dp = new int[nums.length];
    Arrays.fill(dp, 1);
 
-   for (int i = 0; i < len; i++) {
+   for (int i = 0; i < nums.length; i++) {
      for (int j = 0; j < i; j++) {
-  //当 nums[i] <= nums[j]nums[i]<=nums[j] 时： nums[i]nums[i] 无法接在 nums[j]nums[j] 之后，此情况上升子序列不成立，跳过
+     //当 nums[i] <= nums[j] 时： nums[i] 无法接在 nums[j]之后，此情况上升子序列不成立，跳过，不是比较dp[i]和dp[j]
        if (nums[i] > nums[j]) {
          //这里要注意是 nums[i] 还是 dp[i]
+         // 寻找 nums[0..j-1] 中比 nums[i] 小的元素
+         // 把 nums[i] 接在后面，即可形成长度为 dp[j] + 1，
+            // 且以 nums[i] 为结尾的递增子序列
          dp[i] = Math.max(dp[i], dp[j] + 1);
        }
      }
@@ -53,6 +88,164 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 > 类似问题还有，最长递增子序列的个数、俄罗斯套娃信封问题
 
 
+
+### [最大子数组和_53](https://leetcode.cn/problems/maximum-subarray/)
+
+> 给你一个整数数组 `nums` ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+>
+> **子数组**  是数组中的一个连续部分。
+>
+> ```
+> 输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+> 输出：6
+> 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+> ```
+
+思路：
+
+`dp[i]` 有两种「选择」，要么与前面的相邻子数组连接，形成一个和更大的子数组；要么不与前面的子数组连接，自成一派，自己作为一个子数组。
+`dp[i] = Math.max(nums[i], nums[i] + dp[i - 1]);`
+
+```java
+int maxSubArray(int[] nums) {
+    int n = nums.length;
+    if (n == 0) return 0;
+    int[] dp = new int[n];
+    // base case
+    // 第一个元素前面没有子数组
+    dp[0] = nums[0];
+    // 状态转移方程
+    for (int i = 1; i < n; i++) {
+        dp[i] = Math.max(nums[i], nums[i] + dp[i - 1]);
+    }
+    // 得到 nums 的最大子数组
+    int res = Integer.MIN_VALUE;
+    for (int i = 0; i < n; i++) {
+        res = Math.max(res, dp[i]);
+    }
+    return res;
+}
+
+```
+
+
+
+### [最长公共子序列_1143](https://leetcode.cn/problems/longest-common-subsequence/)
+
+> 给定两个字符串 `text1` 和 `text2`，返回这两个字符串的最长 **公共子序列** 的长度。如果不存在 **公共子序列** ，返回 `0` 。
+>
+> 一个字符串的 **子序列** 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+>
+> - 例如，`"ace"` 是 `"abcde"` 的子序列，但 `"aec"` 不是 `"abcde"` 的子序列。
+>
+> 两个字符串的 **公共子序列** 是这两个字符串所共同拥有的子序列。
+>
+> ```
+> 输入：text1 = "abcde", text2 = "ace" 
+> 输出：3  
+> 解释：最长公共子序列是 "ace" ，它的长度为 3 。
+> ```
+
+思路：
+
+两个字符串这种，算是典型的二维动态规划问题
+
+![img](https://gitee.com/labuladong/pictures/raw/master/LCS/dp.png)为了方便理解此表，我们暂时认为索引是从 1 开始的，待会的代码中只要稍作调整即可。其中，`dp[i][j]` 的含义是：对于 `s1[1..i]` 和 `s2[1..j]`，它们的 LCS 长度是 `dp[i][j]`。
+
+比如上图的例子，d[2][4] 的含义就是：对于 `"ac"` 和 `"babc"`，它们的 LCS 长度是 2。我们最终想得到的答案应该是 `dp[3][6]`。
+
+![img](https://gitee.com/labuladong/pictures/raw/master/LCS/lcs.png)求 `s1` 和 `s2` 的最长公共子序列，不妨称这个子序列为 `lcs`。那么对于 `s1` 和 `s2` 中的每个字符，有什么选择？很简单，两种选择，要么在 `lcs` 中，要么不在。这个「在」和「不在」就是选择，关键是，应该如何选择呢？这个需要动点脑筋：如果某个字符应该在 `lcs` 中，那么这个字符肯定同时存在于 `s1` 和 `s2` 中，因为 `lcs` 是最长**公共**子序列嘛
+
+用两个指针 `i` 和 `j` 从后往前遍历 `s1` 和 `s2`，如果 `s1[i]==s2[j]`，那么这个字符**一定在 `lcs` 中**；否则的话，`s1[i]`和 `s2[j]` 这两个字符**至少有一个不在 `lcs` 中**，需要丢弃一个
+
+```java
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        int n = text1.length(), m =  text2.length();
+        int[][] dp = new int[n + 1][m + 1];
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+               //这边找到一个 lcs 的元素，继续往前找
+                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                    dp[i][j] = f[i - 1][j - 1] + 1;
+                } else {
+                    //谁能让 lcs 最长，就听谁的
+                    dp[i][j] = Math.max(f[i - 1][j], f[i][j - 1]);
+                }
+            }
+        }
+        return dp[n][m];
+    }
+}
+
+```
+
+
+
+### [516. 最长回文子序列](https://leetcode.cn/problems/longest-palindromic-subsequence/)
+
+> 给你一个字符串 `s` ，找出其中最长的回文子序列，并返回该序列的长度。
+>
+> 子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
+>
+> ```
+> 输入：s = "bbbab"
+> 输出：4
+> 解释：一个可能的最长回文子序列为 "bbbb" 
+> ```
+
+
+
+
+
+## 背包问题
+
+### 0-1 背包问题
+
+> 给定 n 个物品，第 个物品的重量为 wgt[i-1]、价值为 val[i-1] ，和一个容量为 cap 的背包。每个物品只能选择一次，问在限定背包容量下能放入物品的最大价值。
+>
+
+![](https://www.hello-algo.com/chapter_dynamic_programming/knapsack_problem.assets/knapsack_example.png)
+
+我们可以将 0-1 背包问题看作一个由 轮决策组成的过程，对于每个物体都有不放入和放入两种决策，因此该问题满足决策树模型。
+
+该问题的目标是求解“在限定背包容量下能放入物品的最大价值”，因此较大概率是一个动态规划问题。
+
+1. 定义状态：当前物品编号 i 和背包容量  c，记为 `[i,c]`。**前 i 个物品在容量为 c 的背包中的最大价值**，记为 `dp[i,c]`
+
+2. 转移方程：对于每个物品来说，不放入背包，背包容量不变；放入背包，背包容量减小
+
+   当我们做出物品 的决策后，剩余的是前 个物品决策的子问题，可分为以下两种情况
+
+   - **不放入物品** ：背包容量不变，最大价值 `dp[i][c]` 应该等于 `dp[i-1][c]`，继承之前的结果。
+   - **放入物品** ：背包容量减少 `wgt[i-1]`，价值增加 `val[i-1]`，状态变化为 `[i-1, c-w[i-1]]`
+
+​	`dp[i,c] = Math.max(dp[i-1][c],dp[i-1, c-wgt[i-1]]+val[i+1])`
+
+​	若当前物品重量 `wgt[i-1]` 超出剩余背包容量 c，则只能选择不放入背包
+
+3. 确定 base case：`dp[0][..] = dp[..][0] = 0`，因为没有物品或者背包没有空间的时候，能装的最大价值就是 0。
+
+```java
+int knapsackDP(int[] wgt, int[] val, int cap) {
+    int n = wgt.length;
+    // 初始化 dp 表
+    int[][] dp = new int[n + 1][cap + 1];
+    // 状态转移
+    for (int i = 1; i <= n; i++) {
+        for (int c = 1; c <= cap; c++) {
+            if (wgt[i - 1] > c) {
+                // 若超过背包容量，则不选物品 i
+                dp[i][c] = dp[i - 1][c];
+            } else {
+                // 不选和选物品 i 这两种方案的较大值
+                dp[i][c] = Math.max(dp[i - 1][c], dp[i - 1][c - wgt[i - 1]] + val[i - 1]);
+            }
+        }
+    }
+    return dp[n][cap];
+}
+```
 
 
 
@@ -99,18 +292,4 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 
 
 
-
-
-## 背包问题
-
-### 0-1 背包问题
-
-> 给你一个可装载重量为 `W` 的背包和 `N` 个物品，每个物品有重量和价值两个属性。其中第 `i` 个物品的重量为 `w[i]`，价值为 `v[i]`，现在让你用这个背包装物品，最多能装的价值是多少？
->
-> ```
-> 输入:W=5,N=3
-> 	  w = [3, 2, 1], v = [5, 2, 3]
-> 输出:8
-> 解释:选择 i=0 和 i=2 这两件物品装进背包。它们的总重量 4 小于 W，同时可以获得最大价值 8。
-> ```
 
