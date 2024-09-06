@@ -1,6 +1,12 @@
-### lambda 原理
+---
+title: Java 基础面试 
+date: 2024-08-31
+tags: 
+ - Java
+categories: Java
+---
 
-
+![](https://img.starfish.ink/common/faq-banner.png)
 
 ### JDK和JRE、 JVM
 
@@ -68,11 +74,32 @@ Exception 又分为**可检查**（checked）异常和**不检查**（unchecked�
 
 ### 作用域public，private，protected，以及不写时的区别
 
-  这四个作用域的可见范围如下表所示。
+在Java中，作用域（也称为访问修饰符）决定了类、方法、变量或其他成员的可见性。Java提供了四种作用域：`public`、`private`、`protected`，以及默认（不写时）的作用域。以下是它们的区别：
 
-  说明：如果在修饰的元素上面没有写任何访问修饰符，则表示 default 。  
+1. **public（公共的）**：
+   - `public` 成员可以被任何其他类访问，无论它们位于哪个包中。
+   - `public` 类可以被任何其他类实例化。
+   - `public` 接口或方法可以被任何外部类实现或调用。
+2. **private（私有的）**：
+   - `private` 成员只能在其所在的类内部访问。
+   - `private` 成员不能被同一个包中的其他类访问，更不能被不同包中的类访问。
+   - `private` 成员是封装性原则的一部分，用于隐藏类的内部实现细节。
+3. **protected（受保护的）**：
+   - `protected` 成员可以被同一个包中的其他类访问，也可以被不同包中的子类访问。
+   - `protected` 成员提供了比 `private` 更宽的访问范围，但比 `public` 窄。
+4. **默认（不写时）**：
+   - 当你没有指定任何访问修饰符时，成员具有默认（也称为包级私有）作用域。
+   - 默认作用域的成员只能被同一个包中的其他类访问，不能被不同包中的类访问。
+5. **接口中的成员**：
+   - 接口中的所有成员默认都是 `public` 的，并且隐式地标记为 `static` 和 `final`（除非被声明为 `default` 方法）。
+6. **类的作用域**：
+   - 类的访问修饰符决定了该类是否可以被其他类实例化。
+   - `public` 类可以被任何其他类实例化。
+   - 默认（包级私有）类只能被同一个包中的其他类实例化。
+7. **内部类的作用域**：
+   - 内部类的访问修饰符决定了外部类是否可以访问内部类。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200929182248.png)
+在设计类和成员时，应根据需要选择合适的作用域，以确保适当的封装和访问控制。通常，应尽可能使成员的可见性最小化，以提高代码的安全性和可维护性。
 
 
 
@@ -531,6 +558,104 @@ java.lang.reflect.AnnotatedElement 接口是所有程序元素（Class、Method�
 
 
 ## Java 版本差异
+
+### lambda 原理
+
+Lambda 表达式依赖于 **函数式接口**。函数式接口是只包含**一个抽象方法**的接口，这就是为什么 Lambda 表达式可以简化接口实现的原因
+
+```java
+@FunctionalInterface
+public interface MyFunctionalInterface {
+    void doSomething();
+}
+
+```
+
+Lambda 表达式其实是对一个函数式接口的实现。在 Java 中常见的函数式接口有：
+
+- `Runnable`
+- `Callable`
+- `Function`
+- `Supplier`
+- `Consumer`
+- `Predicate`
+
+Lambda 表达式的底层实现
+
+Lambda 表达式在编译时并不会像匿名类那样直接生成内部类，而是通过 JVM 的 `invokedynamic` 指令以及 `LambdaMetafactory` 来动态生成。
+
+3.1 `invokedynamic` 指令
+
+Lambda 表达式引入了 `invokedynamic` 字节码指令，它使得 JVM 能够在运行时动态地将 Lambda 表达式与目标函数式接口进行绑定。
+
+- 在 Java 8 之前，所有方法调用都使用静态绑定，比如通过 `invokestatic`、`invokevirtual` 等字节码指令。而 `invokedynamic` 是一种动态绑定的指令，它允许在运行时决定如何调用方法。
+
+当编译器遇到 Lambda 表达式时，会将其编译成一个 `invokedynamic` 调用指令，而不是生成一个匿名类。
+
+3.2 `LambdaMetafactory`
+
+`LambdaMetafactory` 是 Java 8 中引入的一个类，它与 `invokedynamic` 配合使用，用于生成 Lambda 表达式的实际实现。简而言之，`LambdaMetafactory` 是负责动态创建 Lambda 实现的工厂类。
+
+当 JVM 执行到 `invokedynamic` 时，会调用 `LambdaMetafactory`，动态生成与 Lambda 表达式相关的代码。
+
+3.3 Lambda 表达式的编译过程
+
+让我们来详细看看 Lambda 表达式的编译和执行过程。
+
+Lambda 表达式代码：
+
+```
+Runnable runnable = () -> System.out.println("Hello, Lambda!");
+runnable.run();
+```
+
+编译后的字节码：
+
+编译器将 Lambda 表达式编译成类似以下的字节码（可以通过 `javap -c` 命令查看）：
+
+```
+INVOKEDYNAMIC run()Ljava/lang/Runnable; [
+  // BootstrapMethods:
+  0: #27 invokestatic java/lang/invoke/LambdaMetafactory.metafactory
+  ...
+]
+```
+
+- **`INVOKEDYNAMIC`**：编译器生成的 `invokedynamic` 指令，表示该调用将在运行时被解析。
+- **`LambdaMetafactory.metafactory`**：JVM 在执行时会调用 `LambdaMetafactory` 来创建 `Runnable` 的具体实现。
+
+##### 运行时：
+
+1. JVM 遇到 `invokedynamic` 指令。
+2. JVM 调用 `LambdaMetafactory.metafactory` 方法来生成 Lambda 的实际实现。
+3. `LambdaMetafactory` 动态生成 `Runnable` 的实现类，该实现类在内部包含了 `System.out.println("Hello, Lambda!")` 的逻辑。
+4. Lambda 表达式的实例被创建，赋值给 `runnable`。
+5. 执行 `runnable.run()`，输出 `Hello, Lambda!`。
+
+3.4 Lambda 是如何优化的
+
+与传统的匿名内部类不同，Lambda 表达式的实现通过动态生成类，这样可以避免创建大量的匿名内部类，并且有助于性能优化。
+
+- **性能优化**：由于 Lambda 表达式是通过动态生成的，因此在某些情况下，JVM 可以进行优化，比如复用同一个 Lambda 实现，而不是每次都创建新的实例。
+- **减少类加载开销**：匿名内部类每次定义时都要生成一个新的类，而 Lambda 表达式则通过 `invokedynamic` 动态生成，减少了类加载的开销。
+
+4. Lambda 表达式与匿名类的区别
+
+尽管在语法上 Lambda 表达式与匿名类看起来相似，但它们在底层实现上有着明显区别：
+
+- **编译后处理**：
+  - **匿名类**：会生成一个内部类，每次使用都会创建新的类。
+  - **Lambda 表达式**：通过 `invokedynamic` 和 `LambdaMetafactory` 动态生成代码，不会生成额外的类文件。
+- **性能**：
+  - **匿名类**：每次使用时都需要创建新对象。
+  - **Lambda 表达式**：可以在某些情况下复用已有实现，性能更好。
+- **内存使用**：
+  - **匿名类**：每次实例化时都需要额外的内存。
+  - **Lambda 表达式**：在运行时生成，减少了类的数量，有更好的内存表现。
+
+Java 8 的 Lambda 表达式通过 `invokedynamic` 指令和 `LambdaMetafactory` 动态生成代码，而不是像匿名类那样生成新的类文件。这使得 Lambda 表达式的性能更加优越，并减少了类加载的开销。Lambda 表达式的引入大大简化了函数式接口的实现方式，使得 Java 代码更加简洁和高效。
+
+
 
 ### lambda 表达式中使用外部变量，为什么要 final？
 

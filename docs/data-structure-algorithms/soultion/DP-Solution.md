@@ -249,6 +249,117 @@ int knapsackDP(int[] wgt, int[] val, int cap) {
 
 
 
+### [分割等和子集_416](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+> 给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+>
+> ```
+> 输入：nums = [1,5,11,5]
+> 输出：true
+> 解释：数组可以分割成 [1, 5, 5] 和 [11] 。
+> ```
+
+思路：这也算背包问题，要转化下想法，**给一个可装载重量为 `sum / 2` 的背包和 `N` 个物品，每个物品的重量为 `nums[i]`。现在让你装物品，是否存在一种装法，能够恰好将背包装满**？  现在变成了背包问题
+
+1. 定义状态：**`dp[i][j] = x` 表示，对于前 `i` 个物品（`i` 从 1 开始计数），当前背包的容量为 `j` 时，若 `x`为 `true`，则说明可以恰好将背包装满，若 `x` 为 `false`，则说明不能恰好将背包装满** `boolean[][] dp = new boolean[n + 1][sum + 1];`
+
+2. 转移方程：以 `nums[i]` 算不算入子集来看
+
+   - **不算（不放入背包）** ：不把这第 `i` 个物品装入背包，而且还装满背包，那就看上一个状态 `dp[i-1][j]`，继承之前的结果
+
+   - **算入子集（放入物品）** ：是否能够恰好装满背包，取决于状态 `dp[i-1][j-nums[i-1]]`
+
+3. base case： `dp[..][0] = true` 和 `dp[0][..] = false`
+
+```java
+public boolean canPartition(int[] nums) {
+      int sum = 0;
+      for (int num : nums) sum += num;
+      // 和为奇数时，不可能划分成两个和相等的集合
+      if (sum % 2 != 0) return false;
+      int n = nums.length;
+      sum = sum / 2;
+      boolean[][] dp = new boolean[n + 1][sum + 1];
+      // base case
+      for (int i = 0; i <= n; i++)
+          dp[i][0] = true;
+
+      for (int i = 1; i <= n; i++) {
+          for (int j = 1; j <= sum; j++) {
+              if (j - nums[i - 1] < 0) {
+                  // 背包容量不足，不能装入第 i 个物品
+                  dp[i][j] = dp[i - 1][j];
+              } else {
+                  // 装入或不装入背包
+                  dp[i][j] = dp[i - 1][j] || dp[i - 1][j - nums[i - 1]];
+              }
+          }
+      }
+      return dp[n][sum];
+}
+
+```
+
+空间优化，**`dp[i][j]` 都是通过上一行 `dp[i-1][..]` 转移过来的**，之前的数据都不会再使用了。
+
+```java
+public boolean canPartition(int[] nums) {
+      int sum = 0;
+      for (int num : nums) sum += num;
+      // 和为奇数时，不可能划分成两个和相等的集合
+      if (sum % 2 != 0) return false;
+      int n = nums.length;
+      sum = sum / 2;
+      boolean[] dp = new boolean[sum + 1];
+
+      // base case
+      dp[0] = true;
+
+      for (int i = 0; i < n; i++) {
+          for (int j = sum; j >= 0; j--) {
+              if (j - nums[i] >= 0) {
+                  dp[j] = dp[j] || dp[j - nums[i]];
+              }
+          }
+      }
+      return dp[sum];
+}
+```
+
+
+
+### [零钱兑换 II_518](https://leetcode.cn/problems/coin-change-ii/)
+
+> 给你一个整数数组 `coins` 表示不同面额的硬币，另给一个整数 `amount` 表示总金额。
+>
+> 请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 `0` 。
+>
+> 假设每一种面额的硬币有无限个。 
+>
+> 题目数据保证结果符合 32 位带符号整数。
+>
+> ```
+> 输入：amount = 5, coins = [1, 2, 5]
+> 输出：4
+> 解释：有四种方式可以凑成总金额：
+> 5=5
+> 5=2+2+1
+> 5=2+1+1+1
+> 5=1+1+1+1+1
+> ```
+
+思路：
+
+可以把这个问题转化为背包问题的描述形式：
+
+有一个背包，最大容量为 `amount`，有一系列物品 `coins`，每个物品的重量为 `coins[i]`，**每个物品的数量无限**。请问有多少种方法，能够把背包恰好装满？
+
+这个问题和我们前面讲过的两个背包问题，有一个最大的区别就是，每个物品的数量是无限的，这也就是传说中的「**完全背包问题**」，
+
+1. 定义状态：**若只使用 `coins` 中的前 `i` 个（`i` 从 1 开始计数）硬币的面值，若想凑出金额 `j`，有 `dp[i][j]` 种凑法**。
+2. base case 为 `dp[0][..] = 0, dp[..][0] = 1`。`i = 0` 代表不使用任何硬币面值，这种情况下显然无法凑出任何金额；`j = 0` 代表需要凑出的目标金额为 0，那么什么都不做就是唯一的一种凑法
+3. 
+
 ### [编辑距离（72）](https://leetcode.cn/problems/edit-distance/)
 
 > 给你两个单词 `word1` 和 `word2`， *请返回将 `word1` 转换成 `word2` 所使用的最少操作数* 。
@@ -269,6 +380,12 @@ int knapsackDP(int[] wgt, int[] val, int cap) {
 > exention -> exection (将 'n' 替换为 'c')
 > exection -> execution (插入 'u')
 > ```
+
+
+
+
+
+
 
 
 

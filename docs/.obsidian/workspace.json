@@ -57,7 +57,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/algorithm/DFS.md",
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
                 "mode": "source",
                 "source": false
               }
@@ -150,7 +150,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/algorithm/DFS.md",
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -167,7 +167,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/algorithm/DFS.md",
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -190,7 +190,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/algorithm/DFS.md"
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md"
               }
             }
           }
@@ -213,6 +213,7 @@
   },
   "active": "f02bfed475530fbe",
   "lastOpenFiles": [
+    "data-structure-algorithms/algorithm/DFS.md",
     "data-management/MySQL/MySQL-Select.md",
     "java/JVM/Runtime-Data-Areas.md",
     "java/JVM/JVM-Java.md",
@@ -239,7 +240,6 @@
     "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
     "data-management/Redis/reproduce/Key 寻址算法.md",
     "data-management/Redis/reproduce/Cache-Design.md",
-    "data-management/Redis/Redis-Conf.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
