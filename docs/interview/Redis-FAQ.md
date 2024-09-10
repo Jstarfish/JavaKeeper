@@ -513,12 +513,15 @@ Redis 列表是简单的字符串列表，按照插入顺序排序。你可以�
 >
 > ##### Redis3.2+ list的新实现quickList
 >
-> 可以认为quickList，是ziplist和linkedlist二者的结合；quickList将二者的优点结合起来。
+> 可以认为quickList，是 ziplist 和 linkedlist 二者的结合；quickList 将二者的优点结合起来。
 >
-> quickList就是一个标准的双向链表的配置，有head 有tail;
->每一个节点是一个quicklistNode，包含prev和next指针。
-> 每一个quicklistNode 包含 一个ziplist，*zp 压缩链表里存储键值。
-> 所以quicklist是对ziplist进行一次封装，使用小块的ziplist来既保证了少使用内存，也保证了性能。
+> - quickList 就是一个标准的双向链表的配置，有head 有tail;
+>
+> - 每一个节点是一个quicklistNode，包含prev和next指针。
+>
+> - 每一个quicklistNode 包含 一个ziplist，*zp 压缩链表里存储键值。
+>
+>   所以quicklist是对ziplist进行一次封装，使用小块的ziplist来既保证了少使用内存，也保证了性能。
 
 
 
