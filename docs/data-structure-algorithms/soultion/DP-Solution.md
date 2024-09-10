@@ -182,7 +182,7 @@ class Solution {
 
 
 
-### [516. 最长回文子序列](https://leetcode.cn/problems/longest-palindromic-subsequence/)
+### [最长回文子序列_516](https://leetcode.cn/problems/longest-palindromic-subsequence/)
 
 > 给你一个字符串 `s` ，找出其中最长的回文子序列，并返回该序列的长度。
 >
@@ -240,6 +240,36 @@ int knapsackDP(int[] wgt, int[] val, int cap) {
             } else {
                 // 不选和选物品 i 这两种方案的较大值
                 dp[i][c] = Math.max(dp[i - 1][c], dp[i - 1][c - wgt[i - 1]] + val[i - 1]);
+            }
+        }
+    }
+    return dp[n][cap];
+}
+```
+
+
+
+### 完全背包问题
+
+> 给定 n 个物品，第 i 个物品的重量为 *wgt[i-1]* 、价值为 *val[i-1]*，和一个容量为 *cap* 的背包。**每个物品可以重复选取**，问在限定背包容量下能放入物品的最大价值![](https://www.hello-algo.com/chapter_dynamic_programming/unbounded_knapsack_problem.assets/unbounded_knapsack_example.png)
+
+思路：完全背包问题和 0-1 背包问题非常相似，**区别仅在于不限制物品的选择次数**
+
+```java
+/* 完全背包：动态规划 */
+int unboundedKnapsackDP(int[] wgt, int[] val, int cap) {
+    int n = wgt.length;
+    // 初始化 dp 表
+    int[][] dp = new int[n + 1][cap + 1];
+    // 状态转移
+    for (int i = 1; i <= n; i++) {
+        for (int c = 1; c <= cap; c++) {
+            if (wgt[i - 1] > c) {
+                // 若超过背包容量，则不选物品 i
+                dp[i][c] = dp[i - 1][c];
+            } else {
+                // 不选和选物品 i 这两种方案的较大值
+                dp[i][c] = Math.max(dp[i - 1][c], dp[i][c - wgt[i - 1]] + val[i - 1]);
             }
         }
     }
@@ -328,6 +358,90 @@ public boolean canPartition(int[] nums) {
 
 
 
+### [零钱兑换_322](https://leetcode.cn/problems/coin-change/)
+
+> 给你一个整数数组 `coins` ，表示不同面额的硬币；以及一个整数 `amount` ，表示总金额。
+>
+> 计算并返回可以凑成总金额所需的 **最少的硬币个数** 。如果没有任何一种硬币组合能组成总金额，返回 `-1` 。
+>
+> 你可以认为每种硬币的数量是无限的。
+>
+> ```
+> 输入：coins = [1, 2, 5], amount = 11
+> 输出：3 
+> 解释：11 = 5 + 5 + 1
+> ```
+
+思路：
+
+**零钱兑换可以看作完全背包问题的一种特殊情况**
+
+- “物品”对应“硬币”、“物品重量”对应“硬币面值”、“背包容量”对应“目标金额”。
+- 优化目标相反，完全背包问题是要最大化物品价值，零钱兑换问题是要最小化硬币数量
+
+1. 定义状态：只使用 `coins` 中的前 `i` 个（`i` 从 1 开始计数）硬币的面值，若想凑出金额 `j`，最少有 `dp[i][j]` 种凑法
+2. 状态转移方程：`dp[i][j] = Math.min(dp[i-1][j],dp[i,j-coins[i-1]+1])`
+3. base case：`dp[0][a] = MAX`
+
+
+
+```java
+/* 零钱兑换：动态规划 */
+int coinChangeDP(int[] coins, int amt) {
+    int n = coins.length;
+    //amt + 1 表示无效解
+    int MAX = amt + 1;
+    // 初始化 dp 表
+    int[][] dp = new int[n + 1][amt + 1];
+    // 状态转移：首行首列
+    for (int a = 1; a <= amt; a++) {
+        dp[0][a] = MAX;
+    }
+    // 状态转移：其余行和列
+    for (int i = 1; i <= n; i++) {
+        for (int a = 1; a <= amt; a++) {
+            if (coins[i - 1] > a) {
+                // 若超过目标金额，则不选硬币 i
+                dp[i][a] = dp[i - 1][a];
+            } else {
+                // 不选和选硬币 i 这两种方案的较小值  ，硬币数量而非商品价值，因此在选中硬币时执行 +1 
+                dp[i][a] = Math.min(dp[i - 1][a], dp[i][a - coins[i - 1]] + 1);
+            }
+        }
+    }
+    return dp[n][amt] != MAX ? dp[n][amt] : -1;
+}
+```
+
+![](https://www.hello-algo.com/chapter_dynamic_programming/unbounded_knapsack_problem.assets/coin_change_dp_step1.png)空间优化后
+
+```java
+/* 零钱兑换：空间优化后的动态规划 */
+int coinChangeDPComp(int[] coins, int amt) {
+    int n = coins.length;
+    int MAX = amt + 1;
+    // 初始化 dp 表
+    int[] dp = new int[amt + 1];
+    Arrays.fill(dp, MAX);
+    dp[0] = 0;
+    // 状态转移
+    for (int i = 1; i <= n; i++) {
+        for (int a = 1; a <= amt; a++) {
+            if (coins[i - 1] > a) {
+                // 若超过目标金额，则不选硬币 i
+                dp[a] = dp[a];
+            } else {
+                // 不选和选硬币 i 这两种方案的较小值
+                dp[a] = Math.min(dp[a], dp[a - coins[i - 1]] + 1);
+            }
+        }
+    }
+    return dp[amt] != MAX ? dp[amt] : -1;
+}
+```
+
+
+
 ### [零钱兑换 II_518](https://leetcode.cn/problems/coin-change-ii/)
 
 > 给你一个整数数组 `coins` 表示不同面额的硬币，另给一个整数 `amount` 表示总金额。
@@ -358,9 +472,63 @@ public boolean canPartition(int[] nums) {
 
 1. 定义状态：**若只使用 `coins` 中的前 `i` 个（`i` 从 1 开始计数）硬币的面值，若想凑出金额 `j`，有 `dp[i][j]` 种凑法**。
 2. base case 为 `dp[0][..] = 0, dp[..][0] = 1`。`i = 0` 代表不使用任何硬币面值，这种情况下显然无法凑出任何金额；`j = 0` 代表需要凑出的目标金额为 0，那么什么都不做就是唯一的一种凑法
-3. 
 
-### [编辑距离（72）](https://leetcode.cn/problems/edit-distance/)
+
+
+
+
+### [最小路径和_64](https://leetcode.cn/problems/minimum-path-sum/)
+
+> 给定一个包含非负整数的 `m * x ` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+>
+> **说明：**每次只能向下或者向右移动一步。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg)
+>
+> ```
+> 输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+> 输出：7
+> 解释：因为路径 1→3→1→1→1 的总和最小。
+> ```
+
+思路：
+
+递归解法，dp[i][l]
+
+```java
+int dp(int[][] grid, int i, int j) {
+    // base case
+    if (i == 0 && j == 0) {
+        return grid[0][0];
+    }
+    // 如果索引出界，返回一个很大的值，
+    // 保证在取 min 的时候不会被取到
+    if (i < 0 || j < 0) {
+        return Integer.MAX_VALUE;
+    }
+
+    // 左边和上面的最小路径和加上 grid[i][j]
+    // 就是到达 (i, j) 的最小路径和
+    return Math.min(
+            dp(grid, i - 1, j), 
+            dp(grid, i, j - 1)
+        ) + grid[i][j];
+}
+```
+
+
+
+## 股票问题
+
+ [[stock-problems]]
+
+
+
+
+
+## 其他热题
+
+### [编辑距离_72](https://leetcode.cn/problems/edit-distance/)
 
 > 给你两个单词 `word1` 和 `word2`， *请返回将 `word1` 转换成 `word2` 所使用的最少操作数* 。
 >
@@ -381,17 +549,58 @@ public boolean canPartition(int[] nums) {
 > exection -> execution (插入 'u')
 > ```
 
+思路：
+
+编辑距离，也称 Levenshtein 距离，指两个字符串之间互相转换的最少修改次数，通常用于在信息检索和自然语言处理中度量两个序列的相似度。
+
+1. 定义状态：设字符串 s 和 t 的长度分别为 m 和 n ，我们先考虑两字符串尾部的字符 *s[m-1]* 和 *t[n-1]*。
+
+   - 若 *s[m-1]* 和  *t[n-1]* 相同，我们可以跳过它们，直接考虑  *s[m-2]*  和  *t[n-2]*。
+   - 若 *s[m-1]* 和  *t[n-1]*  不同，我们需要对 s 进行一次编辑（插入、删除、替换），使得两字符串尾部的字符相同，从而可以跳过它们，考虑规模更小的问题
+
+   也就是说，我们在字符串 中进行的每一轮决策（编辑操作），都会使得 s 和 t 中剩余的待匹配字符发生变化。因此，状态为当前在 s和 t 中考虑的第 i 和第 j  个字符，记为 `dp[i][j]`。
+
+2. 状态转移方程：`dp[i][j]` 对应的两个字符串的尾部字符 `s[i-1]` 和 `t[j-1]` ，根据不同的编辑操作（增、删、改）可以有 3 种情况
+
+   - 在  `s[i-1]`  之后添加 `t[j-1]` ，剩余子问题 `dp[i][j-1]`
+   - 删除 `t[j-1]`，剩余子问题 `dp[i-1][j]`
+   - 把 `s[i-1]`  替换为 `t[j-1]` ，剩余子问题 `dp[i-1][j-1]`
+
+   最优步数是这 3 种情况的最小值，`dp[i][j] = Math.min(Math.min(dp[i][j - 1], dp[i - 1][j]), dp[i - 1][j - 1]) + 1`
+
+   3. base case :  `dp[i][0] = i;`  `dp[0][j] = j;`
+
+```java
+/* 编辑距离：动态规划 */
+int editDistanceDP(String s, String t) {
+    int n = s.length(), m = t.length();
+    int[][] dp = new int[n + 1][m + 1];
+    // 状态转移：首行首列
+    for (int i = 1; i <= n; i++) {
+        dp[i][0] = i;
+    }
+    for (int j = 1; j <= m; j++) {
+        dp[0][j] = j;
+    }
+    // 状态转移：其余行和列
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (s.charAt(i - 1) == t.charAt(j - 1)) {
+                // 若两字符相等，则直接跳过此两字符
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                // 最少编辑步数 = 插入、删除、替换这三种操作的最少编辑步数 + 1
+                dp[i][j] = Math.min(Math.min(dp[i][j - 1], dp[i - 1][j]), dp[i - 1][j - 1]) + 1;
+            }
+        }
+    }
+    return dp[n][m];
+}
+```
 
 
 
-
-
-
-
-
-
-
-## [括号生成_22](https://leetcode-cn.com/problems/generate-parentheses/)
+### [括号生成_22](https://leetcode-cn.com/problems/generate-parentheses/)
 
 > 数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
 >
@@ -405,8 +614,7 @@ public boolean canPartition(int[] nums) {
 > 输出：["()"]
 > ```
 
-属于dfs
-
+思路：属于dfs
 
 
 

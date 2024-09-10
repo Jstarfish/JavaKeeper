@@ -1,9 +1,11 @@
 ---
 title: 股票买卖问题-套路解题
 date: 2022-03-09
-tags: 
- - DP
+tags:
+  - DP
 categories: leetcode
+aliases:
+  - DP-Solution
 ---
 
 ![](https://img.starfish.ink/leetcode/stock-profit-banner.png)

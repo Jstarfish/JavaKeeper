@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/MySQL/MySQL-Lock.md",
+                "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "mode": "source",
                 "source": false
               }
@@ -57,7 +57,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
+                "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "mode": "source",
                 "source": false
               }
@@ -69,14 +69,14 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "framework/SpringWebFlux/响应式编程.md",
+                "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
         ],
-        "currentTab": 4
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -150,7 +150,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
+                "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -167,7 +167,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
+                "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -190,12 +190,11 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md"
+                "file": "data-structure-algorithms/soultion/DP-Solution.md"
               }
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
@@ -211,8 +210,19 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "f02bfed475530fbe",
+  "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-structure-algorithms/algorithm/Sort.md",
+    "data-structure-algorithms/algorithm/Greedy~.md",
+    "data-structure-algorithms/algorithm/Greedy.md",
+    "data-structure-algorithms/soultion/stock-problems.md",
+    "data-structure-algorithms/soultion/DP-Solution.md",
+    "data-management/MySQL/MySQL-Lock.md",
+    "framework/SpringWebFlux/响应式编程.md",
+    "java/JVM/JVM性能监控和故障处理工具.md",
+    "sidebar.md",
+    "data-structure-algorithms/algorithm/Backtracking.md",
+    "data-structure-algorithms/algorithm/Dynamic-Programming.md",
     "data-structure-algorithms/algorithm/DFS.md",
     "data-management/MySQL/MySQL-Select.md",
     "java/JVM/Runtime-Data-Areas.md",
@@ -229,17 +239,6 @@
     "interview/GC-FAQ.md",
     "interview/networks-interview.md",
     "java/JVM/对象的创建.md",
-    "interview/Ability-FAQ.md",
-    "interview/Untitled.md",
-    "interview/JVM-FAQ.md",
-    "data-management/Redis/Redis-Database.md",
-    "data-management/Redis/Redis-Datatype.md",
-    "data-management/Redis/Redis-Cluster.md",
-    "data-management/Redis/Redis 有用指令.md",
-    "data-management/Redis/ReadRedis.md",
-    "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
-    "data-management/Redis/reproduce/Key 寻址算法.md",
-    "data-management/Redis/reproduce/Cache-Design.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]

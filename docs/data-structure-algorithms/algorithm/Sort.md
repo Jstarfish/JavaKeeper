@@ -6,9 +6,11 @@ tags:
 categories: Algorithm
 ---
 
+![img](https://miro.medium.com/v2/resize:fit:1400/1*ZY2e2BNXTYBf9aBBHALCAw.png)
+
 > 排序算法可以分为内部排序和外部排序，内部排序是数据记录在内存中进行排序，而外部排序是因排序的数据很大，一次不能容纳全部的排序记录，在排序过程中需要访问外存。常见的内部排序算法有：**插入排序、希尔排序、选择排序、冒泡排序、归并排序、快速排序、堆排序、基数排序**等。用一张图概括：
 >
-> ![十大经典排序算法 概览截图](/Users/starfish/Desktop/sort.png)
+> ![十大经典排序算法 概览截图](https://ask.qcloudimg.com/http-save/yehe-1196009/nky6kqzm0o.png)
 
 **关于时间复杂度**：
 
@@ -19,9 +21,9 @@ categories: Algorithm
 
 **关于稳定性**：
 
-稳定的排序算法：冒泡排序、插入排序、归并排序和基数排序。
+稳定的排序算法：冒泡排序、插入排序、归并排序和基数排序
 
-不是稳定的排序算法：选择排序、快速排序、希尔排序、堆排序。
+不稳定的排序算法：选择排序、快速排序、希尔排序、堆排序
 
 **名词解释**：
 
@@ -64,38 +66,36 @@ categories: Algorithm
 
 
 
-### 3. 什么时候最快
+- **什么时候最快**：当输入的数据已经是正序时（都已经是正序了，我还要你冒泡排序有何用啊）。
 
-当输入的数据已经是正序时（都已经是正序了，我还要你冒泡排序有何用啊）。
-
-### 4. 什么时候最慢
-
-当输入的数据是反序时（写一个 for 循环反序输出数据不就行了，干嘛要用你冒泡排序呢，我是闲的吗）。
+- **什么时候最慢**：当输入的数据是反序时（写一个 for 循环反序输出数据不就行了，干嘛要用你冒泡排序呢，我是闲的吗）。
 
 ```java
-public class BubbleSort {
-
-    public static void main(String[] args) {
-        int[] arrs = {1, 3, 4, 2, 6, 5};
-
-        for (int i = 0; i < arrs.length; i++) {
-            for (int j = 0; j < arrs.length - 1 - i; j++) {
-                if (arrs[j] > arrs[j + 1]) {
-                    int tmp = arrs[j];
-                    arrs[j] = arrs[j + 1];
-                    arrs[j + 1] = tmp;
-                }
-            }
-        }
-
-        for (int arr : arrs) {
-            System.out.print(arr + " ");
-        }
+//冒泡排序，a 表示数组， n 表示数组大小
+public void bubbleSort(int[] a) {
+  int n = a.length;
+  if (n <= 1) return;
+  // 外层循环遍历每一个元素
+  for (int i = 0; i < n; i++) {
+    //提前退出冒泡循环的标志位
+    boolean flag = false;
+    // 内层循环进行元素的比较与交换
+    for (int j = 0; j < n - i - 1; j++) {
+      if (a[j] > a[j+1]) {
+        int temp = a[j];
+        a[j] = a[j+1];
+        a[j+1] = temp;
+        flag = true; //表示有数据交换
+      }
     }
+    if (!flag) break; //没有数据交换，提前退出。
+  }
 }
 ```
 
 嵌套循环，应该立马就可以得出这个算法的时间复杂度为 $O(n²)$。
+
+冒泡的过程只涉及相邻数据的交换操作，只需要常量级的临时空间，所以它的空间复杂度是O(1)，是一个原地排序算法。
 
 
 
@@ -116,28 +116,21 @@ public class BubbleSort {
 ![img](https://miro.medium.com/max/551/1*OA7a3OGWmGMRJQmwkGIwAw.gif)
 
 ```java
-public class SelectionSort {
-
-    public static void main(String[] args) {
-        int[] arrs = {5, 2, 4, 6, 1, 3};
-
-        for (int i = 0; i < arrs.length; i++) {
-            //最小元素下标
-            int min = i;
-            for (int j = i +1; j < arrs.length; j++) {
-                if (arrs[j] < arrs[min]) {
-                    min = j;
-                }
-            }
-            //交换位置
-            int temp = arrs[i];
-            arrs[i] = arrs[min];
-            arrs[min] = temp;
-        }
-        for (int arr : arrs) {
-            System.out.println(arr);
-        }
-    }
+public void selectionSort(int [] arrs) {
+      for (int i = 0; i < arrs.length; i++) {
+          //最小元素下标
+          int min = i;
+          for (int j = i +1; j < arrs.length; j++) {
+              if (arrs[j] < arrs[min]) {
+                  min = j;
+              }
+          }
+          //交换位置
+          int temp = arrs[i];
+          arrs[i] = arrs[min];
+          arrs[min] = temp;
+      }
+  }
 }
 ```
 
@@ -145,14 +138,14 @@ public class SelectionSort {
 
 ## 插入排序
 
-插入排序的代码实现虽然没有冒泡排序和选择排序那么简单粗暴，但它的原理应该是最容易理解的了，因为只要打过扑克牌的人都应该能够秒懂。插入排序是一种最简单直观的排序算法，它的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。
+插入排序的代码实现虽然没有冒泡排序和选择排序那么简单粗暴，但它的原理应该是最容易理解的了，因为只要打过扑克牌的人都应该能够秒懂。插入排序是一种最简单直观的排序算法，它的工作原理为将待排列元素划分为「已排序」和「未排序」两部分，每次从「未排序的」元素中选择一个插入到「已排序的」元素中的正确位置。![insertion sort animate example](https://oi-wiki.org/basic/images/insertion-sort-animate.svg)
 
 插入排序和冒泡排序一样，也有一种优化算法，叫做拆半插入。
 
 ### 1. 算法步骤
 
 1. 从第一个元素开始，该元素可以认为已经被排序；
-2. 取出下一个元素，在已经排序的元素序列中从后向前扫描；
+2. 取出下一个元素，在已经排序的元素序列中**从后向前**扫描；
 3. 如果该元素（已排序）大于新元素，将该元素移到下一位置；
 4. 重复步骤3，直到找到已排序的元素小于或者等于新元素的位置；
 5. 将新元素插入到该位置后；
@@ -163,8 +156,7 @@ public class SelectionSort {
 ![](https://miro.medium.com/max/500/1*onU9OmVftR5WeoLWh14iZw.gif)
 
 ```java
-public static void main(String[] args) {
-    int[] arr = {5, 2, 4, 6, 1, 3};
+public void insertionSort(int[] arr) {
     // 从下标为1的元素开始选择合适的位置插入，因为下标为0的只有一个元素，默认是有序的
     for (int i = 1; i < arr.length; i++) {
 
@@ -172,22 +164,14 @@ public static void main(String[] args) {
         int tmp = arr[i];
 
         // 从已经排序的序列最右边的开始比较，找到比其小的数
-        int j = i;
-        while (j > 0 && tmp < arr[j - 1]) {
-            arr[j] = arr[j - 1];
+        int j = i - 1;
+        while (j > 0 && arr[j] > tmp) {
+            arr[j + 1] = arr[j];
             j--;
         }
-
         // 存在比其小的数，插入
-        if (j != i) {
-            arr[j] = tmp;
-        }
+        arr[j + 1] = tmp;
     }
-
-    for (int i : arr) {
-        System.out.println(i);
-    }
-}
 }
 ```
 
@@ -200,6 +184,8 @@ public static void main(String[] args) {
 快速排序的核心思想也是分治法，分而治之。它的实现方式是每次从序列中选出一个基准值，其他数依次和基准值做比较，比基准值大的放右边，比基准值小的放左边，然后再对左边和右边的两组数分别选出一个基准值，进行同样的比较移动，重复步骤，直到最后都变成单个元素，整个数组就成了有序的序列。
 
 > 快速排序的最坏运行情况是 O(n²)，比如说顺序数列的快排。但它的平摊期望时间是 O(nlogn)，且 O(nlogn) 记号中隐含的常数因子很小，比复杂度稳定等于 O(nlogn) 的归并排序要小很多。所以，对绝大多数顺序性较弱的随机数列而言，快速排序总是优于归并排序。
+>
+> ![img](https://miro.medium.com/v2/resize:fit:1400/1*DXQsNsa-DeGjsMtp7V6z9A.png)
 
 ### 1. 算法步骤
 
@@ -207,7 +193,7 @@ public static void main(String[] args) {
 2. 重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区退出之后，该基准就处于数列的中间位置。这个称为分区（partition）操作；
 3. 递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序；
 
-递归的最底部情形，是数列的大小是零或一，也就是永远都已经被排序好了。虽然一直递归下去，但是这个算法总会退出，因为在每次的迭代（iteration）中，它至少会把一个元素摆到它最后的位置去。
+递归的最底部情形，是数列的大小是零或一，也就是数组都已经被排序好了。虽然一直递归下去，但是这个算法总会退出，因为在每次的迭代（iteration）中，它至少会把一个元素摆到它最后的位置去。
 
 ### 2. 动图演示
 
@@ -254,63 +240,125 @@ public static int partion(int[] arrs, int startIndex, int endIndex) {
 我们来看一下实现代码，不同之处只有 partition 方法：
 
 ```java
-public static void sort(int[] arr) {
-    sort(arr， 0， arr.length - 1);
+// 快速排序方法
+public void quickSort(int[] arr) {
+  quickSortC(arr, 0, arr.length-1);
 }
 
-private static void sort(int[] arr， int startIndex， int endIndex) {
-    if (endIndex <= startIndex) {
-        return;
+public void quickSort(int[] arr, int low, int high) {
+    if (low < high) {
+        // pi 是 partitioning index，arr[pi] 现在处于正确位置
+        int pi = partition(arr, low, high);
+
+        // 递归地对基准左侧和右侧的子数组进行排序
+        quickSort(arr, low, pi - 1);  // 排序基准左侧的子数组
+        quickSort(arr, pi + 1, high); // 排序基准右侧的子数组
     }
-    //切分
-    int pivotIndex = partition(arr， startIndex， endIndex);
-    sort(arr， startIndex， pivotIndex-1);
-    sort(arr， pivotIndex+1， endIndex);
 }
 
+// 用于找到基准元素的正确位置并进行分区
+private int partition(int[] arr, int low, int high) {
+    int pivot = arr[high];    // 选择最后一个元素作为基准
+    int i = low - 1;  // i是较小元素的索引，小于基准元素的区间右边界
 
-private static int partition(int[] arr， int startIndex， int endIndex) {
-    int left = startIndex;
-    int right = endIndex;
-    int pivot = arr[startIndex];//取第一个元素为基准值
-
-    while (true) {
-        //从左往右扫描
-        while (arr[left] <= pivot) {
-            left++;
-            if (left == right) {
-                break;
-            }
+    for (int j = low; j < high; j++) {
+        // 如果当前元素小于或等于pivot
+        if (arr[j] <= pivot) {
+            i++;
+            // 交换 arr[i] 和 arr[j]
+            swap(arr, i, j);
         }
-
-        //从右往左扫描
-        while (pivot < arr[right]) {
-            right--;
-            if (left == right) {
-                break;
-            }
-        }
-
-        //左右指针相遇
-        if (left >= right) {
-            break;
-        }
-
-        //交换左右数据
-        int temp = arr[left];
-        arr[left] = arr[right];
-        arr[right] = temp;
     }
 
-    //将基准值插入序列
-    int temp = arr[startIndex];
-    arr[startIndex] = arr[right];
-    arr[right] = temp;
-    return right;
+    // 交换 arr[i+1] 和 arr[high] (或 pivot)
+    // 将基准元素放到正确位置
+    swap(arr, i + 1, right);
+
+    return i + 1;
 }
+
+  // 交换数组中的两个元素
+  private static void swap(int[] arr, int i, int j) {
+      int temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+  }
 ```
 
 
+
+## 归并排序
+
+> ![img](https://miro.medium.com/v2/resize:fit:1400/1*1gyAaMcfcGIuZqrLJNDmgA.png)
+
+归并排序（Merge sort）是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。
+
+分治，就是分而治之，将一个大问题分解成小的子问题来解决。小的问题解决了，大问题也就解决了。
+
+分治思想和递归思想很像。分治算法一般都是用递归来实现的。**分治是一种解决问题的处理思想，递归是一种编程技巧**，这两者并不冲突。
+
+作为一种典型的分而治之思想的算法应用，归并排序的实现由两种方法：
+
+- 自上而下的递归
+- 自下而上的迭代（所有递归的方法都可以用迭代重写，所以就有了第 2 种方法）
+
+和选择排序一样，归并排序的性能不受输入数据的影响，但表现比选择排序好的多，因为始终都是 $O(nlogn)$ 的时间复杂度。代价是需要额外的内存空间。
+
+### 1. 算法步骤
+
+1. 申请空间，使其大小为两个已经排序序列之和，该空间用来存放合并后的序列；
+2. 设定两个指针，最初位置分别为两个已经排序序列的起始位置；
+3. 比较两个指针所指向的元素，选择相对小的元素放入到合并空间，并移动指针到下一位置；
+4. 重复步骤 3 直到某一指针达到序列尾；
+5. 将另一序列剩下的所有元素直接复制到合并序列尾。
+
+### 2. 动图演示
+
+![img](https://miro.medium.com/max/300/1*fE7yGW2WPaltJWo6OnZ8LQ.gif)
+
+```java
+/* 合并左子数组和右子数组 */
+void merge(int[] nums, int left, int mid, int right) {
+    // 左子数组区间为 [left, mid], 右子数组区间为 [mid+1, right]
+    // 创建一个临时数组 tmp ，用于存放合并后的结果
+    int[] tmp = new int[right - left + 1];
+    // 初始化左子数组和右子数组的起始索引
+    int i = left, j = mid + 1, k = 0;
+    // 当左右子数组都还有元素时，进行比较并将较小的元素复制到临时数组中
+    while (i <= mid && j <= right) {
+        if (nums[i] <= nums[j])
+            tmp[k++] = nums[i++];
+        else
+            tmp[k++] = nums[j++];
+    }
+    // 将左子数组和右子数组的剩余元素复制到临时数组中
+    while (i <= mid) {
+        tmp[k++] = nums[i++];
+    }
+    while (j <= right) {
+        tmp[k++] = nums[j++];
+    }
+    // 将临时数组 tmp 中的元素复制回原数组 nums 的对应区间
+    for (k = 0; k < tmp.length; k++) {
+        nums[left + k] = tmp[k];
+    }
+}
+
+/* 归并排序 */
+void mergeSort(int[] nums, int left, int right) {
+    // 终止条件
+    if (left >= right)
+        return; // 当子数组长度为 1 时终止递归
+    // 划分阶段
+    int mid = left + (right - left) / 2; // 计算中点
+    mergeSort(nums, left, mid); // 递归左子数组
+    mergeSort(nums, mid + 1, right); // 递归右子数组
+    // 合并阶段
+    merge(nums, left, mid, right);
+}
+```
+
+![img](https://miro.medium.com/v2/resize:fit:1400/1*rx1sSHQEwVI0H9_6DP0S-Q.png)
 
 
 
@@ -334,41 +382,6 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 ### 2. 动图演示
 
 ![img](https://mmbiz.qpic.cn/mmbiz_gif/951TjTgiabkzow2ORRzgpfHIGAKIAWlXm6GpRDRhiczgOdibbGBtpibtIhX4YRzibicUyEOSVh3JZBHtiaZPN30X1WOhA/640?wx_fmt=gif&tp=webp&wxfrom=5&wx_lazy=1)
-
-
-
-## 归并排序
-
-> https://www.cnblogs.com/chengxiao/p/6194356.html
-
-归并排序（Merge sort）是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。
-
-作为一种典型的分而治之思想的算法应用，归并排序的实现由两种方法：
-
-- 自上而下的递归（所有递归的方法都可以用迭代重写，所以就有了第 2 种方法）；
-- 自下而上的迭代；
-
-在《数据结构与算法 JavaScript 描述》中，作者给出了自下而上的迭代方法。但是对于递归法，作者却认为：
-
-> However, it is not possible to do so in JavaScript, as the recursion goes too deep for the language to handle.
->
-> 然而，在 JavaScript 中这种方式不太可行，因为这个算法的递归深度对它来讲太深了。
-
-说实话，我不太理解这句话。意思是 JavaScript 编译器内存太小，递归太深容易造成内存溢出吗？还望有大神能够指教。
-
-和选择排序一样，归并排序的性能不受输入数据的影响，但表现比选择排序好的多，因为始终都是 O(nlogn) 的时间复杂度。代价是需要额外的内存空间。
-
-### 2. 算法步骤
-
-1. 申请空间，使其大小为两个已经排序序列之和，该空间用来存放合并后的序列；
-2. 设定两个指针，最初位置分别为两个已经排序序列的起始位置；
-3. 比较两个指针所指向的元素，选择相对小的元素放入到合并空间，并移动指针到下一位置；
-4. 重复步骤 3 直到某一指针达到序列尾；
-5. 将另一序列剩下的所有元素直接复制到合并序列尾。
-
-### 3. 动图演示
-
-![img](https://miro.medium.com/max/300/1*fE7yGW2WPaltJWo6OnZ8LQ.gif)
 
 
 
@@ -447,3 +460,10 @@ private static int partition(int[] arr， int startIndex， int endIndex) {
 
 [![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/radixSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/radixSort.gif)
 
+
+
+
+
+## Reference:
+
+- https://yuminlee2.medium.com/sorting-algorithms-summary-f17ea88a9174
