@@ -119,6 +119,8 @@ public static List<List<Integer>> levelOrder(TreeNode treeNode) {
 
 **思路**：翻转整棵树其实就是交换每个节点的左右子节点，**只要把二叉树上的每一个节点的左右子节点进行交换，最后的结果就是完全翻转之后的二叉树**
 
+在**前序位置操作**是为了确保在递归遍历时，首先处理当前节点的子树，具体是交换左右子树的顺序。这样做能够保证在遍历左右子树之前，当前节点的左右子节点已经被正确地交换。
+
 ```java
 public static TreeNode invertTree(TreeNode root) {
   if(root == null){

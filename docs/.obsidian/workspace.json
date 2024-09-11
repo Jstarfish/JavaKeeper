@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/soultion/DP-Solution.md",
+                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
                 "mode": "source",
                 "source": false
               }
@@ -150,8 +150,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/soultion/DP-Solution.md",
-                "collapseAll": false,
+                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -167,7 +167,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/soultion/DP-Solution.md",
+                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -190,11 +190,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/soultion/DP-Solution.md"
+                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md"
               }
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -212,11 +213,12 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-structure-algorithms/data-structure/Binary-Tree.md",
+    "data-structure-algorithms/soultion/DP-Solution.md",
     "data-structure-algorithms/algorithm/Sort.md",
     "data-structure-algorithms/algorithm/Greedy~.md",
     "data-structure-algorithms/algorithm/Greedy.md",
     "data-structure-algorithms/soultion/stock-problems.md",
-    "data-structure-algorithms/soultion/DP-Solution.md",
     "data-management/MySQL/MySQL-Lock.md",
     "framework/SpringWebFlux/响应式编程.md",
     "java/JVM/JVM性能监控和故障处理工具.md",
@@ -238,7 +240,6 @@
     "interview/MyBatis-FAQ~.md",
     "interview/GC-FAQ.md",
     "interview/networks-interview.md",
-    "java/JVM/对象的创建.md",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
   ]
