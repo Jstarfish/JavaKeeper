@@ -563,6 +563,78 @@ java.lang.reflect.AnnotatedElement 接口是所有程序元素（Class、Method�
 
 ### 有用过jdk17吗，有什么新特性
 
+JDK 17 是 Java 的长期支持版本（LTS），发布于 2021 年，带来了许多新特性和改进，以下是一些重要的更新：
+
+1. **Sealed Classes（封闭类）**
+
+JDK 17 引入了封闭类（Sealed Classes），它允许你限制哪些类可以继承或实现一个特定的类或接口。通过这种方式，开发者可以更好地控制继承结构。封闭类通过 `permits` 关键字指定哪些类可以继承。
+
+```java
+public abstract sealed class Shape permits Circle, Rectangle {
+}
+```
+
+2. **Pattern Matching for Switch (预览)**
+
+在 JDK 17 中，switch 语句的模式匹配功能被引入（作为预览功能）。这使得 switch 语句不仅可以根据值进行匹配，还可以根据类型进行匹配。以前的 switch 仅支持基本类型或枚举，而新特性扩展了其灵活性。
+
+```java
+static String formatterPatternSwitch(Object obj) {
+    return switch (obj) {
+        case Integer i -> String.format("int %d", i);
+        case Long l    -> String.format("long %d", l);
+        case String s  -> String.format("String %s", s);
+        default        -> obj.toString();
+    };
+}
+```
+
+3. **Records（记录类型）增强**
+
+Records 是 JDK 16 引入的特性，但在 JDK 17 中得到了进一步增强。Records 提供了一种简洁的方式来创建不可变的数据类，它自动生成构造函数、`equals()`、`hashCode()` 和 `toString()` 方法。
+
+```java
+public record Point(int x, int y) {}
+```
+
+4. **强封装的 Java 内部 API**
+
+JDK 17 强化了对 Java 内部 API 的封装，默认情况下不再允许非公共 API 访问其他模块的内部 API。通过此特性，Java 模块化变得更加安全，防止非预期的依赖。
+
+5. **Foreign Function & Memory API (外部函数和内存 API)**
+
+JDK 17 通过新的外部函数和内存 API 预览功能，允许 Java 程序直接调用非 Java 代码（如本地代码）。这一特性极大增强了与原生系统库的集成能力。
+
+```java
+MemorySegment segment = MemorySegment.allocateNative(100);
+```
+
+6. **macOS 上的 AArch64 支持**
+
+随着 Apple M1 处理器的推出，JDK 17 为 macOS 引入了对 AArch64 架构的支持。开发者现在可以在 macOS 的 ARM 平台上更高效地运行 Java 程序。
+
+7. **Deprecation for Removal of RMI Activation**
+
+RMI Activation（远程方法调用激活机制）已经被弃用并计划在未来移除。这一功能的移除是因为它在现代分布式系统中较少使用，并且存在更好的替代方案。
+
+8. **Vector API (预览)**
+
+JDK 17 进一步预览了 Vector API，允许在 Java 中进行向量运算。Vector API 利用 SIMD（单指令多数据）硬件指令，可以实现高性能的数学计算。这对科学计算和机器学习任务尤为重要。
+
+```java
+VectorSpecies<Float> SPECIES = FloatVector.SPECIES_256;
+```
+
+9. **简化的强制性 NullPointerException 信息**
+
+JDK 17 改进了 `NullPointerException` 的错误信息，帮助开发者更快定位问题。例如，如果你访问空引用对象的字段，JDK 17 会明确指出是哪个字段导致了异常。
+
+10. **默认垃圾回收器 ZGC 和 G1 的改进**
+
+JDK 17 对 ZGC（Z Garbage Collector）和 G1 垃圾回收器进行了优化，以进一步降低垃圾收集的延迟，并提高应用程序的整体性能。
+
+这些新特性和改进使得 JDK 17 成为一个功能丰富、性能优越的版本，特别适合长期支持和大规模企业级应用。
+
 
 
 ### lambda 原理
