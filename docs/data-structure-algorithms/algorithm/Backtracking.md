@@ -74,9 +74,9 @@ function backtrack(solution, candidates):  //入参可以理解为 路径, 选�
 
 
 
-## 热门面试题
+### Demo
 
-### [全排列_46](https://leetcode.cn/problems/permutations/description/)
+#### [全排列](https://leetcode.cn/problems/permutations/description/)
 
 > 给定一个不含重复数字的数组 `nums` ，返回其 *所有可能的全排列* 。你可以 **按任意顺序** 返回答案。
 >
@@ -141,6 +141,10 @@ class Solution {
 
 ![image.png](https://pic.leetcode-cn.com/0bf18f9b86a2542d1f6aa8db6cc45475fce5aa329a07ca02a9357c2ead81eec1-image.png)
 
+# 热门面试题
+
+## 排列、组合类
+
 > 无论是排列、组合还是子集问题，简单说无非就是让你从序列 `nums` 中以给定规则取若干元素，主要有以下几种变体：
 >
 > **形式一、元素无重不可复选，即 `nums` 中的元素都是唯一的，每个元素最多只能被使用一次，这也是最基本的形式**。
@@ -165,7 +169,9 @@ class Solution {
 
 
 
-### [子集_78](https://leetcode.cn/problems/subsets/)
+### 一、元素无重不可复选
+
+#### [子集_78](https://leetcode.cn/problems/subsets/)
 
 > 给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
 >
@@ -176,7 +182,7 @@ class Solution {
 > 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
 > ```
 
-思路：![](https://labuladong.online/algo/images/排列组合/5.jpeg)
+思路：使用 `start` 参数控制树枝的生长避免产生重复的子集，用 `track` 记录根节点到每个节点的路径的值，同时在前序位置把每个节点的路径值收集起来，完成回溯树的遍历就收集了所有子集![](https://labuladong.online/algo/images/排列组合/5.jpeg)
 
 ```java
 class Solution {
@@ -212,7 +218,7 @@ class Solution {
 
 
 
-### [组合_77](https://leetcode.cn/problems/combinations/)
+#### [组合_77](https://leetcode.cn/problems/combinations/)
 
 > 给定两个整数 `n` 和 `k`，返回范围 `[1, n]` 中所有可能的 `k` 个数的组合。你可以按 **任何顺序** 返回答案。
 >
@@ -227,7 +233,6 @@ class Solution {
 > [1,3],
 > [1,4],
 > ]
-> 
 > ```
 
 思路：翻译一下就变成子集问题了：
@@ -249,6 +254,7 @@ class Solution {
 
     // 主函数
     public List<List<Integer>> combine(int n, int k) {
+        // start 从 1 开始即可
         backtrack(1, n, k);
         return res;
     }
@@ -273,6 +279,314 @@ class Solution {
     }
 }
 ```
+
+
+
+#### [全排列_46](https://leetcode.cn/problems/permutations/description/)
+
+组合/子集问题使用 `start` 变量保证元素 `nums[start]` 之后只会出现 `nums[start+1..]`中的元素，通过固定元素的相对位置保证不出现重复的子集。
+
+**但排列问题本身就是让你穷举元素的位置，`nums[i]` 之后也可以出现 `nums[i]` 左边的元素，所以之前的那一套玩不转了，需要额外使用 `used` 数组来标记哪些元素还可以被选择**。
+
+![img](https://labuladong.online/algo/images/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/7.jpeg)
+
+```java
+class Solution {
+
+    List<List<Integer>> res = new LinkedList<>();
+    // 记录回溯算法的递归路径
+    LinkedList<Integer> track = new LinkedList<>();
+    // track 中的元素会被标记为 true
+    boolean[] used;
+
+    // 主函数，输入一组不重复的数字，返回它们的全排列
+    public List<List<Integer>> permute(int[] nums) {
+        used = new boolean[nums.length];
+        backtrack(nums);
+        return res;
+    }
+
+    // 回溯算法核心函数
+    void backtrack(int[] nums) {
+        // base case，到达叶子节点
+        if (track.size() == nums.length) {
+            // 收集叶子节点上的值
+            res.add(new LinkedList(track));
+            return;
+        }
+
+        // 回溯算法标准框架
+        for (int i = 0; i < nums.length; i++) {
+            // 已经存在 track 中的元素，不能重复选择
+            if (used[i]) {
+                continue;
+            }
+            // 做选择
+            used[i] = true;
+            track.addLast(nums[i]);
+            // 进入下一层回溯树
+            backtrack(nums);
+            // 取消选择
+            track.removeLast();
+            used[i] = false;
+        }
+    }
+}
+```
+
+
+
+### 二、元素可重不可复选
+
+#### [子集 II_90](https://leetcode.cn/problems/subsets-ii/) 
+
+> 给你一个整数数组 `nums` ，其中可能包含重复元素，请你返回该数组所有可能的 子集（幂集）。
+>
+> 解集 **不能** 包含重复的子集。返回的解集中，子集可以按 **任意顺序** 排列。
+>
+> ```
+> 输入：nums = [1,2,2]
+> 输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+> ```
+
+思路：按之前的思路，画出 回溯树，会有重复的，所有我们需要去重（剪枝），**体现在代码上，需要先进行排序，让相同的元素靠在一起，如果发现 `nums[i] == nums[i-1]`，则跳过**：
+
+![img](https://labuladong.online/algo/images/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/9.jpeg)
+
+```java
+class Solution {
+
+    List<List<Integer>> res = new LinkedList<>();
+    LinkedList<Integer> track = new LinkedList<>();
+
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        // 先排序，让相同的元素靠在一起
+        Arrays.sort(nums);
+        backtrack(nums, 0);
+        return res;
+    }
+
+    void backtrack(int[] nums, int start) {
+        // 前序位置，每个节点的值都是一个子集
+        res.add(new LinkedList<>(track));
+        
+        for (int i = start; i < nums.length; i++) {
+            // 剪枝逻辑，值相同的相邻树枝，只遍历第一条
+            if (i > start && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            track.addLast(nums[i]);
+            backtrack(nums, i + 1);
+            track.removeLast();
+        }
+    }
+}
+```
+
+
+
+#### [组合总和 II_40](https://leetcode.cn/problems/combination-sum-ii/)
+
+> 给定一个候选人编号的集合 `candidates` 和一个目标数 `target` ，找出 `candidates` 中所有可以使数字和为 `target` 的组合。
+>
+> `candidates` 中的每个数字在每个组合中只能使用 **一次** 。
+>
+> **注意：**解集不能包含重复的组合。 
+>
+> ```
+> 输入: candidates = [10,1,2,7,6,1,5], target = 8,
+> 输出:
+> [
+> [1,1,6],
+> [1,2,5],
+> [1,7],
+> [2,6]
+> ]
+> ```
+
+思路：说这是一个组合问题，其实换个问法就变成子集问题了：请你计算 `candidates` 中所有和为 `target` 的子集。
+
+只要额外用一个 `trackSum` 变量记录回溯路径上的元素和，然后将 base case 改一改即可解决这道题
+
+```java
+class Solution {
+
+    List<List<Integer>> res = new LinkedList<>();
+    // 记录回溯的路径
+    LinkedList<Integer> track = new LinkedList<>();
+    // 记录 track 中的元素之和
+    int trackSum = 0;
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        if (candidates.length == 0) {
+            return res;
+        }
+        // 先排序，让相同的元素靠在一起
+        Arrays.sort(candidates);
+        backtrack(candidates, 0, target);
+        return res;
+    }
+
+    // 回溯算法主函数
+    void backtrack(int[] nums, int start, int target) {
+        // base case，达到目标和，找到符合条件的组合
+        if (trackSum == target) {
+            res.add(new LinkedList<>(track));
+            return;
+        }
+        // base case，超过目标和，直接结束
+        if (trackSum > target) {
+            return;
+        }
+
+        // 回溯算法标准框架
+        for (int i = start; i < nums.length; i++) {
+            // 剪枝逻辑，值相同的树枝，只遍历第一条
+            if (i > start && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            // 做选择
+            track.add(nums[i]);
+            trackSum += nums[i];
+            // 递归遍历下一层回溯树
+            backtrack(nums, i + 1, target);
+            // 撤销选择
+            track.removeLast();
+            trackSum -= nums[i];
+        }
+    }
+}
+```
+
+
+
+#### [全排列 II_47](https://leetcode.cn/problems/permutations-ii/)
+
+> 给定一个可包含重复数字的序列 `nums` ，***按任意顺序*** 返回所有不重复的全排列。
+>
+> ```
+> 输入：nums = [1,1,2]
+> 输出：
+> [[1,1,2],
+>  [1,2,1],
+>  [2,1,1]]
+> ```
+
+思路：
+
+```java
+class Solution {
+
+    List<List<Integer>> res = new LinkedList<>();
+    LinkedList<Integer> track = new LinkedList<>();
+    boolean[] used;
+
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        // 先排序，让相同的元素靠在一起
+        Arrays.sort(nums);
+        used = new boolean[nums.length];
+        backtrack(nums);
+        return res;
+    }
+
+    void backtrack(int[] nums) {
+        if (track.size() == nums.length) {
+            res.add(new LinkedList(track));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) {
+                continue;
+            }
+            // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) {
+                continue;
+            }
+            track.add(nums[i]);
+            used[i] = true;
+            backtrack(nums);
+            track.removeLast();
+            used[i] = false;
+        }
+    }
+}
+```
+
+
+
+### 三、元素无重复可复选
+
+输入数组无重复元素，但每个元素可以被无限次使用
+
+#### [组合总和_39](https://leetcode.cn/problems/combination-sum/)
+
+> 给你一个 **无重复元素** 的整数数组 `candidates` 和一个目标整数 `target` ，找出 `candidates` 中可以使数字和为目标数 `target` 的 所有 **不同组合** ，并以列表形式返回。你可以按 **任意顺序** 返回这些组合。
+>
+> `candidates` 中的 **同一个** 数字可以 **无限制重复被选取** 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+>
+> 对于给定的输入，保证和为 `target` 的不同组合数少于 `150` 个。
+>
+> ```
+> 输入：candidates = [2,3,6,7], target = 7
+> 输出：[[2,2,3],[7]]
+> 解释：
+> 2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+> 7 也是一个候选， 7 = 7 。
+> 仅有这两种组合。
+> ```
+
+思路：**元素无重可复选，即 `nums` 中的元素都是唯一的，每个元素可以被使用若干次**，只要删掉去重逻辑即可
+
+![img](https://labuladong.online/algo/images/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/10.jpeg)
+
+```java
+class Solution {
+
+    List<List<Integer>> res = new LinkedList<>();
+    // 记录回溯的路径
+    LinkedList<Integer> track = new LinkedList<>();
+    // 记录 track 中的路径和
+    int trackSum = 0;
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        if (candidates.length == 0) {
+            return res;
+        }
+        backtrack(candidates, 0, target);
+        return res;
+    }
+
+    // 回溯算法主函数
+    void backtrack(int[] nums, int start, int target) {
+        // base case，找到目标和，记录结果
+        if (trackSum == target) {
+            res.add(new LinkedList<>(track));
+            return;
+        }
+        // base case，超过目标和，停止向下遍历
+        if (trackSum > target) {
+            return;
+        }
+        // 回溯算法标准框架
+        for (int i = start; i < nums.length; i++) {
+            // 选择 nums[i]
+            trackSum += nums[i];
+            track.add(nums[i]);
+            // 递归遍历下一层回溯树
+            backtrack(nums, i, target);
+            // 同一元素可重复使用，注意参数
+            // 撤销选择 nums[i]
+            trackSum -= nums[i];
+            track.removeLast();
+        }
+    }
+}
+```
+
+
+
+
 
 
 
