@@ -14,7 +14,7 @@ categories: Algorithm
 >
 > 回溯是递归的副产品，只要有递归就会有回溯。
 
-# 回溯算法
+# 一、回溯算法
 
 ## 基本思想
 
@@ -141,7 +141,7 @@ class Solution {
 
 ![image.png](https://pic.leetcode-cn.com/0bf18f9b86a2542d1f6aa8db6cc45475fce5aa329a07ca02a9357c2ead81eec1-image.png)
 
-# 热门面试题
+# 二、热门面试题
 
 ## 排列、组合类
 
@@ -586,11 +586,7 @@ class Solution {
 
 
 
-
-
-
-
-
+## 其他问题
 
 ### [电话号码的字母组合_17](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
 
@@ -609,11 +605,47 @@ class Solution {
 
 图中可以看出遍历的深度，就是输入"23"的长度，而叶子节点就是我们要收集的结果，输出["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]。
 
-
-
 ![](https://pic.leetcode-cn.com/02b0ec926e3da5f12a0a118293b8ac10dc236741ccb04414ded44a30f7fc70af-1573829897(1).jpg)
 
+```java
+class Solution {
+    List<String> result = new ArrayList<>();
+    StringBuilder track = new StringBuilder();
+    public List<String> letterCombinations(String digits) {
 
+        if(digits == null || digits.length() < 1){
+            return result;
+        }
+
+        Map<Character,String> digitToLetters = new HashMap<>();
+        digitToLetters.put('2', "abc");
+        digitToLetters.put('3', "def");
+        digitToLetters.put('4', "ghi");
+        digitToLetters.put('5', "jkl");
+        digitToLetters.put('6', "mno");
+        digitToLetters.put('7', "pqrs");
+        digitToLetters.put('8', "tuv");
+        digitToLetters.put('9', "wxyz");
+
+        backtrack(digits, 0, digitToLetters);
+        return result;
+    }
+
+    private void backtrack(String digits, int index, Map<Character, String> digitToLetters) {
+        if(index == digits.length()){
+            result.add(track.toString());
+            return;
+        }
+        String letters = digitToLetters.get(digits.charAt(index));
+        for (char letter : letters.toCharArray()) {
+            track.append(letter);
+            backtrack(digits, index + 1, digitToLetters);
+            track.deleteCharAt(track.length() - 1);
+        }
+
+    }
+}
+```
 
 
 
@@ -626,7 +658,88 @@ class Solution {
 > 输出：["((()))","(()())","(())()","()(())","()()()"]
 > ```
 
+思路：![image.png](https://pic.leetcode-cn.com/1612765058-NToQkc-image.png)
 
+```java
+class Solution {
+    // 回溯过程中的路径
+    StringBuilder track = new StringBuilder();
+    // 记录所有合法的括号组合
+    List<String> res = new ArrayList<>();
+
+    public List<String> generateParenthesis(int n) {
+        if (n == 0) return res;
+        // 可用的左括号和右括号数量初始化为 n
+        backtrack(n, n);
+        return res;
+    }
+
+    // 可用的左括号数量为 left 个，可用的右括号数量为 right 个
+    private void backtrack(int left, int right) {
+        // 若左括号剩下的多，说明不合法
+        if (right < left) return;
+        // 数量小于 0 肯定是不合法的
+        if (left < 0 || right < 0) return;
+        // 当所有括号都恰好用完时，得到一个合法的括号组合
+        if (left == 0 && right == 0) {
+            res.add(track.toString());
+            return;
+        }
+
+        // 做选择，尝试放一个左括号
+        track.append('(');
+        backtrack(left - 1, right);
+        // 撤消选择
+        track.deleteCharAt(track.length() - 1);
+
+        // 做选择，尝试放一个右括号
+        track.append(')');
+        backtrack(left, right - 1);
+        // 撤销选择
+        track.deleteCharAt(track.length() - 1);
+    }
+}
+```
+
+dfs 思路：
+
+由于一共要填 2n 个括号，那么当我们递归到终点时：
+
+- 如果左括号少于 n 个，那么右括号也会少于 n 个，与 i == m 矛盾，因为每填一个括号 i 都会增加 1。
+- 如果左括号超过 n 个，与 if open < n 矛盾，这行代码限制了左括号至多填 n 个。
+- 所以递归到终点时，左括号恰好填了 n 个，此时右括号填了 2n−n=n 个。
+
+```java
+class Solution {
+    private int n;
+    private char[] path;
+    private final List<String> ans = new ArrayList<>();
+
+    public List<String> generateParenthesis(int n) {
+        this.n = n;
+        path = new char[n * 2]; // 所有括号长度都是一样的 n*2
+        dfs(0, 0);
+        return ans;
+    }
+
+    // i=目前填了多少个括号
+    // open=左括号个数，i-open=右括号个数
+    private void dfs(int i, int open) {
+        if (i == n * 2) { // 括号构造完毕
+            ans.add(new String(path)); // 加入答案
+            return;
+        }
+        if (open < n) { // 可以填左括号
+            path[i] = '('; // 直接覆盖
+            dfs(i + 1, open + 1); // 多了一个左括号
+        }
+        if (i - open < open) { // 可以填右括号
+            path[i] = ')'; // 直接覆盖
+            dfs(i + 1, open);
+        }
+    }
+}
+```
 
 
 
