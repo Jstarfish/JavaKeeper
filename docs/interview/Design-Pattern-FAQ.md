@@ -55,8 +55,7 @@ public class Singleton
     {
     }
 
-    public static Singleton getInstance()
-    {
+    public static Singleton getInstance(){
         if (singleton == null)
             singleton = new Singleton();
         return singleton;
@@ -71,12 +70,10 @@ public class Singleton
 {
     private static Singleton singleton;
 
-    private Singleton()
-    {
+    private Singleton(){
     }
 
-    public synchronized static Singleton getInstance()
-    {
+    public synchronized static Singleton getInstance(){
         if (singleton == null)
             singleton = new Singleton();
         return singleton;

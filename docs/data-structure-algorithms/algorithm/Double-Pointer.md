@@ -69,19 +69,6 @@ public void reverseString(char[] s) {
 }
 ```
 
-简化一下
-
-```java
-public void reverseString(char[] s) {
-  int n = s.length;
-  for (int left = 0, right = n - 1; left < right; ++left, --right) {
-    char tmp = s[left];
-    s[left] = s[right];
-    s[right] = tmp;
-  }
-}
-```
-
 
 
 ### [两数之和 II - 输入有序数组](https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/)
@@ -170,7 +157,7 @@ public List<List<Integer>> threeSum(int[] nums) {
                     //不要用成 if 判断，只跳过 1 条，还会有重复的，且需要再加上 l<r，以防死循环
                     while (l < r && nums[l] == nums[l + 1]) l++;
                     while (l < r && nums[r] == nums[r - 1]) r--;
-                    //移动指针
+                    //移动指针, 必须在去重后再移动
                     l++;
                     r--;
                 }
@@ -367,6 +354,8 @@ public boolean hasCycle(ListNode head) {
 - 假设环是这样的，slow 指针进入环后，又走了 b 的距离与 fast 相遇
 
   ![fig1](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
+
+
 
 
 
@@ -629,20 +618,6 @@ public static double getMaxAverage(int[] nums, int k) {
 
 
 
-#### [字符串的排列（567）](https://leetcode.cn/problems/permutation-in-string/description/)
-
-> 给你两个字符串 `s1` 和 `s2` ，写一个函数来判断 `s2` 是否包含 `s1` 的排列。如果是，返回 `true` ；否则，返回 `false` 。
->
-> 换句话说，`s1` 的排列之一是 `s2` 的 **子串** 。
->
-> ```
-> 输入：s1 = "ab" s2 = "eidbaooo"
-> 输出：true
-> 解释：s2 包含 s1 的排列之一 ("ba").
-> ```
-
-
-
 ### 3.2 不定长度的滑动窗口
 
 #### [无重复字符的最长子串（3）](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
@@ -720,7 +695,138 @@ int lengthOfLongestSubstring(String s) {
 > 输出："BANC"
 > ```
 
+思路：
 
+1. 我们在字符串 `S` 中使用双指针中的左右指针技巧，初始化 `left = right = 0`，把索引**左闭右开**区间 `[left, right)` 称为一个「窗口」。
+
+   > [!IMPORTANT]
+   >
+   > 为什么要「左闭右开」区间
+   >
+   > **理论上你可以设计两端都开或者两端都闭的区间，但设计为左闭右开区间是最方便处理的**。
+   >
+   > 因为这样初始化 `left = right = 0` 时区间 `[0, 0)` 中没有元素，但只要让 `right` 向右移动（扩大）一位，区间 `[0, 1)` 就包含一个元素 `0` 了。
+   >
+   > 如果你设置为两端都开的区间，那么让 `right` 向右移动一位后开区间 `(0, 1)` 仍然没有元素；如果你设置为两端都闭的区间，那么初始区间 `[0, 0]` 就包含了一个元素。这两种情况都会给边界处理带来不必要的麻烦。
+
+2. 我们先不断地增加 `right` 指针扩大窗口 `[left, right)`，直到窗口中的字符串符合要求（包含了 `T` 中的所有字符）。
+
+3. 此时，我们停止增加 `right`，转而不断增加 `left` 指针缩小窗口 `[left, right)`，直到窗口中的字符串不再符合要求（不包含 `T` 中的所有字符了）。同时，每次增加 `left`，我们都要更新一轮结果。
+
+4. 重复第 2 和第 3 步，直到 `right` 到达字符串 `S` 的尽头。
+
+```java
+public String minWindow(String s, String t) {
+    // 两个map，window 代表字符字符出现的次数，need 记录所需字符出现次数
+    HashMap<Character, Integer> window = new HashMap<>();
+    HashMap<Character, Integer> need = new HashMap<>();
+
+    for (int i = 0; i < t.length(); i++) {
+        char c = t.charAt(i);
+        //算出每个字符的数量，有可能有重复的
+        need.put(c, need.getOrDefault(c, 0) + 1);
+    }
+
+    //左开右闭的区间，然后创建移动窗口
+    int left = 0, right = 0;
+    // 窗口中满足need条件的字符个数， valid == need.size 说明窗口满足条件
+    int valid = 0;
+    //记录最小覆盖子串的开始索引和长度
+    int start = 0, len = Integer.MAX_VALUE;
+    while (right < s.length()) {
+        // c 代表将移入窗口的字符
+        char c = s.charAt(right);
+        //扩大窗口
+        right++;
+
+        if (need.containsKey(c)) {
+            window.put(c, window.getOrDefault(c, 0) + 1);
+            if (window.get(c).equals(need.get(c))) {
+                valid++;
+            }
+        }
+        //判断左窗口是否需要收缩
+        while (valid == need.size()) {
+            if (right - left < len) {
+                start = left;
+                len = right - left;
+            }
+            //d 是将移除窗口的字符
+            char d = s.charAt(left);
+            left++;  //缩小窗口
+
+            //更新窗口
+            if (need.containsKey(d)) {
+                if (window.get(d).equals(need.get(d))) {
+                    valid--;
+                    window.put(d, window.get(d) - 1);
+                }
+            }
+        }
+    }
+    //返回最小覆盖子串
+    return len == Integer.MAX_VALUE ? "" : s.substring(start, start + len);
+}
+```
+
+
+
+#### [字符串的排列（567）](https://leetcode.cn/problems/permutation-in-string/description/)
+
+> 给你两个字符串 `s1` 和 `s2` ，写一个函数来判断 `s2` 是否包含 `s1` 的排列。如果是，返回 `true` ；否则，返回 `false` 。
+>
+> 换句话说，`s1` 的排列之一是 `s2` 的 **子串** 。
+>
+> ```
+> 输入：s1 = "ab" s2 = "eidbaooo"
+> 输出：true
+> 解释：s2 包含 s1 的排列之一 ("ba").
+> ```
+
+思路：和上一题基本一致，只是 移动 `left` 缩小窗口的时机是窗口大小大于 `t.length()` 时，当发现 `valid == need.size()` 时，就说明窗口中就是一个合法的排列
+
+```java
+class Solution {
+    // 判断 s 中是否存在 t 的排列
+    public boolean checkInclusion(String t, String s) {
+        Map<Character, Integer> need = new HashMap<>();
+        Map<Character, Integer> window = new HashMap<>();
+        for (char c : t.toCharArray()) {
+            need.put(c, need.getOrDefault(c, 0) + 1);
+        }
+
+        int left = 0, right = 0;
+        int valid = 0;
+        while (right < s.length()) {
+            char c = s.charAt(right);
+            right++;
+            // 进行窗口内数据的一系列更新
+            if (need.containsKey(c)) {
+                window.put(c, window.getOrDefault(c, 0) + 1);
+                if (window.get(c).intValue() == need.get(c).intValue())
+                    valid++;
+            }
+
+            // 判断左侧窗口是否要收缩
+            while (right - left >= t.length()) {
+                // 在这里判断是否找到了合法的子串
+                if (valid == need.size())
+                    return true;
+                char d = s.charAt(left);
+                left++;
+                // 进行窗口内数据的一系列更新
+                if (need.containsKey(d)) {
+                    if (window.get(d).intValue() == need.get(d).intValue())
+                        valid--;
+                    window.put(d, window.get(d) - 1);
+                }
+            }
+        }
+        // 未找到符合条件的子串
+        return false;
+    }
+}
+```
 
 
 
@@ -743,10 +849,6 @@ int lengthOfLongestSubstring(String s) {
 > ```
 
 思路：
-
-- 
-
-
 
 ```java
 public int characterReplacement(String s, int k) {

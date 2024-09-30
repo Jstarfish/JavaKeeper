@@ -154,3 +154,6 @@ ls –la input_file_name
    - **个人经验**: 可以提到如何配置 Prometheus 采集日志指标、设置警报规则，以及如何利用 Grafana 创建可视化面板。
 
 我们使用 ELK Stack 来集中管理和分析日志数据。通过 Logstash 我们收集来自不同服务的日志，并将其存储在 Elasticsearch 中，然后使用 Kibana 创建了多个仪表盘来监控系统的健康状况和性能
+
+
+

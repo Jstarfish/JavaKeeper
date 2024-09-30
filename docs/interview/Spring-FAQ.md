@@ -99,6 +99,41 @@ spring boot 我理解就是把 spring spring mvc spring data jpa 等等的一些
 
 
 
+### 让你设计一个spring-boot-starter你会怎么设计？
+
+设计一个 Spring Boot Starter 需要考虑其目的、功能、易用性和扩展性。以下是设计一个 Spring Boot Starter 的一般步骤：
+
+1. **定义 Starter 的目的和功能**：
+   - 确定 Starter 要解决的问题或要提供的功能。
+   - 例如，可能是为了简化数据库操作、提供缓存解决方案、实现特定的业务功能等。
+2. **创建 Maven 项目**：
+   - 使用 Spring Initializr 或者手动创建一个 Maven 项目。
+   - 包含必要的依赖，如 Spring Boot 和其他相关库。
+3. **设计自动配置**：
+   - 创建 `@Configuration` 类来定义自动配置。
+   - 使用 `@EnableAutoConfiguration` 和 `@ComponentScan` 注解来启用自动配置和组件扫描。
+   - 通过 `@ConditionalOnClass`、`@ConditionalOnMissingBean` 等条件注解来控制配置的生效条件。
+4. **定义默认配置属性**：
+   - 在 `application.properties` 或 `application.yml` 中定义默认配置属性。
+   - 创建一个配置类，使用 `@ConfigurationProperties` 注解来绑定这些属性。
+5. **创建自定义注解**：
+   - 如果需要，可以创建自定义注解来进一步简化配置。
+6. **实现依赖管理**：
+   - 在 `pom.xml` 中定义 `<dependencyManagement>` 标签，管理 Starter 依赖的版本。
+7. **编写文档**：
+   - 提供清晰的文档说明如何使用 Starter，包括配置属性的详细说明。
+8. **打包和命名**：
+   - 按照 `spring-boot-starter-xxx` 的格式命名你的 Starter。
+   - 在 `pom.xml` 中配置 `<groupId>`、`<artifactId>` 和 `<version>`。
+9. **测试**：
+   - 编写单元测试和集成测试来验证自动配置的正确性。
+10. **发布**：
+    - 将 Starter 发布到 Maven 中央仓库或私有仓库，以便其他项目可以依赖。
+11. **提供示例**：
+    - 提供一个示例项目，展示如何使用你的 Starter。
+
+
+
 ### spring-boot-starter-parent 有什么用 ?
 
 我们都知道，新创建一个 Spring Boot 项目，默认都是有 parent 的，这个 parent 就是 spring-boot-starter-parent ，spring-boot-starter-parent 主要有如下作用：

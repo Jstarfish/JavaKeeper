@@ -16,11 +16,11 @@
 
 假设我们是一家饮品店的师傅，起码需要以下两个手艺
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gigzsl1cnpj32gj0sk4ck.jpg)
+![img](https://static001.geekbang.org/infoq/19/196f4c041c71d63442c2c688051c893a.jpeg)
 
 真简单哈，这么看，步骤大同小异，我的第一反应就是写个业务接口，不同的饮品实现其中的方法就行，像这样
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih087fykdj31pk0u0nbj.jpg)
+![img](https://static001.geekbang.org/infoq/a2/a226b8a9219cd7a29af2f3b626cd5fcb.jpeg)
 
 
 
@@ -28,7 +28,7 @@
 
 灵机一动，不用接口了，用一个**抽象父类**，把步骤方法放在一个大的流程方法 `makingDrinks()` 中，且第一步和第三步，完全一样，没必要在子类实现，改进如下
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1giidk5vt5cj31pf0u0nal.jpg)
+![img](https://static001.geekbang.org/infoq/21/2146409c43149828b8a12949daf5b0a4.jpeg)
 
 再看下我们的设计，感觉还不错，现在用同一个 `makingDrinks()` 方法来处理咖啡和茶的制作，而且我们不希望子类覆盖这个方法，所以可以申明为 final，不同的制作步骤，我们希望子类来提供，必须在父类申明为抽象方法，而第一步和第三步我们不希望子类重写，所以我们声明为非抽象方法
 
@@ -117,7 +117,7 @@ public static void main(String[] args) {
 
 模板方法模式是所有模式中最为常见的几个模式之一，是**基于继承**的代码复用的基本技术，我们再看下类图
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih2dmwutxj31ug0u0h0i.jpg)
+![img](https://static001.geekbang.org/infoq/b1/b114ec408fb0231529d8748618df9ed7.jpeg)
 
 模板方法模式就是用来创建一个算法的模板，这个模板就是方法，该方法将算法定义成一组步骤，其中的任意步骤都可能是抽象的，由子类负责实现。这样可以**确保算法的结构保持不变，同时由子类提供部分实现**。
 
@@ -207,7 +207,7 @@ public class Coffee extends Drinks {
 
 接着再去测试下代码，看看结果吧。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gih3og312yj315y07uta9.jpg)
+![img](https://static001.geekbang.org/infoq/e6/e608360ad552adc44dab00293fddd671.jpeg)
 
 
 
@@ -252,7 +252,7 @@ public static void main(String[] args) {
 }
 ```
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1giha6rya5nj319006adhb.jpg)
+![img](https://static001.geekbang.org/infoq/92/9241c28ee542321b3e6f4e2a2fbf805a.jpeg)
 
 你可能会说，这个看着不像我们常规的模板方法，是的。我们看下比较器实现的步骤
 
@@ -329,7 +329,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends …… {
 
 看下大概的类图：
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1giie97gicdj31c20u0hdt.jpg)
+![img](https://static001.geekbang.org/infoq/13/1360f5528a2e86e5b0d0bf3a97b3c04b.jpeg)
 
 
 
@@ -350,5 +350,3 @@ public abstract class AbstractRefreshableWebApplicationContext extends …… {
 《Head First 设计模式》、《研磨设计模式》
 
 https://sourcemaking.com/design_patterns/template_method
-
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20200907141047.png)
