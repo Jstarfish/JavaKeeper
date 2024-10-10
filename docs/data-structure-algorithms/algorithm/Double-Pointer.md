@@ -966,7 +966,173 @@ public int characterReplacement(String s, int k) {
 
 
 
+### [下一个排列_31](https://leetcode.cn/problems/next-permutation/)
 
+> 整数数组的一个 **排列** 就是将其所有成员以序列或线性顺序排列。
+>
+> - 例如，`arr = [1,2,3]` ，以下这些都可以视作 `arr` 的排列：`[1,2,3]`、`[1,3,2]`、`[3,1,2]`、`[2,3,1]` 。
+>
+> 整数数组的 **下一个排列** 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 **下一个排列** 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
+>
+> - 例如，`arr = [1,2,3]` 的下一个排列是 `[1,3,2]` 。
+> - 类似地，`arr = [2,3,1]` 的下一个排列是 `[3,1,2]` 。
+> - 而 `arr = [3,2,1]` 的下一个排列是 `[1,2,3]` ，因为 `[3,2,1]` 不存在一个字典序更大的排列。
+>
+> 给你一个整数数组 `nums` ，找出 `nums` 的下一个排列。
+>
+> 必须**[ 原地 ](https://baike.baidu.com/item/原地算法)**修改，只允许使用额外常数空间。
+
+**Approach**: 
+
+1. 我们希望下一个数 比当前数大，这样才满足 “下一个排列” 的定义。因此只需要 将后面的「大数」与前面的「小数」交换，就能得到一个更大的数。比如 123456，将 5 和 6 交换就能得到一个更大的数 123465。
+2. 我们还希望下一个数 增加的幅度尽可能的小，这样才满足“下一个排列与当前排列紧邻“的要求。为了满足这个要求，我们需要：
+   - 在 尽可能靠右的低位 进行交换，需要 从后向前 查找
+   - 将一个 尽可能小的「大数」 与前面的「小数」交换。比如 123465，下一个排列应该把 5 和 4 交换而不是把 6 和 4 交换
+   - 将「大数」换到前面后，需要将「大数」后面的所有数 重置为升序
+
+该算法可以分为三个步骤：
+
+1. **从右向左找到第一个升序对**（即`nums[i] < nums[i + 1]`），记为`i`。如果找不到，则说明数组已经是最大的排列，直接将数组反转为最小的排列。
+2. **从右向左找到第一个比`nums[i]`大的数**，记为`j`，然后交换`nums[i]`和`nums[j]`。
+3. **反转`i + 1`之后的数组**，使其变成最小的排列。
+
+```java
+public void nextPermutation(int[] nums){
+
+    //为什么从倒数第二个元素开始，因为我们第一步要从右往左找到第一个“升序对”，
+    int i = nums.length - 2;
+    //step 1： 找到第一个下降的元素
+    while (i >= 0 && nums[i] >= nums[i + 1]) {
+        i--;
+    }
+
+    //step2 : 如果找到了 i, 找到第一个比 nums[i] 大的元素 j
+    if (i > 0) {
+        int j = nums.length - 1;
+        while (j >= 0 && nums[j] <= nums[i]) {
+            j--;
+        }
+        //交换i 和 j 的位置
+        swap(nums, i, j);
+
+    }
+
+    // step3: 反转从 start 开始到末尾的部分（不需要重新排序，是因为这半部分再交换前就是降序的，我们第一步找的升序对）
+    reverse(nums, i+1);
+}
+
+private void swap(int[] nums, int i, int j){
+    int tmp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = tmp;
+}
+
+private void reverse(int[] nums, int start){
+    int end = nums.length - 1;
+    while(start < end){
+        swap(nums, start, end);
+        start ++;
+        end --;
+    }
+}
+```
+
+
+
+### [颜色分类_75](https://leetcode.cn/problems/sort-colors/)
+
+> 给定一个包含红色、白色和蓝色、共 `n` 个元素的数组 `nums` ，**[原地](https://baike.baidu.com/item/原地算法)** 对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+>
+> 我们使用整数 `0`、 `1` 和 `2` 分别表示红色、白色和蓝色。
+>
+> 必须在不使用库内置的 sort 函数的情况下解决这个问题。
+>
+> ```
+> 输入：nums = [2,0,2,1,1,0]
+> 输出：[0,0,1,1,2,2]
+> ```
+
+**Approach**: 
+
+荷兰国旗问题
+
+我们可以使用三个指针：`low`、`mid` 和 `high`，分别用来处理 0、1 和 2 的排序问题。
+
+- `low` 表示红色 (0) 的边界，指向的元素是 1 的位置，即把所有 0 放在 `low` 的左边。
+- `mid` 表示当前处理的元素索引。
+- `high` 表示蓝色 (2) 的边界，指向的元素是 2 的位置，把所有 2 放在 `high` 的右边。
+
+#### 算法步骤：
+
+1. 初始化：`low = 0`，`mid = 0`，`high = nums.length - 1`。
+2. 当  `mid <= high` 时，进行以下判断：
+   - 如果 `nums[mid] == 0`，将其与 `nums[low]` 交换，并将 `low` 和 `mid` 都加 1。
+   - 如果 `nums[mid] == 1`，只需将 `mid` 加 1，因为 1 已经在正确的位置。
+   - 如果 `nums[mid] == 2`，将其与 `nums[high]` 交换，并将 `high` 减 1，但 `mid` 不动，因为交换过来的数还未处理。
+
+```java
+public void sortColors(int[] nums) {
+    int low = 0, mid = 0, high = nums.length - 1;
+
+    while (mid <= high) {
+        if (nums[mid] == 0) {
+            // 交换 nums[mid] 和 nums[low]
+            swap(nums, low, mid);
+            low++;
+            mid++;
+        } else if (nums[mid] == 1) {
+            mid++;
+        } else if (nums[mid] == 2) {
+            // 交换 nums[mid] 和 nums[high]
+            swap(nums, mid, high);
+            high--;
+        }
+    }
+}
+
+private void swap(int[] nums, int i, int j) {
+    int temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+}
+
+```
+
+- 时间复杂度：O(n)，每个元素只遍历一次。
+
+- 空间复杂度：O(1)，不需要额外的空间，只在原数组中进行操作。
+
+双指针方法的话，就是两次遍历。
+
+```java
+public void sortColors(int[] nums) {
+    int left = 0;
+    int right = nums.length - 1;
+
+    // 第一次遍历，把 0 移动到数组的左边
+    for (int i = 0; i <= right; i++) {
+        if (nums[i] == 0) {
+            swap(nums, i, left);
+            left++;
+        }
+    }
+
+    // 第二次遍历，把 2 移动到数组的右边
+    for (int i = nums.length - 1; i >= left; i--) {
+        if (nums[i] == 2) {
+            swap(nums, i, right);
+            right--;
+        }
+    }
+}
+
+private void swap(int[] nums, int i, int j) {
+    int temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+}
+
+```
 
 
 

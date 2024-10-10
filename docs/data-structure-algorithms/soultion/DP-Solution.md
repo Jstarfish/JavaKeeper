@@ -618,3 +618,65 @@ int editDistanceDP(String s, String t) {
 
 
 
+### [最长回文子串_5](https://leetcode.cn/problems/longest-palindromic-substring/)
+
+> 给你一个字符串 `s`，找到 `s` 中最长的 回文子串。
+>
+> ```
+> 输入：s = "babad"
+> 输出："bab"
+> 解释："aba" 同样是符合题意的答案。
+> ```
+
+**思路**：**中心扩散法**，「中心扩散法」的基本思想是：遍历每一个下标，以这个下标为中心，利用「回文串」中心对称的特点，往两边扩散，直到不再满足回文的条件。
+
+细节：回文串在长度为奇数和偶数的时候，「回文中心」的形态不一样：
+
+- 奇数回文串的「中心」是一个具体的字符，例如：回文串 "aba" 的中心是字符 "b"；
+- 偶数回文串的「中心」是位于中间的两个字符的「空隙」，例如：回文串 "abba" 的中心是两个 "b"，也可以看成两个 "b" 中间的空隙。
+
+```java
+public String longestPalindrome(String s){
+    //处理边界
+    if(s == null || s.length() < 2){
+        return s;
+    }
+
+    //初始化start和maxLength变量，用来记录最长回文子串的起始位置和长度
+    int start = 0, maxLength = 0;
+
+    //遍历每个字符
+    for (int i = 0; i < s.length(); i++) {
+        //以当前字符为中心的奇数长度回文串
+        int len1 = centerExpand(s, i, i);
+        //以当前字符和下一个字符之间的中心的偶数长度回文串
+        int len2 = centerExpand(s, i, i+1);
+
+        int len = Math.max(len1, len2);
+
+        //当前找到的回文串大于之前的记录，更新start和maxLength
+        if(len > maxLength){
+            // i 是当前扩展的中心位置， len 是找到的回文串的总长度，我们要用这两个值计算出起始位置 start
+            // （len - 1)/2 为什么呢，计算中心到回文串起始位置的距离， 为什么不用 len/2， 这里考虑的是奇数偶数的通用性，比如'abcba' 和 'abba' 或者 'cabbad'，巧妙的同时处理两种，不需要分别考虑
+            start = i - (len - 1)/2;
+            maxLength = len;
+        }
+
+    }
+
+    return s.substring(start, start + maxLength);
+}
+
+private int centerExpand(String s, int left, int right){
+    while(left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)){
+        left --;
+        right ++;
+    }
+    //这个的含义： 假设扩展过程中，left 和 right 已经超出了回文返回， 此时回文范围是 (left+1,right-1), 那么回文长度= (right-1)-(left+1)+1=right-left-1
+    return right - left - 1;
+}
+```
+
+
+
+![img](https://pic.leetcode-cn.com/2f205fcd0493818129e8d3604b2d84d94678fda7708c0e9831f192e21abb1f34.png)
