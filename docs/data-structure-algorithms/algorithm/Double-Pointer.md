@@ -122,12 +122,32 @@ public int[] twoSum(int[] nums, int target) {
 第一个想法是，这三个数，两个指针？
 
 - 对数组排序，固定一个数 $nums[i]$ ，然后遍历数组，并移动左右指针求和，判断是否有等于 0 的情况
+
 - 特例：
   - 排序后第一个数就大于 0，不干了
+  
   - 有三个需要去重的地方
-    - nums[i] == nums[i - 1]  直接跳过本次遍历
-    - nums[left] == nums[left + 1]  移动指针，即去重
-    - nums[right] == nums[right - 1]  移动指针
+    - `nums[i] == nums[i - 1]`  直接跳过本次遍历
+    
+      > **避免重复三元组：**
+      >
+      > - 我们从第一个元素开始遍历数组，逐步往后移动。如果当前的 `nums[i]` 和前一个 `nums[i - 1]` 相同，说明我们已经处理过以 `nums[i - 1]` 为起点的组合（即已经找过包含 `nums[i - 1]` 的三元组），此时再处理 `nums[i]` 会导致生成重复的三元组，因此可以跳过。
+      > - 如果我们检查 `nums[i] == nums[i + 1]`，由于 `nums[i + 1]` 还没有被处理，这种方式无法避免重复，并且会产生错误的逻辑。
+    
+    - `nums[left] == nums[left + 1]`  移动指针，即去重
+    
+    - `nums[right] == nums[right - 1]`  移动指针
+    
+      > **避免重复的配对：**
+      >
+      > 在每次固定一个 `nums[i]` 后，剩下的两数之和问题通常使用双指针法来解决。双指针的左右指针 `left` 和 `right` 分别从数组的两端向中间逼近，寻找合适的配对。
+      >
+      > 为了**避免相同的数字被重复使用**，导致重复的三元组，双指针法中也需要跳过相同的元素。
+      >
+      > - 左指针跳过重复元素：
+      >   - 如果 `nums[left] == nums[left + 1]`，说明接下来的数字与之前处理过的数字相同。为了避免生成相同的三元组，我们将 `left` 向右移动跳过这个重复的数字。
+      > - 右指针跳过重复元素：
+      >   - 同样地，`nums[right] == nums[right - 1]` 也会导致重复的配对，因此右指针也要向左移动，跳过这个重复数字。
 
 ```java
 public List<List<Integer>> threeSum(int[] nums) {
@@ -143,7 +163,7 @@ public List<List<Integer>> threeSum(int[] nums) {
             //排序后的第一个数字就大于0，就说明没有符合要求的结果
             if (nums[i] > 0) break;
 
-            //去重, 不能是 nums[i] == nums[i +1 ]，会造成遗漏
+            //去重, 不能是 nums[i] == nums[i +1 ]，因为顺序遍历的逻辑使得前一个元素已经被处理过，而后续的元素还没有处理
             if (i > 0 && nums[i] == nums[i - 1]) continue;
             //左右指针
             int l = i + 1;
@@ -239,27 +259,26 @@ public int maxArea(int[] height){
 
 ```java
 public boolean isPalindrome(String s) {
-  int left = 0;
-  int right = s.length() - 1;
-  while (left < right) {
-    //这里还得加个left<right，小心while死循环,这两步就是用来过滤非字符，逗号啥的
-    while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
-      left++;
-    }
-    while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
-      right--;
-    }
+    // 转换为小写并去掉非字母和数字的字符
+    int left = 0, right = s.length() - 1;
 
-    if (left < right) {
-      if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
-        return false;
-      }
-      //同时相向移动指针
-      left++;
-      right--;
+    while (left < right) {
+        // 忽略左边非字母和数字字符
+        while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
+            left++;
+        }
+        // 忽略右边非字母和数字字符
+        while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
+            right--;
+        }
+        // 比较两边字符
+        if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
+            return false;
+        }
+        left++;
+        right--;
     }
-  }
-  return true;
+    return true;
 }
 ```
 
@@ -355,7 +374,49 @@ public boolean hasCycle(ListNode head) {
 
   ![fig1](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
 
+1. **检测是否有环**：通过快慢指针来判断链表中是否存在环。慢指针一次走一步，快指针一次走两步。如果链表中有环，两个指针最终会相遇；如果没有环，快指针会到达链表末尾。
 
+2. **找到环的起点**：
+
+   - 当快慢指针相遇时，我们已经确认链表中存在环。
+
+   - 从相遇点开始，慢指针保持不动，快指针回到链表头部，此时两个指针每次都走一步。两个指针会在环的起点再次相遇。
+
+```java
+public ListNode detectCycle(ListNode head) {
+    if (head == null || head.next == null) {
+        return null;
+    }
+
+    ListNode slow = head;
+    ListNode fast = head;
+
+    // 判断是否有环
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        // 快慢指针相遇，说明有环
+        if (slow == fast) {
+            break;
+        }
+    }
+
+    // 如果没有环
+    if (fast == null || fast.next == null) {
+        return null;
+    }
+
+    // 快指针回到起点，慢指针保持在相遇点
+    fast = head;
+    while (fast != slow) {
+        fast = fast.next;
+        slow = slow.next;
+    }
+
+    // 此时快慢指针相遇的地方就是环的起点
+    return slow;
+}
+```
 
 
 
@@ -620,7 +681,7 @@ public static double getMaxAverage(int[] nums, int k) {
 
 ### 3.2 不定长度的滑动窗口
 
-#### [无重复字符的最长子串（3）](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
+#### [无重复字符的最长子串_3](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
 
 > 给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长子串** 的长度。
 >
@@ -684,8 +745,6 @@ int lengthOfLongestSubstring(String s) {
 
 
 
-
-
 #### [最小覆盖子串（76）](https://leetcode-cn.com/problems/minimum-window-substring/)
 
 > 给你一个字符串 `s` 、一个字符串 `t` 。返回 `s` 中涵盖 `t` 所有字符的最小子串。如果 `s` 中不存在涵盖 `t` 所有字符的子串，则返回空字符串 `""` 。
@@ -717,7 +776,7 @@ int lengthOfLongestSubstring(String s) {
 
 ```java
 public String minWindow(String s, String t) {
-    // 两个map，window 代表字符字符出现的次数，need 记录所需字符出现次数
+    // 两个map，window 记录窗口中的字符频率，need 记录t中字符的频率
     HashMap<Character, Integer> window = new HashMap<>();
     HashMap<Character, Integer> need = new HashMap<>();
 
@@ -783,7 +842,11 @@ public String minWindow(String s, String t) {
 > 解释：s2 包含 s1 的排列之一 ("ba").
 > ```
 
-思路：和上一题基本一致，只是 移动 `left` 缩小窗口的时机是窗口大小大于 `t.length()` 时，当发现 `valid == need.size()` 时，就说明窗口中就是一个合法的排列
+思路：
+
+通过滑动窗口（Sliding Window）和字符频率统计来解决
+
+和上一题基本一致，只是 移动 `left` 缩小窗口的时机是窗口大小大于 `t.length()` 时，当发现 `valid == need.size()` 时，就说明窗口中就是一个合法的排列
 
 ```java
 class Solution {
@@ -962,11 +1025,59 @@ public int characterReplacement(String s, int k) {
 
 ## 四、其他双指针问题
 
-#### [88. 合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array/)
+#### [最长回文子串_5](https://leetcode.cn/problems/longest-palindromic-substring/)
+
+> 给你一个字符串 `s`，找到 `s` 中最长的 回文子串。
+
+```java
+public static String longestPalindrome(String s){
+    //处理边界
+    if(s == null || s.length() < 2){
+        return s;
+    }
+
+    //初始化start和maxLength变量，用来记录最长回文子串的起始位置和长度
+    int start = 0, maxLength = 0;
+
+    //遍历每个字符
+    for (int i = 0; i < s.length(); i++) {
+        //以当前字符为中心的奇数长度回文串
+        int len1 = centerExpand(s, i, i);
+        //以当前字符和下一个字符之间的中心的偶数长度回文串
+        int len2 = centerExpand(s, i, i+1);
+
+        int len = Math.max(len1, len2);
+
+        //当前找到的回文串大于之前的记录，更新start和maxLength
+        if(len > maxLength){
+            // i 是当前扩展的中心位置， len 是找到的回文串的总长度，我们要用这两个值计算出起始位置 start
+            // （len - 1)/2 为什么呢，计算中心到回文串起始位置的距离， 为什么不用 len/2， 这里考虑的是奇数偶数的通用性，比如'abcba' 和 'abba' 或者 'cabbad'，巧妙的同时处理两种，不需要分别考虑
+            start = i - (len - 1)/2;
+            maxLength = len;
+        }
+
+    }
+
+    return s.substring(start, start + maxLength);
+}
+
+private static  int centerExpand(String s, int left, int right){
+    while(left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)){
+        left --;
+        right ++;
+    }
+    //这个的含义： 假设扩展过程中，left 和 right 已经超出了回文返回， 此时回文范围是 (left+1,right-1), 那么回文长度= (right-1)-(left+1)+1=right-left-1
+    return right - left - 1;
+}
+```
 
 
 
-### [下一个排列_31](https://leetcode.cn/problems/next-permutation/)
+#### [合并两个有序数组_88](https://leetcode-cn.com/problems/merge-sorted-array/)
+
+
+
+#### [下一个排列_31](https://leetcode.cn/problems/next-permutation/)
 
 > 整数数组的一个 **排列** 就是将其所有成员以序列或线性顺序排列。
 >
@@ -1039,7 +1150,7 @@ private void reverse(int[] nums, int start){
 
 
 
-### [颜色分类_75](https://leetcode.cn/problems/sort-colors/)
+#### [颜色分类_75](https://leetcode.cn/problems/sort-colors/)
 
 > 给定一个包含红色、白色和蓝色、共 `n` 个元素的数组 `nums` ，**[原地](https://baike.baidu.com/item/原地算法)** 对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
 >
@@ -1062,7 +1173,7 @@ private void reverse(int[] nums, int start){
 - `mid` 表示当前处理的元素索引。
 - `high` 表示蓝色 (2) 的边界，指向的元素是 2 的位置，把所有 2 放在 `high` 的右边。
 
-#### 算法步骤：
+**算法步骤：**
 
 1. 初始化：`low = 0`，`mid = 0`，`high = nums.length - 1`。
 2. 当  `mid <= high` 时，进行以下判断：
@@ -1132,6 +1243,87 @@ private void swap(int[] nums, int i, int j) {
     nums[j] = temp;
 }
 
+```
+
+
+
+#### [排序链表_148](https://leetcode.cn/problems/sort-list/description/)
+
+> 给你链表的头结点 `head` ，请将其按 **升序** 排列并返回 **排序后的链表** 。
+>
+> ```
+> 输入：head = [4,2,1,3]
+> 输出：[1,2,3,4]
+> ```
+
+**Approach**: 要将链表排序，并且时间复杂度要求为 O(nlog⁡n)O(n \log n)O(nlogn)，这提示我们需要使用 **归并排序**。归并排序的特点就是时间复杂度是 O(nlog⁡n)O(n \log n)O(nlogn)，并且它在链表上的表现很好，因为链表的分割和合并操作相对容易。
+
+具体实现步骤：
+
+1. **分割链表**：我们可以使用 **快慢指针** 来找到链表的中点，从而将链表一分为二。
+2. **递归排序**：分别对左右两部分链表进行排序。
+3. **合并有序链表**：最后将两个已经排序好的链表合并成一个有序链表。
+
+```java
+
+public ListNode sortList(ListNode head) {
+    // base case: if the list is empty or contains a single element, it's already sorted
+    if (head == null || head.next == null) {
+        return head;
+    }
+
+    // Step 1: split the linked list into two halves
+    ListNode mid = getMiddle(head);
+   // right 为链表右半部分的头结点
+    ListNode right = mid.next;
+    mid.next = null;  //断开
+
+    // Step 2: recursively sort both halves
+    ListNode leftSorted = sortList(head);
+    ListNode rightSorted = sortList(right);
+
+    // Step 3: merge the sorted halves
+    return mergeTwoLists(leftSorted, rightSorted);
+}
+
+// Helper method to find the middle node of the linked list
+private ListNode getMiddle(ListNode head) {
+    ListNode slow = head;
+    ListNode fast = head;
+
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    return slow;
+}
+
+// Helper method to merge two sorted linked lists
+private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+    ListNode dummy = new ListNode(-1);
+    ListNode current = dummy;
+
+    while (l1 != null && l2 != null) {
+        if (l1.val < l2.val) {
+            current.next = l1;
+            l1 = l1.next;
+        } else {
+            current.next = l2;
+            l2 = l2.next;
+        }
+        current = current.next;
+    }
+
+    // Append the remaining elements of either list
+    if (l1 != null) {
+        current.next = l1;
+    } else {
+        current.next = l2;
+    }
+
+    return dummy.next;
+}
 ```
 
 
