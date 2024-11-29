@@ -2556,6 +2556,39 @@ WHERE
 
 
 
+### 查询第二大的数值
+
+1. 使用 ORDER BY 和 LIMIT
+
+   ```sql
+   SELECT DISTINCT column_name FROM table_name
+   ORDER BY column_name DESC
+   LIMIT 1 OFFSET 1
+   ```
+
+   这个查询先按降序排列,然后跳过第一个结果(OFFSET 1),取下一个结果(LIMIT 1)
+
+2. 使用子查询
+
+   ```sql
+   SELECT MAX(column_name)
+   FROM table_name
+   WHERE column_name < (SELECT MAX(column_name) FROM table_name)
+   ```
+
+3. 使用 `DENSE_RANK()` 窗口函数【MySQL 8.0+  支持】
+
+   ```sql
+   SELECT column_name
+   FROM (
+       SELECT column_name, DENSE_RANK() OVER (ORDER BY column_name DESC) AS rank
+       FROM table_name
+   ) AS ranked
+   WHERE rank = 2;
+   ```
+
+   
+
 ## 参考与感谢：
 
 - https://zhuanlan.zhihu.com/p/29150809

@@ -8,7 +8,7 @@ categories: Redis
 
 ![](https://img.starfish.ink/redis/redis-faq-banner.png)
 
-> 不管哪个模板的面试题，其实都是分原理和实践两部分。所以两方面都要准备。
+> **导读：**不管哪个模板的面试题，其实都是分原理和实践两部分。所以两方面都要准备。
 >
 > 比如你们项目是怎么用缓存的，服务是怎么部署的，不要像有些同学自己项目中的 Redis 是集群部署还是哨兵都不清楚。
 >
@@ -323,7 +323,54 @@ Redis 为了平衡空间和时间效率，针对 value 的具体类型在底层�
 
 ![](https://img.starfish.ink/redis/redis-data-types.png)
 
-
+> 源码中，`redisObject`（或 `robj`）是 Redis 用于表示数据对象的核心结构。每一个 Redis 数据对象，无论是字符串、列表、集合、哈希还是有序集合，都会被封装在一个 `redisObject` 结构体中
+>
+> ```c
+> //简化版
+> typedef struct redisObject {
+>     unsigned type:4;          // 数据类型
+>     unsigned encoding:4;      // 对象的编码方式
+>     unsigned lru:LRU_BITS;    // LRU 时间，用于内存淘汰策略
+>     int refcount;             // 引用计数
+>     void *ptr;                // 指向实际存储数据的指针
+> } robj;
+> ```
+>
+> `redisObject` **各字段解析**
+>
+> - **type**：用来标识对象的数据类型（如字符串、列表、集合等）。Redis 支持的几种核心数据类型在源码中定义为常量，例如：
+>
+>   ```c
+>   #define OBJ_STRING 0  // 字符串
+>   #define OBJ_LIST 1    // 列表
+>   #define OBJ_SET 2     // 集合
+>   #define OBJ_ZSET 3    // 有序集合
+>   #define OBJ_HASH 4    // 哈希表
+>   ```
+>
+> - **encoding**：用来标识对象的具体编码方式，也就是该对象的底层数据结构（如 `intset`, `ziplist`, `hashtable` 等）。常见的编码方式如下：
+>
+>   ```c
+>   #define OBJ_ENCODING_RAW 0         // 普通字符串编码
+>   #define OBJ_ENCODING_INT 1         // 整数编码
+>   #define OBJ_ENCODING_HT 2          // 哈希表编码
+>   #define OBJ_ENCODING_ZIPMAP 3      // 压缩地图编码（老版本 Redis）
+>   #define OBJ_ENCODING_LINKEDLIST 4  // 链表编码（旧的列表编码）
+>   #define OBJ_ENCODING_ZIPLIST 5     // 压缩列表编码
+>   #define OBJ_ENCODING_INTSET 6      // 整数集合编码
+>   #define OBJ_ENCODING_SKIPLIST 7    // 跳表编码（用于有序集合）
+>   #define OBJ_ENCODING_QUICKLIST 8   // 快速列表编码（新的列表编码）
+>   ```
+>
+> - **lru**：用于记录该对象的最后访问时间，Redis 使用这个字段来实现内存淘汰策略（LRU，最近最少使用算法）。在新的 Redis 版本中，它可能改为 LRU 或 LFU（频率淘汰）。
+>
+> - **refcount**：对象的引用计数。Redis 使用引用计数机制来管理对象的内存。如果一个对象的引用计数为 0，则该对象可以被释放。
+>
+> - **ptr**：这是一个通用指针，指向该对象实际存储的数据。根据 `type` 和 `encoding` 的不同，`ptr` 指向的结构也不同。例如：
+>
+>   - 对于字符串对象，`ptr` 可能指向的是一个 `sds`（简单动态字符串）。
+>   - 对于列表对象，`ptr` 可能指向的是 `quicklist`。
+>   - 对于有序集合对象，`ptr` 可能指向的是 `skiplist` 或 `ziplist`。
 
 ### 那你能说说这些数据类型的使用指令吗？
 

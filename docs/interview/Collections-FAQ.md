@@ -384,11 +384,9 @@ public E get(int index) {
 
 
 
-
-
 ### HashMap说一下，其中的Key需要重写hashCode()和equals()吗？
 
-在使用 `HashMap` 时，键（Key）需要重写 `hashCode()` 和 `equals()` 方法，这是确保 `HashMap` 正确运作的关键。下面是详细的解释：
+在大多数情况下，如果您使用 `HashMap` 并希望使用自定义对象作为键（Key），那么最好重写这两个方法
 
 **1、`hashCode()` 方法**
 
@@ -488,36 +486,6 @@ public class Key {
 在 `HashMap` 中，键需要重写 `hashCode()` 和 `equals()` 方法，以确保对象可以正确地存储和检索。这两个方法共同保证了键的唯一性和查找的高效性，避免了逻辑上相等但哈希码不同的对象导致的存储和查找问题。
 
 实际开发中，好像也很少用对象当 Key 去存储。
-
-
-
-### 两个对象值相同 (x.equals(y) == true)，但却可有不同的 hash code，这句话对不对?
-
-正确 
-
-如果此对象重写了equals方法，那么可能出现这两个对象的equals相同，而hashcode不同。因此可以说它是对的。 但是，如果此对象继承Object，没有重写equals方法，那么就使用Object的equals方法，Object对象的equals方法默认是用==实现的，那么如果equals相同，hashcode一定相同。
-
-```java
-public class EqualsTest {
-    public static void main(String[] args) {
-        A a = new A();
-        B b = new B();
-        System.out.println(a.equals(b));   //true
-        System.out.println(a.hashCode() + "," + b.hashCode());	//1086865489,452372241
-    }
-}
-
-class A {
-    @Override
-    public boolean equals(Object obj) {
-        return true;
-    }
-}
-
-class B {
-}
-
-```
 
 
 
@@ -1809,35 +1777,33 @@ public V get(Object key) {
 
 
 
-> 
->
 > `ConcurrentHashMap` 是 Java 中一个线程安全的哈希表实现，它在不同版本的 Java 中有一些显著的变化。以下是 JDK 1.7 和 JDK 1.8 中 `ConcurrentHashMap` 的主要区别：
 >
 > **1. 锁结构**
 >
 > - **JDK 1.7**：基于 `Segment` + `HashEntry` 数组实现。`Segment` 是 `ReentrantLock` 的子类，内部维护了一个 `HashEntry` 数组。每个 `Segment` 相当于一个小的 `HashMap`，并且每个 `Segment` 可以独立加锁，实现了分段锁技术。
-> - **JDK 1.8**：摒弃了 `Segment`，采用 `synchronized` + `CAS` + `Node` + `Unsafe` 的实现。锁的粒度从段锁缩小为节点锁，提高了并发性能。
->
+>- **JDK 1.8**：摒弃了 `Segment`，采用 `synchronized` + `CAS` + `Node` + `Unsafe` 的实现。锁的粒度从段锁缩小为节点锁，提高了并发性能。
+> 
 > **2. 数据结构**
 >
 > - **JDK 1.7**：使用 `Segment` 数组和 `HashEntry` 数组。`HashEntry` 类似于 `HashMap` 中的节点，存储键值对数据。
-> - **JDK 1.8**：使用 `Node` 数组，节点可以是链表或红黑树。当链表长度超过8个时，链表会转换为红黑树，以提高查找效率。
->
+>- **JDK 1.8**：使用 `Node` 数组，节点可以是链表或红黑树。当链表长度超过8个时，链表会转换为红黑树，以提高查找效率。
+> 
 > **3. `put()` 方法的执行流程**
 >
 > - **JDK 1.7**：需要进行两次定位，先定位 `Segment`，再定位 `HashEntry`。使用自旋锁和锁膨胀机制进行加锁，整个 `put` 操作期间都持有锁。
-> - **JDK 1.8**：只需要一次定位，采用 `CAS` + `synchronized` 的机制。如果对应下标处没有节点，说明没有发生哈希冲突，此时直接通过 `CAS` 进行插入。若失败，则使用 `synchronized` 进行加锁插入。
->
+>- **JDK 1.8**：只需要一次定位，采用 `CAS` + `synchronized` 的机制。如果对应下标处没有节点，说明没有发生哈希冲突，此时直接通过 `CAS` 进行插入。若失败，则使用 `synchronized` 进行加锁插入。
+> 
 > **4. `get()` 方法**
 >
 > - **JDK 1.7**：通过两次哈希定位到 `Segment` 和 `HashEntry`，然后遍历链表进行查找。由于 `value` 变量被 `volatile` 修饰，保证了内存可见性。
-> - **JDK 1.8**：通过一次哈希定位到 `Node`，然后遍历链表或红黑树进行查找。`value` 变量同样被 `volatile` 修饰，保证了内存可见性。
->
+>- **JDK 1.8**：通过一次哈希定位到 `Node`，然后遍历链表或红黑树进行查找。`value` 变量同样被 `volatile` 修饰，保证了内存可见性。
+> 
 > **5. `size()` 方法**
 >
 > - **JDK 1.7**：采用类似于乐观锁的机制，先是不加锁直接进行统计，最多执行三次，如果前后两次计算的结果一样，则直接返回。若超过了三次，则对每一个 `Segment` 进行加锁后再统计。
-> - **JDK 1.8**：维护一个 `baseCount` 属性用来记录节点数量，每次进行 `put` 操作之后都会 `CAS` 自增 `baseCount`。部分元素的变化个数保存在 `CounterCell` 数组中，实现如下。
->
+>- **JDK 1.8**：维护一个 `baseCount` 属性用来记录节点数量，每次进行 `put` 操作之后都会 `CAS` 自增 `baseCount`。部分元素的变化个数保存在 `CounterCell` 数组中。
+> 
 > **6. 引入红黑树**
 >
 > - **JDK 1.8**：引入了红黑树结构，用降低哈希冲突严重的场景的时间复杂度。当链表长度超过8个时，链表会转换为红黑树。

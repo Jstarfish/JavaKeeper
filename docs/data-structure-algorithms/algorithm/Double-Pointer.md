@@ -377,10 +377,9 @@ public boolean hasCycle(ListNode head) {
 1. **检测是否有环**：通过快慢指针来判断链表中是否存在环。慢指针一次走一步，快指针一次走两步。如果链表中有环，两个指针最终会相遇；如果没有环，快指针会到达链表末尾。
 
 2. **找到环的起点**：
-
-   - 当快慢指针相遇时，我们已经确认链表中存在环。
-
-   - 从相遇点开始，慢指针保持不动，快指针回到链表头部，此时两个指针每次都走一步。两个指针会在环的起点再次相遇。
+- 当快慢指针相遇时，我们已经确认链表中存在环。
+   
+- 从相遇点开始，慢指针保持不动，快指针回到链表头部，此时两个指针每次都走一步。两个指针会在环的起点再次相遇。
 
 ```java
 public ListNode detectCycle(ListNode head) {
@@ -707,11 +706,12 @@ public static int lengthOfLongestSubstring(String s){
     //当前字符包含在当前有效的子段中，如：abca，当我们遍历到第二个a，当前有效最长子段是 abc，我们又遍历到a，
     //那么此时更新 left 为 map.get(a)+1=1，当前有效子段更新为 bca；
     //相当于左指针往前移动了一位
+    char c = s.charAt(right);
     if (map.containsKey(s.charAt(right))) {
-      left = Math.max(left, map.get(s.charAt(right)) + 1);
+      left = Math.max(left, map.get(c) + 1);
     }
     //右指针一直往前移动
-    map.put(s.charAt(right), right);
+    map.put(c, right);
     result = Math.max(result, right - left + 1);
   }
   return result;
@@ -798,14 +798,17 @@ public String minWindow(String s, String t) {
         //扩大窗口
         right++;
 
+        //先判断当前滑动窗口右端（right 指针处）的字符 c 是否是目标字符串 t 中的一个字符
         if (need.containsKey(c)) {
             window.put(c, window.getOrDefault(c, 0) + 1);
+            //检查当前字符 c 的频率在滑动窗口中是否达到了目标字符串 t 中所要求的频率
             if (window.get(c).equals(need.get(c))) {
                 valid++;
             }
         }
         //判断左窗口是否需要收缩
         while (valid == need.size()) {
+            //如果当前滑动窗口的长度比已记录的最小长度 len 更短，则说明找到了一个更小的符合条件的覆盖子串
             if (right - left < len) {
                 start = left;
                 len = right - left;
@@ -814,7 +817,7 @@ public String minWindow(String s, String t) {
             char d = s.charAt(left);
             left++;  //缩小窗口
 
-            //更新窗口
+            //更新窗口，收缩，更新窗口中的字符频率并检查是否还满足覆盖条件
             if (need.containsKey(d)) {
                 if (window.get(d).equals(need.get(d))) {
                     valid--;
@@ -849,45 +852,43 @@ public String minWindow(String s, String t) {
 和上一题基本一致，只是 移动 `left` 缩小窗口的时机是窗口大小大于 `t.length()` 时，当发现 `valid == need.size()` 时，就说明窗口中就是一个合法的排列
 
 ```java
-class Solution {
-    // 判断 s 中是否存在 t 的排列
-    public boolean checkInclusion(String t, String s) {
-        Map<Character, Integer> need = new HashMap<>();
-        Map<Character, Integer> window = new HashMap<>();
-        for (char c : t.toCharArray()) {
-            need.put(c, need.getOrDefault(c, 0) + 1);
-        }
-
-        int left = 0, right = 0;
-        int valid = 0;
-        while (right < s.length()) {
-            char c = s.charAt(right);
-            right++;
-            // 进行窗口内数据的一系列更新
-            if (need.containsKey(c)) {
-                window.put(c, window.getOrDefault(c, 0) + 1);
-                if (window.get(c).intValue() == need.get(c).intValue())
-                    valid++;
-            }
-
-            // 判断左侧窗口是否要收缩
-            while (right - left >= t.length()) {
-                // 在这里判断是否找到了合法的子串
-                if (valid == need.size())
-                    return true;
-                char d = s.charAt(left);
-                left++;
-                // 进行窗口内数据的一系列更新
-                if (need.containsKey(d)) {
-                    if (window.get(d).intValue() == need.get(d).intValue())
-                        valid--;
-                    window.put(d, window.get(d) - 1);
-                }
-            }
-        }
-        // 未找到符合条件的子串
-        return false;
+// 判断 s 中是否存在 t 的排列
+public boolean checkInclusion(String t, String s) {
+    Map<Character, Integer> need = new HashMap<>();
+    Map<Character, Integer> window = new HashMap<>();
+    for (char c : t.toCharArray()) {
+        need.put(c, need.getOrDefault(c, 0) + 1);
     }
+
+    int left = 0, right = 0;
+    int valid = 0;
+    while (right < s.length()) {
+        char c = s.charAt(right);
+        right++;
+        // 进行窗口内数据的一系列更新
+        if (need.containsKey(c)) {
+            window.put(c, window.getOrDefault(c, 0) + 1);
+            if (window.get(c).intValue() == need.get(c).intValue())
+                valid++;
+        }
+
+        // 判断左侧窗口是否要收缩
+        while (right - left >= t.length()) {
+            // 在这里判断是否找到了合法的子串
+            if (valid == need.size())
+                return true;
+            char d = s.charAt(left);
+            left++;
+            // 进行窗口内数据的一系列更新
+            if (need.containsKey(d)) {
+                if (window.get(d).intValue() == need.get(d).intValue())
+                    valid--;
+                window.put(d, window.get(d) - 1);
+            }
+        }
+    }
+    // 未找到符合条件的子串
+    return false;
 }
 ```
 
@@ -951,14 +952,6 @@ public int characterReplacement(String s, int k) {
 
 ### 3.3 计数问题
 
-> ### 至多包含两个不同字符的最长子串
->
-> ### 至多包含 K 个不同字符的最长子串
->
-> ### 区间子数组个数
->
-> ### K 个不同整数的子数组
-
 #### 至多包含两个不同字符的最长子串
 
 > 给定一个字符串 `s`，找出 **至多** 包含两个不同字符的最长子串 `t` ，并返回该子串的长度。
@@ -969,13 +962,55 @@ public int characterReplacement(String s, int k) {
 > 解释: t 是 "ece"，长度为3。
 > ```
 
-思路：
-
-- 这种字符串用滑动窗口的题目，一般用 `toCharArray()` 先转成字符数组
 
 
+```java
+public int lengthOfLongestSubstringTwoDistinct(String s) {
+    if (s == null || s.length() == 0) {
+        return 0;
+    }
 
-#### 至多包含 K 个不同字符的最长子串
+    // 滑动窗口的左指针
+    int left = 0;
+    // 记录滑动窗口内的字符及其出现的频率
+    Map<Character, Integer> map = new HashMap<>();
+    // 记录最长子串的长度
+    int maxLen = 0;
+
+    // 遍历整个字符串
+    for (int right = 0; right < s.length(); right++) {
+        // 右指针的字符
+        char c = s.charAt(right);
+        // 将字符 c 加入到窗口中，并更新其出现的次数
+        map.put(c, map.getOrDefault(c, 0) + 1);
+
+        // 当窗口内的不同字符数超过 2 时，开始缩小窗口
+        while (map.size() > 2) {
+            // 左指针的字符
+            char leftChar = s.charAt(left);
+            // 减少左指针字符的频率
+            map.put(leftChar, map.get(leftChar) - 1);
+            // 如果左指针字符的频率为 0，则从窗口中移除该字符
+            if (map.get(leftChar) == 0) {
+                map.remove(leftChar);
+            }
+            // 移动左指针，缩小窗口
+            left++;
+        }
+
+        // 更新最大长度
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+
+    return maxLen;
+}
+
+
+```
+
+
+
+#### 至多包含 K 个不同字符的最长子串_340
 
 > 给定一个字符串 `s`，找出 **至多** 包含 `k` 个不同字符的最长子串 `T`。
 >
@@ -985,9 +1020,51 @@ public int characterReplacement(String s, int k) {
 > 解释: 则 T 为 "ece"，所以长度为 3。
 > ```
 
+```java
+public int lengthOfLongestSubstringKDistinct(String s, int k) {
+    if (s == null || s.length() == 0 || k == 0) {
+        return 0;
+    }
+
+    // 滑动窗口的左指针
+    int left = 0;
+    // 记录滑动窗口内的字符及其出现的频率
+    Map<Character, Integer> map = new HashMap<>();
+    // 记录最长子串的长度
+    int maxLen = 0;
+
+    // 遍历整个字符串
+    for (int right = 0; right < s.length(); right++) {
+        // 右指针的字符
+        char c = s.charAt(right);
+        // 将字符 c 加入到窗口中，并更新其出现的次数
+        map.put(c, map.getOrDefault(c, 0) + 1);
+
+        // 当窗口内的不同字符数超过 K 时，开始缩小窗口
+        while (map.size() > k) {
+            // 左指针的字符
+            char leftChar = s.charAt(left);
+            // 减少左指针字符的频率
+            map.put(leftChar, map.get(leftChar) - 1);
+            // 如果左指针字符的频率为 0，则从窗口中移除该字符
+            if (map.get(leftChar) == 0) {
+                map.remove(leftChar);
+            }
+            // 移动左指针，缩小窗口
+            left++;
+        }
+
+        // 更新最大长度
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+
+    return maxLen;
+}
+```
 
 
-#### 区间子数组个数
+
+#### [ 区间子数组个数_795](https://leetcode.cn/problems/number-of-subarrays-with-bounded-maximum/)
 
 > 给定一个元素都是正整数的数组`A` ，正整数 `L` 以及 `R` (`L <= R`)。
 >
@@ -1003,11 +1080,30 @@ public int characterReplacement(String s, int k) {
 > 解释: 满足条件的子数组: [2], [2, 1], [3].
 > ```
 
+```java
+public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+    int count = 0;
+    int start = -1;  // 记录大于right的元素下标
+    int last_bounded = -1;  // 记录符合[Left, Right]区间的元素下标
+
+    for (int i = 0; i < nums.length; i++) {
+        if (nums[i] > right) {
+            // 遇到大于right的元素，重置窗口起始点
+            start = i;
+        }
+        if (nums[i] >= left && nums[i] <= right) {
+            // 记录符合区间条件的元素下标
+            last_bounded = i;
+        }
+        // 计算当前有效子数组的数量
+        count += last_bounded - start;
+    }
+
+    return count;
+}
+```
 
 
-#### K 个不同整数的子数组
-
-> 
 
 
 

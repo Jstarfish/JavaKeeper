@@ -1,8 +1,5 @@
-node_modules
+node_modules/
 package-lock.json
 package.json
 yarn.lock
-compile.sh
-deploy.sh
-
-
+scripts/

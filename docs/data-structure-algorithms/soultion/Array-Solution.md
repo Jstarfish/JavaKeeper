@@ -32,6 +32,41 @@ public static int[] twoSum(int[] nums,int target){
 
 
 
+### [14. 最长公共前缀](https://leetcode.cn/problems/longest-common-prefix/)
+
+> 编写一个函数来查找字符串数组中的最长公共前缀。如果不存在公共前缀，返回空字符串 `""`。
+>
+> ```
+> 输入：strs = ["flower","flow","flight"]
+> 输出："fl"
+> ```
+
+```java
+public String longestCommonPrefix(String[] strs) {
+    if (strs == null || strs.length == 0) {
+        return "";
+    }
+
+    String prefix = strs[0];
+    for (int i = 1; i < strs.length; i++) {
+        int j = 0;
+        // Compare characters one by one
+        while (j < prefix.length() && j < strs[i].length() && prefix.charAt(j) == strs[i].charAt(j)) {
+            j++;
+        }
+        // prefix should be shortened to the common prefix found so far
+        prefix = prefix.substring(0, j);
+        // If prefix becomes empty, there is no common prefix
+        if (prefix.isEmpty()) {
+            return "";
+        }
+    }
+    return prefix;
+}
+```
+
+
+
 ### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
 
 > 给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。

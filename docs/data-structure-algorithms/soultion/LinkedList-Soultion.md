@@ -21,7 +21,7 @@ categories: leetcode
 - 如果链表只包含两个结点时，代码是否能正常工作？
 - 代码逻辑在处理头结点和尾结点的时候，是否能正常工作？
 
-最重要的一个技巧就是，你得行动，写起来
+**最重要的一个技巧就是，你得行动，写起来**
 
 ### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)
 
@@ -52,8 +52,9 @@ public ListNode reverseList_1(ListNode head){
     return head;
   }
   //申请节点，pre和 cur，pre指向null
-  ListNode cur = head;
   ListNode pre = null;
+  ListNode cur = head;
+
   while(cur != null) {
     //记录当前节点的下一个节点
     ListNode tmp = cur.next;
@@ -68,6 +69,18 @@ public ListNode reverseList_1(ListNode head){
 ```
 
 **思路**：递归 (https://leetcode.cn/problems/reverse-linked-list/solution/shi-pin-jiang-jie-die-dai-he-di-gui-hen-hswxy/)
+
+```java
+public ListNode reverseList(ListNode head) {
+    if (head == null || head.next == null) {
+        return head; // 基本情况：空链表或只有一个节点
+    }
+    ListNode p = reverseList(head.next); // 递归反转子链表
+    head.next.next = head; // 将当前节点的下一个节点的next指回当前节点
+    head.next = null; // 将当前节点的next设为null，防止循环引用
+    return p; // 返回新的头节点
+}
+```
 
 
 
@@ -382,7 +395,7 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     int sum = x + y + carry;
 
     //如果大于10了，就进位，除以10来计算进位数
-    carry = sum / 10;1
+    carry = sum / 10;
     //进位后剩下的余数
     sum = sum % 10;
     //进位后的数据
@@ -401,7 +414,7 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     }
   }
   //如果最后一位还有进位的话，再往后增加一个节点
-  if (carry == 1) {
+  if (carry > 0) {
     cur.next = new ListNode(carry);
   }
   return pre.next;
