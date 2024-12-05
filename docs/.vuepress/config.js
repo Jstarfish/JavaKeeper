@@ -166,7 +166,7 @@ function genDSASidebar() {
       collapsable: true,
       children: [
         "complexity",
-        "Sort",
+        ['algorithm/Sort', '排序'],
         ['algorithm/Binary-Search', '二分查找'],
       	['algorithm/Recursion', '递归'],
         ['algorithm/Double-Pointer', '双指针'],

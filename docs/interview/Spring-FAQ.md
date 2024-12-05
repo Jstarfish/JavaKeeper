@@ -136,15 +136,16 @@ spring boot 我理解就是把 spring spring mvc spring data jpa 等等的一些
 
 ### spring-boot-starter-parent 有什么用 ?
 
-我们都知道，新创建一个 Spring Boot 项目，默认都是有 parent 的，这个 parent 就是 spring-boot-starter-parent ，spring-boot-starter-parent 主要有如下作用：
+`spring-boot-starter-parent` 是 Spring Boot 提供的一个父 POM（项目对象模型），用于简化 Spring Boot 项目的构建和依赖管理。它作为父级 POM，主要提供了许多方便的配置，包括版本管理、插件配置、依赖管理等。使用 `spring-boot-starter-parent` 可以减少很多手动配置的工作，让开发者专注于应用程序的开发而非构建过程：
 
-1. 定义了 Java 编译版本为 1.8 。
-2. 使用 UTF-8 格式编码。
-3. 继承自 spring-boot-dependencies，这个里边定义了依赖的版本，也正是因为继承了这个依赖，所以我们在写依赖时才不需要写版本号。
-4. 执行打包操作的配置。
-5. 自动化的资源过滤。
-6. 自动化的插件配置。
-7. 针对 application.properties 和 application.yml 的资源过滤，包括通过 profile 定义的不同环境的配置文件，例如 application-dev.properties 和 application-dev.yml。
+1. **依赖管理**：`spring-boot-starter-parent` 预定义了 Spring Boot 相关依赖的版本，这意味着你不需要在每个模块的 `pom.xml` 中显式指定版本号，可以避免版本冲突和兼容性问题。
+2. **插件管理**：它提供了一些预先配置的 Maven 插件，例如 `maven-compiler-plugin`（用于Java编译）、`maven-surefire-plugin`（用于单元测试）等，这些插件都已经配置好了适合大多数Spring Boot应用的参数。
+3. **资源过滤和属性替换**：通过在父 POM 中定义资源过滤和属性替换规则，可以确保应用程序的配置文件（如 `application.properties`）在不同环境间正确切换。
+4. **Spring Boot 应用的打包优化**：它配置了 `maven-war-plugin` 插件，使得打包的 WAR 文件中不包含 `META-INF` 目录下的 `pom.xml` 和 `pom.properties` 文件，这对于部署到 Servlet 容器是有益的。
+5. **自动配置的依赖**：可以方便地引入 Spring Boot 的自动配置依赖，例如 `spring-boot-starter`，这可以自动配置应用程序的大部分设置。
+6. **版本一致性**：确保所有 Spring Boot 相关依赖的版本一致，避免不同库之间的版本冲突。
+7. **快速开始**：对于新项目，使用 `spring-boot-starter-parent` 可以快速开始，无需手动配置大量的 Maven 设置。
+8. **继承和自定义**：如果需要，你可以继承 `spring-boot-starter-parent` 并根据项目需求进行自定义配置。
 
 
 
@@ -198,7 +199,7 @@ Spring Boot 是一个基于 Spring 框架的快速开发框架，它简化了基
 
 
 
-### `CommandLineRunner`或`ApplicationRunner`接口区别
+### `CommandLineRunner` 或 `ApplicationRunner`接口区别
 
 `CommandLineRunner` 和 `ApplicationRunner` 是 Spring Boot 提供的两个接口，用于在 Spring Boot 应用启动完成后运行特定代码。这两个接口的主要区别在于它们的 `run` 方法的参数类型。
 
@@ -1064,6 +1065,19 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 
 
 
+### @Transactional 为什么不能用在私有方法上？
+
+`@Transactional` 注解是 Spring 提供的一种声明式事务管理方式，它用于指定某个方法在执行时需要进行事务管理。通常，这个注解被用在公有（public）方法上，原因包括：
+
+1. **代理机制**：Spring 的声明式事务管理是基于 AOP（面向切面编程）实现的。当使用 `@Transactional` 注解时，Spring 会为被注解的方法创建一个代理对象。对于非公有方法，Spring 无法在运行时动态地创建代理，因为这些方法不能被代理对象所调用。
+2. **事务传播**：事务的传播依赖于方法调用链。`@Transactional` 注解通常用于服务层或对外的 API 方法上，这样可以确保在业务逻辑的开始处就开启事务，并在业务逻辑结束时提交或回滚事务。如果将 `@Transactional` 注解用在私有方法上，那么事务的传播行为（如传播级别、事务的保存点等）可能不会按预期工作。
+3. **代码设计**：从设计的角度来看，将 `@Transactional` 注解用在公有方法上更符合业务逻辑的封装和分层。私有方法通常被设计为辅助方法，不应该独立承担事务管理的责任。
+4. **事务的可见性**：将 `@Transactional` 注解用在公有方法上可以清晰地表明事务的边界，这对于理解和维护代码都是有益的。如果用在私有方法上，可能会隐藏事务的边界，使得其他开发者难以理解事务的范围。
+5. **事务的粒度**：事务应该在业务逻辑的适当粒度上进行管理。通常，一个业务操作会跨越多个方法调用，将 `@Transactional` 注解用在私有方法上可能会导致过细的事务粒度，这不利于事务管理。
+6. **Spring 版本限制**：在 Spring 5 之前的版本中，`@Transactional` 注解确实不能用于非公有方法。从 Spring 5 开始，引入了对非公有方法的支持，但是仍然推荐将 `@Transactional` 注解用在公有方法上。
+
+
+
 ### 事务传播属性
 
 - 当事务方法被另一个事务方法调用时， 必须指定事务应该如何传播。例如：方法可能继续在现有事务中运行，也可能开启一个新事务，并在自己的事务中运行
@@ -1215,11 +1229,57 @@ public class ScopeTestController {
 
 **单例是不安全的，会导致属性重复使用**。
 
-#### 解决方案
+**解决方案**
 
 1. 不要在controller中定义成员变量
 2. 万一必须要定义一个非静态成员变量时候，则通过注解@Scope(“prototype”)，将其设置为多例模式。
 3. 在Controller中使用ThreadLocal变量
+
+
+
+### springMVC  和 spring WebFlux 区别？
+
+`Spring MVC` 和 `Spring WebFlux` 都是 Spring 框架中用于构建 Web 应用程序的模块，但它们有一些根本性的区别，特别是在处理请求的方式和支持的编程模型上。以下是两者的主要区别和工作原理的详细说明：
+
+1. **编程模型和架构**
+
+- Spring MVC（同步阻塞式）
+
+  Spring MVC 是一个基于 Servlet 的 Web 框架，遵循经典的请求-响应模型。它是一个 **同步阻塞** 的框架，即每个请求都由一个独立的线程处理，直到请求完成，线程才会被释放。其工作流程如下：
+
+  1. **请求到达**：客户端发送请求到服务器，Tomcat 接收请求并交给 Spring MVC 处理。
+  2. **请求分发**：DispatcherServlet 将请求传递给合适的控制器（Controller）。
+  3. **处理请求**：控制器处理业务逻辑，调用服务层、数据访问层等。
+  4. **视图解析**：返回模型和视图（ModelAndView），然后交由视图解析器（如 JSP）渲染成最终的 HTML。
+  5. **响应返回**：最终的响应通过 Tomcat 返回到客户端。
+
+​	Spring MVC 适用于传统的基于 Servlet 的 Web 应用，通常用于同步场景，像表单提交、处理重定向等。
+
+2. **Spring WebFlux（异步非阻塞式）**
+
+   Spring WebFlux 是一个 **异步非阻塞** 的 Web 框架，可以更好地处理高并发场景和 I/O 密集型操作。Spring WebFlux 适用于响应式编程模型，通过使用 **Reactor**（一个响应式编程库）提供的支持，能够以异步和非阻塞的方式处理请求。
+
+   Spring WebFlux 可以运行在多种容器上，除了传统的 Servlet 容器（如 Tomcat），它还支持基于 Netty 等非 Servlet 容器的运行模式。它的工作原理如下：
+
+   1. **请求到达**：客户端发送请求到服务器，Tomcat 或 Netty 接收请求。
+   2. **请求分发**：DispatcherHandler 将请求传递给合适的控制器。
+   3. **异步处理**：控制器在处理请求时，通常会返回一个 `Mono` 或 `Flux`（Reactor 库的异步数据流类型），这些类型代表了一个单一元素（Mono）或者多个元素（Flux）的异步响应。
+   4. **响应返回**：通过事件驱动的方式，最终响应异步返回给客户端。
+
+​	Spring WebFlux 适合高并发、I/O 密集型和实时数据流场景，像聊天系统、实时通知、数据流处理等。
+
+| 特性                | Spring MVC                                      | Spring WebFlux                                         |
+| ------------------- | ----------------------------------------------- | ------------------------------------------------------ |
+| **编程模型**        | 同步阻塞模型（传统的请求-响应模型）             | 异步非阻塞模型（响应式编程）                           |
+| **线程模型**        | 每个请求分配一个线程，阻塞等待响应              | 请求通过事件循环处理，异步返回结果                     |
+| **请求处理方式**    | 阻塞，处理请求时，线程会被占用                  | 非阻塞，线程可以用于其他任务，直到结果返回             |
+| **I/O 模型**        | 阻塞式 I/O                                      | 非阻塞式 I/O                                           |
+| **适用场景**        | 对同步请求较为适合，例如表单提交，传统 Web 应用 | 高并发、实时数据流处理，I/O 密集型场景，微服务         |
+| **支持的容器**      | Servlet 容器（如 Tomcat）                       | Servlet 容器（如 Tomcat）及非 Servlet 容器（如 Netty） |
+| **响应体类型**      | `ModelAndView`（同步返回）                      | `Mono` 和 `Flux`（异步返回）                           |
+| **扩展性与性能**    | 高并发时性能较差，容易出现线程饱和              | 高并发时性能更优，线程利用率更高                       |
+| **学习曲线**        | 更易上手，熟悉的编程模型                        | 学习曲线较陡，需要理解异步编程和响应式流               |
+| **支持的 API 类型** | REST API、Web 应用                              | 支持 REST API，且更适合长连接和实时通信                |
 
 
 
@@ -1362,22 +1422,6 @@ public class Employee {
 
 
 
-### @Autowired和@Resource之间的区别
-
-用途：做bean的注入时使用
-
-- @Autowired，属于Spring的注解，`org.springframework.beans.factory.annotation.Autowired`　　　　
-
-- @Resource，不属于Spring的注解，JDK1.6支持的注解，`javax.annotation.Resource`
-
-共同点：都用来装配bean。写在字段上，或写在setter方法
-
-不同点：@Autowired  默认按类型装配。依赖对象必须存在，如果要允许null值，可以设置它的required属性为false  @Autowired(required=false)，也可以使用名称装配，配合@Qualifier注解
-
-@Resource默认是按照名称来装配注入的，只有当找不到与名称匹配的bean才会按照类型来装配注入
-
-
-
 ### @Qualifier 注解有什么作用
 
 当创建多个相同类型的 bean 并希望仅使用属性装配其中一个 bean 时，可以使用 @Qualifier 注解和 @Autowired 通过指定应该装配哪个确切的 bean 来消除歧义。
@@ -1409,21 +1453,13 @@ public class Employee {
 
 
 
-
-
-
-
-
-
 ### Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
 
 启动类上面的注解是@SpringBootApplication，它也是 Spring Boot 的核心注解，主要组合包含了以下 3 个注解：
 
-@SpringBootConfiguration：组合了 @Configuration 注解，实现配置文件的功能。
-
-@EnableAutoConfiguration：打开自动配置的功能，也可以关闭某个自动配置的选项，如关闭数据源自动配置功能： @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })。
-
-@ComponentScan：Spring组件扫描。
+- @SpringBootConfiguration：组合了 @Configuration 注解，实现配置文件的功能。
+- @EnableAutoConfiguration：打开自动配置的功能，也可以关闭某个自动配置的选项，如关闭数据源自动配置功能： @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })。
+- @ComponentScan：Spring组件扫描。
 
 
 
