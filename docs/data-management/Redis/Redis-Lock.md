@@ -162,7 +162,7 @@ Redisson 是 Redis 官方的分布式锁组件。GitHub 地址：[https://github
 
 > Redisson 是一个在 Redis 的基础上实现的 Java 驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的 Java 常用对象，还实现了可重入锁（Reentrant Lock）、公平锁（Fair Lock、联锁（MultiLock）、 红锁（RedLock）、 读写锁（ReadWriteLock）等，还提供了许多分布式服务。Redisson 提供了使用 Redis 的最简单和最便捷的方法。Redisson 的宗旨是促进使用者对 Redis 的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。
 
-redisson 现在已经很强大了，github 的 wiki 也很详细，分布式锁的介绍直接戳 [Distributed locks and synchronizers](https://github.com/redisson/redisson/wiki/8.-Distributed-locks-and-synchronizers)
+Redisson 现在已经很强大了，github 的 wiki 也很详细，分布式锁的介绍直接戳 [Distributed locks and synchronizers](https://github.com/redisson/redisson/wiki/8.-Distributed-locks-and-synchronizers)
 
 Redisson 支持单点模式、主从模式、哨兵模式、集群模式，只是配置的不同，我们以单点模式来看下怎么使用，代码很简单，都已经为我们封装好了，直接拿来用就好，详细的 demo，我放在了 github: starfish-learn-redisson 上，这里就不一步步来了
 

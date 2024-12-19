@@ -30,9 +30,7 @@ Redis 集群刚好解决了上述问题，实现了较为完善的高可用方�
 
 2. **高可用**： 集群支持主从复制和主节点的 **自动故障转移** *（与哨兵类似）*，当任一节点发生故障时，集群仍然可以对外提供服务。
 
-![Redis Cluster Architecture](https://www.mybluelinux.com/img/post/posts/0189/redis-cluster-architecture.webp)
-
-![](https://img.starfish.ink/redis/redis-cluster-framework.png)
+![redis-cluster-framework](https://img.starfish.ink/redis/redis-cluster-framework.png)
 
 上图展示了 **Redis Cluster** 典型的架构图，集群中的每一个 Redis 节点都 **互相两两相连**，客户端任意 **直连** 到集群中的 **任意一台**，就可以对其他 Redis 节点进行 **读写** 的操作。
 
@@ -485,7 +483,7 @@ Redis 集群自身实现了高可用。高可用首先需要解决集群部分�
 
    - 更新配置纪元
 
-     配置纪元是一个只增不减的整数，每个主节点自身维护一个配置纪元 (`clusterNode.configEpoch`)标示当前主节点的版本，所有主节点的配置纪元 都不相等，从节点会复制主节点的配置纪元。整个集群又维护一个全局的配 置纪元(`clusterState.current Epoch`)，用于记录集群内所有主节点配置纪元的最大版本。
+     配置纪元是一个只增不减的整数，每个主节点自身维护一个配置纪元 (`clusterNode.configEpoch`)标示当前主节点的版本，所有主节点的配置纪元 都不相等，从节点会复制主节点的配置纪元。整个集群又维护一个全局的配置纪元(`clusterState.current Epoch`)，用于记录集群内所有主节点配置纪元的最大版本。
 
    - 广播选举消息
 
@@ -499,7 +497,7 @@ Redis 集群自身实现了高可用。高可用首先需要解决集群部分�
 
    当从节点收集到 N/2+1 个持有槽的主节点投票时，从节点可以执行替换主节点操作，例如集群内有 5 个持有槽的主节点，主节点 b 故障后还有 4 个， 当其中一个从节点收集到 3 张投票时代表获得了足够的选票可以进行替换主节点操作。
 
-​		![](https://img.starfish.ink/redis/redis-cluster-vote.png)
+![](https://img.starfish.ink/redis/redis-cluster-vote.png)
 
 5. 替换主节点
 

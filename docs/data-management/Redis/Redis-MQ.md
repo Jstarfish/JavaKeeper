@@ -142,7 +142,7 @@ Redis 提供了好几对 List 指令，先大概看下这些命令，混个眼�
 
 
 
-因为 Redis 单线程的特点，所以在消费数据时，同一个消息会不会同时被多个 `consumer` 消费掉，但是需要我们考虑消费不成功的情况。
+因为 Redis 单线程的特点，所以在消费数据时，同一个消息不会同时被多个 `consumer` 消费掉，但是需要我们考虑消费不成功的情况。
 
 #### 可靠队列模式 | ack 机制
 
@@ -260,7 +260,7 @@ Redis 5.0 版本新增了一个更强大的数据结构——**Stream**。它提
 
 
 
-Streams 是 Redis 专门为消息队列设计的数据类型，所以提供了丰富的消息队列操作命令。
+Stream 是 Redis 专门为消息队列设计的数据类型，所以提供了丰富的消息队列操作命令。
 
 #### Stream 常用命令
 
@@ -379,7 +379,7 @@ Redis Stream 借鉴了很多 Kafka 的设计。
 
 ![redis-group-strucure](https://img.starfish.ink/redis/redis-group-strucure.png)
 
-Stream 不像 Kafak 那样有分区的概念，如果想实现类似分区的功能，就要在客户端使用一定的策略将消息写到不同的 Stream。
+Stream 不像 Kafka 那样有分区的概念，如果想实现类似分区的功能，就要在客户端使用一定的策略将消息写到不同的 Stream。
 
 - `xgroup create`：创建消费者组
 - `xgreadgroup`：读取消费组中的消息

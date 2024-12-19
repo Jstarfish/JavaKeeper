@@ -34,7 +34,7 @@ Redis 在形式上看起来也差不多，分为三个阶段
 2. 命令入队（业务操作）
 3. 执行事务（exec）或取消事务（discard）
 
-```
+```sh
 > multi
 OK
 > incr star

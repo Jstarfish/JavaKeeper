@@ -37,7 +37,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "mode": "source",
                 "source": false
               }
@@ -150,7 +150,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -167,7 +167,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
+                "file": "data-management/Redis/Redis-Datatype.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -190,7 +190,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/soultion/Binary-Tree-Solution.md"
+                "file": "data-management/Redis/Redis-Datatype.md"
               }
             }
           }
@@ -213,6 +213,15 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/Redis/Redis-Database.md",
+    "data-management/Redis/Nosql-Overview.md",
+    "data-management/Redis/Nosql-Overview~.md",
+    "data-management/Redis/reproduce/Cache-Design.md",
+    "data-management/Redis/reproduce/Redis为什么变慢了-常见延迟问题定位与分析.md",
+    "data-management/Redis/reproduce/Key 寻址算法.md",
+    "interview/Redis-FAQ.md",
+    "data-structure-algorithms/soultion/Binary-Tree-Solution.md",
+    "未命名文件夹",
     "java/IO~.md",
     "java/IO.md",
     "java/未命名.md",
@@ -231,14 +240,6 @@
     "data-management/MySQL/MySQL-Lock.md",
     "framework/SpringWebFlux/响应式编程.md",
     "java/JVM/JVM性能监控和故障处理工具.md",
-    "sidebar.md",
-    "data-structure-algorithms/algorithm/Backtracking.md",
-    "data-structure-algorithms/algorithm/Dynamic-Programming.md",
-    "data-structure-algorithms/algorithm/DFS.md",
-    "data-management/MySQL/MySQL-Select.md",
-    "java/JVM/Runtime-Data-Areas.md",
-    "java/JVM/JVM-Java.md",
-    "java/JVM/Java-Object.md",
     "Untitled.canvas",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"
