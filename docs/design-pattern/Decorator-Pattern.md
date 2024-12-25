@@ -1,12 +1,18 @@
-# 装饰模式——看看 JDK 和 Spring 是如何杜绝继承滥用的
+---
+title: 装饰模式——看看 JDK 和 Spring 是如何杜绝继承滥用的
+date: 2022-10-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-《Head First 设计模式》中是这么形容装饰者模式的——“**给爱用继承的人一个全新的设计眼界**”，拒绝继承滥用，从装饰者模式开始。
+![](https://images.unsplash.com/photo-1613574450323-9df30ffe3566?q=80&w=2969&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
 
-装饰者模式允许向一个现有的对象添加新的功能，同时又不改变其结构。这种类型的设计模式属于**结构型模式**，它是作为现有的类的一个包装。
-
-这种模式创建了一个装饰类，用来包装原有的类，并在保持类方法签名完整性的前提下，提供了额外的功能。
-
-------
+> 《Head First 设计模式》中是这么形容装饰者模式的——“**给爱用继承的人一个全新的设计眼界**”，拒绝继承滥用，从装饰者模式开始。
+>
+> 装饰者模式允许向一个现有的对象添加新的功能，同时又不改变其结构。这种类型的设计模式属于**结构型模式**，它是作为现有的类的一个包装。
+>
+> 这种模式创建了一个装饰类，用来包装原有的类，并在保持类方法签名完整性的前提下，提供了额外的功能。
 
 
 
@@ -53,7 +59,7 @@
 
 ## 类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd5a7252usj31750tpgof.jpg)
+![](https://img.starfish.ink/design-patterns/decorator-uml.png)
 
 ------
 
@@ -69,7 +75,7 @@
 
 我还是比较喜欢卖煎饼的例子
 
- ![](https://i04piccdn.sogoucdn.com/a000fc61baeaeb5b) 
+![](https://static001.geekbang.org/infoq/5e/5eacd172775ac7b72bf28bc00b7b6b03.jpeg)
 
 1、定义抽象组件
 
@@ -188,7 +194,7 @@ public class Client {
 
 顺便看下通过 IDEA 生成的 UML 类图（和我们画的类图一样哈）
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd515ta83tj318c0pmjui.jpg)
+![](https://static001.geekbang.org/infoq/58/58aee40fcd93d09715db45982d39b046.jpeg)
 
 ------
 
@@ -200,13 +206,13 @@ public class Client {
 
 我们使用 `java.io` 包下的各种输入流、输出流、字节流、字符流、缓冲流等各种各样的流，他们中的许多类都是装饰者，下面是一个典型的对象集合，用装饰者将功能结合起来，以读取文件数据
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd51gr33b0j30ls0au74n.jpg)
+![img](https://static001.geekbang.org/infoq/9d/9d0dcea2ea4653e9740e54f64a389e1c.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 `BufferedInputStream` 和 `LinerNumberInputStream` 都是扩展自 `FilterInputStream`，而 `FilterInputStream` 是一个抽象的装饰类。
 
 在 idea 中选中一些常见 InputStream 类，生成 UML 图如下：
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd51yq60yxj322e0rewkg.jpg)
+![img](https://static001.geekbang.org/infoq/46/46ddc8880590ba83c3cfed5b80a8e3bf.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 我们平时读取一个文件中的内容其实就使用到了装饰模式的思想，简化《Head First 设计模式》的例子，我们自定义一个装饰者，把输入流中的所有大写字符转换为小写
 
@@ -282,7 +288,7 @@ Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSo
 
 Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component `接口。`org.apache.ibatis.cache` 包下的结构
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gd56rvosupj30kw0r6gpg.jpg)
+![img](https://static001.geekbang.org/infoq/56/56fcb2669209f990446e8710756264ce.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 ------
 
@@ -319,10 +325,8 @@ Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Deco
 
 ## 参考
 
-《Head First 设计模式》《研磨设计模式》
-
-https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
-
-https://www.runoob.com/design-pattern/decorator-pattern.html
-
-https://juejin.im/post/5ba0fb04e51d450e67494256#heading-14
+- 《Head First 设计模式》
+- 《研磨设计模式》
+- https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
+- https://www.runoob.com/design-pattern/decorator-pattern.html
+- https://juejin.im/post/5ba0fb04e51d450e67494256#heading-14
