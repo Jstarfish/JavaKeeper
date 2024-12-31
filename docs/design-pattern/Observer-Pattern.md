@@ -1,4 +1,12 @@
-# 观察者模式
+---
+title: 观察者模式
+date: 2022-11-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
+
+![](https://images.unsplash.com/photo-1463310127152-33b375103141?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fG9ic2VydmVyfGVufDB8fDB8fHww)
 
 在软件系统中经常会有这样的需求：如果一个对象的状态发生改变，某些与它相关的对象也要随之做出相应的变化。
 
@@ -8,7 +16,7 @@
 - 气象站可以将每天预测到的温度、湿度、气压等以公告的形式发布给各种第三方网站，如果天气数据有更新，要能够实时的通知给第三方，这里的气象局就是『被观察者』，第三方网站就是『观察者』
 - MVC 模式中的模型与视图的关系也属于观察与被观察关系
 
-观察者模式是使用频率较高的设计模式之一。
+观察者模式是使用频率较高的设计模式之一，也被称为发布订阅模式。
 
 ![](https://img01.sogoucdn.com/app/a/100520093/e18d20c94006dfe0-9eef65073f0f6be0-688789934e19c96097ccf76b41f77cf4.jpg)
 
@@ -26,7 +34,7 @@
 
 细究的话，发布订阅和观察者有些不同，可以理解成发布订阅模式属于广义上的观察者模式。
 
-![img](https://tva1.sinaimg.cn/large/00831rSTly1gcyfkrn2s3j30ip0badgh.jpg)
+![](https://howtodoinjava.com/wp-content/uploads/2019/01/observer-pattern.png)
 
 ## 角色
 
@@ -42,7 +50,7 @@
 
 ## 类图
 
-![](https://tva1.sinaimg.cn/large/00831rSTly1gcxwtvpenhj311t0lnacu.jpg)
+![](https://img.starfish.ink/design-patterns/observer-uml.png)
 
 再记录下 UML 类图的注意事项，这里我的 Subject 是**抽象方法**，所以用***斜体***，抽象方法也要用斜体，具体的各种箭头意义，我之前也总结过《设计模式前传——学设计模式前你要知道这些》（被网上各种帖子毒害过的自己，认真记录~~~）。
 
@@ -265,6 +273,6 @@ ListenerB received
 
 ## 参考
 
-https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
+- https://design-patterns.readthedocs.io/zh_CN/latest/behavioral_patterns/observer.html
 
-https://www.cnblogs.com/jmcui/p/11054756.html
+- https://www.cnblogs.com/jmcui/p/11054756.html

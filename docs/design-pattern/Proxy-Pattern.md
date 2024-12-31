@@ -1,6 +1,12 @@
-# 代理模式
+---
+title: 代理模式
+date: 2023-09-12
+tags: 
+ - Design Pattern
+categories: Design Pattern
+---
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b3ynhb0j31900u0b29.jpg)
+![](https://cdn.pixabay.com/photo/2019/11/12/09/03/proxy-4620557_1280.jpg)
 
 ##  基本介绍
 
@@ -20,7 +26,7 @@
 
 为什么要控制对于某个对象的访问呢？ 举个例子： 有这样一个消耗大量系统资源的巨型对象， 你只是偶尔需要使用它， 并非总是需要。
 
-![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b594jl2j30e604gdfw.jpg)
+![img](https://static001.geekbang.org/infoq/4e/4e2863150390d43ec414a4102a9a1e69.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 
 
@@ -34,7 +40,7 @@
 
 代理模式建议新建一个与原服务对象接口相同的代理类， 然后更新应用以将代理对象传递给所有原始对象客户端。 代理类接收到客户端请求后会创建实际的服务对象， 并将所有工作委派给它。
 
-![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b5d5zc6j30e604gmx8.jpg)
+![img](https://static001.geekbang.org/infoq/86/864c66131785654125df50bee958952b.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 代理将自己伪装成数据库对象， 可在客户端或实际数据库对象不知情的情况下处理延迟初始化和缓存查询结果的工作。
 
@@ -44,7 +50,7 @@
 
 ##  代理模式结构
 
-![图：refactoringguru.cn](https://tva1.sinaimg.cn/large/007S8ZIlly1gg0b5gg8kij30aa0aa3yf.jpg)
+![img](https://static001.geekbang.org/infoq/5e/5ef204c0c80b74e3366945a7af856079.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 
 1. **服务接口** （Service Interface） 声明了服务接口。 代理必须遵循该接口才能伪装成服务对象。
 2. **服务** （Service） 类提供了一些实用的业务逻辑。
@@ -402,7 +408,7 @@ Spring AOP 采用的是动态代理，在运行期间对业务方法进行增强
 
 默认情况下，Spring 对实现了接口的类使用 JDK Proxy 方式，否则的话使用 CGLib。不过可以通过配置指定 Spring AOP 都通过 CGLib 来生成代理类。
 
-![](https://cdn.jsdelivr.net/gh/Jstarfish/picBed/img/20201009104733.png)
+![](https://img.starfish.ink/design-patterns/spring-aop-proxy.png)
 
 具体逻辑在 `org.springframework.aop.framework.DefaultAopProxyFactory` 类中，使用哪种方式生成由`AopProxy` 根据 `AdvisedSupport` 对象的配置来决定源码如下：
 
@@ -436,6 +442,6 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 ## 参考与感谢
 
-https://refactoringguru.cn/design-patterns/proxy
+- https://refactoringguru.cn/design-patterns/proxy
 
-https://www.geeksforgeeks.org/proxy-design-pattern/
+- https://www.geeksforgeeks.org/proxy-design-pattern/

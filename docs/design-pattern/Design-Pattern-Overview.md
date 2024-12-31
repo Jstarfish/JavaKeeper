@@ -191,7 +191,7 @@
 
 #### 基于UML1.5 的UML种类
 
-![UML-type](https://tva1.sinaimg.cn/large/006tNbRwly1gbezv0jdfcj30sr0pin0a.jpg) 
+![UML-type](https://img.starfish.ink/design-patterns/UML-type.png) 
 
 
 
@@ -200,11 +200,11 @@
 类图（ClassDiagram）是用来显示系统中的类、接口、协作以及它们之间的静态结构和关系的一种静态模型，是我们 Java 猿帅们最需要掌握的。它主要用于描述软件系统的结构化设计，帮助人们简化对软件系统的理解，它是系统分析与设计阶段的重要产物，也是系统编码与测试的重要模型依据。
 类图中的类可以通过某种编程语言直接实现。类图在软件系统开发的整个生命周期都是有效的，它是面向对象系统的建模中最常见的图。
 
-![Class Diagram Example](https://tva1.sinaimg.cn/large/006tNbRwly1gbesjtiy6nj30ki0b1dgc.jpg)
+![](https://img.starfish.ink/design-patterns/class-diagram.jpg)
 
 #### 类图表示法
 
-![UML Class Diagram Example](https://tva1.sinaimg.cn/large/006tNbRwly1gbesl8l4hgj309603f3yq.jpg)            ![Visibilitiy Example (Attribute)](https://online.visual-paradigm.com/images/tutorials/class-diagram-tutorial/06-attributes-visibilities.png)
+   ![](https://img.starfish.ink/design-patterns/06-attributes-visibilities.png)
 
 ### 类之间的关系
 
@@ -227,11 +227,11 @@
 
 **单向关联**
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbewpnx59rj308e015a9t.jpg)
+![](https://img.starfish.ink/design-patterns/class-dependency.jpg)
 
 **双向关联**
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbewprnfy5j308e0150sh.jpg)
+![](https://img.starfish.ink/design-patterns/class-association2.jpg)
 
 **多重关联**
 
@@ -242,28 +242,28 @@
 聚合（Aggregation）关系表示的是整体和部分的关系，是 has-a 的关系，整体与部分可以分开，是关联关系的特例，是强关联关系。
 聚合关系也是通过成员对象来实现的，其中成员对象是整体对象的一部分，但是成员对象可以脱离整体对象而独立存在。例如，学校与老师的关系，学校包含老师，但如果学校停办了，老师依然存在。
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbezv6lm32j30f504k74l.jpg)
+![](https://img.starfish.ink/design-patterns/class-aggregation.jpg)
 
 #### 4.组合关系
 
 组合（Composition）关系也是关联关系的一种特例，也表示类之间的整体与部分的关系，但它是一种更强烈的聚合关系，不可以分开，是 cxmtains-a 关系。	
 在组合关系中，整体对象可以控制部分对象的生命周期，一旦整体对象不存在，部分对象也将不存在，部分对象不能脱离整体对象而存在。例如，公司和部门。
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbezvb57w5j30e303zjre.jpg)
+![](https://img.starfish.ink/design-patterns/class-composition.jpg)
 
 #### 5.泛化关系
 
 泛化（Generalization）关系是对象之间耦合度最大的一种关系，表示一般与特殊的关系，是父类与子类之间的关系，是一种**继承关系**，是 is-a 的关系。
 在 UML 类图中，泛化关系用带空心三角箭头的实线来表示，箭头从子类指向父类。在代码实现时，使用面向对象的继承机制来实现泛化关系。
 
-![](https://tva1.sinaimg.cn/large/006tNbRwly1gbewgz6t91j30c60563yi.jpg)
+![](https://img.starfish.ink/design-patterns/class-generalization.jpg)
 
 #### 6.实现关系
 
 实现（Realization）关系是接口与实现类之间的关系。在这种关系中，类实现了接口，类中的操作实现了接口中所声明的所有的抽象操作。
 在 UML 类图中，实现关系使用带空心三角箭头的虚线来表示，箭头从实现类指向接口。
 
- ![UML Realization Example](https://tva1.sinaimg.cn/large/006tNbRwly1gbeweuf8pbj307704fdfo.jpg) 
+ ![](https://img.starfish.ink/design-patterns/class-realization.jpg) 
 
  
 

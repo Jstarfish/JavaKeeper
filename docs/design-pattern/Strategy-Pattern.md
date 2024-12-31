@@ -1,4 +1,12 @@
-# 策略模式——略施小计就彻底消除了多重 if else
+---
+title: 策略模式——略施小计就彻底消除了多重 if else
+date: 2022-11-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
+
+![](https://cdn.pixabay.com/photo/2018/06/10/22/48/chess-3467512_1280.jpg)
 
 > 最近接手了一个新项目，有段按不同类型走不同检验逻辑的代码，将近小 10 个 `if -else` 判断，真正的“屎山”代码。
 >

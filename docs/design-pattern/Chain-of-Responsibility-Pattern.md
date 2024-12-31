@@ -1,12 +1,18 @@
-# 责任链模式
+---
+title: 责任链模式
+date: 2021-10-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-责任链，顾名思义，就是用来处理相关事务责任的一条执行链，执行链上有多个节点，每个节点都有机会（条件匹配）处理请求事务，如果某个节点处理完了就可以根据实际业务需求传递给下一个节点继续处理或者返回处理完毕。
+![](https://images.unsplash.com/photo-1463587480257-3c60227e1e52?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGNoYWluJTIwb2YlMjByZXNwb25zbGl0eXxlbnwwfHwwfHx8MA%3D%3D)
 
-这种模式给予请求的类型，对请求的发送者和接收者进行解耦。属于行为型模式。
-
-在这种模式中，通常每个接收者都包含对另一个接收者的引用。如果一个对象不能处理该请求，那么它会把相同的请求传给下一个接收者，依此类推。
-
-![责任链设计模式](https://tva1.sinaimg.cn/large/00831rSTly1gdgeavn9h7j30hs0b4ta9.jpg)
+> 责任链，顾名思义，就是用来处理相关事务责任的一条执行链，执行链上有多个节点，每个节点都有机会（条件匹配）处理请求事务，如果某个节点处理完了就可以根据实际业务需求传递给下一个节点继续处理或者返回处理完毕。
+>
+> 这种模式给予请求的类型，对请求的发送者和接收者进行解耦。属于行为型模式。
+>
+> 在这种模式中，通常每个接收者都包含对另一个接收者的引用。如果一个对象不能处理该请求，那么它会把相同的请求传给下一个接收者，依此类推。
 
 先来看一段代码
 
@@ -57,7 +63,7 @@ public void test(int i, Request request){
 
 ## 类图
 
-![](../_images/design-pattern/responsibility-pattern-uml.png)
+![](https://img.starfish.ink/design-patterns/responsibility-pattern-uml.png)
 
 ### coding
 
@@ -218,51 +224,51 @@ Spring MVC 的 diapatcherServlet 的 doDispatch 方法中，获取与请求匹�
 
 ```java
 protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        HttpServletRequest processedRequest = request;
-        HandlerExecutionChain mappedHandler = null;    //使用到了责任链模式
-        boolean multipartRequestParsed = false;
-        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+    HttpServletRequest processedRequest = request;
+    HandlerExecutionChain mappedHandler = null;    //使用到了责任链模式
+    boolean multipartRequestParsed = false;
+    WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 
+    try {
         try {
+            ModelAndView mv = null;
+            Object dispatchException = null;
+
             try {
-                ModelAndView mv = null;
-                Object dispatchException = null;
+                processedRequest = this.checkMultipart(request);
+                multipartRequestParsed = processedRequest != request;
+                mappedHandler = this.getHandler(processedRequest); 
+                if (mappedHandler == null) {
+                    this.noHandlerFound(processedRequest, response);
+                    return;
+                }
 
-                try {
-                    processedRequest = this.checkMultipart(request);
-                    multipartRequestParsed = processedRequest != request;
-                    mappedHandler = this.getHandler(processedRequest); 
-                    if (mappedHandler == null) {
-                        this.noHandlerFound(processedRequest, response);
+                HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());
+                String method = request.getMethod();
+                boolean isGet = "GET".equals(method);
+                if (isGet || "HEAD".equals(method)) {
+                    long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+                    if ((new ServletWebRequest(request, response)).checkNotModified(lastModified) && isGet) {
                         return;
                     }
+                }
+                //责任链模式执行预处理方法，其实是将请求交给注册的拦截器执行
+                if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+                    return;
+                }
 
-                    HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());
-                    String method = request.getMethod();
-                    boolean isGet = "GET".equals(method);
-                    if (isGet || "HEAD".equals(method)) {
-                        long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
-                        if ((new ServletWebRequest(request, response)).checkNotModified(lastModified) && isGet) {
-                            return;
-                        }
-                    }
-										//责任链模式执行预处理方法，其实是将请求交给注册的拦截器执行
-                    if (!mappedHandler.applyPreHandle(processedRequest, response)) {
-                        return;
-                    }
+                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+                if (asyncManager.isConcurrentHandlingStarted()) {
+                    return;
+                }
 
-                    mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
-                    if (asyncManager.isConcurrentHandlingStarted()) {
-                        return;
-                    }
-
-                    this.applyDefaultViewName(processedRequest, mv);
-                   //责任链执行后处理方法
-                    mappedHandler.applyPostHandle(processedRequest, response, mv);
-                } catch (Exception var22) {
-             //...
-        } finally {
-     }
+                this.applyDefaultViewName(processedRequest, mv);
+               //责任链执行后处理方法
+                mappedHandler.applyPostHandle(processedRequest, response, mv);
+            } catch (Exception var22) {
+         //...
+    } finally {
+ }
  }
 ```
 
@@ -309,8 +315,6 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 ## 参考
 
-《研磨设计模式》
-
-https://wiki.jikexueyuan.com/project/java-design-pattern/chain-responsibility-pattern.html
-
-https://refactoringguru.cn/design-patterns/chain-of-responsibility
+- 《研磨设计模式》
+- https://wiki.jikexueyuan.com/project/java-design-pattern/chain-responsibility-pattern.html
+- https://refactoringguru.cn/design-patterns/chain-of-responsibility

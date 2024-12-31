@@ -1,6 +1,12 @@
-# 随遇而安的适配器模式 | Spring 中的适配器
+---
+title: 随遇而安的适配器模式 | Spring 中的适配器
+date: 2023-10-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-![适配器设计模式](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjtnx5644j30hs0b4mxx.jpg)
+![](https://img.starfish.ink/design-patterns/banner-adapter.jpg)
 
 
 
@@ -14,7 +20,7 @@
 
 适配器模式通过封装对象将复杂的转换过程隐藏于幕后。 被封装的对象甚至察觉不到适配器的存在。 
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjt8avun0j31py0kztda.jpg)
+![](https://img.starfish.ink/design-patterns/adapter.jpg)
 
 
 
@@ -22,7 +28,7 @@
 
 适配器是什么，不难理解，生活中也随处可见。比如，笔记本电脑的电源适配器、万能充（曾经的它真有一个这么牛逼的名字）、一拖十数据线等等。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjhf9tjluj32hc0mu4p8.jpg)
+![](https://img.starfish.ink/design-patterns/adapter-real.jpg)
 
 
 
@@ -50,7 +56,7 @@
 
 实现时使用了构成原则： 适配器实现了其中一个对象的接口， 并对另一个对象进行封装。 所有流行的编程语言都可以实现适配器。
 
-![适配器设计模式的结构（对象适配器）](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjjbh88h7j31od0u0ds2.jpg)
+![适配器设计模式的结构（对象适配器）](https://img.starfish.ink/design-patterns/adapter-uml.jpg)
 
 1. **客户端** （Client） 是包含当前程序业务逻辑的类。
 2. **客户端接口** （Target） 描述了其他类与客户端代码合作时必须遵循的协议。
@@ -135,7 +141,7 @@
 
 这一实现使用了继承机制： 适配器同时继承两个对象的接口。 请注意， 这种方式仅能在支持多重继承的编程语言中实现，例如 C++， Java 不支持多重继承，也就没有这种适配器了。
 
-![适配器设计模式（类适配器）](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjtka91z8j31od0u0n9c.jpg)
+![适配器设计模式（类适配器）](https://img.starfish.ink/design-patterns/adapter-class.jpg)
 
 **类适配器**不需要封装任何对象， 因为它同时继承了客户端和服务的行为。 适配功能在重写的方法中完成。 最后生成的适配器可替代已有的客户端类进行使用。
 
@@ -297,7 +303,7 @@ Spring 源码中搜关键字`Adapter` 会出现很多实现类，SpringMVC 中�
 
 我们先回顾下 SpringMVC  处理流程：
 
-![qsli.github.io](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjqoif1ddj30vq0ij0uq.jpg)
+![qsli.github.io](https://img.starfish.ink/design-patterns/adapter-spring.jpg)
 
 Spring MVC 中的适配器模式主要用于执行目标 `Controller` 中的请求处理方法。
 
@@ -401,15 +407,14 @@ public interface HandlerAdapter {
 
 适配器与 handler 有对应关系，而各个适配器又都是适配器接口的实现类，因此，它们都遵循相同的适配器标准，所以用户可以按照相同的方式，通过不同的 handler 去处理请求。 当然了，Spring 框架中也为我们定义了一些默认的 Handler 对应的适配器。
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gfjrbrv96pj31ck0j0dl6.jpg)
+![](https://img.starfish.ink/design-patterns/adapter-demo.jpg)
 
 通过适配器模式我们将所有的 `controller` 统一交给 `HandlerAdapter` 处理，免去了写大量的 `if-else`  语句对 `Controller` 进行判断，也更利于扩展新的 `Controller` 类型。
 
 
 
 ## 参考与感谢
-《图解 Java 设计模式》
-《Head First设计模式》
-https://refactoringguru.cn/design-patterns/
-https://blog.csdn.net/lu__peng/article/details/79117894
-https://juejin.im/post/5ba28986f265da0abc2b6084#heading-12
+- 《图解 Java 设计模式》
+- 《Head First设计模式》
+- https://refactoringguru.cn/design-patterns/
+- https://juejin.im/post/5ba28986f265da0abc2b6084#heading-12

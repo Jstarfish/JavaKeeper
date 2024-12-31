@@ -246,7 +246,7 @@ public class InputTest {
 }
 ```
 
-采用装饰者模式在实例化组件时，将增加代码的复杂度，一旦使用装饰者模式，不只需要实例化组件，还把把此组件包装进装饰者中，天晓得有几个，所以在某些复杂情况下，我们还会结合工厂模式和生成器模式。比如Spring中的装饰者模式。
+采用装饰者模式在实例化组件时，将增加代码的复杂度，一旦使用装饰者模式，不只需要实例化组件，还要把此组件包装进装饰者中，天晓得有几个，所以在某些复杂情况下，我们还会结合工厂模式和生成器模式。比如 Spring 中的装饰者模式。
 
 
 
@@ -273,11 +273,11 @@ public class ServletRequestWrapper implements ServletRequest {
 
 
 
-### spring 中的装饰者模式
+### pring 中的装饰者模式
 
 Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSource 可能是各种不同类型的， 比如不同的数据库： Oracle、 SQL Server、 MySQL 等， 也可能是不同的数据源。 然后 SessionFactory 根据客户的每次请求， 将 DataSource 属性设置成不同的数据源， 以达到切换数据源的目的。
 
-在 Spring 的命名体现：Spring 中用到的包装器模式在类名上有两种表现： 一种是类名中含有 `Wrapper`， 另一种是类名中含有 `Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
+在 Spring 的命名体现：Spring 中用到的装饰器模式在类名上有两种表现： 一种是类名中含有 `Wrapper`， 另一种是类名中含有 `Decorator`。 基本上都是动态地给一个对象添加一些额外的职责，比如
 
 - `org.springframework.cache.transaction` 包下的 `TransactionAwareCacheDecorator` 类
 - `org.springframework.session.web.http` 包下的 `SessionRepositoryFilter` 内部类 `SessionRepositoryRequestWrapper` 
@@ -286,7 +286,7 @@ Spring 的 `ApplicationContext` 中配置所有的 `DataSource`。 这些 DataSo
 
 ### Mybatis 缓存中的装饰者模式
 
-Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component `接口。`org.apache.ibatis.cache` 包下的结构
+Mybatis 的缓存模块中，使用了装饰器模式的变体，其中将 `Decorator` 接口和 `Componet` 接口合并为一个`Component` 接口。`org.apache.ibatis.cache` 包下的结构
 
 ![img](https://static001.geekbang.org/infoq/56/56fcb2669209f990446e8710756264ce.jpeg?x-oss-process=image%2Fresize%2Cp_80%2Fauto-orient%2C1)
 

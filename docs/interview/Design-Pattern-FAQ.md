@@ -20,13 +20,13 @@ categories: 设计模式
 
 
 
-### 1. 什么是设计模式？你是否在你的代码里面使用过任何设计模式？
+### 1、什么是设计模式？你是否在你的代码里面使用过任何设计模式？
 
 软件设计模式（Software Design Pattern），又称设计模式，是指在软件开发中，经过验证的，用于解决在特定环境下、重复出现的、特定问题的**解决方案**。
 
 
 
-### 2. 请列举出在 JDK 中几个常用的设计模式？
+### 2、请列举出在 JDK 中几个常用的设计模式？
 
 单例模式（Singleton pattern）用于 Runtime，Calendar 和其他的一些类中。
 
@@ -38,11 +38,13 @@ categories: 设计模式
 
 
 
-### 3. Java 中什么叫单例设计模式？请用 Java 写出线程安全的单例模式
+### 3、什么是单例模式？有哪些应用场景？请用 Java 写出线程安全的单例模式
 
-单例模式重点在于在整个系统上共享一些创建时较耗资源的对象。整个应用中只维护一个特定类实例，它被所有组件共同使用。Java.lang.Runtime 是单例模式的经典例子。从 Java5 开始你可以使用枚举（enum）来实现线程安全的单例。
+**单例模式确保一个类只有一个实例，并提供一个全局唯一访问点**。有一些对象我们确实只需要一个，比如，线程池、数据库连接、缓存、日志对象等，如果有多个的话，会造成程序的行为异常，资源使用过量或者不一致的问题。
 
-### 单例模式的 7 种写法：懒汉 2 种，枚举，饿汉 2 种，静态内部类，双重校验锁（推荐）。
+单例模式重点在于在整个系统上共享一些创建时较耗资源的对象。整个应用中只维护一个特定类实例，它被所有组件共同使用。`Java.lang.Runtime` 是单例模式的经典例子。从 Java5 开始你可以使用枚举（enum）来实现线程安全的单例。
+
+**单例模式的 7 种写法：懒汉 2 种，枚举，饿汉 2 种，静态内部类，双重校验锁（推荐）。**
 
 - 懒汉式：懒加载，线程不安全
 
@@ -51,8 +53,7 @@ public class Singleton
 {
     private static Singleton singleton;
 
-    private Singleton()
-    {
+    private Singleton(){
     }
 
     public static Singleton getInstance(){
@@ -84,16 +85,13 @@ public class Singleton
 - 饿汉式：
 
 ```java
-public class Singleton
-{
+public class Singleton{
     private static Singleton singleton = new Singleton();
 
-    private Singleton()
-    {
+    private Singleton(){
     }
 
-    public static Singleton getInstance()
-    {
+    public static Singleton getInstance(){
         return singleton;
     }
 }
@@ -102,20 +100,16 @@ public class Singleton
 - 饿汉式变种：
 
 ```java
-public class Singleton
-{
+public class Singleton{
     private static Singleton singleton;
-    static
-    {
+    static{
         singleton = new Singleton();
     }
 
-    private Singleton()
-    {
+    private Singleton(){
     }
 
-    public static Singleton getInstance()
-    {
+    public static Singleton getInstance(){
         return singleton;
     }
 }
@@ -124,19 +118,15 @@ public class Singleton
 - 静态内部类方式：利用 JVM 的加载机制，当使用到 SingletonHolder 才会进行初始化。
 
 ```java
-public class Singleton
-{
-    private Singleton()
-    {
+public class Singleton{
+    private Singleton(){
     }
 
-    private static class SingletonHolder
-    {
+    private static class SingletonHolder{
         private static final Singleton singleton = new Singleton();
     }
 
-    public static Singleton getInstance()
-    {
+    public static Singleton getInstance(){
         return SingletonHolder.singleton;
     }
 }
@@ -149,8 +139,7 @@ public enum Singletons
 {
     INSTANCE;
     // 此处表示单例对象里面的各种方法
-    public void Method()
-    {
+    public void Method(){
     }
 }
 ```
@@ -162,18 +151,14 @@ public class Singleton
 {
     private volatile static Singleton singleton;
 
-    private Singleton()
-    {
+    private Singleton(){
     }
 
     public static Singleton getInstance()
     {
-        if (singleton == null)
-        {
-            synchronized (Singleton.class)
-            {
-                if (singleton == null)
-                {
+        if (singleton == null){
+            synchronized (Singleton.class){
+                if (singleton == null){
                     singleton = new Singleton();
                 }
             }
@@ -185,30 +170,270 @@ public class Singleton
 
 
 
-### 4. 在 Java 中，什么叫观察者设计模式（observer design pattern ）？
+### 4、如何防止反射和序列化破坏单例？
+
+#### 1. 防止反射破坏单例
+
+在 Java 中，即使实现了线程安全的单例模式，**反射**和**序列化/反序列化**仍可能破坏单例模式的约束（即只存在一个实例）
+
+**防止反射破坏单例**
+
+通过反射，可以调用私有构造函数创建新的实例，从而破坏单例模式。例如：
+
+```java
+Singleton instance1 = Singleton.getInstance();
+Constructor<Singleton> constructor = Singleton.class.getDeclaredConstructor();
+constructor.setAccessible(true); // 绕过私有访问限制
+Singleton instance2 = constructor.newInstance();
+
+System.out.println(instance1 == instance2); // false
+```
+
+这种方式直接调用了私有构造函数，从而生成了新的实例
+
+**解决方法**
+
+1.1 **在构造函数中添加防护机制**
+
+通过在构造函数中添加防止多次实例化的逻辑，可以避免反射调用私有构造函数。
+
+实现如下：
+
+```java
+public class Singleton {
+    private static volatile Singleton instance;
+    private static boolean isInstanceCreated = false;
+
+    private Singleton() {
+        // 如果已经有实例存在，抛出异常
+        if (isInstanceCreated) {
+            throw new RuntimeException("单例模式禁止通过反射创建多个实例");
+        }
+        isInstanceCreated = true;
+    }
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+原理：
+
+- `isInstanceCreated` 标志记录是否已经创建过实例。
+- 如果通过反射调用构造函数并尝试创建新的实例，会触发异常。
+
+1.2 **使用枚举单例**
+
+Java 的枚举类型天然防止反射破坏。即使通过反射调用 `Enum` 类的私有构造函数，也会抛出 `java.lang.IllegalArgumentException`。
+
+实现如下：
+
+```java
+public enum Singleton {
+    INSTANCE;
+
+    public void doSomething() {
+        System.out.println("Singleton using Enum");
+    }
+}
+```
+
+使用枚举的优点：
+
+- 枚举本身是线程安全的。
+- 防止反射和序列化破坏单例。
+
+
+
+#### **2. 防止序列化/反序列化破坏单例**
+
+通过序列化和反序列化，可以生成一个新的实例，从而破坏单例。例如：
+
+```java
+Singleton instance1 = Singleton.getInstance();
+
+// 序列化
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("singleton.ser"));
+oos.writeObject(instance1);
+oos.close();
+
+// 反序列化
+ObjectInputStream ois = new ObjectInputStream(new FileInputStream("singleton.ser"));
+Singleton instance2 = (Singleton) ois.readObject();
+ois.close();
+
+System.out.println(instance1 == instance2); // false
+```
+
+序列化和反序列化过程中，会重新创建一个新的对象，破坏了单例模式。
+
+**解决方法**
+
+2.1 **实现 `readResolve` 方法**
+
+通过实现 `readResolve` 方法，可以在反序列化时，返回已有的单例对象，而不是创建新的实例。
+
+修改后的代码如下：
+
+```java
+import java.io.Serializable;
+
+public class Singleton implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+
+    // 防止反序列化创建新实例
+    protected Object readResolve() {
+        return getInstance();
+    }
+}
+```
+
+原理：
+
+- 序列化时，Java 会将对象转换为字节流。
+- 反序列化时，`readResolve` 方法会被调用，用以替换从字节流中反序列化出来的对象。
+- 这样可以确保返回的是单例实例，而不是新的实例
+
+同样地，枚举天生支持序列化，且反序列化时不会创建新的对象。
+
+
+
+### 5、 使用工厂模式最主要的好处是什么？在哪里使用？
+
+工厂模式是一种**创建型设计模式**，用于将对象的创建过程与使用过程解耦。其主要目的是**隐藏对象创建的复杂性**，使代码更具灵活性和扩展性。
+
+使用工厂的理由： 
+
+- **解耦——降低代码的耦合度**：客户端（调用者）不需要了解具体对象的创建细节，只需要通过工厂接口获取对象。
+
+- **可以使代码结构清晰，有效地封装变化**：新增对象类型时，只需扩展工厂类，而不需要修改客户端代码
+
+- **简化对象的创建：**某些对象的创建过程可能非常复杂，涉及多步骤初始化或配置。工厂模式将这些复杂的创建逻辑封装在工厂类中，客户端只需调用工厂方法，获取创建好的对象。
+
+  
+
+### 6、简单工厂、工厂方法和抽象工厂的区别？
+
+简单工厂其实不是一个标准的的设计模式。GOF 23 种设计模式中只有「工厂方法模式」与「抽象工厂模式」。
+
+简单工厂模式可以看为工厂方法模式的一种特例。
+
+各模式的理解： 
+
+- 简单工厂：把对象的创建放到一个工厂类中，通过参数来创建不同的对象。 
+
+  ```java
+  class SimpleFactory {
+      public static Product createProduct(String type) {
+          if (type.equals("A")) {
+              return new ProductA();
+          } else if (type.equals("B")) {
+              return new ProductB();
+          }
+          return null;
+      }
+  }
+  ```
+
+- 工厂方法：每种产品由一种工厂来创建。（每次增加一个产品时，都需要增加一个具体类和对象实现工厂）
+
+  ```java
+  interface Factory {
+      Product createProduct();
+  }
+  class ProductAFactory implements Factory {
+      public Product createProduct() {
+          return new ProductA();
+      }
+  }
+  class ProductBFactory implements Factory {
+      public Product createProduct() {
+          return new ProductB();
+      }
+  }
+  ```
+
+- 抽象工厂：对工厂方法的改进，一个产品族对应一个工厂
+
+  ```java
+  interface AbstractFactory {
+      ProductA createProductA();
+      ProductB createProductB();
+  }
+  ```
+
+  
+
+### 什么是代理模式？有哪几种代理？
+
+**代理模式（Proxy Pattern）** 是一种结构型设计模式，用于为目标对象提供一个代理对象，通过代理对象来控制对目标对象的访问。代理对象在客户端与目标对象之间起到中介的作用，可以对访问进行控制、增强或简化。
+
+- **静态代理**：在编译阶段，代理类已经被定义好。
+- **动态代理**
+  - 在运行时动态生成代理类，而不需要手动编写代理类代码。
+  - 动态代理通常基于 **Java 反射** 实现，最常用的两种动态代理技术是 **JDK 动态代理** 和 **CGLIB 动态代理**。
+
+
+
+### 静态代理和动态代理的区别？
+
+| **对比维度**       | **静态代理**                                                 | **动态代理**                                                 |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **代理类生成时间** | 代理类在 **编译时** 已经生成，由开发者手动编写代理类。       | 代理类在 **运行时** 动态生成，不需要手动编写代理类。         |
+| **实现方式**       | 手动创建一个实现目标类接口的代理类，通过代理类调用目标对象的方法。 | 使用反射机制（如 `Proxy` 或 `CGLIB`）在运行时生成代理类。    |
+| **目标类要求**     | 目标类必须实现接口。                                         | **JDK 动态代理**：目标类必须实现接口。 **CGLIB 动态代理**：目标类无需实现接口，但不能是 `final` 类。 |
+| **灵活性**         | 灵活性较低，每个目标类都需要一个对应的代理类，代码量较大。   | 灵活性高，一个代理类可以代理多个目标对象。                   |
+| **性能**           | 性能略优于动态代理（因为无需反射机制）。                     | 性能略低于静态代理（因依赖反射）。 但在 CGLIB 中，性能接近静态代理。 |
+| **实现难度**       | 实现简单，但代码量较多，维护麻烦。                           | 实现复杂，但代码量少，易于维护。                             |
+| **扩展性**         | 扩展性差，新增目标类时需要新增代理类。                       | 扩展性好，新增目标类时无需新增代理类，只需修改动态代理逻辑。 |
+
+
+
+### JDK 动态代理和 CGLIB 动态代理的区别？
+
+| **对比维度**        | **JDK 动态代理**                                             | **CGLIB 动态代理**                                           |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **实现方式**        | 基于 **Java 反射机制** 和接口实现，使用 `java.lang.reflect.Proxy`。 | 基于 **字节码增强** 技术，使用第三方库（如 `CGLIB` 或 `ASM`）。 |
+| **代理对象要求**    | 目标类必须实现 **接口**。                                    | 目标类 **无需实现接口**，可以代理普通类。                    |
+| **继承限制**        | 无需继承，直接代理接口即可。                                 | 目标类不能是 `final` 类，代理的方法也不能是 `final` 方法（因为无法被重写）。 |
+| **性能**            | 性能略低（因反射调用方法效率较低）。                         | 性能较高（直接生成字节码，调用方法接近普通方法调用）。       |
+| **代码依赖**        | 无需依赖外部库，属于 JDK 原生功能。                          | 需要引入 `CGLIB` 或其他字节码增强库（如 ASM）。              |
+| **应用场景**        | 目标类实现了接口时适用。                                     | 目标类未实现接口或需要对具体类进行代理时适用。               |
+| **实现复杂度**      | 简单，使用 `Proxy` 类和 `InvocationHandler` 接口生成代理对象。 | 复杂，需要处理字节码增强逻辑（通常通过工具库封装）。         |
+| **Spring AOP 支持** | 默认情况下，Spring AOP 使用 JDK 动态代理（如果目标类实现了接口）。 | Spring 会使用 CGLIB 动态代理（如果目标类未实现接口）。       |
+
+
+
+### 在 Java 中，什么叫观察者设计模式（observer design pattern ）？
 
 观察者模式是基于对象的状态变化和观察者的通讯，以便他们作出相应的操作。简单的例子就是一个天气系统，当天气变化时必须在展示给公众的视图中进行反映。这个视图对象是一个主体，而不同的视图是观察者。
 
 
 
-### 5. 使用工厂模式最主要的好处是什么？在哪里使用？
-
-各模式的理解： 
-简单工厂：把对象的创建放到一个工厂类中，通过参数来创建不同的对象。 
-工厂方法：每种产品由一种工厂来创建。（每次增加一个产品时，都需要增加一个具体类和对象实现工厂） 
-抽象工厂：对工厂方法的改进，一个产品族对应一个工厂
-
-面向接口编程：设计模式的一个重要原则是 针对接口编程，不要依赖实现类。工厂模式遵循了这一个原则。 
-开闭原则（Open-Closed Principle,OCP） “Software entities should be open for extension,but closed for modification”。翻译过来就是：“软件实体应当对扩展开放，对修改关闭”。这句话说得略微有点专业，我们把它讲得更通俗一点，也就是：软件系统中包含的各种组件，例如模块（Modules）、类（Classes）以及功能（Functions）等等，应该在不修改现有代码的基础上，引入新功能。开闭原则中“开”，是指对于组件功能的扩展是开放的，是允许对其进行功能扩展的；开闭原则中“闭”，是指对于原有代码的修改是封闭的，即不应该修改原有的代码。
-
-使用工厂的理由： 
-A.把对象的创建集中在一个地方(工厂中),在增加新的对象类型的时候,只需要改变工厂方法;否则在应用中四处散布对象创建逻辑,如果创建方法改变时则需要四处修改，维护量增加. 
-B.应用的场合是新的对象类型很可能经常被添加进来. 
-C.你所关心的仅仅是工厂方法返回的接口方法,不必关心实现细节
-
-
-
-### 6. 举一个用 Java 实现的装饰模式(decorator design pattern) ？它是作用于对象层次还是类层次？
+### 举一个用 Java 实现的装饰模式(decorator design pattern) ？它是作用于对象层次还是类层次？
 
 装饰模式增加强了单个对象的能力。Java IO 到处都使用了装饰模式，典型例子就是 Buffered 系列类如 BufferedReader 和 BufferedWriter，它们增强了 Reader 和 Writer 对象，以实现提升性能的 Buffer 层次的读取和写入。
 
@@ -217,25 +442,25 @@ C.你所关心的仅仅是工厂方法返回的接口方法,不必关心实现�
 
 
 
-### 7. 在 Java 中，为什么不允许从静态方法中访问非静态变量？
+### 在 Java 中，为什么不允许从静态方法中访问非静态变量？
 
 Java 中不能从静态上下文访问非静态数据只是因为非静态变量是跟具体的对象实例关联的，而静态的却没有和任何实例关联。
 
 
 
-### 8. 设计一个 ATM 机，请说出你的设计思路？
+### 设计一个 ATM 机，请说出你的设计思路？
 
 比如设计金融系统来说，必须知道它们应该在任何情况下都能够正常工作。不管是断电还是其他情况，ATM 应该保持正确的状态（事务） , 想想 加锁（locking）、事务（transaction）、错误条件（error condition）、边界条件（boundary condition） 等等。尽管你不能想到具体的设计，但如果你可以指出非功能性需求，提出一些问题，想到关于边界条件，这些都会是很好的。
 
 
 
-### 9. 在 Java 中，什么时候用重载，什么时候用重写？
+### 在 Java 中，什么时候用重载，什么时候用重写？
 
 如果你看到一个类的不同实现有着不同的方式来做同一件事，那么就应该用重写（overriding），而重载（overloading）是用不同的输入做同一件事。在 Java 中，重载的方法签名不同，而重写并不是。
 
 
 
-### 10. 举例说明什么情况下会更倾向于使用抽象类而不是接口？
+### 举例说明什么情况下会更倾向于使用抽象类而不是接口？
 
 接口和抽象类都遵循”面向接口而不是实现编码”设计原则，它可以增加代码的灵活性，可以适应不断变化的需求。下面有几个点可以帮助你回答这个问题：
 

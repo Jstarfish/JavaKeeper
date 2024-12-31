@@ -1,14 +1,20 @@
-# 模板方法模式——看看 JDK 和 Spring 是如何优雅复用代码的
+---
+title: 模板方法模式——看看 JDK 和 Spring 是如何优雅复用代码的
+date: 2022-11-09
+tags: 
+ - Design Patterns
+categories: Design Patterns
+---
 
-> 文章收录在 GitHub [JavaKeeper](https://github.com/Jstarfish/JavaKeeper) ，N线互联网开发必备技能兵器谱
+![](https://images.unsplash.com/photo-1655892796775-c947f39f1106?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fHRlbXBsYXRlfGVufDB8fDB8fHww)
 
-## 前言
+> 模板，顾名思义，它是一个固定化、标准化的东西。
+>
+> **模板方法模式**是一种行为设计模式， 它在超类中定义了一个算法的框架， 允许子类在不修改结构的情况下重写算法的特定步骤。
 
-模板，顾名思义，它是一个固定化、标准化的东西。
 
-**模板方法模式**是一种行为设计模式， 它在超类中定义了一个算法的框架， 允许子类在不修改结构的情况下重写算法的特定步骤。
 
-## 场景问题
+### 场景问题
 
 程序员不愿多扯，上来先干两行代码
 
@@ -16,7 +22,7 @@
 
 假设我们是一家饮品店的师傅，起码需要以下两个手艺
 
-![img](https://static001.geekbang.org/infoq/19/196f4c041c71d63442c2c688051c893a.jpeg)
+![](https://static001.geekbang.org/infoq/19/196f4c041c71d63442c2c688051c893a.jpeg)
 
 真简单哈，这么看，步骤大同小异，我的第一反应就是写个业务接口，不同的饮品实现其中的方法就行，像这样
 
@@ -105,7 +111,7 @@ public static void main(String[] args) {
 
 
 
-## 认识模板方法
+### 认识模板方法
 
 在阎宏博士的《JAVA与模式》一书中开头是这样描述模板方法（Template Method）模式的：
 
@@ -301,7 +307,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
     // 两个抽象方法
     @Override
-	public abstract ConfigurableListableBeanFactory getBeanFactory() throws 		IllegalStateException;	
+	  public abstract ConfigurableListableBeanFactory getBeanFactory() throws 		IllegalStateException;	
     
     protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
     
@@ -335,18 +341,15 @@ public abstract class AbstractRefreshableWebApplicationContext extends …… {
 
 ## 小总结
 
-**优点**：1、封装不变部分，扩展可变部分。 2、提取公共代码，便于维护。 3、行为由父类控制，子类实现。
-
-**缺点**：每一个不同的实现都需要一个子类来实现，导致类的个数增加，使得系统更加庞大。
-
-**使用场景**： 1、有多个子类共有的方法，且逻辑相同。 2、重要的、复杂的方法，可以考虑作为模板方法。
-
-**注意事项**：为防止恶意操作，一般模板方法都加上 final 关键词。
+- **优点**：1、封装不变部分，扩展可变部分。 2、提取公共代码，便于维护。 3、行为由父类控制，子类实现。
+- **缺点**：每一个不同的实现都需要一个子类来实现，导致类的个数增加，使得系统更加庞大。
+- **使用场景**： 1、有多个子类共有的方法，且逻辑相同。 2、重要的、复杂的方法，可以考虑作为模板方法。
+- **注意事项**：为防止恶意操作，一般模板方法都加上 final 关键词。
 
 
 
 ## 参考：
 
-《Head First 设计模式》、《研磨设计模式》
-
-https://sourcemaking.com/design_patterns/template_method
+- 《Head First 设计模式》
+- 《研磨设计模式》
+- https://sourcemaking.com/design_patterns/template_method
