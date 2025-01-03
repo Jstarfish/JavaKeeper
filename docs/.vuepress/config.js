@@ -192,19 +192,41 @@ function genDSASidebar() {
 function genDesignPatternSidebar() {
   return [
     ['Design-Pattern-Overview', '设计模式前传'],
-    ['Singleton-Pattern', '单例模式'],
-    ['Factory-Pattern', '工厂模式'],
-    ['Prototype-Pattern', '原型模式'],
-    ['Builder-Pattern', '建造者模式'],
-    ['Decorator-Pattern', '装饰模式'],
-    ['Proxy-Pattern', '代理模式'],
-    ['Adapter-Pattern', '适配器模式'],
-    ['Chain-of-Responsibility-Pattern', '责任链模式'],
-    ['Observer-Pattern', '观察者模式'],
-    ['Facade-Pattern', '外观模式'],
-    ['Template-Pattern', '模板方法模式'],
-    ['Strategy-Pattern', '策略模式'],
-    ['Pipeline-Pattern', '管道模式']
+    {
+      title: "创建型模式", 
+      collapsable: true,
+      sidebarDepth: 3, // 可选的, 默认值是 1
+      children: [
+        ['Singleton-Pattern', '单例模式'],
+        ['Factory-Pattern', '工厂模式'],
+        ['Prototype-Pattern', '原型模式'],
+        ['Builder-Pattern', '建造者模式']
+      ]
+    },
+    {
+      title: "结构型模式", 
+      collapsable: true,
+      sidebarDepth: 3, // 可选的, 默认值是 1
+      children: [
+        ['Decorator-Pattern', '装饰模式'],
+        ['Proxy-Pattern', '代理模式'],
+        ['Adapter-Pattern', '适配器模式']
+      ]
+    },
+    {
+      title: "行为模式", 
+      collapsable: true,
+      sidebarDepth: 2, // 可选的, 默认值是 1
+      children: [
+        ['Chain-of-Responsibility-Pattern', '责任链模式'],
+        ['Observer-Pattern', '观察者模式'],
+        ['Template-Pattern', '模板方法模式'],
+        ['Strategy-Pattern', '策略模式'],
+        ['Facade-Pattern', '外观模式']
+      ]
+    },
+    ['Pipeline-Pattern', '管道模式'],
+    ['Spring-Design.md', 'Spring 中的设计模式']
   ];
 }
 
