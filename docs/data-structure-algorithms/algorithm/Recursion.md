@@ -33,7 +33,7 @@ public long factorial(int n) {
 
 ![img](https://img.starfish.ink/algorithm/recursion.png)
 
-求解问题 `f(6)`，由于 `f(6) = n * f(5)`, 所以 f(6) 需要拆解成 f(5) 子问题进行求解，同理 `f(5) = n * f(4) `,也需要进一步拆分,... ,直到 `f(1)`, 这是「递」，`f(1) `解决了，由于 `f(2) =  2 f(1) = 2` 也解决了,.... `f(n)` 到最后也解决了，这是「归」，所以递归的本质是能把问题拆分成具有**相同解决思路**的子问题，。。。直到最后被拆解的子问题再也不能拆分，解决了最小粒度可求解的子问题后，在「归」的过程中自然顺其自然地解决了最开始的问题。
+求解问题 `f(6)`，由于 `f(6) = n * f(5)`, 所以 `f(6)` 需要拆解成 `f(5)` 子问题进行求解，同理 `f(5) = n * f(4) `,也需要进一步拆分,... ,直到 `f(1)`, 这是「递」，`f(1) `解决了，由于 `f(2) =  2 f(1) = 2` 也解决了,.... `f(n)` 到最后也解决了，这是「归」，所以递归的本质是能把问题拆分成具有**相同解决思路**的子问题，。。。直到最后被拆解的子问题再也不能拆分，解决了最小粒度可求解的子问题后，在「归」的过程中自然顺其自然地解决了最开始的问题。
 
 
 
@@ -62,6 +62,26 @@ int func(你今年几岁) {
 2. 一组规则，也称作`递推关系（recurrence relation）`，可将所有其他情况拆分到基本案例。
 
 注意，函数可能会有多个位置进行自我调用。
+
+```java
+public returnType recursiveFunction(parameters) {
+    // 1. 递归终止条件（Base Case）
+    if (isBaseCase(parameters)) {
+        return baseCaseResult;  // 返回问题的基本解，避免继续递归
+    }
+
+    // 2. 递归调用（Recursive Call）
+    // 将当前问题分解为更小的子问题
+    return recursiveFunction(modifiedParameters);
+    
+    // 或者对于分治问题，递归调用多个子问题：
+    // return combineResults(
+    //    recursiveFunction(subProblem1),
+    //    recursiveFunction(subProblem2)
+    // );
+}
+
+```
 
 
 
@@ -147,7 +167,7 @@ int f(int n){
 
 第三要素就是，我们要**不断缩小参数的范围**，缩小之后，我们可以通过一些辅助的变量或者操作，使原函数的结果不变。
 
-例如，f(n) 这个范围比较大，我们可以让 `f(n) = n * f(n-1)`。这样，范围就由 n 变成了 n-1 了，范围变小了，并且为了原函数f(n) 不变，我们需要让 f(n-1) 乘以 n。
+例如，f(n) 这个范围比较大，我们可以让 `f(n) = n * f(n-1)`。这样，范围就由 n 变成了 n-1 了，范围变小了，并且为了原函数 f(n) 不变，我们需要让 f(n-1) 乘以 n。
 
 说白了，就是要找到原函数的一个等价关系式，`f(n)` 的等价关系式为 `n * f(n-1)`，即 `f(n) = n * f(n-1)`。
 
@@ -169,13 +189,13 @@ int f(int n){
 
 #### 递归代码要警惕堆栈溢出
 
-递归调用的深度受限于程序的栈空间。如果递归深度太深，可能会导致栈溢出。对于深度较大的递归问题，可以考虑使用迭代方法或尾递归优化（Tail Recursion Optimization）
+递归调用的深度受限于程序的栈空间。如果递归深度太深，可能会导致栈溢出。对于深度较大的递归问题，可以考虑使用迭代方法或尾递归优化（Tail Recursion Optimization）。
 
 
 
 #### 递归代码要警惕重复计算
 
-在某些问题中（如斐波那契数列），直接递归可能导致大量重复计算，影响效率。可以使用记忆化（Memoization）或动态规划（Dynamic Programming）来优化递归，避免重复计算
+在某些问题中（如斐波那契数列），直接递归可能导致大量重复计算，影响效率。可以使用记忆化（Memoization）或动态规划（Dynamic Programming）来优化递归，避免重复计算。
 
 
 
@@ -243,7 +263,7 @@ int f(int n){
 
 链表的节点定义如下：
 
-```
+```java
 class Node{
     int date;
     Node next;
@@ -254,7 +274,7 @@ class Node{
 
 ```java
 //用递归的方法反转链表
-public static Node reverseList(Node head){
+public Node reverseList(Node head){
     // 1.递归结束条件
     if (head == null || head.next == null) {
         return head;
@@ -286,7 +306,7 @@ public static Node reverseList(Node head){
 > 输出：[2,1,4,3]
 > ```
 
-当前节点next，指向当前节点，指针互换
+当前节点 next，指向当前节点，指针互换
 
 ```java
 public ListNode swapPairs(ListNode head) {

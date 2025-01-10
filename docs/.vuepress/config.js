@@ -169,9 +169,10 @@ function genDSASidebar() {
         ['algorithm/Sort', '排序'],
         ['algorithm/Binary-Search', '二分查找'],
       	['algorithm/Recursion', '递归'],
+        ['algorithm/Backtracking', '回溯'],
+        ['algorithm/DFS', 'DFS'],
         ['algorithm/Double-Pointer', '双指针'],
-      	['algorithm/Dynamic-Programming', '动态规划'],
-        ['algorithm/DFS', 'DFS']
+      	['algorithm/Dynamic-Programming', '动态规划']
       ]
     },
     {
