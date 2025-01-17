@@ -309,6 +309,30 @@ public Node reverseList(Node head){
 当前节点 next，指向当前节点，指针互换
 
 ```java
+    public ListNode swapPairs(ListNode head) {
+        // 基本情况：链表为空或只有一个节点
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        // 交换前两个节点
+        ListNode first = head;
+        ListNode second = head.next;
+
+        // 递归交换后续的节点
+        first.next = swapPairs(second.next);
+
+        // 交换后的第二个节点成为新的头节点
+        second.next = first;
+
+        // 返回新的头节点
+        return second;
+    }
+```
+
+下边这么写也可以，少了一个局部变量，交换操作和递归调用在一行内完成。
+
+```java
 public ListNode swapPairs(ListNode head) {
   //递归的终止条件
   if(head==null || head.next==null) {
@@ -325,5 +349,41 @@ public ListNode swapPairs(ListNode head) {
   tmp.next = head;
   return tmp;
 }
+```
+
+当然，也可以迭代实现~
+
+![img](https://miro.medium.com/v2/resize:fit:1400/1*imD5_rA0Hkov-kWXSUdr2Q.png)
+
+```java
+public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        // 创建虚拟头节点，指向链表的头节点
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        // 当前节点指针，初始化为虚拟头节点
+        ListNode current = dummy;
+
+        // 遍历链表
+        while (current.next != null && current.next.next != null) {
+            // 初始化两个要交换的节点
+            ListNode first = current.next;
+            ListNode second = current.next.next;
+
+            // 交换这两个节点
+            first.next = second.next;
+            second.next = first;
+            current.next = second;
+
+            // 移动 current 指针到下一个需要交换的位置
+            current = first;
+        }
+
+        // 返回交换后的链表头
+        return dummy.next;
+    }
+}
+
 ```
 

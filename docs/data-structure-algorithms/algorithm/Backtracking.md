@@ -80,15 +80,15 @@ function backtrack(solution, candidates):  //入参可以理解为 路径, 选�
 
 > 无论是排列、组合还是子集问题，简单说无非就是让你从序列 `nums` 中以给定规则取若干元素，主要有以下几种变体：
 >
-> **形式一、元素无重不可复选，即 `nums` 中的元素都是唯一的，每个元素最多只能被使用一次，这也是最基本的形式**。
+> **元素无重不可复选，即 `nums` 中的元素都是唯一的，每个元素最多只能被使用一次，这也是最基本的形式**。
 >
 > - 以组合为例，如果输入 `nums = [2,3,6,7]`，和为 7 的组合应该只有 `[7]`。
 >
-> **形式二、元素可重不可复选，即 `nums` 中的元素可以存在重复，每个元素最多只能被使用一次**。
+> **元素可重不可复选，即 `nums` 中的元素可以存在重复，每个元素最多只能被使用一次**。
 >
 > - 以组合为例，如果输入 `nums = [2,5,2,1,2]`，和为 7 的组合应该有两种 `[2,2,2,1]` 和 `[5,2]`。
 >
-> **形式三、元素无重可复选，即 `nums` 中的元素都是唯一的，每个元素可以被使用若干次**。
+> **元素无重可复选，即 `nums` 中的元素都是唯一的，每个元素可以被使用若干次**。
 >
 > - 以组合为例，如果输入 `nums = [2,3,6,7]`，和为 7 的组合应该有两种 `[2,2,3]` 和 `[7]`。
 >
@@ -117,12 +117,26 @@ function backtrack(solution, candidates):  //入参可以理解为 路径, 选�
 
 思路：
 
+**子集的特性**：
+
+- 对于给定的数组 `[1, 2, 3]`，它的所有子集应该包括空集、单个元素的子集、两个元素的组合和完整数组。
+- 每个元素都有两种选择：要么加入子集，要么不加入子集。
+
+**回溯算法**：
+
+- 使用回溯的方式可以从空集开始，逐步添加元素来生成所有子集。
+- 从当前的元素出发，尝试包含它或者不包含它，然后递归地处理下一个元素。
+
+参数定义：
+
 - `res`：一个列表，存储最终的所有子集，类型是 `List<List<Integer>>`。
 
 - `track`：一个临时列表，记录当前路径（即当前递归中形成的子集）。
 -  `start`：当前递归要开始的位置（即考虑从哪个位置开始生成子集）。这个 `start` 是非常重要的，它确保了我们在递归时不会重复生成相同的子集。
 
 完成回溯树的遍历就收集了所有子集。
+
+![](https://img.starfish.ink/leetcode/leetcode-78.png)
 
 ```java
 class Solution {
@@ -175,11 +189,9 @@ class Solution {
 > ]
 > ```
 
-思路：翻译一下就变成子集问题了：
+思路：翻译一下就变成子集问题了：**给你输入一个数组 `nums = [1,2..,n]` 和一个正整数 `k`，请你生成所有大小为 `k` 的子集**。
 
-**给你输入一个数组 `nums = [1,2..,n]` 和一个正整数 `k`，请你生成所有大小为 `k` 的子集**。
-
-![img](https://miro.medium.com/v2/resize:fit:1400/1*dD57UGOTerbeCk_0gSxmxg.png)
+![](https://img.starfish.ink/leetcode/leetcode-77.png)
 
 反映到代码上，只需要稍改 base case，控制算法仅仅收集第 `k` 层节点的值即可：
 
@@ -229,17 +241,17 @@ class Solution {
 > 输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
 > ```
 
-组合/子集问题使用 `start` 变量保证元素 `nums[start]` 之后只会出现 `nums[start+1..]`中的元素，通过固定元素的相对位置保证不出现重复的子集。
+思路：组合/子集问题使用 `start` 变量保证元素 `nums[start]` 之后只会出现 `nums[start+1..]`中的元素，通过固定元素的相对位置保证不出现重复的子集。
 
 **但排列问题本身就是让你穷举元素的位置，`nums[i]` 之后也可以出现 `nums[i]` 左边的元素，所以之前的那一套玩不转了，需要额外使用 `used` 数组来标记哪些元素还可以被选择**。
 
-思路：全排列共有 `n!` 个，我们可以按阶乘举例的思想，画出「回溯树」![backtracking 001](https://user-images.githubusercontent.com/72732446/147382581-06c3312f-5a20-4378-a546-4c462d489455.jpeg)
+全排列共有 `n!` 个，我们可以按阶乘举例的思想，画出「回溯树」
 
-只要从根遍历这棵树，记录路径上的数字，其实就是所有的全排列。**我们不妨把这棵树称为回溯算法的「决策树」**
+![](https://img.starfish.ink/leetcode/leetcode-46.png)
 
-**为啥说这是决策树呢，因为你在每个节点上其实都在做决策**。比如说你站在下图的红色节点上：你现在就在做决策，可以选择 1 那条树枝，也可以选择 3 那条树枝。为啥只能在 1 和 3 之中选择呢？因为 2 这个树枝在你身后，这个选择你之前做过了，而全排列是不允许重复使用数字的。
+> 回溯树是一种树状结构，树的每个节点表示一个状态（即当前的选择或部分解），树的每条边表示一次决策的选择。在回溯过程中，我们从根节点开始，递归地选择下一个数字，每次递归都相当于进入树的下一层。
 
-**`[2]` 就是「路径」，记录你已经做过的选择；`[1,3]` 就是「选择列表」，表示你当前可以做出的选择；「结束条件」就是遍历到树的底层叶子节点，这里也就是选择列表为空的时候**。
+> **东哥称为 决策树，你在每个节点上其实都在做决策**。因为比如你选了 2 之后，只能再选 1 或者 3，全排列是不允许重复使用数字的。**`[2]` 就是「路径」，记录你已经做过的选择；`[1,3]` 就是「选择列表」，表示你当前可以做出的选择；「结束条件」就是遍历到树的底层叶子节点，这里也就是选择列表为空的时候**。
 
 ```java
 class Solution {
@@ -287,8 +299,6 @@ class Solution {
 }
 ```
 
-![image.png](https://pic.leetcode-cn.com/0bf18f9b86a2542d1f6aa8db6cc45475fce5aa329a07ca02a9357c2ead81eec1-image.png)
-
 
 
 ### 二、元素可重不可复选
@@ -304,9 +314,7 @@ class Solution {
 > 输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
 > ```
 
-思路：按之前的思路，画出 回溯树，会有重复的，所有我们需要去重（剪枝），**体现在代码上，需要先进行排序，让相同的元素靠在一起，如果发现 `nums[i] == nums[i-1]`，则跳过**：
-
-![img](https://labuladong.online/algo/images/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/9.jpeg)
+思路：该问题的关键是**去重**（剪枝），**体现在代码上，需要先进行排序，让相同的元素靠在一起，如果发现 `nums[i] == nums[i-1]`，则跳过**
 
 ```java
 class Solution {
@@ -361,9 +369,11 @@ class Solution {
 
 思路：说这是一个组合问题，其实换个问法就变成子集问题了：请你计算 `candidates` 中所有和为 `target` 的子集。
 
-只要额外用一个 `trackSum` 变量记录回溯路径上的元素和，然后将 base case 改一改即可解决这道题
+1. **排序**：首先对 `candidates` 数组进行排序，排序后的数组方便处理重复数字。
+2. **递归选择**：在递归过程中，确保如果当前数字和上一个数字相同，且上一个数字没有被选择过，则跳过当前数字，从而避免重复组合。
+3. **递归终止条件**：如果 `target` 变为 0，表示找到了一个符合条件的组合；如果 `target` 小于 0，表示当前路径不合法，应该回溯。
 
-![img](https://miro.medium.com/v2/resize:fit:1400/1*KPTXyI3bBeM6BBcealsWKA.png)
+可以额外用一个 `trackSum` 变量记录回溯路径上的元素和，或者做减法，target == 0 递归结束也可以。
 
 ```java
 class Solution {
@@ -429,7 +439,19 @@ class Solution {
 >  [2,1,1]]
 > ```
 
-思路：
+思路：典型的回溯
+
+1. **排序**：首先对 `nums` 进行排序。
+
+2. **回溯生成排列**：
+
+   - 递归生成排列时，每次递归时选择一个数字。
+
+   - 如果选择了当前数字，递归处理下一个数字。
+
+   - 每次递归前，判断是否跳过重复数字。
+
+3. **记录结果**：每当一个排列完成时，将其加入结果中。
 
 ```java
 class Solution {
@@ -495,8 +517,6 @@ class Solution {
 
 思路：**元素无重可复选，即 `nums` 中的元素都是唯一的，每个元素可以被使用若干次**，只要删掉去重逻辑即可
 
-![img](https://labuladong.online/algo/images/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/10.jpeg)
-
 ```java
 class Solution {
 
@@ -558,11 +578,13 @@ class Solution {
 > 输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
 > ```
 
-思路：
+思路：回溯，递归地尝试每一位数字对应的所有字母，直到找出所有有效的组合
 
-图中可以看出遍历的深度，就是输入"23"的长度，而叶子节点就是我们要收集的结果，输出["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]。
+首先，我们需要将每个数字 2 到 9 映射到其对应的字母
 
-![](https://pic.leetcode-cn.com/02b0ec926e3da5f12a0a118293b8ac10dc236741ccb04414ded44a30f7fc70af-1573829897(1).jpg)
+**递归终止条件**：当当前组合的长度与输入的数字字符串长度相同，就说明我们已经得到了一个有效的组合，可以将其加入结果集。
+
+![](http://img.starfish.ink/leetcode/leetcode-letterCombinations.png)
 
 ```java
 class Solution {
@@ -574,6 +596,7 @@ class Solution {
             return result;
         }
 
+        //也可以用数组做映射
         Map<Character,String> digitToLetters = new HashMap<>();
         digitToLetters.put('2', "abc");
         digitToLetters.put('3', "def");
@@ -593,8 +616,10 @@ class Solution {
             result.add(track.toString());
             return;
         }
+        // 获取当前数字对应的字母
         String letters = digitToLetters.get(digits.charAt(index));
         for (char letter : letters.toCharArray()) {
+            //选择一个字母
             track.append(letter);
             backtrack(digits, index + 1, digitToLetters);
             track.deleteCharAt(track.length() - 1);
@@ -615,7 +640,9 @@ class Solution {
 > 输出：["((()))","(()())","(())()","()(())","()()()"]
 > ```
 
-思路：![image.png](https://pic.leetcode-cn.com/1612765058-NToQkc-image.png)
+思路：
+
+![](http://img.starfish.ink/leetcode/leetcode-generate-parentheses.png)
 
 ```java
 class Solution {
@@ -658,9 +685,7 @@ class Solution {
 }
 ```
 
-dfs 思路：
-
-由于一共要填 2n 个括号，那么当我们递归到终点时：
+dfs 思路：由于一共要填 2n 个括号，那么当我们递归到终点时：
 
 - 如果左括号少于 n 个，那么右括号也会少于 n 个，与 i == m 矛盾，因为每填一个括号 i 都会增加 1。
 - 如果左括号超过 n 个，与 if open < n 矛盾，这行代码限制了左括号至多填 n 个。
@@ -815,3 +840,5 @@ class Solution {
 ## 参考与感谢：
 
 - https://yuminlee2.medium.com/combinations-and-combination-sum-3ed2accc8d12
+- https://medium.com/@sunshine990316/leetcode-python-backtracking-summary-medium-1-e8ae88839e85
+- https://blog.devgenius.io/10-daily-practice-problems-day-18-f7293b55224d
