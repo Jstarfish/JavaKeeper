@@ -16,7 +16,9 @@
                 "file": "data-management/MySQL/MySQL-Index.md",
                 "mode": "preview",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "MySQL-Index"
             }
           },
           {
@@ -28,7 +30,9 @@
                 "file": "data-structure-algorithms/soultion/LinkedList-Soultion.md",
                 "mode": "source",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "LinkedList-Soultion"
             }
           },
           {
@@ -40,7 +44,9 @@
                 "file": "data-management/Redis/Redis-Datatype.md",
                 "mode": "source",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "Redis-Datatype"
             }
           },
           {
@@ -48,7 +54,9 @@
             "type": "leaf",
             "state": {
               "type": "empty",
-              "state": {}
+              "state": {},
+              "icon": "lucide-file",
+              "title": "新标签页"
             }
           },
           {
@@ -60,7 +68,9 @@
                 "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "mode": "source",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "DP-Solution"
             }
           },
           {
@@ -72,7 +82,9 @@
                 "file": "data-structure-algorithms/soultion/DP-Solution.md",
                 "mode": "source",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "DP-Solution"
             }
           }
         ],
@@ -96,7 +108,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
             }
           },
           {
@@ -111,7 +125,9 @@
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
             }
           },
           {
@@ -119,7 +135,9 @@
             "type": "leaf",
             "state": {
               "type": "starred",
-              "state": {}
+              "state": {},
+              "icon": "lucide-file",
+              "title": "插件不再活动"
             }
           },
           {
@@ -127,7 +145,9 @@
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {}
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
             }
           }
         ]
@@ -158,7 +178,9 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-coming-in",
+              "title": "Redis-Datatype 的反向链接列表"
             }
           },
           {
@@ -170,7 +192,9 @@
                 "file": "data-management/Redis/Redis-Datatype.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-going-out",
+              "title": "Redis-Datatype 的出链列表"
             }
           },
           {
@@ -181,7 +205,9 @@
               "state": {
                 "sortOrder": "frequency",
                 "useHierarchy": true
-              }
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
             }
           },
           {
@@ -191,7 +217,9 @@
               "type": "outline",
               "state": {
                 "file": "data-management/Redis/Redis-Datatype.md"
-              }
+              },
+              "icon": "lucide-list",
+              "title": "Redis-Datatype 的大纲"
             }
           }
         ],
