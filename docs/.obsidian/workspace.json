@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md",
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Redis-Datatype"
+              "title": "Dynamic-Programming"
             }
           },
           {
@@ -216,10 +216,10 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-management/Redis/Redis-Datatype.md"
+                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md"
               },
               "icon": "lucide-list",
-              "title": "Redis-Datatype 的大纲"
+              "title": "Dynamic-Programming 的大纲"
             }
           }
         ],
@@ -241,6 +241,7 @@
   },
   "active": "e24a131a4a8c13f9",
   "lastOpenFiles": [
+    "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Database.md",
     "data-management/Redis/Nosql-Overview.md",
     "data-management/Redis/Nosql-Overview~.md",
@@ -267,7 +268,6 @@
     "data-structure-algorithms/soultion/stock-problems.md",
     "data-management/MySQL/MySQL-Lock.md",
     "framework/SpringWebFlux/响应式编程.md",
-    "java/JVM/JVM性能监控和故障处理工具.md",
     "Untitled.canvas",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"

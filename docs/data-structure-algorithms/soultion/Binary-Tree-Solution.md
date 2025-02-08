@@ -1,4 +1,20 @@
-> 我们在做二叉树题目时候，第一想到的应该是用 **递归** 来解决。
+---
+title: 二叉树通关秘籍：LeetCode 热题 100 全解析
+date: 2025-01-08
+tags: 
+ - Binary Tree
+categories: leetcode
+---
+
+![](https://img.starfish.ink/leetcode/binary-tree-banner.png)
+
+> 二叉树作为数据结构中的常青树，在算法面试中出现的频率居高不下。
+>
+> 有人说刷题要先刷二叉树，培养思维。目前还没培养出来，感觉分类刷都差不多。
+>
+> 我把二叉树相关题目进行了下分类。
+>
+> 当然，在做二叉树题目时候，第一想到的应该是用 **递归** 来解决。
 
 ## 一、二叉树基本操作类
 
@@ -70,38 +86,44 @@ public void postorder(TreeNode root, List<Integer> res) {
 
 **思路**：BFS 的思想。
 
+![](https://pic.leetcode-cn.com/fdcd3bd27f4008948084f6ec86b58535e71f66862bd89a34bd6fe4cc42d68e89.gif)
+
 借助一个队列，首先将二叉树的根结点入队，然后访问出队结点并出队，如果有左孩子结点，左孩子结点也入队；如果有右孩子结点，右孩子结点也入队。然后访问出队结点并出队，直到队列为空为止.
 
-```java
-public static List<List<Integer>> levelOrder(TreeNode treeNode) {
-  List<List<Integer>> res = new ArrayList<>();
-  if (treeNode == null) {
-    return res;
-  }
+![](https://pic.leetcode-cn.com/94cd1fa999df0276f1dae77a9cca83f4cabda9e2e0b8571cd9550a8ee3545f56.gif)
 
-  //用LinkedList 实现类
-  Queue<TreeNode> queue = new LinkedList<TreeNode>();
-  queue.offer(treeNode);
-  // 当队列不为空时，从上到下遍历二叉树的每一层
-  while (!queue.isEmpty()) {
-    int size = queue.size();
-    List<Integer> currentList = new ArrayList<>();
-    // 从左到右遍历每一层的每个节点
-    for (int i = 0; i < size; i++) {
-      //取出队头元素
-      TreeNode node = queue.poll();
-      // 将下一层节点放入队列
-      if (node.left != null) {
-        queue.offer(node.left);
-      }
-      if (node.right != null) {
-        queue.offer(node.right);
-      }
-      currentList.add(node.val);
+```java
+public List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) {
+        return result;  // 如果根节点为空，直接返回空的结果
     }
-    res.add(currentList);
-  }
-  return res;
+
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);  // 根节点入队
+
+    while (!queue.isEmpty()) {
+        int levelSize = queue.size();  // 当前层节点数
+        List<Integer> level = new ArrayList<>();
+
+        for (int i = 0; i < levelSize; i++) {
+            TreeNode node = queue.poll();  // 弹出队首节点
+            level.add(node.val);
+
+            // 左子节点入队
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            // 右子节点入队
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+
+        result.add(level);  // 将当前层的结果加入结果集
+    }
+
+    return result;
 }
 ```
 
@@ -117,31 +139,86 @@ public static List<List<Integer>> levelOrder(TreeNode treeNode) {
 >
 > ```
 > 输入: [1,2,3,null,5,null,4]
-> 输出: [1,3,4]
+> 输出: [1, 3, 4]
+> 解释:
+>    1            <---
+>  /   \
+> 2     3         <---
+>  \     \
+>   5     4       <---
 > ```
 
-**思路**：  我们对树进行深度优先搜索，在搜索过程中，我们总是先访问右子树。那么对于每一层来说，我们在这层见到的第一个结点一定是最右边的结点。
+**思路**：  既可以用 BFS  也可以用 DFS 解此题。
 
-这样一来，我们可以存储在每个深度访问的第一个结点，一旦我们知道了树的层数，就可以得到最终的结果数组。
+1. **层序遍历（BFS）**：
+
+   - 使用广度优先搜索（BFS）逐层遍历二叉树。
+   - 对于每一层，记录最后一个节点（即最右侧的节点）的值。
+   - 将每一层的最后一个节点的值加入结果列表。
+
+   ```java
+   public class Solution {
+       public List<Integer> rightSideView(TreeNode root) {
+           List<Integer> result = new ArrayList<>();
+           if (root == null) {
+               return result;
+           }
+   
+           Queue<TreeNode> queue = new LinkedList<>();
+           queue.offer(root);
+   
+           while (!queue.isEmpty()) {
+               int levelSize = queue.size();
+               for (int i = 0; i < levelSize; i++) {
+                   TreeNode currentNode = queue.poll();
+                   // 如果是当前层的最后一个节点，加入结果列表
+                   if (i == levelSize - 1) {
+                       result.add(currentNode.val);
+                   }
+                   // 将左右子节点加入队列
+                   if (currentNode.left != null) {
+                       queue.offer(currentNode.left);
+                   }
+                   if (currentNode.right != null) {
+                       queue.offer(currentNode.right);
+                   }
+               }
+           }
+   
+           return result;
+       }
+   }
+   ```
+
+2. **深度优先搜索（DFS）**：
+
+   - 使用深度优先搜索（DFS）遍历二叉树。
+   - 在遍历时，记录当前深度，并将每一层的第一个访问到的节点（即最右侧的节点）的值加入结果列表。
 
 ![](https://assets.leetcode-cn.com/solution-static/199/fig1.png)
 
 使用深度优先遍历递归，一边遍历需要一边记录树的深度。先遍历右子树，当右子树有值的时候，肯定使用右子树的值，右子树遍历完后遍历左子树，对于左子树，只有当左子树的高度超过了当前结果长度时，才进行记录
 
 ```java
-public List<Integer> rightSideView(TreeNode root) {
-    List<Integer> list = new ArrayList<Integer>();
-    rightSideView(root,list,0);
-    return list;
-}
-
-private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
-    if(root ==null) return ;
-    if(currentLevel>=list.size()){
-        list.add(root.val);
+public class Solution {
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        dfs(root, 0, result);
+        return result;
     }
-    rightSideView(root.right,list,currentLevel+1);
-    rightSideView(root.left,list,currentLevel+1);
+
+    private void dfs(TreeNode node, int depth, List<Integer> result) {
+        if (node == null) {
+            return;
+        }
+        // 如果当前深度等于结果列表的大小，说明是当前层第一个访问的节点（最右侧节点）
+        if (depth == result.size()) {
+            result.add(node.val);
+        }
+        // 先遍历右子树，再遍历左子树
+        dfs(node.right, depth + 1, result);
+        dfs(node.left, depth + 1, result);
+    }
 }
 ```
 
@@ -179,36 +256,45 @@ private void rightSideView(TreeNode root, List<Integer> list, int currentLevel){
 >         - 空数组，无子节点。
 > ```
 
-思路：递归，**对于每个根节点，只需要找到当前 `nums` 中的最大值和对应的索引，然后递归调用左右数组构造左右子树即可**
+思路：最大二叉树：二叉树的根是数组 nums 中的最大元素。 左子树是通过数组中最大值左边部分递归构造出的最大二叉树。 右子树是通过数组中最大值右边部分递归构造出的最大二叉树。
 
-最大二叉树：二叉树的根是数组 nums 中的最大元素。 左子树是通过数组中最大值左边部分递归构造出的最大二叉树。 右子树是通过数组中最大值右边部分递归构造出的最大二叉树。
+- **递归构建**
+  - 先找到当前数组 `nums` 中的最大值，并以其作为当前子树的根节点。
+  - 递归处理最大值左侧的子数组，构建左子树。
+  - 递归处理最大值右侧的子数组，构建右子树。
+
+- **时间复杂度**
+
+  - 每次找最大值需要遍历整个子数组，最坏情况（类似递增数组）会导致 **O(n²)** 的时间复杂度。
+
+  - 但是，如果 `nums` 是类似 `[6, 5, 4, 3, 2, 1]` 这样单调递减的数组，树会变成链式结构，每次找到最大值都只会减少一个元素，导致递归深度为 `O(n)`。
 
 ```java
-public TreeNode constructMaximumBinaryTree(int[] nums) {
-    return build( 0, nums.length - 1,nums);
-}
+public class Solution {
+    public TreeNode constructMaximumBinaryTree(int[] nums) {
+        return buildTree(nums, 0, nums.length - 1);
+    }
 
-private TreeNode build(int low, int high, int[] nums) {
-  if (low > high) {
-     return null;
-  }
+    private TreeNode buildTree(int[] nums, int left, int right) {
+        if (left > right) return null;
 
-  //找出最大值和对应的索引位置
-  int index = -1, maxVal = Integer.MIN_VALUE;
-  //遍历是从本次 low 到 hign 即可
-  for (int i = low; i <= high; i++) {
-     if (nums[i] > maxVal) {
-        maxVal = nums[i];
-        index = i;
-     }
-  }
+        // 找到最大值的索引
+        int maxIndex = left;
+        for (int i = left; i <= right; i++) {
+            if (nums[i] > nums[maxIndex]) {
+                maxIndex = i;
+            }
+        }
 
-  //构造根节点、递归调用左右两边数据构造左、右子树
-  TreeNode root = new TreeNode(maxVal);
-  root.left = build(low, index - 1, nums);
-  root.right = build(index + 1, high,nums);
-  return root;
+        // 创建根节点
+        TreeNode root = new TreeNode(nums[maxIndex]);
 
+        // 递归构建左右子树
+        root.left = buildTree(nums, left, maxIndex - 1);
+        root.right = buildTree(nums, maxIndex + 1, right);
+
+        return root;
+    }
 }
 ```
 
@@ -218,52 +304,86 @@ private TreeNode build(int low, int high, int[] nums) {
 
 > 给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
 >
-> ![img](https://assets.leetcode.com/uploads/2021/02/19/tree.jpg)
->
 > ```
 > 输入: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
 > 输出: [3,9,20,null,null,15,7]
+> 
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
 > ```
 
-思路：前序遍历的第一个值 `preorder[0]` 就是根节点的值
+思路：
 
-![img](https://labuladong.online/algo/images/二叉树系列2/4.jpeg)
+- 前序遍历顺序为【根节点 -> 左子树 -> 右子树】，那 `preorder[0]` 就是根节点的值
+
+- 中序遍历顺序为【左子树 -> 根节点 -> 右子树】，在中序遍历中找到根节点后，可以将其左右两侧划分为左子树和右子树所在的区间
+
+**构建过程**
+
+- 在 `preorder` 第一个元素就是根节点的值 `rootVal`。
+- 在 `inorder`中找到 `rootVal`的索引位置 `inIndex`。
+  - `inIndex` 左侧的部分是**左子树**的中序遍历序列；右侧部分是**右子树**的中序遍历序列。
+- 知道了左子树在中序数组中的区间 `[inStart, inIndex - 1]` 之后，可以确定左子树节点的数量，从而**切分**先序遍历中左子树和右子树对应的区间。
+- 递归进行构建：
+  - 左子树：先序遍历区间 + 中序遍历 `[inStart, inIndex - 1]`
+  - 右子树：先序遍历区间 + 中序遍历 `[inIndex + 1, inEnd]`
 
 ```java
-private Map<Integer,Integer> indexMap;
-
-public TreeNode buildTree(int[] preorder, int[] inorder) {
-
-  int n = preorder.length;
-  // 构造哈希映射，帮助我们快速定位根节点
-  indexMap = new HashMap<>();
-  for (int i = 0; i < n; i++) {
-    indexMap.put(inorder[i], i);
-  }
-  return build(preorder, 0, n - 1 , inorder, 0, n - 1);
-}
-
-public TreeNode build(int[] preorder, int preStart, int preEnd,
-                      int[] inorder, int inStart, int inEnd) {
-  if (preStart > preEnd) {
-    return null;
-  }
-  // 前序遍历中的第一个节点就是根节点
-  int rootVal = preorder[preStart];
-  // 在中序遍历中定位根节点
-  int index = indexMap.get(rootVal);
-
-  // 先把根节点建立出来
-  TreeNode root = new TreeNode(preorder[index]);
-  // 得到左子树中的节点数目
-  int leftSize = index - inStart;
-  // 递归地构造左子树，并连接到根节点
-  // 先序遍历中「从 左边界+1 开始的 size_left_subtree」个元素就对应了中序遍历中「从 左边界 开始到 根节点定位-1」的元素
-  root.left = build(preorder, preStart + 1, preStart + leftSize, inorder, inStart, index - 1);
-  // 递归地构造右子树，并连接到根节点
-  // 先序遍历中「从 左边界+1+左子树节点数目 开始到 右边界」的元素就对应了中序遍历中「从 根节点定位+1 到 右边界」的元素
-  root.right = build(preorder, preStart + leftSize + 1, preEnd, inorder, index + 1, inEnd);
-  return root;
+public class Solution {
+    
+    // 记录先序遍历中当前处理到的索引
+    private int preIndex;
+    // 中序遍历数值 -> 索引的映射
+    private Map<Integer, Integer> indexMap;
+    
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        // 参数合法性判断
+        if (preorder == null || inorder == null || preorder.length != inorder.length) {
+            return null;
+        }
+        
+        // 初始化全局索引和哈希表
+        preIndex = 0;
+        indexMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            indexMap.put(inorder[i], i);
+        }
+        
+        // 递归构造二叉树
+        return buildSubTree(preorder, 0, inorder.length - 1);
+    }
+    
+    /**
+     * 根据先序数组和中序数组的区间，构造子树并返回根节点
+     *
+     * @param preorder 先序数组
+     * @param inStart  中序数组的起始索引
+     * @param inEnd    中序数组的结束索引
+     * @return         子树根节点
+     */
+    private TreeNode buildSubTree(int[] preorder, int inStart, int inEnd) {
+        // 若区间无效，返回 null
+        if (inStart > inEnd) {
+            return null;
+        }
+        
+        // 先序遍历的当前元素即为根节点
+        int rootVal = preorder[preIndex++];
+        TreeNode root = new TreeNode(rootVal);
+        
+        // 在中序遍历中找到根节点的位置
+        int inIndex = indexMap.get(rootVal);
+        
+        // 递归构建左子树
+        root.left = buildSubTree(preorder, inStart, inIndex - 1);
+        // 递归构建右子树
+        root.right = buildSubTree(preorder, inIndex + 1, inEnd);
+        
+        return root;
+    }
 }
 ```
 
@@ -276,46 +396,81 @@ public TreeNode build(int[] preorder, int preStart, int preEnd,
 > ```
 > 输入：inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
 > 输出：[3,9,20,null,null,15,7]
+> 
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
 > ```
 
-![](https://labuladong.online/algo/images/二叉树系列2/6.jpeg)
+思路：
+
+- **后序遍历 (Postorder)**：顺序为 **[左子树 -> 右子树 -> 根节点]**
+  - `postorder` 数组的最后一个元素是当前子树的根节点。
+
+- **中序遍历 (Inorder)**：顺序为 **[左子树 -> 根节点 -> 右子树]**
+  - 在 `inorder` 中找到**根节点的位置**，可以划分**左子树**和**右子树**的范围。
+
+**递归构建二叉树**
+
+- 取 `postorder` **最后一个元素** 作为当前子树的**根节点**。
+- 在 `inorder`中找到根节点的位置 `inIndex`，然后：
+  - `inIndex` **左侧的部分**属于**左子树**。
+  - `inIndex` **右侧的部分**属于**右子树**。
+- 递归构造左子树和右子树：
+  - **注意：因为后序遍历是 [左 -> 右 -> 根]，所以递归时要先构造右子树，再构造左子树！**
+- **优化：用哈希表存储 `inorder` 的索引，快速查找根节点的位置**，避免 O(n²) 的查找时间。
 
 ```java
-class Solution {
-    // 存储 inorder 中值到索引的映射
-    HashMap<Integer, Integer> valToIndex = new HashMap<>();
+public class Solution {
+    private int postIndex;
+    private Map<Integer, Integer> inMap;
 
     public TreeNode buildTree(int[] inorder, int[] postorder) {
-        for (int i = 0; i < inorder.length; i++) {
-            valToIndex.put(inorder[i], i);
+        if (inorder == null || postorder == null || inorder.length != postorder.length) {
+            return null;
         }
-        return build(inorder, 0, inorder.length - 1,
-                    postorder, 0, postorder.length - 1);
+
+        // 1. 构建哈希表存储 inorder 值的位置
+        inMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            inMap.put(inorder[i], i);
+        }
+
+        // 2. 初始化 postIndex 为 postorder 最后一个元素（即根节点）
+        postIndex = postorder.length - 1;
+
+        // 3. 递归构造二叉树
+        return buildSubTree(postorder, 0, inorder.length - 1);
     }
 
-    // build 函数的定义：
-    // 后序遍历数组为 postorder[postStart..postEnd]，
-    // 中序遍历数组为 inorder[inStart..inEnd]，
-    // 构造二叉树，返回该二叉树的根节点 
-    TreeNode build(int[] inorder, int inStart, int inEnd,
-                int[] postorder, int postStart, int postEnd) {
-
+    /**
+     * 递归构造子树
+     * @param postorder 后序遍历数组
+     * @param inStart   当前子树的中序遍历范围（左边界）
+     * @param inEnd     当前子树的中序遍历范围（右边界）
+     * @return 返回子树根节点
+     */
+    private TreeNode buildSubTree(int[] postorder, int inStart, int inEnd) {
+        // 递归终止条件
         if (inStart > inEnd) {
             return null;
         }
-        // root 节点对应的值就是后序遍历数组的最后一个元素
-        int rootVal = postorder[postEnd];
-        // rootVal 在中序遍历数组中的索引
-        int index = valToIndex.get(rootVal);
-        // 左子树的节点个数
-        int leftSize = index - inStart;
+
+        // 1. 取出 postorder[postIndex] 作为根节点
+        int rootVal = postorder[postIndex--];
         TreeNode root = new TreeNode(rootVal);
-        // 递归构造左右子树
-        root.left = build(inorder, inStart, index - 1,
-                            postorder, postStart, postStart + leftSize - 1);
-        
-        root.right = build(inorder, index + 1, inEnd,
-                            postorder, postStart + leftSize, postEnd - 1);
+
+        // 2. 在 inorder 中找到 rootVal 的索引
+        int inIndex = inMap.get(rootVal);
+
+        // 3. 递归构造右子树（**先右后左，因为后序遍历是 [左 -> 右 -> 根]**）
+        root.right = buildSubTree(postorder, inIndex + 1, inEnd);
+
+        // 4. 递归构造左子树
+        root.left = buildSubTree(postorder, inStart, inIndex - 1);
+
         return root;
     }
 }
@@ -329,11 +484,15 @@ class Solution {
 >
 > 如果存在多个答案，您可以返回其中 任何 一个。
 >
-> ![img](https://assets.leetcode.com/uploads/2021/07/24/lc-prepost.jpg)
->
 > ```
 > 输入：preorder = [1,2,4,5,3,6,7], postorder = [4,5,2,6,7,3,1]
 > 输出：[1,2,3,4,5,6,7]
+> 
+>         1
+>        / \
+>       2   3
+>      / \  / \
+>     4  5 6  7
 > ```
 
 思路：这个的区别就是无法确定原始二叉树，可能有不同形式，所以我们可以通过控制左右子树的索引来构建
@@ -344,51 +503,58 @@ class Solution {
 
 3. 在后序遍历结果中寻找左子树根节点的值，从而确定了左子树的索引边界，进而确定右子树的索引边界，递归构造左右子树即可。
 
-这样就和前两道解法相似了
+**关键点**
+
+- `preorder[1]` 是左子树的根节点（如果存在左子树）。
+- 在 `postorder` 中找到 `preorder[1]` 的位置，就可以确定左子树的范围。
+
+**核心步骤**
+
+1. 取 `preorder[0]` 作为当前子树的根节点 `root`。
+2. **如果 `preorder.length == 1`，直接返回 `root`**。
+3. 在 `postorder` 中找到 `preorder[1]` 的索引 `leftIndex`，它表示左子树的范围。
+4. 递归构造左子树：
+   - **左子树的 `preorder`**: `preorder[1 : leftIndex + 2]`
+   - **左子树的 `postorder`**: `postorder[0 : leftIndex + 1]`
+5. 递归构造右子树：
+   - **右子树的 `preorder`**: `preorder[leftIndex + 2 : end]`
+   - **右子树的 `postorder`**: `postorder[leftIndex + 1 : end-1]`
 
 ```java
-class Solution {
-    // 存储 postorder 中值到索引的映射
-    HashMap<Integer, Integer> valToIndex = new HashMap<>();
+public class Solution {
+    private Map<Integer, Integer> postMap;
+    private int preIndex;
 
     public TreeNode constructFromPrePost(int[] preorder, int[] postorder) {
+        postMap = new HashMap<>();
         for (int i = 0; i < postorder.length; i++) {
-            valToIndex.put(postorder[i], i);
+            postMap.put(postorder[i], i);  // 存储 postorder 值和索引的映射
         }
-        return build(preorder, 0, preorder.length - 1,
-                    postorder, 0, postorder.length - 1);
+        preIndex = 0;
+        return buildTree(preorder, postorder, 0, postorder.length - 1);
     }
 
-    // 定义：根据 preorder[preStart..preEnd] 和 postorder[postStart..postEnd]
-    // 构建二叉树，并返回根节点。
-    TreeNode build(int[] preorder, int preStart, int preEnd,
-                   int[] postorder, int postStart, int postEnd) {
-        if (preStart > preEnd) {
+    private TreeNode buildTree(int[] preorder, int[] postorder, int postStart, int postEnd) {
+        if (postStart > postEnd) {
             return null;
         }
-        if (preStart == preEnd) {
-            return new TreeNode(preorder[preStart]);
+
+        // 1. 取出 preorder 的当前索引值作为根节点
+        TreeNode root = new TreeNode(preorder[preIndex++]);
+
+        // 2. 递归结束条件
+        if (postStart == postEnd) {
+            return root;
         }
 
-        // root 节点对应的值就是前序遍历数组的第一个元素
-        int rootVal = preorder[preStart];
-        // root.left 的值是前序遍历第二个元素
-        // 通过前序和后序遍历构造二叉树的关键在于通过左子树的根节点
-        // 确定 preorder 和 postorder 中左右子树的元素区间
-        int leftRootVal = preorder[preStart + 1];
-        // leftRootVal 在后序遍历数组中的索引
-        int index = valToIndex.get(leftRootVal);
-        // 左子树的元素个数
-        int leftSize = index - postStart + 1;
+        // 3. 找到左子树的根（preorder[preIndex]）在 postorder 里的索引
+        int leftRootIndex = postMap.get(preorder[preIndex]);
 
-        // 先构造出当前根节点
-        TreeNode root = new TreeNode(rootVal);
-        // 递归构造左右子树
-        // 根据左子树的根节点索引和元素个数推导左右子树的索引边界
-        root.left = build(preorder, preStart + 1, preStart + leftSize,
-                postorder, postStart, index);
-        root.right = build(preorder, preStart + leftSize + 1, preEnd,
-                postorder, index + 1, postEnd - 1);
+        // 4. 递归构建左子树
+        root.left = buildTree(preorder, postorder, postStart, leftRootIndex);
+        
+        // 5. 递归构建右子树
+        root.right = buildTree(preorder, postorder, leftRootIndex + 1, postEnd - 1);
 
         return root;
     }
@@ -399,7 +565,7 @@ class Solution {
 
 ## 二、树的结构操作类
 
-
+### 2.1 树的深度计算
 
 #### [ 二叉树的最大深度（104）](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
 
@@ -616,7 +782,7 @@ public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
 
 ### 
 
-### 2.1 反转与镜像
+### 2.2 反转与镜像
 
 - **翻转二叉树**（Invert Binary Tree）
 - **[101] 对称二叉树**（Symmetric Tree）
@@ -691,14 +857,16 @@ public boolean check(TreeNode left,TreeNode right){
 
 
 
-### 2.2 路径问题
+### 2.3 路径问题
 
-- **[124] 二叉树中的最大路径和**（Binary Tree Maximum Path Sum）
-- **[113] 路径总和 II**（Path Sum II）
-- **[257] 二叉树的所有路径**（Binary Tree Paths）
-- **[257] 二叉树的所有路径**（Binary Tree Paths）
+- - [112. 路径总和](https://leetcode.cn/problems/path-sum/)
+  - [113. 路径总和 II](https://leetcode.cn/problems/path-sum-ii/)
+  - [124. 二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)
+  - [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
 
-### 2.3 判断树的结构特性
+  
+
+### 2.4 判断树的结构特性
 
 - **[100] 相同的树**（Same Tree）
 - **[105] 从前序与中序遍历序列构造二叉树**（Construct Binary Tree from Preorder and Inorder Traversal）
@@ -714,7 +882,65 @@ public boolean check(TreeNode left,TreeNode right){
 
 2、对于 BST 的每一个节点 `node`，它的左侧子树和右侧子树都是 BST。
 
+### 3.1 搜索、插入、删除
 
+
+
+#### [二叉搜索树中的搜索（700）](https://leetcode.cn/problems/search-in-a-binary-search-tree/)
+
+> 给定二叉搜索树（BST）的根节点 `root` 和一个整数值 `val`。
+>
+> 你需要在 BST 中找到节点值等于 `val` 的节点。 返回以该节点为根的子树。 如果节点不存在，则返回 `null` 。
+
+```java
+TreeNode searchBST(TreeNode root, int target) {
+    if (root == null) {
+        return null;
+    }
+    // 去左子树搜索
+    if (root.val > target) {
+        return searchBST(root.left, target);
+    }
+    // 去右子树搜索
+    if (root.val < target) {
+        return searchBST(root.right, target);
+    }
+    // 当前节点就是目标值
+    return root;
+}
+```
+
+
+
+#### [二叉搜索树中的插入操作（701）](https://leetcode.cn/problems/insert-into-a-binary-search-tree/)
+
+> 给定二叉搜索树（BST）的根节点 `root` 和要插入树中的值 `value` ，将值插入二叉搜索树。 返回插入后二叉搜索树的根节点。 输入数据 **保证** ，新值和原始二叉搜索树中的任意节点值都不同。
+>
+> **注意**，可能存在多种有效的插入方式，只要树在插入后仍保持为二叉搜索树即可。 你可以返回 **任意有效的结果**。
+
+```java
+public TreeNode insertIntoBST(TreeNode root, int val) {
+    if (root == null) {
+        // 找到空位置插入新节点
+        return new TreeNode(val);
+    }
+
+    // 去右子树找插入位置
+    if (root.val < val) {
+        root.right = insertIntoBST(root.right, val);
+    }
+    // 去左子树找插入位置
+    if (root.val > val) {
+        root.left = insertIntoBST(root.left, val);
+    }
+    // 返回 root，上层递归会接收返回值作为子节点
+    return root;
+}
+```
+
+
+
+### 3.2 特殊操作
 
 #### [二叉搜索树中第 K 小的元素（230）](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)
 
@@ -830,60 +1056,6 @@ class Solution {
 
 
 
-#### [二叉搜索树中的搜索（700）](https://leetcode.cn/problems/search-in-a-binary-search-tree/)
-
-> 给定二叉搜索树（BST）的根节点 `root` 和一个整数值 `val`。
->
-> 你需要在 BST 中找到节点值等于 `val` 的节点。 返回以该节点为根的子树。 如果节点不存在，则返回 `null` 。
-
-```java
-TreeNode searchBST(TreeNode root, int target) {
-    if (root == null) {
-        return null;
-    }
-    // 去左子树搜索
-    if (root.val > target) {
-        return searchBST(root.left, target);
-    }
-    // 去右子树搜索
-    if (root.val < target) {
-        return searchBST(root.right, target);
-    }
-    // 当前节点就是目标值
-    return root;
-}
-```
-
-
-
-#### [二叉搜索树中的插入操作（701）](https://leetcode.cn/problems/insert-into-a-binary-search-tree/)
-
-> 给定二叉搜索树（BST）的根节点 `root` 和要插入树中的值 `value` ，将值插入二叉搜索树。 返回插入后二叉搜索树的根节点。 输入数据 **保证** ，新值和原始二叉搜索树中的任意节点值都不同。
->
-> **注意**，可能存在多种有效的插入方式，只要树在插入后仍保持为二叉搜索树即可。 你可以返回 **任意有效的结果**。
-
-```java
-public TreeNode insertIntoBST(TreeNode root, int val) {
-    if (root == null) {
-        // 找到空位置插入新节点
-        return new TreeNode(val);
-    }
-
-    // 去右子树找插入位置
-    if (root.val < val) {
-        root.right = insertIntoBST(root.right, val);
-    }
-    // 去左子树找插入位置
-    if (root.val > val) {
-        root.left = insertIntoBST(root.left, val);
-    }
-    // 返回 root，上层递归会接收返回值作为子节点
-    return root;
-}
-```
-
-
-
 #### [不同的二叉搜索树（96）](https://leetcode-cn.com/problems/unique-binary-search-trees/)
 
 > 给你一个整数 `n` ，求恰由 `n` 个节点组成且节点值从 `1` 到 `n` 互不相同的 **二叉搜索树** 有多少种？返回满足题意的二叉搜索树的种数。
@@ -944,21 +1116,21 @@ public int numTrees(int n) {
 
 这类问题主要涉及树的子树、路径和等相关的动态规划问题，通常涉及子树的某种最优解或者路径的最优解。
 
-#### **1. 路径和问题**
+### 4.1  路径和问题
 
 - **[112] 路径总和**（Path Sum）
 - **[113] 路径总和 II**（Path Sum II）
 - **[124] 二叉树中的最大路径和**（Binary Tree Maximum Path Sum）
 - **[437] 路径总和 III**（Path Sum III）
 
-#### **2. 子树问题**
+### 4.2. 子树问题
 
 - **[100] 相同的树**（Same Tree）
 - **[101] 对称二叉树**（Symmetric Tree）
 - **[226] 翻转二叉树**（Invert Binary Tree）
 - **[222] 完全二叉树的节点个数**（Count Complete Tree Nodes）
 
-#### **3. 动态规划应用**
+### 4.3 动态规划应用
 
 - **[337] 打家劫舍 III**（House Robber III）
 
