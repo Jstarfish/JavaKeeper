@@ -8,6 +8,8 @@ categories: Algorithm
 
 ![img](https://miro.medium.com/v2/resize:fit:1400/1*ZY2e2BNXTYBf9aBBHALCAw.png)
 
+> 排序算法，从接触计算机学科就会遇到的一个问题。
+
 排序算法可以分为内部排序和外部排序，内部排序是数据记录在内存中进行排序，而外部排序是因排序的数据很大，一次不能容纳全部的排序记录，在排序过程中需要访问外存。常见的内部排序算法有：**插入排序、希尔排序、选择排序、冒泡排序、归并排序、快速排序、堆排序、基数排序**等。
 
 |         排序算法         | 平均时间复杂度 | 最好情况                                              | 最坏情况                                            | 空间复杂度                                                 | 稳定性                                         |
@@ -15,9 +17,9 @@ categories: Algorithm
 |   冒泡排序-Bubble Sort   | $O(n²)$        | $O(n)$（当数组已经有序时，只需遍历一次）              | $O(n²)$（当数组是逆序时，需要多次交换）             | $O(1)$（原地排序）                                         | 稳定                                           |
 | 选择排序-Selection Sort  | $O(n²)$        | $O(n²)$                                               | $O(n²)$                                             | $O(1)$（原地排序）                                         | 不稳定（交换元素时可能破坏相对顺序）           |
 | 插入排序-Insertion Sort  | $O(n²)$        | $O(n)$（当数组已经有序时）                            | $O(n²)$（当数组是逆序时）                           | $O(1)$（原地排序）                                         | 稳定                                           |
+|   快速排序-Quick Sort    | $O(n \log n)$  | $O(n \log n)$（每次划分的子数组大小相等）             | $O(n²)$（每次选取的基准值使得数组划分非常不平衡）   | $O(\log n)$（对于递归栈） $O(n)$（最坏情况递归栈深度为 n） | 不稳定（交换可能改变相同元素的相对顺序）       |
 |   希尔排序-Shell Sort    | $O(n \log² n)$ | $O(n \log n)$                                         | $O(n²)$（不同的增量序列有不同的最坏情况）           | $O(1)$（原地排序）                                         | 不稳定                                         |
 |   归并排序-Merge Sort    | $O(n \log n)$  | $O(n \log n)$                                         | $O(n \log n)$                                       | $O(n)$（需要额外的空间用于辅助数组）                       | 稳定                                           |
-|   快速排序-Quick Sort    | $O(n \log n)$  | $O(n \log n)$（每次划分的子数组大小相等）             | $O(n²)$（每次选取的基准值使得数组划分非常不平衡）   | $O(\log n)$（对于递归栈） $O(n)$（最坏情况递归栈深度为 n） | 不稳定（交换可能改变相同元素的相对顺序）       |
 |     堆排序-Heap Sort     | $O(n \log n)$  | $O(n \log n)$                                         | $O(n \log n)$                                       | $O(1)$（原地排序）                                         | 不稳定（在调整堆时可能改变相同元素的相对顺序） |
 | 计数排序-Counting Sort） | $O(n + k)$     | $O(n + k)$（k 是数组中元素的取值范围）                | $O(n + k)$                                          | $O(n + k)$（需要额外的数组来存储计数结果）                 | 稳定                                           |
 |   桶排序-Bucket Sort）   | $O(n + k)$     | $O(n + k)$（k 是桶的数量，n 是元素数量）              | $O(n²)$（所有元素都集中到一个桶里，退化成冒泡排序） | $O(n + k)$                                                 | 稳定                                           |
@@ -101,19 +103,22 @@ public void bubbleSort(int[] a) {
 
 ```java
 public void selectionSort(int [] arrs) {
-      for (int i = 0; i < arrs.length; i++) {
-          //最小元素下标
-          int min = i;
-          for (int j = i +1; j < arrs.length; j++) {
-              if (arrs[j] < arrs[min]) {
-                  min = j;
-              }
-          }
+    for (int i = 0; i < arrs.length; i++) {
+        //最小元素下标
+        int min = i;
+        for (int j = i +1; j < arrs.length; j++) {
+            if (arrs[j] < arrs[min]) {
+                min = j;
+            }
+        }
+       //如果当前位置i的元素已经是未排序部分的最小元素，就不需要交换了
+        if(min != i){
           //交换位置
           int temp = arrs[i];
           arrs[i] = arrs[min];
           arrs[min] = temp;
-      }
+        }
+    }
   }
 }
 ```
@@ -145,19 +150,15 @@ public void selectionSort(int [] arrs) {
 public void insertionSort(int[] arr) {
     // 从下标为1的元素开始选择合适的位置插入，因为下标为0的只有一个元素，默认是有序的
     for (int i = 1; i < arr.length; i++) {
+        int current = arr[i];  // 当前待插入元素
+        int j = i - 1;         // 已排序部分的末尾索引
 
-        // 记录要插入的数据
-        int tmp = arr[i];
-
-        // 从已经排序的序列最右边的开始比较，找到比其小的数
-        int j = i - 1;
-        //内循环：将 tmp 插入到已排序区间 [0, i-1] 中的正确位置
-        while (j >= 0 && arr[j] > tmp) {
-            arr[j + 1] = arr[j];
-            j--;
+        // 从后向前扫描，找到插入位置
+        while (j >= 0 && arr[j] > current) {
+            arr[j + 1] = arr[j];  // 元素后移
+            j--;     							// 索引左移
         }
-        // 存在比其小的数，插入(将 tmp 赋值到正确位置)
-        arr[j + 1] = tmp;
+        arr[j + 1] = current;     // 插入到正确位置
     }
 }
 ```
@@ -189,37 +190,33 @@ public void insertionSort(int[] arr) {
 ```java
 // 快速排序方法
 public void quickSort(int[] arr) {
-  quickSortC(arr, 0, arr.length-1);
+  quickSort(arr, 0, arr.length-1);
 }
 
 public void quickSort(int[] arr, int low, int high) {
-    if (low < high) {
-        // pivot 是 partitioning index，arr[pi] 现在处于正确位置
-        int pivot = partition(arr, low, high);
+    if (arr == null || low >= high) return;
 
-        // 递归地对基准左侧和右侧的子数组进行排序
-        quickSort(arr, low, pivot - 1);  // 排序基准左侧的子数组
-        quickSort(arr, pivot + 1, high); // 排序基准右侧的子数组
-    }
+    int pivot = partition(arr, low, high); // 分区并获取基准位置
+    quickSort(arr, low, pivot - 1);        // 递归左子数组
+    quickSort(arr, pivot + 1, high);       // 递归右子数组
 }
 
 // 用于找到基准元素的正确位置并进行分区
 private int partition(int[] arr, int low, int high) {
     int pivot = arr[high];    // 选择最后一个元素作为基准
-    int i = low - 1;      // i是已处理区域的最后一个元素下标
+    int i = low - 1;      // 左区间指针（初始化为low-1，表示小于基准的元素区间）
 
     for (int j = low; j < high; j++) {
         // 如果当前元素小于或等于基准值，将它放到左侧
         if (arr[j] <= pivot) {
-            i++;
-            // 交换 arr[i] 和 arr[j]
-            swap(arr, i, j);
+            i++;		// 左区间指针右移
+            swap(arr, i, j);   // 交换当前元素到左区间
         }
     }
 
     // 交换 arr[i+1] 和 arr[high] (或 pivot)
     // 将基准值放到正确位置，即i + 1处
-    swap(arr, i + 1, high);
+    swap(arr, i + 1, high);   // 基准归位
     
     return i + 1;  // 返回基准值的位置
 }
@@ -231,6 +228,46 @@ private int partition(int[] arr, int low, int high) {
       arr[j] = temp;
   }
 ```
+
+### 3. 时间复杂度分析
+
+- 最优情况时间复杂度：$O(n log n)$
+
+  - **适用场景**：每次分区操作都能将数组**均匀划分**（基准值接近中位数）。
+
+  - 推导过程：
+
+    - 每次分区将数组分为两个近似相等的子数组。
+
+    - 递归深度为 log₂n（分治次数），每层需遍历 n 个元素。
+
+    - 总比较次数满足递推公式：
+      $$
+      T(n)=2T(n/2)+O(n)
+      $$
+
+    - 通过主定理或递归树展开可得时间复杂度为 $O(n log n)$
+
+- 最坏情况时间复杂度：$O(n²)$
+
+  - **适用场景**：每次分区划分极不均衡（如基准值始终为最大/最小元素）。
+
+  - **常见案例**：输入数组已完全有序或逆序，且基准固定选择首/尾元素。
+
+  - 推导过程：
+
+    - 每次分区仅减少一个元素（类似冒泡排序）。
+
+    - 总比较次数为等差数列求和：
+      $$
+      (n - 1) + (n - 2) + \cdots + 1 = \frac{n(n - 1)}{2} = O(n^2)
+      $$
+      
+
+    - 递归深度为 n-1 层，导致时间复杂度退化为 $O(n²)$
+
+- 平均情况时间复杂度：$O(n log n)$
+  - **适用场景**：输入数据**随机分布**，基准值随机选取。
 
 
 
@@ -244,7 +281,7 @@ private int partition(int[] arr, int low, int high) {
 
 分治思想和递归思想很像。分治算法一般都是用递归来实现的。**分治是一种解决问题的处理思想，递归是一种编程技巧**，这两者并不冲突。
 
-作为一种典型的分而治之思想的算法应用，归并排序的实现由两种方法：
+作为一种典型的分而治之思想的算法应用，归并排序的实现有两种方法：
 
 - 自上而下的递归
 - 自下而上的迭代（所有递归的方法都可以用迭代重写，所以就有了第 2 种方法）
