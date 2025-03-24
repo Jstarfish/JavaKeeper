@@ -1,10 +1,54 @@
+---
+title: Spring WebFlux
+date: 2023-05-23
+tags: 
+ - Spring
+categories: Spring
+---
+
+![](https://miro.medium.com/v2/resize:fit:1228/format:webp/1*S_6ZOB75Uk-oLh8qVVuC8w.png)
+
+> WebFlux 到底是个什么，主要用于解决什么问题，有什么优势和劣势
+>
+> 哪些场景或者业务适用于 WebFlux
+
+![](https://img.starfish.ink/spring/springwebflux-banner.svg)
+
+
+
+传统的基于Servlet的Web框架，如 Spring MVC，在本质上都是阻塞和多线程的，每个连接都会使用一个线程。在请求处理的时候，会在线程池中拉取一个工作者( worker )线程来对请求进行处理。同时，请求线程是阻塞的，直到工作者线程提示它已经完成为止。
+
+在 Spring5 中，引入了一个新的异步、非阻塞的WEB模块，就是Spring-WebFlux。该框架在很大程度上是基于Reactor项目的，能够解决Web应用和API中对更好的可扩展性的需求。
+
+> 关于Reactor响应式编程的前置知识：看上一篇
+
+要了解 WebFlux ，首先得知道什么是响应式编程，什么是 Reactice
+
+### Reactive Streams（响应式流）
+
+Reactive Streams 是 JVM 中面向流的库标准和规范：
+
+一般由以下组成：
+
+- 发布者：发布元素到订阅者
+- 订阅者：消费元素
+- 订阅：在发布者中，订阅被创建时，将与订阅者共享
+- 处理器：发布者与订阅者之间处理数据
+
+特性
+
+- 处理可能无限数量的元素
+- 按顺序处理
+- 组件之间异步传递
+- 强制性非阻塞背压（Backpressure）
+
+
+
+### Backpressure（背压）
+
 ## 一、响应式编程
 
-> 或者叫 反应式编程
-
 这是微软为了应对 **高并发环境下** 的服务端编程，提出的一个实现 **异步编程** 的方案。
-
-
 
 > reactive programming is a declarative programming paradigm concerned with data streams and the propagation of change
 
@@ -50,6 +94,8 @@ public static void main(String[] args) {
 
 ![外行人都能看懂的WebFlux，错过了血亏！_Java_07](https://img-blog.csdnimg.cn/img_convert/e65280d03d75299559d90138d99ebe65.png)
 
+
+
 ### 响应式编程->异步非阻塞
 
 说到响应式编程就离不开异步非阻塞。
@@ -61,6 +107,12 @@ public static void main(String[] args) {
 而在JDK9 已经支持响应式流了，下面我们来看一下
 
 
+
+响应式编程打破了传统的同步阻塞式编程模型，基于响应式数据流和背压机制实现了异步非阻塞式的网络通信、数据访问和事件驱动架构，能够减轻服务器资源之间的竞争关系，从而提高服务的响应能力。
+
+Spring 5 中内嵌了响应式 Web 框架、响应式数据访问、响应式消息通信等多种响应式组件，从而极大简化了响应式应用程序的开发过程和难度。
+
+事实上，响应式编程的实施目前主要有两个障碍，一个是关系型数据访问，而另一个就是网络协议。
 
 ## 二、JDK9 Reactive
 
@@ -156,6 +208,20 @@ Spring Framework 中包含的原始 Web 框架 Spring Web MVC 是专门为 Servl
 
 ![](https://img-blog.csdnimg.cn/img_convert/a07973cc0b1fc58382d8fefdfe5f1683.png)
 
+- **编程模型**：Spring 5 web 模块包含了 Spring WebFlux 的 HTTP 抽象。类似 Servlet API , WebFlux 提供了 WebHandler API 去定义非阻塞 API 抽象接口。可以选择以下两种编程模型实现：
+
+  - 注解控制层。和 MVC 保持一致，WebFlux 也支持响应性 @RequestBody 注解。
+
+  - 功能性端点。基于 lambda 轻量级编程模型，用来路由和处理请求的小工具。和上面最大的区别就是，这种模型，全程控制了请求 - 响应的生命流程
+
+- **内嵌容器**：跟 Spring Boot 大框架一样启动应用，但 WebFlux 默认是通过 Netty 启动，并且自动设置了默认端口为 8080。另外还提供了对 Jetty、Undertow 等容器的支持。开发者自行在添加对应的容器 Starter 组件依赖，即可配置并使用对应内嵌容器实例。
+
+  但是要注意，必须是 Servlet 3.1+ 容器，如 Tomcat、Jetty；或者非 Servlet 容器，如 Netty 和 Undertow。
+
+- **Starter 组件**：Spring Boot Webflux 提供了很多 “开箱即用” 的 Starter 组件
+
+
+
 Spring WebFlux 是一个异步非阻塞式 IO 模型，通过少量的容器线程就可以支撑大量的并发访问。底层使用的是 Netty 容器，这点也和传统的 SpringMVC 不一样，SpringMVC 是基于 Servlet 的。
 
 > 接口的响应时间并不会因为使用了 WebFlux 而缩短，服务端的处理结果还是得由 worker 线程处理完成之后再返回给前端。
@@ -216,8 +282,128 @@ https://subscription.packtpub.com/book/programming/9781788995979/5/ch05lvl1sec40
 
 ![img](https://static.packt-cdn.com/products/9781788995979/graphics/d2af6e5b-5d26-448d-b54c-64b42d307736.png)
 
+
+
+
+
+- Mono：实现发布者，并返回 0 或 1 个元素，即单对象。
+
+- Flux：实现发布者，并返回 N 个元素，即 List 列表对象。
+
+
+
+#### WebHandler
+
+```java
+public interface WebHandler {
+ /**
+ * Handle the web server exchange.
+ * @param exchange the current server exchange
+ * @return {@code Mono<Void>} to indicate when request handling is complete
+ */
+    Mono<Void> handle(ServerWebExchange exchange);
+}
+```
+
+在这里，说明一下HttpHandler与WebHandler的区别，两者的设计目标不同。前者主要针对的是跨HTTP服务器，即付出最小的代价在各种不同的HTTP服务器上保证程序正常运行。于是我们在前面的章节中看到了为适配Reactor Netty而进行的ReactorHttpHandlerAdapter类相关实现。而后者则侧重于提供构建常用Web应用程序的基本功能。例如，我们可以在上面的WebHandler源码中看到handle方法传入的参数是ServerWebExchange类型的，通过这个类型参数，我们所定义的WebHandler组件不仅可以访问请求（ServerHttpRequest getRequest）和响应（ServerHttpResponse getResponse），也可以访问请求的属性（Map<String, Object> getAttributes）及会话的属性，还可以访问已解析的表单数据（Form data）、多部分数据（Multipart data）等。
+
+
+
+#### DispatcherHandler
+
+```java
+public class DispatcherHandler implements WebHandler, ApplicationContextAware {
+ @Nullable
+ private List<HandlerMapping> handlerMappings;
+
+ @Nullable
+ private List<HandlerAdapter> handlerAdapters;
+
+ @Nullable
+ private List<HandlerResultHandler> resultHandlers;
+    ...
+ @Override
+ public void setApplicationContext(ApplicationContext applicationContext) {
+ initStrategies(applicationContext);
+    }
+ protected void initStrategies(ApplicationContext context) {
+ Map<String, HandlerMapping> mappingBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+                context, HandlerMapping.class, true, false);
+
+ ArrayList<HandlerMapping> mappings = new ArrayList<>(mappingBeans.values());
+        AnnotationAwareOrderComparator.sort(mappings);
+ this.handlerMappings = Collections.unmodifiableList(mappings);
+
+ Map<String, HandlerAdapter> adapterBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+                context, HandlerAdapter.class, true, false);
+
+ this.handlerAdapters = new ArrayList<>(adapterBeans.values());
+        AnnotationAwareOrderComparator.sort(this.handlerAdapters);
+
+ Map<String, HandlerResultHandler> beans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+                context, HandlerResultHandler.class, true, false);
+
+ this.resultHandlers = new ArrayList<>(beans.values());
+        AnnotationAwareOrderComparator.sort(this.resultHandlers);
+    }
+    ...
+}
+```
+
+Spring WebFlux 为了适配我们在 Spring MVC 中养成的开发习惯，围绕熟知的Controller进行了相应的适配设计，其中有一个WebHandler实现类DispatcherHandler(如下代码所示)，是请求处理的调度中心，实际处理工作则由可配置的委托组件执行。该模型非常灵活，支持多种工作流程。
+
+换句话说，DispatcherHandler就是HTTP请求相应处理器（handler）或控制器（controller）的中央调度程序。DispatcherHandler会从Spring Configuration中发现自己所需的组件，也就是它会从应用程序上下文中（application context）查找以下内容。
+
+### 路由模式
+
+Spring WebFlux包含一个轻量级的函数式编程模型，其中定义的函数可以对请求进行路由处理。请求也可以通过基于注解形式的路由模式进行处理。
+
+
+
+
+
+
+
+### 原理
+
+首先，WebFlux是Spring的响应式框架，基于Reactor和Netty。那底层原理应该包括它的异步非阻塞模型、Reactor库的使用、Netty的处理流程，以及和传统Servlet的区别。
+
+#### 一、异步非阻塞 I/O 模型
+
+1. **与传统 Servlet 的对比**
+   - Spring MVC：基于 Servlet 的同步阻塞模型，每个请求占用一个线程，线程在等待 I/O（如数据库操作）时会被阻塞，导致高并发场景下线程资源耗尽。
+   - WebFlux：采用异步非阻塞 I/O，通过 Reactor 库和 Netty 的事件驱动机制，单线程可处理多个请求。线程仅在数据就绪时被唤醒处理，避免资源浪费。
+2. **事件循环（EventLoop）**
+   - WebFlux 默认使用 Netty 作为服务器，其核心是 EventLoop 线程池（BossGroup 和 WorkerGroup）。BossGroup 负责接收连接，WorkerGroup 处理 I/O 事件（如 HTTP 请求解析）。
+   - 处理逻辑通过回调机制实现，例如在 Netty 的 `HttpServerHandle`中，当请求到达时触发 `onStateChange`方法，将请求交给 Reactor 的响应式流处理。
+
+#### 二、响应式编程与 Reactor 库
+
+1. **Reactive Streams 规范**
+   - WebFlux 基于 Reactive Streams 规范，通过 Publisher-Subscriber模型实现数据流的异步处理，支持**背压（Backpressure）**机制，防止生产者压垮消费者。
+   - 核心类：
+     - **Flux**：处理 0-N 个元素的异步序列（如分页查询结果流）。
+     - Mono：处理 0-1 个元素的异步序列（如单条数据库查询）。
+2. **线程切换与调度**
+   - 默认情况下，WebFlux 的请求处理在 Netty 的 I/O 线程中执行。若业务逻辑耗时较长（如 CPU 密集型操作），需通过 `publishOn` 或 `subscribeOn` 切换到自定义线程池，避免阻塞 I/O 线程。
+   - 示例：使用 `Schedulers.elastic()` 或 `Schedulers.parallel()`管理线程池。
+
+#### 三、核心处理流程
+
+1. **请求处理链路**
+   - Netty 接收请求：Netty 的 `HttpServerOperations` 封装请求和响应对象，触发状态变更事件（如 `REQUEST_RECEIVED`）。
+   - Handler 处理：请求通过 `ReactorHttpHandlerAdapter` 转发至 WebFlux 的 `DispatcherHandler`，匹配路由并调用 Controller 方法。
+   - 响应式流传递：Controller 返回 `Flux`/`Mono`对象，数据流经过滤器链（如 `WebFilter`）后，由 Netty 异步写入响应。
+2. **背压实现**
+   - 当消费者处理速度慢于生产者时，通过 `Subscription.request(n)` 控制数据拉取速率。例如，数据库查询结果流分批推送，避免内存溢出
+
+
+
+
+
 ## References
 
+- https://docs.spring.io/spring-framework/reference/web-reactive.html
 - [vivo互联网技术-深入剖析 Spring WebFlux](https://mp.weixin.qq.com/s?__biz=MzI4NjY4MTU5Nw==&mid=2247492039&idx=2&sn=eec30ff895a29e608fdafe78c626115d&chksm=ebdb9155dcac1843580ec28b8c31e334eb8aeb0a10573b5f3d4e7e8aaaec49893772399790a9&cur_album_id=1612326847164284932&scene=189#wechat_redirect)
 - http://www.dre.vanderbilt.edu/~schmidt/PDF/reactor-siemens.pdf
 - https://blog.51cto.com/u_12206475/3118309

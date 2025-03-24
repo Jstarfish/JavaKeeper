@@ -18,7 +18,7 @@ categories: leetcode
 
 ## 一、二叉树基本操作类
 
-### 2.1 二叉树的遍历
+### 1.1 二叉树的遍历
 
 #### [二叉树的前序遍历（144）](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
 
@@ -129,7 +129,7 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 
 
 
-### 2.2 深度优先
+### 1.2 深度优先
 
 #### [二叉树的右视图（199）](https://leetcode.cn/problems/binary-tree-right-side-view/)
 
@@ -224,7 +224,7 @@ public class Solution {
 
 
 
-### 2.3 构造二叉树
+### 1.3 构造二叉树
 
 **二叉树的构造问题一般都是使用「分解问题」的思路：构造整棵树 = 根节点 + 构造左子树 + 构造右子树**。
 
@@ -315,7 +315,7 @@ public class Solution {
 >    15   7
 > ```
 
-思路：
+**思路**：
 
 - 前序遍历顺序为【根节点 -> 左子树 -> 右子树】，那 `preorder[0]` 就是根节点的值
 
@@ -604,12 +604,11 @@ public static int maxDepth(TreeNode root) {
 
 > 给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
 >
->         1
->        / \
->       2   3
->      / \     
->     4   5   
->
+>       1
+>      / \
+>      2   3
+>     / \     
+>     4   5 
 > 返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
 > 注意：两结点之间的路径长度是以它们之间边的数目表示。
 
@@ -658,10 +657,10 @@ public int traverse(TreeNode root) {
 >
 > 注意: 合并必须从两个树的根节点开始。
 
-思路：DFS
+思路：递归解法（深度优先搜索）
 
 ```java
-public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
+public TreeNode mergeTrees(TreeNode node1, TreeNode node2) {
   if (node1 == null) {
     return node2;
   }
@@ -670,10 +669,14 @@ public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
   }
   TreeNode res = new TreeNode(node1.val + node2.val);
   res.left = mergeTrees(node1.left, node2.left);
-  res.right = mergeTree5(node1.right, node2.right);
+  res.right = mergeTrees(node1.right, node2.right);
   return res;
 }
 ```
+
+**时间复杂度**：$O(min(m,n))$，仅需遍历两棵树中较小的一棵。
+
+**空间复杂度**：$O(min(m,n))$，递归栈深度由较小的树高度决定
 
 
 
@@ -747,45 +750,43 @@ public TreeNode mergeTree5(TreeNode node1, TreeNode node2) {
 > 输出：[1,null,2,null,3,null,4,null,5,null,6]
 > ```
 
-思路：![](https://labuladong.online/algo/images/二叉树系列/2.jpeg)
+思路：递归是一种解决此类问题的有效方法。我们可以从根节点开始，递归地处理每个节点：
+- 如果当前节点为空，直接返回。
+- 递归地将当前节点的左子树展开为列表。
+- 将当前节点的左子树移动到右子树的位置。
+- 将当前节点的原右子树接到新右子树的末尾。
+- 将当前节点的左子节点置为空。
 
 ```java
-  // 定义：将以 root 为根的树拉平为链表
-  public void flatten(TreeNode root) {
-      // base case
-      if (root == null) return;
+public void flatten(TreeNode root) {
+    if (root == null) {
+        return;
+    }
 
-      // 利用定义，把左右子树拉平
-      flatten(root.left);
-      flatten(root.right);
+    // 递归展开左子树
+    flatten(root.left);
+    
+    // 将左子树移动到右子树的位置
+    TreeNode temp = root.right;
+    root.right = root.left;
+    root.left = null;
+    
+    // 找到新右子树的末尾节点
+  //初始化curr指针，指向当前root的右子节点，展开过程中，root的左子树已被移到了右子树的位置，所以 root.right 指向的是当前节点展开后的右子树根节点，需要遍历直到找到最右边的节点
+    TreeNode curr = root.right;  
+    while (curr.right != null) {
+        curr = curr.right;
+    }
+    
+    // 将原右子树接到新右子树的末尾
+    curr.right = temp;
 
-      // *** 后序遍历位置 ***
-      // 1、左右子树已经被拉平成一条链表
-      TreeNode left = root.left;
-      TreeNode right = root.right;
-
-      // 2、将左子树作为右子树
-      root.left = null;
-      root.right = left;
-
-      // 3、将原先的右子树接到当前右子树的末端
-      TreeNode p = root;
-      while (p.right != null) {
-          p = p.right;
-      }
-      p.right = right;
-
-  }
+}
 ```
 
 
 
-### 
-
-### 2.2 反转与镜像
-
-- **翻转二叉树**（Invert Binary Tree）
-- **[101] 对称二叉树**（Symmetric Tree）
+### 2.2 判断树的结构特性
 
 #### [翻转二叉树 [226] ](https://leetcode-cn.com/problems/invert-binary-tree/)
 
@@ -857,20 +858,277 @@ public boolean check(TreeNode left,TreeNode right){
 
 
 
+#### [平衡二叉树（110）](https://leetcode.cn/problems/balanced-binary-tree/)
+
+> 给定一个二叉树，判断它是否是 平衡二叉树 
+>
+> ![img](https://assets.leetcode.com/uploads/2020/10/06/balance_1.jpg)
+>
+> ```
+> 输入：root = [3,9,20,null,null,15,7]
+> 输出：true
+> ```
+
+思路：递归计算左右子树高度差，并逐层向上传递结果
+
+```java
+public boolean isBalanced(TreeNode root) {
+    return height(root) != -1;
+}
+
+private int height(TreeNode node) {
+    if (node == null) return 0;
+    int left = height(node.left);
+    int right = height(node.right);
+    if (left == -1 || right == -1 || Math.abs(left - right) > 1) {
+        return -1; // 标记不平衡
+    }
+    return Math.max(left, right) + 1;
+}
+```
+
+
+
+#### [相同的树（100）](https://leetcode.cn/problems/same-tree/)
+
+> 给你两棵二叉树的根节点 `p` 和 `q` ，编写一个函数来检验这两棵树是否相同。
+>
+> 如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/12/20/ex2.jpg)
+>
+> ```
+> 输入：p = [1,2], q = [1,null,2]
+> 输出：false
+> ```
+
+思路：
+
+```java
+public boolean isSameTree(TreeNode p, TreeNode q) {
+    if (p == null && q == null) return true;
+    if (p == null || q == null) return false;
+    return p.val == q.val 
+           && isSameTree(p.left, q.left) 
+           && isSameTree(p.right, q.right);
+}
+```
+
+
+
+#### [另一棵树的子树（572）](https://leetcode.cn/problems/subtree-of-another-tree/)
+
+> 给你两棵二叉树 `root` 和 `subRoot` 。检验 `root` 中是否包含和 `subRoot` 具有相同结构和节点值的子树。如果存在，返回 `true` ；否则，返回 `false` 。
+>
+> 二叉树 `tree` 的一棵子树包括 `tree` 的某个节点和这个节点的所有后代节点。`tree` 也可以看做它自身的一棵子树。
+>
+> ![img](https://pic.leetcode.cn/1724998676-cATjhe-image.png)
+>
+> ```
+> 输入：root = [3,4,5,1,2], subRoot = [4,1,2]
+> 输出：true
+> ```
+
+思路：
+
+```java
+public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+    if (root == null) return subRoot == null;
+    return isSame(root, subRoot) 
+           || isSubtree(root.left, subRoot) 
+           || isSubtree(root.right, subRoot);
+}
+
+private boolean isSame(TreeNode a, TreeNode b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    return a.val == b.val 
+           && isSame(a.left, b.left) 
+           && isSame(a.right, b.right);
+}
+```
+
+
+
 ### 2.3 路径问题
 
-- - [112. 路径总和](https://leetcode.cn/problems/path-sum/)
-  - [113. 路径总和 II](https://leetcode.cn/problems/path-sum-ii/)
-  - [124. 二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)
-  - [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
+路径问题涵盖路径生成、路径总和及最长路径等类型
 
-  
+#### [二叉树的所有路径(257)](https://leetcode.cn/problems/binary-tree-paths/)
 
-### 2.4 判断树的结构特性
+> 给你一个二叉树的根节点 `root` ，按 **任意顺序** ，返回所有从根节点到叶子节点的路径。
+>
+> **叶子节点** 是指没有子节点的节点。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/03/12/paths-tree.jpg)
+>
+> ```
+> 输入：root = [1,2,3,null,5]
+> 输出：["1->2->5","1->3"]
+> ```
 
-- **[100] 相同的树**（Same Tree）
-- **[105] 从前序与中序遍历序列构造二叉树**（Construct Binary Tree from Preorder and Inorder Traversal）
-- **[106] 从后序与中序遍历序列构造二叉树**（Construct Binary Tree from Inorder and Postorder Traversal）
+思路：DFS 递归遍历，回溯时拼接路径字符串
+
+```java
+public List<String> binaryTreePaths(TreeNode root) {
+    List<String> res = new ArrayList<>();
+    dfs(root, "", res);
+    return res;
+}
+
+private void dfs(TreeNode root, String path, List<String> res) {
+    if (root == null) return;
+    if (root.left == null && root.right == null) { // 叶子节点
+        res.add(path + root.val);
+        return;
+    }
+    String newPath = path + root.val + "->";
+    dfs(root.left, newPath, res);
+    dfs(root.right, newPath, res);
+}
+```
+
+**关键点**：
+
+1. **终止条件**：遇到叶子节点时保存路径。
+2. **路径拼接**：递归时传递拼接后的新路径 `newPath`，避免回溯操作。
+3.  **复杂度**：时间复杂度 O(n)，空间复杂度 O(n)（递归栈）
+
+
+
+#### [路径总和(112)](https://leetcode.cn/problems/path-sum/)
+
+> 给你二叉树的根节点 `root` 和一个表示目标和的整数 `targetSum` 。判断该树中是否存在 **根节点到叶子节点** 的路径，这条路径上所有节点值相加等于目标和 `targetSum` 。如果存在，返回 `true` ；否则，返回 `false` 。
+>
+> **叶子节点** 是指没有子节点的节点。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/01/18/pathsum1.jpg)
+>
+> ```
+> 输入：root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+> 输出：true
+> 解释：等于目标和的根节点到叶节点路径如上图所示。
+> ```
+
+思路：递归过程中逐层减去当前节点值，在叶子节点判断剩余值是否等于当前节点值
+
+```java
+public boolean hasPathSum(TreeNode root, int targetSum) {
+    if (root == null) return false;
+    if (root.left == null && root.right == null) 
+        return root.val == targetSum;
+    return hasPathSum(root.left, targetSum - root.val) 
+        || hasPathSum(root.right, targetSum - root.val);
+}
+```
+
+
+
+#### [路径总和 II（113）](https://leetcode.cn/problems/path-sum-ii/)
+
+> 给你二叉树的根节点 `root` 和一个整数目标和 `targetSum` ，找出所有 **从根节点到叶子节点** 路径总和等于给定目标和的路径。
+>
+> **叶子节点** 是指没有子节点的节点。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/01/18/pathsumii1.jpg)
+>
+> ```
+> 输入：root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+> 输出：[[5,4,11,2],[5,8,4,5]]
+> ```
+
+思路：使用 `List<Integer>` 记录路径，回溯时需删除当前节点值
+
+```java
+public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+    List<List<Integer>> res = new ArrayList<>();
+    backtrack(root, targetSum, new ArrayList<>(), res);
+    return res;
+}
+
+private void backtrack(TreeNode root, int sum, List<Integer> path, List<List<Integer>> res) {
+    if (root == null) return;
+    path.add(root.val);
+    if (root.left == null && root.right == null && sum == root.val) {
+        res.add(new ArrayList<>(path));
+    }
+    backtrack(root.left, sum - root.val, path, res);
+    backtrack(root.right, sum - root.val, path, res);
+    path.remove(path.size() - 1); // 回溯
+}
+```
+
+
+
+#### [二叉树中的最大路径和（124）](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)
+
+>二叉树中的 **路径** 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 **至多出现一次** 。该路径 **至少包含一个** 节点，且不一定经过根节点。
+>
+>![img](https://assets.leetcode.com/uploads/2020/10/13/exx2.jpg)
+>
+>```
+>输入：root = [-10,9,20,null,null,15,7]
+>输出：42
+>解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
+>```
+
+思路：
+
+```java
+private int maxSum = Integer.MIN_VALUE;
+
+public int maxPathSum(TreeNode root) {
+    maxGain(root);
+    return maxSum;
+}
+
+private int maxGain(TreeNode node) {
+    if (node == null) return 0;
+    int leftGain = Math.max(maxGain(node.left), 0); // 左子树贡献值（避免负数）
+    int rightGain = Math.max(maxGain(node.right), 0);
+    maxSum = Math.max(maxSum, node.val + leftGain + rightGain); // 更新全局最大值
+    return node.val + Math.max(leftGain, rightGain); // 返回当前节点最大贡献值
+}
+```
+
+1. **贡献值**：每个节点返回其所能提供的最大单边路径和。
+2. **全局最大值**：路径可能跨越左右子树，因此需计算 `左贡献 + 右贡献 + 当前节点值`。 **复杂度**：时间复杂度 O(n)
+
+
+
+#### [最长同值路径（687）](https://leetcode.cn/problems/longest-univalue-path/)
+
+> 给定一个二叉树的 `root` ，返回 *最长的路径的长度* ，这个路径中的 *每个节点具有相同值* 。 这条路径可以经过也可以不经过根节点。
+>
+> **两个节点之间的路径长度** 由它们之间的边数表示。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/10/13/ex1.jpg)
+>
+> ```
+> 输入：root = [5,4,5,1,1,5]
+> 输出：2
+> ```
+
+思路：递归返回当前节点与子节点同值的单边最长路径，合并左右路径时更新全局最大值
+
+```java
+private int maxLength = 0;
+
+public int longestUnivaluePath(TreeNode root) {
+    dfs(root);
+    return maxLength;
+}
+
+private int dfs(TreeNode root) {
+    if (root == null) return 0;
+    int left = dfs(root.left);
+    int right = dfs(root.right);
+    int arrowLeft = (root.left != null && root.left.val == root.val) ? left + 1 : 0;
+    int arrowRight = (root.right != null && root.right.val == root.val) ? right + 1 : 0;
+    maxLength = Math.max(maxLength, arrowLeft + arrowRight);
+    return Math.max(arrowLeft, arrowRight);
+}
+```
 
 
 
@@ -882,9 +1140,7 @@ public boolean check(TreeNode left,TreeNode right){
 
 2、对于 BST 的每一个节点 `node`，它的左侧子树和右侧子树都是 BST。
 
-### 3.1 搜索、插入、删除
-
-
+### 3.1 BST基础操作与验证
 
 #### [二叉搜索树中的搜索（700）](https://leetcode.cn/problems/search-in-a-binary-search-tree/)
 
@@ -940,7 +1196,75 @@ public TreeNode insertIntoBST(TreeNode root, int val) {
 
 
 
-### 3.2 特殊操作
+#### [删除二叉搜索树中的节点（450）](https://leetcode.cn/problems/delete-node-in-a-bst/)
+
+> 给定一个二叉搜索树的根节点 **root** 和一个值 **key**，删除二叉搜索树中的 **key** 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
+>
+> 一般来说，删除节点可分为两个步骤：
+>
+> 1. 首先找到需要删除的节点；
+> 2. 如果找到了，删除它。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/09/04/del_node_1.jpg)
+>
+> ```
+> 输入：root = [5,3,6,2,4,null,7], key = 3
+> 输出：[5,4,6,2,null,null,7]
+> 解释：给定需要删除的节点值是 3，所以我们首先找到 3 这个节点，然后删除它。
+> 一个正确的答案是 [5,4,6,2,null,null,7], 如下图所示。
+> 另一个正确答案是 [5,2,6,null,4,null,7]。
+> ```
+
+思路：
+
+```java
+class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) {
+            return null; // 树为空，直接返回
+        }
+
+        // 1. 查找要删除的节点
+        if (key < root.val) {
+            // 目标在左子树，递归处理左子树
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.val) {
+            // 目标在右子树，递归处理右子树
+            root.right = deleteNode(root.right, key);
+        } else {
+            // 找到目标节点，根据子节点情况处理
+            // 2. 情况1：只有一个子节点或无子节点
+            if (root.left == null) {
+                return root.right; // 用右子节点替代当前节点
+            } else if (root.right == null) {
+                return root.left;  // 用左子节点替代当前节点
+            } else {
+                // 3. 情况2：有两个子节点
+                // 找到右子树的最小节点（后继节点）
+                TreeNode minNode = findMin(root.right);
+                // 用后继节点的值覆盖当前节点
+                root.val = minNode.val;
+                // 删除右子树中的后继节点（此时该节点值已被移动，相当于删除了原节点）
+                root.right = deleteNode(root.right, minNode.val);
+            }
+        }
+        return root; // 返回处理后的子树根节点
+    }
+
+    // 辅助方法：找到子树的最小节点（一直向左遍历）
+    private TreeNode findMin(TreeNode node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+}
+```
+
+- **时间复杂度**：`O(h)`，其中 `h` 为树的高度。最坏情况需要遍历树的高度（例如单链树）。
+- **空间复杂度**：`O(h)`，递归栈的深度与树高度相关
+
+
 
 #### [二叉搜索树中第 K 小的元素（230）](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)
 
@@ -1029,29 +1353,29 @@ class Solution {
 请注意，为了避免在比较时发生整数溢出，这里使用 `long` 类型来定义最小和最大值。如果节点值超出了 `int` 类型的范围，这种方法仍然有效。
 
 ```java
-  // 辅助函数，用于递归验证
-  public boolean isValidBST(TreeNode root, long min, long max) {
-      // 空树是有效的 BST
-      if (root == null) {
-          return true;
-      }
+// 辅助函数，用于递归验证
+public boolean isValidBST(TreeNode root, long min, long max) {
+    // 空树是有效的 BST
+    if (root == null) {
+        return true;
+    }
 
-      // 当前节点的值必须在 min 和 max 之间
-      if (root.val <= min || root.val >= max) {
-          return false;
-      }
+    // 当前节点的值必须在 min 和 max 之间
+    if (root.val <= min || root.val >= max) {
+        return false;
+    }
 
-      // 递归地验证左子树和右子树
-      // 左子树的所有节点都必须小于当前节点的值
-      // 右子树的所有节点都必须大于当前节点的值
-      return isValidBST(root.left, min, root.val) && 
-             isValidBST(root.right, root.val, max);
-  }
+    // 递归地验证左子树和右子树
+    // 左子树的所有节点都必须小于当前节点的值
+    // 右子树的所有节点都必须大于当前节点的值
+    return isValidBST(root.left, min, root.val) && 
+           isValidBST(root.right, root.val, max);
+}
 
-  // 验证搜索二叉树的接口
-  public boolean isValidBST(TreeNode root) {
-      return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
-  }
+// 验证搜索二叉树的接口
+public boolean isValidBST(TreeNode root) {
+    return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
 ```
 
 
@@ -1110,53 +1434,30 @@ public int numTrees(int n) {
 > 输出：[30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
 > ```
 
+思路：递归法
 
+```java
+class Solution {
+    int sum = 0;
+    public TreeNode convertBST(TreeNode root) {
+        if (root == null) return null;
+        convertBST(root.right);  // 处理右子树
+        sum += root.val;         // 累加当前节点的值
+        root.val = sum;          // 更新当前节点值
+        convertBST(root.left);   // 处理左子树
+        return root;
+    }
+}
+```
 
-## 四、树的动态规划类
-
-这类问题主要涉及树的子树、路径和等相关的动态规划问题，通常涉及子树的某种最优解或者路径的最优解。
-
-### 4.1  路径和问题
-
-- **[112] 路径总和**（Path Sum）
-- **[113] 路径总和 II**（Path Sum II）
-- **[124] 二叉树中的最大路径和**（Binary Tree Maximum Path Sum）
-- **[437] 路径总和 III**（Path Sum III）
-
-### 4.2. 子树问题
-
-- **[100] 相同的树**（Same Tree）
-- **[101] 对称二叉树**（Symmetric Tree）
-- **[226] 翻转二叉树**（Invert Binary Tree）
-- **[222] 完全二叉树的节点个数**（Count Complete Tree Nodes）
-
-### 4.3 动态规划应用
-
-- **[337] 打家劫舍 III**（House Robber III）
+- 时间复杂度：O(n)，每个节点遍历一次。
+- 空间复杂度：O(n)，递归栈深度最坏为树的高度（链状树时为 O(n)）
 
 
 
-## 五、树的平衡与优化类
+## 四、其他
 
-这一类问题涉及二叉搜索树（BST）的平衡性、优化以及自平衡树（如 AVL 树、红黑树）的相关问题。
-
-#### **1. 平衡与自平衡**
-
-- **[110] 平衡二叉树**（Balanced Binary Tree）
-- **[1382] 将二叉搜索树转换为排序单链表**（Convert Sorted Array to Binary Search Tree）
-
-#### **2. 二叉搜索树的操作**
-
-- **[450] 删除二叉搜索树中的节点**（Delete Node in a BST）
-- **[701] 二叉搜索树中的插入操作**（Insert into a Binary Search Tree）
-
-
-
-
-
-## 六、其他
-
-#### [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/)
+#### [打家劫舍 III（337）](https://leetcode-cn.com/problems/house-robber-iii/)
 
 > 小偷又发现了一个新的可行窃的地区。这个地区只有一个入口，我们称之为 root 。
 >
@@ -1174,31 +1475,32 @@ public int numTrees(int n) {
 
 思路：
 
+```java
+class Solution {
+    public int rob(TreeNode root) {
+        int[] result = dfs(root);
+        return Math.max(result[0], result[1]);
+    }
+
+    private int[] dfs(TreeNode node) {
+        if (node == null) {
+            return new int[]{0, 0}; // {rob(node), notRob(node)}
+        }
+
+        int[] left = dfs(node.left);
+        int[] right = dfs(node.right);
+
+        int robNode = node.val + left[1] + right[1]; // 抢劫当前节点
+        int notRobNode = Math.max(left[0], left[1]) + Math.max(right[0], right[1]); // 不抢劫当前节点
+
+        return new int[]{robNode, notRobNode};
+    }
+}
+```
 
 
 
-
-#### [二叉树中的最大路径和（124）](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
-
-> 路径 被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
->
-> 路径和 是路径中各节点值的总和。
->
-> 给你一个二叉树的根节点 root ，返回其 最大路径和 。
->
-> ![img](https://assets.leetcode.com/uploads/2020/10/13/exx2.jpg)
->
-> ```
-> 输入：root = [-10,9,20,null,null,15,7]
-> 输出：42
-> 解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
-> ```
-
-
-
-
-
-#### [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+#### [二叉树的最近公共祖先（236）](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)
 
 > 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
 >
@@ -1224,7 +1526,6 @@ public int numTrees(int n) {
   - p=root ，且 q 在 root 的左或右子树中；
   - q=root ，且 p 在 root 的左或右子树中；![Picture2.png](https://pic.leetcode-cn.com/1599885247-mgYjRv-Picture2.png)
 
-  
 
 ```java
 public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
@@ -1238,80 +1539,6 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 ```
 
 
-
-#### [437. 路径总和 III](https://leetcode-cn.com/problems/path-sum-iii/)
-
-> 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
->
-> 路径 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
->
-> ![img](https://assets.leetcode.com/uploads/2021/04/09/pathsum3-1-tree.jpg)
->
-> ```
-> 输入：root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
-> 输出：3
-> 解释：和等于 8 的路径有 3 条，如图所示。
-> ```
-
-
-
-
-
-#### [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)
-
-> 序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
->
-> 请设计一个算法来实现二叉树的序列化与反序列化。这里不限定你的序列 / 反序列化算法执行逻辑，你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始的树结构。
->
-> 提示: 输入输出格式与 LeetCode 目前使用的方式一致，详情请参阅 LeetCode 序列化二叉树的格式。你并非必须采取这种方式，你也可以采用其他的方法解决这个问题。
->
-> ![img](https://assets.leetcode.com/uploads/2020/09/15/serdeser.jpg)
->
-> ```
-> 输入：root = [1,2,3,null,null,4,5]
-> 输出：[1,2,3,null,null,4,5]
-> ```
-
-
-
-#### [114. 二叉树展开为链表](https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/)
-
-> 给你二叉树的根结点 root ，请你将它展开为一个单链表：
->
-> - 展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
-> - 展开后的单链表应该与二叉树 先序遍历 顺序相同。
->
-> ![img](https://assets.leetcode.com/uploads/2021/01/14/flaten.jpg)
->
-> ```
-> 输入：root = [1,2,5,3,4,null,6]
-> 输出：[1,null,2,null,3,null,4,null,5,null,6]
-> ```
-
-思路：前序遍历后，得到顺序，然后遍历结果，重建一个 TreeNode，左子树都置为 null
-
-```java
-public void flatten(TreeNode node) {
-  List<TreeNode> res = new ArrayList<>();
-  preorder(node, res);
-  int size = res.size();
-  for (int i = 0; i < size; i++) {
-    TreeNode pre = res.get(i);
-    TreeNode curr = res.get(i + 1);
-    pre.left = null;
-    pre.right = curr;
-  }
-}
-
-private void preorder(TreeNode node, List<TreeNode> res) {
-  if (node == null) {
-    return;
-  }
-  res.add(node);
-  preorder(node.left, res);
-  preorder(node.right, res);
-}
-```
 
 
 

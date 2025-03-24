@@ -50,6 +50,18 @@
             }
           },
           {
+            "id": "56243bd84331da43",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.8.9"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.8.9"
+            }
+          },
+          {
             "id": "c7c1397df03f59cc",
             "type": "leaf",
             "state": {
@@ -88,7 +100,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -107,7 +119,8 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
+                "sortOrder": "alphabetical",
+                "autoReveal": false
               },
               "icon": "lucide-folder-closed",
               "title": "文件列表"
@@ -216,10 +229,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data-structure-algorithms/algorithm/Dynamic-Programming.md"
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Dynamic-Programming 的大纲"
+              "title": "大纲"
             }
           }
         ],
@@ -239,8 +254,14 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "e24a131a4a8c13f9",
+  "active": "56243bd84331da43",
   "lastOpenFiles": [
+    "framework/SpringWebFlux/Webflux~.md",
+    "framework/SpringWebFlux/Webflux.md",
+    "framework/SpringWebFlux/Untitled.md",
+    "framework/SpringWebFlux/响应式编程~.md",
+    "framework/SpringWebFlux/SpringWebFlux~.md",
+    "framework/SpringWebFlux/WebFlux~.md",
     "data-management/Redis/Redis-Datatype.md",
     "data-management/Redis/Redis-Database.md",
     "data-management/Redis/Nosql-Overview.md",
@@ -262,12 +283,6 @@
     "interview/Untitled.md",
     "data-structure-algorithms/data-structure/Binary-Tree.md",
     "data-structure-algorithms/soultion/DP-Solution.md",
-    "data-structure-algorithms/algorithm/Sort.md",
-    "data-structure-algorithms/algorithm/Greedy~.md",
-    "data-structure-algorithms/algorithm/Greedy.md",
-    "data-structure-algorithms/soultion/stock-problems.md",
-    "data-management/MySQL/MySQL-Lock.md",
-    "framework/SpringWebFlux/响应式编程.md",
     "Untitled.canvas",
     "data-structure-algorithms/algorithm",
     "data-structure-algorithms/未命名文件夹"

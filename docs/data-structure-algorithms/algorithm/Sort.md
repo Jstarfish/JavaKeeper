@@ -177,7 +177,7 @@ public void insertionSort(int[] arr) {
 
 1. **选择基准值**：从数组中选择一个元素作为基准值（pivot）。常见的选择方法有选取第一个元素、最后一个元素、中间元素或随机选取一个元素。
 2. **分区（Partition）**：遍历数组，将所有小于基准值的元素放在基准值的左侧，大于基准值的元素放在右侧。基准值放置在它的正确位置上。
-3. **递归排序**：对基准值左右两边的子数组分别进行递归排序，直到每个子数组的元素个数为0或1，此时数组已经有序。
+3. **递归排序**：对基准值左右两边的子数组分别进行递归排序，直到每个子数组的元素个数为 0 或 1，此时数组已经有序。
 
 递归的最底部情形，是数列的大小是零或一，也就是数组都已经被排序好了。虽然一直递归下去，但是这个算法总会退出，因为在每次的迭代（iteration）中，它至少会把一个元素摆到它最后的位置去。
 
@@ -262,10 +262,9 @@ private int partition(int[] arr, int low, int high) {
       $$
       (n - 1) + (n - 2) + \cdots + 1 = \frac{n(n - 1)}{2} = O(n^2)
       $$
-      
-
-    - 递归深度为 n-1 层，导致时间复杂度退化为 $O(n²)$
-
+    
+  - 递归深度为 n-1 层，导致时间复杂度退化为 $O(n²)$
+  
 - 平均情况时间复杂度：$O(n log n)$
   - **适用场景**：输入数据**随机分布**，基准值随机选取。
 
@@ -398,7 +397,7 @@ public class MergeSort {
 
 ### 2. 动图演示
 
-[![动图演示](https://github.com/hustcc/JS-Sorting-Algorithm/raw/master/res/heapSort.gif)](https://github.com/hustcc/JS-Sorting-Algorithm/blob/master/res/heapSort.gif)
+![](https://img2018.cnblogs.com/blog/1258817/201904/1258817-20190420150936225-1441021270.gif)
 
 ```java
 public class HeapSort {

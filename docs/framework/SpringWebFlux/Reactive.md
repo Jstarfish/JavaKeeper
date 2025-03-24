@@ -1,3 +1,7 @@
+![](https://plus.unsplash.com/premium_photo-1661898205432-d648667b9c76?q=80&w=3131&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+
+> 原文：[《Reactive Programming 一种技术，各自表述》](https://cloud.tencent.com/developer/article/1532839)
+
 ## 前言
 
 作为一名 Java 开发人员，尤其是 Java 服务端工程师，对于 Reactive Programming 的概念似乎相对陌生。随着 Java 9 以及 Spring Framework 5 的相继发布，Reactive 技术逐渐开始被广大从业人员所注意，我作为其中一员，更渴望如何理解 Reactive Programming，以及它所带来的哪些显著的编程变化，更为重要的是，怎么将其用于实际生产环境，解决当前面临的问题。然而，随着时间的推移和了解的深入，我对 Reactive Programming 的热情逐渐被浇息，对它的未来保持谨慎乐观的态度。
@@ -502,7 +506,6 @@ https://en.wikipedia.org/wiki/Imperative_programming
 - 流式（Streams）
 - 序列（Sequences）
 - 事件（Events）
-  https://gist.github.com/staltz/868e7e9bc2a7b8c1f754#what-is-reactive-programming
 
 流是按时间顺序排列的一系列进行中的事件。
 
@@ -588,7 +591,7 @@ Reactive Programming 作为观察者模式（[Observer] 的延伸，不同于传
 
 > https://github.com/reactive-streams/reactive-streams-jvm
 
-Reactive Stream是JVM的面向流的库的标准和规范:
+Reactive Stream是 JVM 的面向流的库的标准和规范:
 
 - 处理可能无限多的元素
 - 按顺序
@@ -610,7 +613,7 @@ Processor：Publisher和Subscriber混合体
 
  接口：
 
-```
+```java
 public interface Publisher<T> {
     public void subscribe(Subscriber<? super T> s);
 }
@@ -620,7 +623,7 @@ public interface Publisher<T> {
 
 接口：
 
-```
+```java
 public interface Subscriber<T> {
     public void onSubscribe(Subscription s);
     public void onNext(T t);
@@ -643,7 +646,7 @@ onError：当数据流（Data Stream）执行错误时
 
 接口：
 
-```
+```java
 public interface Subscription {
     public void request(long n);
     public void cancel();
@@ -662,7 +665,7 @@ cancel：请求停止发送数据并且清除资源
 
 接口：
 
-```
+```java
 public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
 }
 ```
