@@ -1,20 +1,39 @@
 ---
-title: Mysql Storage Engines
+title: MySQL Storage Engine
 date: 2023-05-31
 tags: 
  - MySQL
 categories: MySQL
 ---
 
-存储引擎是 MySQL 的组件，用于处理不同表类型的 SQL 操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
+![img](https://dbastack.com/wp-content/uploads/2024/09/MySQL-Storage-Engine-3.png.webp)
 
-使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
-
- MySQL 服务器使用可插拔的存储引擎体系结构，可以从运行中的MySQL服务器加载或卸载存储引擎 。
+> 存储引擎是 MySQL 的组件，用于处理不同表类型的 SQL 操作。不同的存储引擎提供不同的存储机制、索引技巧、锁定水平等功能，使用不同的存储引擎，还可以获得特定的功能。
+>
+> 使用哪一种引擎可以灵活选择，**<font color=red>一个数据库中多个表可以使用不同引擎以满足各种性能和实际需求</font>**，使用合适的存储引擎，将会提高整个数据库的性能 。
+>
+>  MySQL 服务器使用可插拔的存储引擎体系结构，可以从运行中的MySQL服务器加载或卸载存储引擎 。
 
 > [MySQL 5.7 可供选择的存储引擎](https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html)
 
-### 查看存储引擎
+## 一、存储引擎的作用与架构
+
+MySQL 存储引擎是数据库的底层核心组件，负责数据的**存储、检索、事务控制**以及**并发管理**。其架构采用**插件式设计**，允许用户根据业务需求灵活选择引擎类型，例如 InnoDB、MyISAM、Memory 等。这种设计将**查询处理**与**数据存储**解耦，提升了系统的可扩展性和灵活性 。
+
+MySQL  的体系架构分为四层：
+
+- **连接层**：管理客户端连接、认证与线程分配，支持 SSL 安全协议。
+- **核心服务层**：处理 SQL 解析、优化、缓存及内置函数执行。
+- **存储引擎层**：实际负责数据的存储和提取，支持多引擎扩展。
+- **数据存储层**：通过文件系统与存储引擎交互，管理物理文件
+
+
+
+## 二、核心存储引擎详解
+
+### 2.1 常用存储引擎
+
+**查看存储引擎**
 
 ```mysql
 -- 查看支持的存储引擎
@@ -31,60 +50,45 @@ show table status like 'tablename'
 show table status from database where name="tablename"
 ```
 
-![](https://img.starfish.ink/mysql/mysql-engines.png)
+以下是 MySQL 主要存储引擎的对比表格，整合了各引擎的核心特性及适用场景，结合最新版本（MySQL 8.0+）特性更新：
 
-> | 存储引擎    | 描述                                 |
-> | ----------- | ------------------------------------ |
-> | `ARCHIVE`   | 用于数据存档（行被插入后不能再修改） |
-> | `BLACKHOLE` | 丢弃写操作，读操作会返回空内容       |
-> | `CSV`       | 在存储数据时，以逗号分隔各个数据项   |
-> | `FEDERATED` | 用来访问远程表                       |
-> | `InnoDB`    | 具备外键支持功能的事务存储引擎       |
-> | `MEMORY`    | 置于内存的表                         |
-> | `MERGE`     | 用来管理多个MyISAM表构成的表集合     |
-> | `MyISAM`    | 主要的非事务处理存储引擎             |
-> | `NDB`       | MySQL集群专用存储引擎                |
-
-
-
-### 设置存储引擎
-
-```mysql
--- 建表时指定存储引擎。默认的就是INNODB，不需要设置
-CREATE TABLE t1 (i INT) ENGINE = INNODB;
-CREATE TABLE t2 (i INT) ENGINE = CSV;
-CREATE TABLE t3 (i INT) ENGINE = MEMORY;
-
--- 修改存储引擎
-ALTER TABLE t ENGINE = InnoDB;
-
--- 修改默认存储引擎，也可以在配置文件my.cnf中修改默认引擎
-SET default_storage_engine=NDBCLUSTER;
-```
-
- 默认情况下，每当CREATE TABLE或ALTER TABLE不能使用默认存储引擎时，都会生成一个警告。为了防止在所需的引擎不可用时出现令人困惑的意外行为，可以启用`NO_ENGINE_SUBSTITUTION SQL`模式。如果所需的引擎不可用，则此设置将产生错误而不是警告，并且不会创建或更改表 
+| **存储引擎**           | **核心特性**                                                 | **事务支持** | **锁级别**     | **索引类型**            | **文件结构**                           | **适用场景**                     |
+| ---------------------- | ------------------------------------------------------------ | ------------ | -------------- | ----------------------- | -------------------------------------- | -------------------------------- |
+| **InnoDB**             | 支持ACID事务、行级锁、MVCC、外键约束，具备崩溃恢复能力，默认使用聚簇索引 | ✅            | 行锁/表锁      | B+Tree/全文索引（5.6+） | `.ibd`（数据+索引）、`.frm`（表结构）  | 高并发OLTP（电商交易、金融系统） |
+| **MyISAM**             | 非事务型，表级锁，支持全文索引和压缩表，查询速度快           | ❌            | 表锁           | B+Tree/全文索引         | `.MYD`（数据）、`.MYI`（索引）、`.frm` | 静态报表、日志分析、只读业务     |
+| **Memory**             | 数据全内存存储，哈希索引加速查询，重启后数据丢失             | ❌            | 表锁           | Hash/B-Tree             | `.frm`（仅表结构）                     | 临时表、会话缓存、高速缓存层     |
+| **Archive**            | 仅支持INSERT/SELECT，Zlib压缩存储（压缩率10:1），无索引      | ❌            | 行锁（仅插入） | ❌                       | `.ARZ`（数据）、`.ARM`（元数据）       | 历史数据归档、审计日志           |
+| **CSV**                | 数据以CSV格式存储，可直接文本编辑，不支持索引                | ❌            | 表锁           | ❌                       | `.CSV`（数据）、`.CSM`（元数据）       | 数据导入/导出中间表              |
+| **Blackhole**          | 写入数据即丢弃，仅保留二进制日志，用于复制链路中继           | ❌            | ❌              | ❌                       | `.frm`（仅表结构）                     | 主从复制中继、性能测试           |
+| **Federated**          | 代理访问远程表，本地无实际数据存储                           | ❌            | 依赖远程表引擎 | 依赖远程表引擎          | `.frm`（仅表结构）                     | 分布式数据聚合                   |
+| **NDB**                | 集群式存储引擎，支持数据自动分片和高可用性                   | ✅            | 行锁           | Hash/B-Tree             | 数据存储在集群节点                     | MySQL Cluster分布式系统          |
+| **Merge**              | 聚合多个MyISAM表，逻辑上作为单个表操作                       | ❌            | 表锁           | B-Tree                  | `.MRG`（聚合定义）、底层使用MyISAM文件 | 分库分表聚合查询                 |
+| **Performance Schema** | 内置性能监控引擎，采集服务器运行时指标                       | ❌            | ❌              | ❌                       | 内存存储，无物理文件                   | 性能监控与诊断                   |
 
 
 
-### 常用存储引擎
+### 2.2 存储引擎架构演进
 
-#### InnoDB
+**1. MySQL 8.0 关键改进**
 
-**InnoDB 是 MySQL5.7 默认的存储引擎，主要特性有**
+- 原子 DDL：DDL操作（如CREATE TABLE）具备事务性，失败时自动回滚元数据变更
+- 数据字典升级：系统表全部转为InnoDB引擎，替代原有的.frm文件，实现事务化元数据管理
+- Redo日志优化：MySQL 8.0.30+ 引入 `innodb_redo_log_capacity` 参数替代旧版日志配置，支持动态调整redo日志大小
 
-- InnoDB存储引擎维护自己的缓冲池，在访问数据时将表和索引数据缓存在主内存中 
-- 支持事务
-- 支持外键
-- B-Tree索引
-- 不支持集群
-- 聚簇索引
-- 行锁
-- 支持地理位置的数据类型和索引
+ **2.  物理文件结构变化**
+
+| 文件类型       | 5.7及之前版本 | 8.0+版本           | 作用               |
+| -------------- | ------------- | ------------------ | ------------------ |
+| 表结构定义文件 | .frm          | .sdi (JSON格式)    | 存储表结构元数据 6 |
+| 事务日志       | ibdata1       | undo_001, undo_002 | 独立UNDO表空间     |
+| 数据文件       | .ibd          | .ibd               | 表数据与索引存储   |
+| 临时文件       | ibtmp1        | ibtmp1             | 临时表空间         |
+
+> 示例：通过 `SHOW CREATE TABLE` 可查看SDI元数据，支持JSON格式导出
 
 
 
-
-##### MySQL之Innodb引擎的4大特性
+### 2.3 Innodb引擎的4大特性
 
 1. 插入缓冲 （Insert Buffer/Change Buffer）
 2. 双写机制（Double Write）
@@ -93,86 +97,9 @@ SET default_storage_engine=NDBCLUSTER;
 
 
 
-#### MyISAM
+### 2.4 数据的存储
 
-在 5.1 版本之前，MyISAM 是 MySQL 的默认存储引擎，MyISAM 并发性比较差，使用的场景比较少，主要特点是
-
-每个MyISAM表存储在磁盘上的三个文件中 。这些文件的名称以表名开头，并有一个扩展名来指示文件类型 。
-
-`.frm`文件存储表的格式。 `.MYD` (`MYData`) 文件存储表的数据。 `.MYI` (`MYIndex`) 文件存储索引。
-
- **MyISAM表具有以下特征** 
-
-- 每个MyISAM表最大索引数是64，这可以通过重新编译来改变。每个索引最大的列数是16
-- 每个MyISAM表都支持一个`AUTO_INCREMENT`的内部列。当执行`INSERT`或者`UPDATE`操作的时候，MyISAM自动更新这个列，这使得`AUTO_INCREMENT`列更快。
--  当把删除和更新及插入操作混合使用的时候，动态尺寸的行产生更少碎片。这要通过合并相邻被删除的块，若下一个块被删除，就扩展到下一块自动完成 
-
-- MyISAM支持**并发插入**
-- **可以将数据文件和索引文件放在不同物理设备上的不同目录中**，以更快地使用数据目录和索引目录表选项来创建表 
-- BLOB和TEXT列可以被索引
-- **NULL被允许在索引的列中**，这个值占每个键的0~1个字节
-- 每个字符列可以有不同的字符集
-- **`MyISAM` 表使用 B-tree 索引**
-- MyISAM表的行最大限制为  (2^32)^2 (1.844E+19)
-- 大文件（达到63位文件长度）在支持大文件的文件系统和操作系统上被支持 
-- 键的最大长度为1000字节，这也可以通过重新编译来改变，对于键长度超过250字节的情况，一个超过1024字节的键将被用上
-
-- VARCHAR支持固定或动态记录长度
-- 表中VARCHAR和CHAR列的长度总和有可能达到64KB 
-- 任意长度的唯一约束
-
-- <small>All data values are stored with the low byte first. This makes the data machine and operating system independent. </small>
-
-- <small> All numeric key values are stored with the high byte first to permit better index compression</small> 
-
-  todo：最后两条没搞懂啥意思
-
-
-
-### 存储引擎对比
-
-| 对比项   | MyISAM                                                   | InnoDB                                                       |
-| -------- | -------------------------------------------------------- | ------------------------------------------------------------ |
-| 主外键   | 不支持                                                   | 支持                                                         |
-| 事务     | 不支持                                                   | 支持                                                         |
-| 行表锁   | 表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作 | 行锁,操作时只锁某一行，不对其它行有影响，<br/>适合高并发的操作 |
-| 缓存     | 只缓存索引，不缓存真实数据                               | 不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响 |
-| 表空间   | 小                                                       | 大                                                           |
-| 关注点   | 性能                                                     | 事务                                                         |
-| 默认安装 | 是                                                       | 是                                                           |
-
- 
-
-官方提供的多种引擎对比
-
-| Feature                                    | MyISAM       | Memory           | InnoDB       | Archive      | NDB          |
-| ------------------------------------------ | ------------ | ---------------- | ------------ | ------------ | ------------ |
-| **B-tree indexes**                         | Yes          | Yes              | Yes          | No           | No           |
-| **Backup/point-in-time recovery** (note 1) | Yes          | Yes              | Yes          | Yes          | Yes          |
-| **Cluster database support**               | No           | No               | No           | No           | Yes          |
-| **Clustered indexes**                      | No           | No               | Yes          | No           | No           |
-| **Compressed data**                        | Yes (note 2) | No               | Yes          | Yes          | No           |
-| **Data caches**                            | No           | N/A              | Yes          | No           | Yes          |
-| **Encrypted data**                         | Yes (note 3) | Yes (note 3)     | Yes (note 4) | Yes (note 3) | Yes (note 3) |
-| **Foreign key support**                    | No           | No               | Yes          | No           | Yes (note 5) |
-| **Full-text search indexes**               | Yes          | No               | Yes (note 6) | No           | No           |
-| **Geospatial data type support**           | Yes          | No               | Yes          | Yes          | Yes          |
-| **Geospatial indexing support**            | Yes          | No               | Yes (note 7) | No           | No           |
-| **Hash indexes**                           | No           | Yes              | No (note 8)  | No           | Yes          |
-| **Index caches**                           | Yes          | N/A              | Yes          | No           | Yes          |
-| **Locking granularity**                    | Table        | Table            | Row          | Row          | Row          |
-| **MVCC**                                   | No           | No               | Yes          | No           | No           |
-| **Replication support** (note 1)           | Yes          | Limited (note 9) | Yes          | Yes          | Yes          |
-| **Storage limits**                         | 256TB        | RAM              | 64TB         | None         | 384EB        |
-| **T-tree indexes**                         | No           | No               | No           | No           | Yes          |
-| **Transactions**                           | No           | No               | Yes          | No           | Yes          |
-| **Update statistics for data dictionary**  | Yes          | Yes              | Yes          | Yes          | Yes          |
-
-
-
-### 数据的存储
-
-在整个数据库体系结构中，我们可以使用不同的存储引擎来存储数据，而绝大多数存储引擎都以二进制的形式存储数据；这一节会介绍 InnoDB 中对数据是如何存储的。
+在整个数据库体系结构中，我们可以使用不同的存储引擎来存储数据，而绝大多数存储引擎都以二进制的形式存储数据；我们来看下啊 InnoDB 中对数据是如何存储的。
 
 在 InnoDB 存储引擎中，所有的数据都被逻辑地存放在表空间中，表空间（tablespace）是存储引擎中最高的存储逻辑单位，在表空间的下面又包括段（segment）、区（extent）、页（page）
 
@@ -286,3 +213,4 @@ ALTER TABLE 表名 ROW_FORMAT=行格式名称
 - https://www.linkedin.com/pulse/leverage-innodb-architecture-optimize-django-model-design-bouslama
 - [踏雪无痕-InnoDB存储引擎](https://www.cnblogs.com/chenpingzhao/p/9177324.html) 
 - [MySQL 与 InnoDB 存储引擎总结](https://wingsxdu.com/posts/database/mysql/innodb/)
+

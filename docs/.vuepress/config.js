@@ -170,7 +170,7 @@ function genDSASidebar() {
         ['algorithm/Binary-Search', '二分查找'],
       	['algorithm/Recursion', '递归'],
         ['algorithm/Backtracking', '回溯'],
-        ['algorithm/DFS', 'DFS'],
+        ['algorithm/DFS-BFS', 'DFS vs BFS'],
         ['algorithm/Double-Pointer', '双指针'],
       	['algorithm/Dynamic-Programming', '动态规划']
       ]
@@ -183,6 +183,7 @@ function genDSASidebar() {
       	['soultion/Array-Solution', '数组'],
       	['soultion/String-Solution', '字符串'],
       	['soultion/LinkedList-Soultion', '链表'],
+        ['soultion/DFS-Solution', 'DFS'],
       	['soultion/Math-Solution', '数学'],
         ['soultion/stock-problems', '股票问题']
       ]
