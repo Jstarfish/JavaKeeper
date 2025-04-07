@@ -1558,6 +1558,14 @@ public class ScopeTestController {
 
 
 
+### Spring MVC 对比 Spring Boot ？
+
+Spring MVC 是 Spring 的 Web 模块，专注于请求处理与视图渲染，适合需要精细控制 Web 层的场景；而 Spring Boot 是 Spring 生态的快速开发工具，通过自动配置和内嵌服务器简化部署，适合快速构建独立应用。整合 Spring 生态（包括 Spring MVC），提供内嵌服务器（Tomcat/Jetty）、自动配置、Starter 依赖等特性。两者并非替代关系。
+
+Spring Boot 是 Spring 生态的“脚手架”，默认集成 Spring MVC 作为 Web 层框架
+
+
+
 ## 八、注解
 
 ### 什么是基于Java的Spring注解配置? 给一些注解的例子
