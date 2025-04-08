@@ -16,19 +16,6 @@ categories: Spring
 
 > 本文基于Spring Framework 4.x 总结的常见面试题，系统学习建议还是官方文档走起：https://spring.io/projects/spring-framework#learn
 
-> - 什么是 Spring Boot？
-> - 为什么要用 Spring Boot？
-> - Spring Boot 的核心配置文件有哪几个？它们的区别是什么？
-> - Spring Boot 的配置文件有哪几种格式？它们有什么区别？
-> - Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
-> - 开启 Spring Boot 特性有哪几种方式？
-> - Spring Boot 需要独立的容器运行吗？
-> - 运行 Spring Boot 有哪几种方式？
-> - Spring Boot 自动配置原理是什么？
-> - Spring Boot 的目录结构是怎样的？
-> - mysql隔离级别和spring的tranction隔离级别不一致，以哪个为准？
-> - http请求header都包含什么？
-
 ## 一、一般问题
 
 ### 开发中主要使用 Spring 的什么技术 ?
@@ -715,77 +702,88 @@ Spring 提供了几种不同的方式来装配 Bean，主要包括以下几种�
 
 Spring Boot 自动配置（Auto-Configuration）是 Spring Boot 的核心特性之一，旨在根据项目中的依赖自动配置 Spring 应用。通过自动配置，开发者无需手动编写大量的配置代码，可以专注于业务逻辑的开发。其实现原理主要基于以下几个方面：
 
-**1. @EnableAutoConfiguration 注解**
+1. **启动类注解的复合结构**
 
-Spring Boot 应用通常使用 `@SpringBootApplication` 注解来启动，该注解本质上是以下三个注解的组合：
+   Spring Boot 应用通常使用 `@SpringBootApplication` 注解来启动，该注解本质上是以下三个注解的组合：
 
-```java
-@SpringBootApplication
-public class MyApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(MyApplication.class, args);
-    }
-}
+   - @SpringBootConfiguration：标识当前类为配置类，继承自 `@Configuration`，支持 Java Config 配置方式。
+
+   - @ComponentScan：自动扫描当前包及其子包下的组件（如 `@Controller`、`@Service`等），将其注册为 Bean。
+
+   - **@EnableAutoConfiguration**：**自动配置的核心入口**，通过 `@Import` 导入 `AutoConfigurationImportSelector` 类，触发自动配置流程
+
+   ```java
+   @SpringBootApplication
+   public class MyApplication {
+       public static void main(String[] args) {
+           SpringApplication.run(MyApplication.class, args);
+       }
+   }
+   -------------
+   @Target(ElementType.TYPE)
+   @Retention(RetentionPolicy.RUNTIME)
+   @Documented
+   @Inherited
+   @SpringBootConfiguration
+   @EnableAutoConfiguration
+   @ComponentScan
+   public @interface SpringBootApplication {
+   }
+   ```
+
+2. **自动配置的触发机制**
+
+   `@EnableAutoConfiguration` 通过 `AutoConfigurationImportSelector` 类加载配置：
+
+   - 读取 `spring.factories` 文件：从所有依赖的 `META-INF/spring.factories` 文件中，查找 `org.springframework.boot.autoconfigure.EnableAutoConfiguration` 键值对应的全类名列表。
+
+     ```
+     # Auto Configure
+     org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+     org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+     org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
+     org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,\
+     ...
+     ```
+
+   - 条件化筛选配置类：通过条件注解（如 `@ConditionalOnClass`、`@ConditionalOnMissingBean`）过滤掉不满足当前环境的配置类，例如：
+     - 类路径中缺少某个类时禁用相关配置（`@ConditionalOnClass`）。
+     - 容器中已存在某个 Bean 时跳过重复注册（`@ConditionalOnMissingBean`）。
+
+   - **加载有效配置类**：筛选后的配置类通过反射实例化，并注册到 Spring 容器中
+
+3. **自动配置类的实现逻辑**
+
+   自动配置类通常包含以下内容：
+
+   - 条件注解控制：例如，`DataSourceAutoConfiguration` 仅在类路径存在 `javax.sql.DataSource` 时生效。
+
+   - 默认 Bean 定义：通过 `@Bean` 方法定义默认组件（如 `JdbcTemplate`），开发者可通过配置文件覆盖默认值。
+
+   - **外部化配置支持**：结合 `@ConfigurationProperties` 将 `application.properties` 中的属性注入到 Bean 中
+
+4. **条件注解的作用**
+
+   Spring Boot 提供丰富的条件注解，用于动态控制配置类的加载和 Bean 的注册：
+
+   - @ConditionalOnClass：类路径存在指定类时生效。
+
+   - @ConditionalOnMissingBean：容器中不存在指定 Bean 时生效。
+
+   - @ConditionalOnProperty：根据配置文件属性值决定是否加载。
+   - **@ConditionalOnWebApplication**：仅在 Web 应用环境下生效
+
+5. **自动配置的优化与扩展**
+
+- 按需加载：通过条件筛选避免加载未使用的组件，减少内存占用。
+- 自定义 Starter：开发者可封装自定义 Starter，遵循相同机制（`spring.factories` \+ 条件注解）实现模块化自动配置。
+- **配置文件优先级**：通过 `spring.autoconfigure.exclude` 显式排除不需要的自动配置类
+
+Spring Boot 的自动配置本质上是 **基于约定和条件判断的 Bean 注册机制**，通过以下流程实现“开箱即用”：
+
 ```
-
-`@SpringBootApplication` 包含：
-
-```java
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-@SpringBootConfiguration
-@EnableAutoConfiguration
-@ComponentScan
-public @interface SpringBootApplication {
-}
+启动类注解 → 加载 spring.factories → 条件筛选 → 注册有效 Bean
 ```
-
-其中，`@EnableAutoConfiguration` 是自动配置的关键。它告诉 Spring Boot 启动时根据项目中的依赖和应用的配置文件自动配置 Spring 应用。
-
-**2. spring.factories 文件**
-
-`@EnableAutoConfiguration` 注解通过 `SpringFactoriesLoader` 加载 `META-INF/spring.factories` 文件来实现自动配置。这个文件列出了所有需要自动配置的类。
-
-在 Spring Boot 的 `spring-boot-autoconfigure` 包中，可以找到类似如下的 `spring.factories` 文件：
-
-```java
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
-org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
-org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,\
-...
-```
-
-这个文件指定了多个自动配置类，这些类会在应用启动时被自动加载和配置。
-
-**3. 自动配置类**
-
-每个自动配置类都是一个使用 `@Configuration` 注解标注的配置类，通常会使用 `@Conditional` 注解来控制是否加载这个配置类。`@Conditional` 注解可以根据特定条件（如某个类是否在类路径中，某个属性是否存在等）来决定是否启用配置。
-
-例如，`DataSourceAutoConfiguration` 类：
-
-```java
-@Configuration
-@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
-@ConditionalOnMissingBean(DataSource.class)
-@EnableConfigurationProperties(DataSourceProperties.class)
-@Import(EmbeddedDataSourceConfiguration.class)
-public class DataSourceAutoConfiguration {
-    ...
-}
-```
-
-在这个配置类中，`@ConditionalOnClass` 表示只有在类路径中存在 `DataSource` 类时才会加载这个配置类，`@ConditionalOnMissingBean` 表示只有当容器中没有 `DataSource` 类型的 Bean 时才会配置数据源。
-
-**4. 自动配置的执行流程**
-
-- **启动阶段**：应用启动时，Spring Boot 根据 `@SpringBootApplication` 注解加载 `@EnableAutoConfiguration`。
-- **加载配置**：`@EnableAutoConfiguration` 通过 `SpringFactoriesLoader` 加载 `META-INF/spring.factories` 文件中的配置类。
-- **条件检查**：每个自动配置类根据其 `@Conditional` 注解进行条件检查，如果条件满足，则执行配置。
-- **自动装配**：根据项目中的依赖和应用的配置文件自动装配 Bean。
 
 
 
@@ -802,7 +800,7 @@ public class DataSourceAutoConfiguration {
 
 对于扫描到的组件，Spring 有默认的命名策略：使用非限定类名，第一个字母小写。也可以在注解中通过 value 属性值标识组件的名称。
 
-当在组件类上使用了特定的注解之后,，还需要在 Spring 的配置文件中声明 `<context:component-scan>`：
+当在组件类上使用了特定的注解之后，还需要在 Spring 的配置文件中声明 `<context:component-scan>`：
 
 - `base-package` 属性指定一个需要扫描的基类包，Spring 容器将会扫描这个基类包里及其子包中的所有类
 
@@ -935,54 +933,77 @@ AOP 的好处:
 
 ### Spring AOP 实现原理
 
-`Spring`的`AOP`实现原理其实很简单，就是通过**动态代理**实现的。如果我们为`Spring`的某个`bean`配置了切面，那么`Spring`在创建这个`bean`的时候，实际上创建的是这个`bean`的一个代理对象，我们后续对`bean`中方法的调用，实际上调用的是代理类重写的代理方法。而`Spring`的`AOP`使用了两种动态代理，分别是**JDK的动态代理**，以及**CGLib的动态代理**。
+Spring AOP 的实现原理基于**动态代理**和**字节码增强**，其核心是通过在运行时生成代理对象，将横切逻辑（如日志、事务）织入目标方法中。以下是其实现原理的详细解析：
 
-**一）JDK动态代理**
+> `Spring`的`AOP`实现原理其实很简单，就是通过**动态代理**实现的。如果我们为`Spring`的某个`bean`配置了切面，那么`Spring`在创建这个`bean`的时候，实际上创建的是这个`bean`的一个代理对象，我们后续对`bean`中方法的调用，实际上调用的是代理类重写的代理方法。而`Spring`的`AOP`使用了两种动态代理，分别是**JDK的动态代理**，以及**CGLib的动态代理**。
 
-  **Spring默认使用JDK的动态代理实现AOP，类如果实现了接口，Spring就会使用这种方式实现动态代理**。熟悉`Java`语言的应该会对`JDK`动态代理有所了解。`JDK`实现动态代理需要两个组件，首先第一个就是`InvocationHandler`接口。我们在使用`JDK`的动态代理时，需要编写一个类，去实现这个接口，然后重写`invoke`方法，这个方法其实就是我们提供的代理方法。然后`JDK`动态代理需要使用的第二个组件就是`Proxy`这个类，我们可以通过这个类的`newProxyInstance`方法，返回一个代理对象。生成的代理类实现了原来那个类的所有接口，并对接口的方法进行了代理，我们通过代理对象调用这些方法时，底层将通过反射，调用我们实现的`invoke`方法。
+一、**核心实现机制：动态代理**
 
-**（二）CGLib动态代理**
+Spring AOP 通过两种动态代理技术实现切面逻辑的织入：
 
-  `JDK`的动态代理存在限制，那就是被代理的类必须是一个实现了接口的类，代理类需要实现相同的接口，代理接口中声明的方法。若需要代理的类没有实现接口，此时`JDK`的动态代理将没有办法使用，于是`Spring`会使用`CGLib`的动态代理来生成代理对象。`CGLib`直接操作字节码，生成类的子类，重写类的方法完成代理。
+1. **JDK 动态代理**
 
-> ####  JDK的动态代理
->
-> **（一）实现原理**
->
->   `JDK`的动态代理是基于**反射**实现。`JDK`通过反射，生成一个代理类，这个代理类实现了原来那个类的全部接口，并对接口中定义的所有方法进行了代理。当我们通过代理对象执行原来那个类的方法时，代理类底层会通过反射机制，回调我们实现的`InvocationHandler`接口的`invoke`方法。**并且这个代理类是Proxy类的子类**（记住这个结论，后面测试要用）。这就是`JDK`动态代理大致的实现方式。
->
-> **（二）优点**
->
-> 1. `JDK`动态代理是`JDK`原生的，不需要任何依赖即可使用；
-> 2. 通过反射机制生成代理类的速度要比`CGLib`操作字节码生成代理类的速度更快；
->
-> **（三）缺点**
->
-> 1. 如果要使用`JDK`动态代理，被代理的类必须实现了接口，否则无法代理；
-> 2. `JDK`动态代理无法为没有在接口中定义的方法实现代理，假设我们有一个实现了接口的类，我们为它的一个不属于接口中的方法配置了切面，`Spring`仍然会使用`JDK`的动态代理，但是由于配置了切面的方法不属于接口，为这个方法配置的切面将不会被织入。
-> 3. `JDK`动态代理执行代理方法时，需要通过反射机制进行回调，此时方法执行的效率比较低；
->
-> 
->
-> #### CGLib动态代理
->
-> **（一）实现原理**
->
->   `CGLib`实现动态代理的原理是，底层采用了`ASM`字节码生成框架，直接对需要代理的类的字节码进行操作，生成这个类的一个子类，并重写了类的所有可以重写的方法，在重写的过程中，将我们定义的额外的逻辑（简单理解为`Spring`中的切面）织入到方法中，对方法进行了增强。而通过字节码操作生成的代理类，和我们自己编写并编译后的类没有太大区别。
->
-> **（二）优点**
->
-> 1. 使用`CGLib`代理的类，不需要实现接口，因为`CGLib`生成的代理类是直接继承自需要被代理的类；
-> 2. `CGLib`生成的代理类是原来那个类的子类，这就意味着这个代理类可以为原来那个类中，所有能够被子类重写的方法进行代理；
-> 3. `CGLib`生成的代理类，和我们自己编写并编译的类没有太大区别，对方法的调用和直接调用普通类的方式一致，所以`CGLib`执行代理方法的效率要高于`JDK`的动态代理；
->
-> **（三）缺点**
->
-> 1. 由于`CGLib`的代理类使用的是继承，这也就意味着如果需要被代理的类是一个`final`类，则无法使用`CGLib`代理；
-> 2. 由于`CGLib`实现代理方法的方式是重写父类的方法，所以无法对`final`方法，或者`private`方法进行代理，因为子类无法重写这些方法；
-> 3. `CGLib`生成代理类的方式是通过操作字节码，这种方式生成代理类的速度要比`JDK`通过反射生成代理类的速度更慢；
+   - **适用条件**：目标对象实现了至少一个接口。
 
+   - **实现原理**：基于 `java.lang.reflect.Proxy` 类生成代理对象，代理类实现目标接口并重写方法。
 
+   - 关键源码：
+
+     ```java
+     Proxy.newProxyInstance(ClassLoader, interfaces, InvocationHandler);
+     ```
+
+     在  `InvocationHandler#invoke()` 方法中拦截目标方法，执行切面逻辑（如前置通知、后置通知）。
+
+2. **CGLIB 动态代理**
+
+   - **适用条件**：目标对象未实现接口。
+
+   - **实现原理**：通过继承目标类生成子类代理，覆盖父类方法并插入切面逻辑。
+
+   - 关键源码：
+
+     ```java
+     Enhancer enhancer = new Enhancer();
+     enhancer.setSuperclass(targetClass);
+     enhancer.setCallback(MethodInterceptor);
+     ```
+
+     在 `MethodInterceptor#intercept()` 方法中实现方法拦截
+
+二、核心组件
+
+1. **切面（Aspect）**：由 **通知（Advice）** 和 **切点（Pointcut）** 组成，定义横切逻辑。
+2. **切点（Pointcut）**：通过表达式（如 `execution(* com.example.service.*.*(..))`）匹配需要拦截的目标方法。
+3. **通知（Advice）**
+   - 类型：
+     - `@Before`：在目标方法前执行。
+     - `@After`：在目标方法后执行。
+     - `@Around`：包裹目标方法，可控制方法执行。
+   - **执行顺序**：通过拦截器链按顺序执行多个通知。
+
+三、织入（Weaving）流程
+
+1. **代理对象生成**
+   - **入口**：`DefaultAopProxyFactory` 根据目标对象选择 JDK 或 CGLIB 代理。
+   - 判断逻辑：
+     - 目标类有接口 → JDK 动态代理。
+     - 目标类无接口 → CGLIB 代理。
+2. **拦截器链执行**
+   - 流程：
+     1. 通过 `AdvisedSupport` 获取匹配的拦截器链。
+     2. 按顺序执行拦截器的通知逻辑。
+     3. 调用目标方法。
+
+> | **特性**     | **JDK 动态代理**                                             | **CGLIB 动态代理**                                           |
+> | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+> | **底层技术** | 基于 Java 反射机制，通过 `Proxy` 类和 `InvocationHandler` 接口生成代理类。 | 基于 **ASM 字节码框架**，通过生成目标类的子类实现代理。      |
+> | **代理方式** | 只能代理实现了接口的类，生成接口的代理类。                   | 可代理普通类（无需接口），生成目标类的子类覆盖方法。         |
+> | **性能**     | 方法调用通过反射实现，性能较低。                             | 通过 **FastClass 机制** 直接调用方法，性能更高（以空间换时间）。 |
+> | **代码生成** | 运行时动态生成代理类的字节码。                               | 生成目标类的子类字节码，修改原始类结构。                     |
+> | **适用场景** | 代理接口实现类，适用于轻量级应用。                           | 代理无接口的类，适用于高性能需求场景（如 Spring AOP）。      |
+> | **优点**     | 1. 无需第三方库依赖；2. 代码简单易用。                       | 1. 支持代理普通类和 final 方法；2. 性能更高（FastClass 机制）。 |
+> | **缺点**     | 1. 只能代理接口；2. 反射调用性能较低。                       | 1. 生成代理类耗时较长；2. 可能破坏类封装性（如代理 final 方法需特殊处理）。 |
 
 
 
@@ -1398,18 +1419,9 @@ Spring Web MVC 框架提供 **模型-视图-控制器** 架构和随时可用的
 
 ### Spring MVC 的整体架构和核心组件？
 
-> **Spring MVC** 是一个基于 Servlet 的 Web 框架，采用 **Model-View-Controller（MVC）** 设计模式，它通过解耦模型、视图和控制器，使得 Web 应用的开发更加灵活和可维护。Spring MVC 的核心组件包括：
->
-> - **DispatcherServlet**：前端控制器，负责接收所有的 HTTP 请求，并将请求分发到相应的处理器。
-> - **HandlerMapping**：根据请求的 URL 映射到相应的控制器方法。
-> - **Controller**：处理请求的业务逻辑，并返回模型和视图。
-> - **HandlerAdapter**：适配器，确保请求能够由正确的控制器方法处理。
-> - **ViewResolver**：根据控制器返回的视图名称解析出具体的视图。
-> - **ModelAndView**：封装模型数据和视图名称，作为控制器返回给 `DispatcherServlet` 的结果。
->
 > Spring MVC 的架构以 `DispatcherServlet` 为核心，负责请求的调度和分发，通过 `HandlerMapping` 找到具体的控制器方法，控制器方法执行后返回 `ModelAndView`，并通过 `ViewResolver` 渲染视图。这样的架构使得 Web 应用中的请求处理过程更加清晰和模块化。
 
-**Spring MVC** 是基于 Java 的一个广泛使用的 Web 应用框架，它遵循了 **MVC（Model-View-Controller）设计模式**，将应用程序的不同功能分离，增强了应用的可维护性、可扩展性和解耦性。Spring MVC 是 Spring Framework 中的一部分，提供了一个灵活的请求处理流程和 Web 层的解决方案。
+**Spring MVC** 是一个基于 Servlet 的 Web 框架，它遵循了 **MVC（Model-View-Controller）设计模式**，将应用程序的不同功能分离，增强了应用的可维护性、可扩展性和解耦性。Spring MVC 是 Spring Framework 中的一部分，提供了一个灵活的请求处理流程和 Web 层的解决方案。
 
 **Spring MVC 的整体架构**
 
@@ -1436,41 +1448,32 @@ Spring MVC 架构是基于请求驱动的模式，处理请求的过程分为以
 7. **View（视图）**：
    - 视图组件负责将模型数据渲染成用户可以查看的页面，常见的视图技术包括 JSP、Thymeleaf、FreeMarker 等。
 
-**Spring MVC 的核心组件**
-
-1. **DispatcherServlet**：
-   - 作为前端控制器，`DispatcherServlet` 是所有请求的入口，负责请求的调度、委托和响应。
-2. **HandlerMapping**：
-   - 查找控制器方法的组件。Spring MVC 支持多种 `HandlerMapping`，例如基于注解的 `RequestMappingHandlerMapping`，也可以使用基于 XML 配置的 `SimpleUrlHandlerMapping`。
-3. **Controller**：
-   - 处理具体的业务请求，并返回 `ModelAndView` 或直接返回视图数据。控制器方法通常是由 `@RequestMapping` 注解来标识的。
-4. **HandlerAdapter**：
-   - 负责调用控制器方法的组件。每种控制器（如 `@Controller`、`@RestController`）都有一个对应的适配器，确保请求能够正确地交给控制器方法进行处理。
-5. **ModelAndView**：
-   - 作为控制器与视图之间传递数据的容器。它包含模型数据（`Model`）和视图信息（`View`）。
-6. **ViewResolver**：
-   - 将控制器返回的视图名解析为一个视图对象，最终渲染为 HTML 响应。常用的 `ViewResolver` 实现有 `InternalResourceViewResolver`、`ThymeleafViewResolver` 等。
-7. **HandlerInterceptor**：
-   - 用于在请求到达控制器之前和处理完成之后执行一些操作。例如日志记录、权限检查、请求计时等。它与 Servlet 过滤器类似，但具有更多的 Spring 集成特性。
 
 
-
-### Spring MVC 的运行流程 | DispatcherServlet描述
+### Spring MVC 的运行流程?
 
 在整个 Spring MVC 框架中， DispatcherServlet 处于核心位置，负责协调和组织不同组件以完成请求处理并返回响应的工作
 
 SpringMVC 处理请求过程：
 
-1. 若一个请求匹配 `DispatcherServlet`  的请求映射路径(在 web.xml中指定)，WEB 容器将该请求转交给 `DispatcherServlet`  处理
-2. `DispatcherServlet`  接收到请求后, 将根据请求信息(包括 URL、HTTP方法、请求头、请求参数、Cookie 等)及 `HandlerMapping` 的配置找到处理请求的处理器(Handler或Controller)。可将 `HandlerMapping` 看成路由控制器， 将 Handler 看成目标主机
-3. 当 `DispatcherServlet`  根据 `HandlerMapping` 得到对应当前请求的 Handler 后，通过 HandlerAdapter 对 Handler 进行封装，再以统一的适配器接口调用 Handler，处理请求逻辑
-4. 处理器完成业务逻辑的处理后将返回一个 `ModelAndView` 给 DispatcherServlet，`ModelAndView` 包含了视图逻辑名和模型数据信息
-5.  `DispatcherServlet`   借助 `ViewResolver`  完成逻辑视图名到真实视图对象的解析
-6. 得到真实视图对象 View 后, `DispatcherServlet` 使用这个 View 对 `ModelAndView`  中的模型数据进行视图渲染
+1. **请求接收与分发**
+   - 入口：用户通过浏览器发送 HTTP 请求，所有请求首先到达 `DispatcherServlet`（前端控制器），它是整个流程的统一入口。
+   - 核心作用：`DispatcherServlet` 负责接收请求并协调后续处理流程，类似“调度中心”。
+2. **处理器映射（HandlerMapping）**
+   - 查找处理器：`DispatcherServlet` 调用 `HandlerMapping` 组件，根据请求的 URL 路径匹配对应的处理器（Controller 或其方法）。例如，带有 `@RequestMapping`注解的方法会被识别为 Handler。
+   - 返回执行链：`HandlerMapping` 返回 `HandlerExecutionChain`，包含目标处理器及关联的拦截器（Interceptor）。
+3. **处理器适配（HandlerAdapter）**
+   - 适配调用：`DispatcherServlet` 通过 `HandlerAdapter` 调用处理器方法。HandlerAdapter 负责将 Servlet 的请求参数转换为处理器方法的输入，并执行具体业务逻辑。
+   - 返回值处理：处理器返回 `ModelAndView` 对象，包含模型数据（Model）和视图名称（View）。
+4. **视图解析与渲染**
+   - 视图解析器：`DispatcherServlet` 将逻辑视图名传递给 `ViewResolver`，解析为具体的视图对象（如 JSP、Thymeleaf 模板）。
+   - 数据渲染：视图对象将模型数据填充到请求域，生成响应内容（如 HTML），最终由 DispatcherServlet 返回客户端。
+5. **异常处理**
+   - **异常捕获**：若处理过程中发生异常，DispatcherServlet 调用 **HandlerExceptionResolver** 组件处理，生成错误视图或 JSON 响应
 
 
 
-### Spring的Controller是单例的吗？多线程情况下Controller是线程安全吗？
+### Spring 的 Controller 是单例的吗？多线程情况下 Controller 是线程安全吗？
 
 controller默认是单例的，不要使用非静态的成员变量，否则会发生数据逻辑混乱。正因为单例所以不是线程安全的
 
@@ -1660,10 +1663,19 @@ Spring Framework 4.3 之后引入的基于HTTP方法的变体
 
 ### @Component, @Controller, @Repository, @Service 有何区别？
 
-- @Component：将 java 类标记为 bean。它是任何 Spring 管理组件的通用构造型。Spring 的组件扫描机制可以将其拾取并将其拉入应用程序环境中
-- @Controller：将一个类标记为 Spring Web MVC 控制器。标有它的 Bean 会自动导入到 IoC 容器中
-- @Service：此注解是组件注解的特化。它不会对 @Component 注解提供任何其他行为。你可以在服务层类中使用 @Service 而不是 @Component，因为它以更好的方式指定了意图
-- @Repository：这个注解是具有类似用途和功能的 @Component 注解的特化。它为 DAO 提供了额外的好处。它将 DAO 导入 IoC 容器，并使未经检查的异常有资格转换为 Spring DataAccessException。
+| **注解**        | **用途**                                                     | **层次**          | **独特功能**                                                 |
+| --------------- | ------------------------------------------------------------ | ----------------- | ------------------------------------------------------------ |
+| **@Component**  | 通用注解，标识任何由 Spring 管理的组件，适用于不属于其他特定分类的类（如工具类、配置类） | 无明确分层        | 无附加功能，仅用于组件注册。                                 |
+| **@Controller** | 专用于 **Web 控制层**，处理 HTTP 请求和响应，常与 `@RequestMapping` 配合使用。 | 表现层（Web 层）  | 与 Spring MVC 深度整合，支持请求分发和视图解析。             |
+| **@Service**    | 标识 **业务逻辑层**，封装复杂业务规则和事务管理。            | 业务层（Service） | 无技术强制功能，但通过语义强调业务逻辑，便于代码分层。       |
+| **@Repository** | 用于 **数据访问层**（DAO），负责数据库操作。                 | 持久层（DAO 层）  | **自动转换数据库异常**（如 JDBC/SQL 异常 → Spring `DataAccessException`）。 |
+
+1. **派生关系**：
+   - `@Controller`、`@Service`、`@Repository`均继承自 `@Component`，本质上是其特化版本。
+   - 技术层面，四者均可互换（例如用 `@Component` 替代 `@Service`），但会破坏语义和功能特性。
+2. **功能差异**：
+   - `@Repository` 的异常转换是唯一性功能，其他注解无法替代。
+   - **@Controller** 与 Spring MVC 的 `DispatcherServlet` 深度绑定，支持视图解析和拦截器逻辑
 
 
 
@@ -1854,7 +1866,6 @@ public class CorsConfig {
     }
 
 }
-12345678910111213141516
 ```
 
 
