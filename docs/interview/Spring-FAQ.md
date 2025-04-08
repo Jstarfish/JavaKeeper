@@ -2,8 +2,9 @@
 title: Spring 面试集
 date: 2022-06-31
 tags: 
- - MySQL
-categories: Spring
+ - Spring
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)
@@ -209,37 +210,51 @@ Spring Boot 提供了异常处理的多种方式，主要通过以下几种手�
 
 ### Spring Boot 启动流程？
 
-Spring Boot 是一个基于 Spring 框架的快速开发框架，它简化了基于 Spring 的应用开发过程，提供了自动配置、微服务支持、监控等功能。Spring Boot 的启动流程主要包括以下几个步骤：
+Spring Boot 的启动流程围绕 `SpringApplication.run()` 方法展开，分为 **初始化阶段、环境准备、上下文创建与刷新、自动配置** 等步骤。整体流程可概括为：
 
-1. **初始化SpringApplication**：创建一个`SpringApplication`实例，它负责启动整个Spring Boot应用。
+```wiki
+启动类 main() → SpringApplication.run()
+├─ 初始化阶段：推断应用类型、加载初始化器/监听器
+├─ 环境准备：加载配置、创建监听器集合
+├─ 上下文创建：实例化 ApplicationContext
+├─ 上下文刷新：加载 Bean、自动配置、启动容器
+└─ 后置处理：执行 Runner、发布完成事件
+```
 
-2. **运行SpringApplication.run()**：调用`run()`方法开始启动流程。这个方法会触发Spring Boot的自动配置机制。
+ **1. 初始化阶段（SpringApplication 构造）**
 
-3. **加载应用类**：SpringApplication会查找主类（带有`@SpringBootApplication`注解的类），这个类通常包含了应用的主要配置。
+- 推断应用类型：通过类路径判断是 Web（Servlet/Reactive）或非 Web 应用，决定后续创建哪种 `ApplicationContext`
 
-   > 主启动类被标注为 `@SpringBootApplication`，这是一个复合注解，包括 `@SpringBootConfiguration`、`@EnableAutoConfiguration` 和 `@ComponentScan`，它们分别负责配置类声明、启用自动配置和包扫描。
+  （如 `AnnotationConfigServletWebServerApplicationContext`）。
 
-4. **创建并配置ApplicationContext**：SpringApplication会创建一个`ApplicationContext`，它是Spring应用的核心，负责管理Bean的生命周期和依赖注入。
+- 加载初始化器与监听器：从 `META-INF/spring.factories` 加载 `ApplicationContextInitializer`（用于自定义上下文初始化逻辑）和 `ApplicationListener`（监听启动事件，如 `ConfigFileApplicationListener` 加载配置文件）。
 
-5. **执行Bean定义的加载**：Spring Boot会加载所有的Bean定义，包括`@Component`、`@Service`、`@Repository`、`@Controller`等注解的类。
+- 确定主类：通过堆栈信息解析包含 `main()`的启动类，用于组件扫描。
 
-6. **自动配置**：Spring Boot的自动配置会根据类路径上的库、Bean的定义以及各种属性来决定配置哪些Bean。
+**2. 环境准备（`run()` 方法前半段）**
 
-   > `@EnableAutoConfiguration` 注解启用自动配置，通过读取 `META-INF/spring.factories` 文件，自动配置类会被加载并应用
+- 创建监听器集合：初始化 `SpringApplicationRunListeners`（如 `EventPublishingRunListener`），发布 `ApplicationStartingEvent`事件。
+- 加载配置环境：
+  - 构建 `ConfigurableEnvironment`，解析命令行参数和 `application.properties/yml`文件。
+  - 通过 `EnvironmentPostProcessor` 扩展环境变量（如 `RandomValuePropertySource` 支持随机值）。
+- 打印 Banner：加载并显示启动 Banner，支持自定义文本或图片。
 
-7. **注册所有的Bean**：将所有配置好的Bean注册到`ApplicationContext`中。
+**3. 上下文创建与刷新（核心阶段）**
 
-8. **调用所有的ApplicationListener**：Spring Boot会调用所有注册的事件监听器，这些监听器可以对Spring的生命周期事件做出响应。
+**调用 `SpringApplication.run()` 方法**：
 
-9. **刷新ApplicationContext**：调用`ApplicationContext.refresh()`方法，完成Bean的创建和初始化。
+- 创建应用上下文：根据应用类型实例化 `ApplicationContext`（如 Web 应用使用 `AnnotationConfigServletWebServerApplicationContext`）。
+- 准备上下文：关联环境变量、注册初始 Bean（如 `BeanDefinitionLoader` 加载启动类）。
+- 刷新上下文（`ApplicationContext.refresh()` 方法）：
+  1. 加载 Bean 定义：扫描 `@Component`、`@Configuration` 等注解，注册 Bean。
+  2. 执行自动配置：通过 `@EnableAutoConfiguration` 加载 `spring.factories` 中的自动配置类（如 `DataSourceAutoConfiguration`），结合条件注解（`@ConditionalOnClass`）按需加载。
+  3. 启动内嵌容器：Web 应用初始化 Tomcat/Jetty 服务器，监听端口
+  4. 完成单例 Bean 初始化：调用 `finishBeanFactoryInitialization()` 实例化所有非懒加载的单例 Bean
 
-10. **运行所有的@PostConstruct注解的方法**：在Bean初始化之后，Spring会调用所有带有`@PostConstruct`注解的方法。
+**4. 后置处理与启动完成**
 
-11. **调用所有的CommandLineRunner和ApplicationRunner**：如果应用中定义了`CommandLineRunner`或`ApplicationRunner`接口的实现，Spring Boot会在这时调用它们。
-
-12. **应用启动完成**：所有上述步骤完成后，Spring Boot应用就启动完成了，可以对外提供服务。
-
-这个流程是Spring Boot启动的大致概述，具体的实现细节可能会根据不同版本的Spring Boot有所差异。
+- 执行 Runner 接口：调用所有 `CommandLineRunner` 和 `ApplicationListener` ，执行启动后自定义逻辑（如初始化数据）。
+- **发布完成事件**：触发 `ApplicationReadyEvent`，通知应用已就绪
 
 
 

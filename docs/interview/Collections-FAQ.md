@@ -3,7 +3,8 @@ title: 「直击面试」—— Java 集合，你肯定也会被问到这些
 date: 2021-05-31
 tags: 
  - Java
-categories: Java
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

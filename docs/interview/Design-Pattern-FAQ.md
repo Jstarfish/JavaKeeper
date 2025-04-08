@@ -3,7 +3,8 @@ title: 「直击面试」—— 设计模式
 date: 2023-05-31
 tags: 
  - 设计模式
-categories: 设计模式
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

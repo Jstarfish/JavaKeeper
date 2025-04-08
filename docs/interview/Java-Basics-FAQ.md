@@ -3,7 +3,8 @@ title: Java 基础面试
 date: 2024-08-31
 tags: 
  - Java
-categories: Java
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

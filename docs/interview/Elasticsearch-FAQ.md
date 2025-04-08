@@ -3,7 +3,8 @@ title: 手撕 ES 面试
 date: 2024-05-31
 tags: 
  - Elasticsearch
-categories: Elasticsearch
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

@@ -3,7 +3,8 @@ title: MySQL 四万字精华总结 + 面试 100 问，和面试官扯皮绰绰�
 date: 2024-05-31
 tags: 
  - MySQL
-categories: MySQL
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

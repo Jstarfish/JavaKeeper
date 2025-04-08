@@ -3,10 +3,11 @@ title: RPC 面试专场
 date: 2024-05-31
 tags: 
  - RPC
-categories: RPC
+ - Interview
+categories: Interview
 ---
 
-![](https://img.starfish.ink/redis/redis-faq-banner.png)
+![](https://img.starfish.ink/common/faq-banner.png)
 
 ### 什么是 RPC ？
 

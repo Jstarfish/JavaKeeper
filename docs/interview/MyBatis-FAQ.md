@@ -3,6 +3,7 @@ title: MyBatis 面试
 date: 2024-1-9
 tags: 
  - MyBatis
+ - Interview
 categories: Interview
 ---
 

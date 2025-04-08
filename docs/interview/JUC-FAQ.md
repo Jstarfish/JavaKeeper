@@ -3,7 +3,8 @@ title: 手撕 JUC 面试
 date: 2024-05-31
 tags: 
  - JUC
-categories: JUC
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

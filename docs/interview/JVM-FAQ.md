@@ -3,7 +3,8 @@ title: 手撕 JVM 面试
 date: 2024-05-31
 tags: 
  - JVM
-categories: JVM
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

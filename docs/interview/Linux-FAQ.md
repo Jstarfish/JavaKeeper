@@ -1,17 +1,22 @@
-Linux 面试题通常会考察你对操作系统的理解，尤其是在系统管理、性能调优、文件系统、进程管理、网络配置、安全性等方面的知识。以下是一些常见的 Linux 面试题知识点和常见面试题的总结。
+---
+title: Linux 面试
+date: 2025-04-08
+tags: 
+ - Linux
+ - Interview
+categories: Interview
+---
+
+![](https://img.starfish.ink/common/faq-banner.png)
+
+> Linux 面试题通常会考察你对操作系统的理解，尤其是在系统管理、性能调优、文件系统、进程管理、网络配置、安全性等方面的知识。以下是一些常见的 Linux 面试题知识点和常见面试题的总结。
 
 ## 一、Linux 知识点
 
-1. 
-2. **文件系统**
-   - Linux 文件系统采用树形结构，从根目录 `/` 开始，并向下分支到各个子目录，如 `/home`、`/etc`、`/usr` 等。
-3. **权限管理**
-   - 文件权限、修改权限和所有者。
-4. - 
-5. **网络管理**
-   - 查看网络配置和网络排障工具。
-6. **系统安全**
-   - 如何查看系统日志、检查系统资源使用情况、配置静态 IP、创建和管理用户、查看和管理服务、设置定时任务、检测和修复文件系统错误、压缩和解压文件、查看和设置环境变量、查找文件和目录、监控系统性能等。
+1. **文件系统**：Linux 文件系统采用树形结构，从根目录 `/` 开始，并向下分支到各个子目录，如 `/home`、`/etc`、`/usr` 等。
+2. **权限管理**：文件权限、修改权限和所有者。
+3. **网络管理**：查看网络配置和网络排障工具。
+4. **系统安全**：如何查看系统日志、检查系统资源使用情况、配置静态 IP、创建和管理用户、查看和管理服务、设置定时任务、检测和修复文件系统错误、压缩和解压文件、查看和设置环境变量、查找文件和目录、监控系统性能等。
 
 
 
@@ -375,3 +380,95 @@ Linux查看日志的命令有多种：tail、cat、tac、head、echo等，只介
 
 
 
+### 如何编写一个备份日志的 Shell 脚本？
+
+```shell
+#!/bin/bash
+# 备份 /var/log 目录下的 .log 文件到 /backup 目录，保留7天
+BACKUP_DIR="/backup"
+LOG_DIR="/var/log"
+DATE=$(date +%Y%m%d)
+
+find $LOG_DIR -name "*.log" -exec cp {} $BACKUP_DIR/logs_$DATE \;
+find $BACKUP_DIR -name "logs_*" -mtime +7 -exec rm -f {} \;
+```
+
+
+
+### 如何快速定位 CPU 100% 问题？
+
+1. 定位高负载进程
+
+   ```bash
+   top -c          # 按P排序CPU使用
+   pidstat 1 5     # 细粒度进程统计
+   ```
+
+2. 分析线程状态
+
+   ```bash
+   top -H -p [PID]   # 查看线程
+   printf "%x\n" [TID]  # 将线程ID转为16进制
+   ```
+
+3. 结合 jstack/gdb 查看堆栈
+
+   ```bash
+   jstack [PID] | grep -A20 [nid]  # Java进程
+   gdb -p [PID] -ex "thread apply all bt" -batch  # 原生进程
+   ```
+
+   
+
+### 如何优化内存使用？
+
+```bash
+# 清除缓存（生产环境慎用）
+echo 3 > /proc/sys/vm/drop_caches
+
+# 调整swappiness
+sysctl vm.swappiness=10
+
+# 透明大页禁用
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
+```
+
+
+
+### 磁盘空间满的快速处理
+
+1. 定位大文件
+
+   ```bash
+   du -h --max-depth=1 / 2>/dev/null | sort -hr
+   ```
+
+2. 清理日志文件
+
+   ```bash
+   find /var/log -name "*.log" -size +100M -exec truncate -s 0 {} \;
+   ```
+
+3. 处理已删除但未释放空间的文件
+
+   ```bash
+   lsof | grep deleted   # 查找被删除但未释放的文件
+   kill -9 [PID]         # 重启相关进程
+   ```
+
+
+
+### **情景模拟题**
+
+**场景**：服务器响应缓慢，SSH 连接困难，请描述排查思路
+
+**排查步骤**：
+
+1. 快速登陆后使用 `w` 查看系统负载
+2. `dmesg -T | tail` 检查硬件/驱动错误
+3. `vmstat 1` 查看 CPU、内存、IO 综合情况
+4. `iostat -x 1` 定位磁盘瓶颈
+5. `sar -n DEV 1` 分析网络流量
+6. `pidstat -d 1` 找到高 IO 进程
+7. `strace -p [PID]` 跟踪进程系统调用
+8. 结合业务日志分析异常请求

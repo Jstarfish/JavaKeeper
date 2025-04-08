@@ -3,7 +3,8 @@ title: 网络面试 100 问，和面试官扯皮绰绰有余
 date: 2024-05-31
 tags: 
  - Network
-categories: Network
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/common/faq-banner.png)

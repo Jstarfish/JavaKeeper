@@ -3,7 +3,8 @@ title: Redis 面试专场
 date: 2024-05-31
 tags: 
  - Redis
-categories: Redis
+ - Interview
+categories: Interview
 ---
 
 ![](https://img.starfish.ink/redis/redis-faq-banner.png)
