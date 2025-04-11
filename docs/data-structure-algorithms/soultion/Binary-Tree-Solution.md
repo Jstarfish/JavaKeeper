@@ -829,28 +829,27 @@ public boolean isSameTree(TreeNode p, TreeNode q) {
 
 ```java
 public void flatten(TreeNode root) {
-    if (root == null) return;
+		if (root == null) {
+        return; // 如果根节点为空，则直接返回
+    }
 
-    // 递归处理左右子树，确保所有子树都已展开为链表
-    flatten(root.left);
-    flatten(root.right);
+    flatten(root.left); // 递归展开左子树
+    flatten(root.right); // 递归展开右子树
 
-    // 保存已展开的左右子树
-    TreeNode left = root.left;
-    TreeNode right = root.right;
-
-    // 将左子树移动到右子树位置，左指针置空
+    // 将左子树移到右子树的位置
+    TreeNode temp = root.right;
+    root.right = root.left;
     root.left = null;
-    root.right = left;
 
-    // 找到新右子树的末尾节点（从根节点开始遍历）
-    TreeNode curr = root;
+    // 找到当前右子树的末尾节点
+    TreeNode curr = root.right;
     while (curr.right != null) {
         curr = curr.right;
     }
 
-    // 将原右子树连接到新右子树的末尾
-    curr.right = right;
+    // 将原来的右子树接到当前右子树的末尾
+    curr.right = temp;
+  }
 }
 ```
 

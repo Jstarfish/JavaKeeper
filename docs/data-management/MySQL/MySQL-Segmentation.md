@@ -36,48 +36,77 @@ subtopic
 
 
 
-### 分区类型及操作
+- **RANGE分区**：基于属于一个给定连续区间的列值，把多行分配给分区。mysql将会根据指定的拆分策略，把数据放在不同的表文件上。相当于在文件上,被拆成了小块.但是,对外给客户的感觉还是一张表，透明的。
 
-#### RANGE分区
+  按照 range 来分，就是每个库一段连续的数据，这个一般是按比如**时间范围**来的，比如交易表啊，销售表啊等，可以根据年月来存放数据。可能会产生热点问题，大量的流量都打在最新的数据上了。
 
-mysql将会根据指定的拆分策略，,把数据放在不同的表文件上。相当于在文件上,被拆成了小块.但是,对外给客户的感觉还是一张表，透明的。
+  range 来分，好处在于说，扩容的时候很简单。
 
- 按照 range 来分，就是每个库一段连续的数据，这个一般是按比如**时间范围**来的，但是这种一般较少用，因为很容易产生热点问题，大量的流量都打在最新的数据上了。
+  ```mysql
+  CREATE TABLE sales (
+      id INT,
+      amount DECIMAL(10,2),
+      sale_date DATE
+  )
+  PARTITION BY RANGE (YEAR(sale_date)) (
+      PARTITION p0 VALUES LESS THAN (2000),
+      PARTITION p1 VALUES LESS THAN (2005),
+      PARTITION p2 VALUES LESS THAN (2010),
+      PARTITION p3 VALUES LESS THAN MAXVALUE
+  );
+  ```
 
- range 来分，好处在于说，扩容的时候很简单 
+- **LIST分区**：按列表划分，类似于RANGE分区，但使用的是明确的值列表。
 
-#### List分区
+  它们的主要区别在于，LIST分区中每个分区的定义和选择是基于某列的值从属于一个值列表集中的一个值，而RANGE分区是从属于一个连续区间值的集合。
 
-MySQL中的LIST分区在很多方面类似于RANGE分区。和按照RANGE分区一样，每个分区必须明确定义。它们的主要区别在于，LIST分区中每个分区的定义和选择是基于某列的值从属于一个值列表集中的一个值，而RANGE分区是从属于一个连续区间值的集合。
+  ```mysql
+  CREATE TABLE customers (
+      id INT,
+      name VARCHAR(50),
+      country VARCHAR(50)
+  )
+  PARTITION BY LIST (country) (
+      PARTITION p0 VALUES IN ('USA', 'Canada'),
+      PARTITION p1 VALUES IN ('UK', 'France'),
+      PARTITION p2 VALUES IN ('Germany', 'Italy')
+  );
+  ```
 
-#### 其它
+- **HASH分区**：按哈希算法划分，将数据根据某个列的哈希值均匀分布到不同的分区中。
 
-- Hash分区: hash 分发，好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表 
+  hash 分发，好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表 
 
-- Key分区
+  ```mysql
+  CREATE TABLE orders (
+      id INT,
+      order_date DATE,
+      customer_id INT
+  )
+  PARTITION BY HASH(id) PARTITIONS 4;
+  ```
 
-- 子分区
+- **KEY分区**：类似于HASH分区，但使用MySQL内部的哈希函数。
 
-#### 对NULL值的处理
+  ```mysql
+  CREATE TABLE logs (
+      id INT,
+      log_date DATE
+  )
+  PARTITION BY KEY(id) PARTITIONS 4;
+  ```
 
-
-MySQL中的分区在禁止空值NULL上没有进行处理，无论它是一个列值还是一个用户定义表达式的值，一般而言，在这种情况下MySQL把NULL当做零。如果你不希望出现类似情况，建议在设计表时声明该列“NOT NULL”
-
-
+  
 
 **看上去分区表很帅气，为什么大部分互联网还是更多的选择自己分库分表来水平扩展咧？**
 
-回答：
+- 分区表，分区键设计不太灵活，如果不走分区键，很容易出现全表锁
 
-1）分区表，分区键设计不太灵活，如果不走分区键，很容易出现全表锁
+- 一旦数据并发量上来，如果在分区表实施关联，就是一个灾难
 
-2）一旦数据量并发量上来，如果在分区表实施关联，就是一个灾难
+- 自己分库分表，自己掌控业务场景与访问模式，可控。分区表，研发写了一个sql，都不确定mysql是怎么玩的，不太可控
 
-3）自己分库分表，自己掌控业务场景与访问模式，可控。分区表，研发写了一个sql，都不确定mysql是怎么玩的，不太可控
-
-4）运维的坑，嘿嘿
-
-
+  
 
 ## Mysql分库
 

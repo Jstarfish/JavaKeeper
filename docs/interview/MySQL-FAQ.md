@@ -1309,6 +1309,10 @@ UNION和UNION ALL都是将两个结果集合并为一个，**两个要联合的S
 
 在 MySQL 的 InnoDB 引擎里面，锁是借助索引来实现的。或者说，加锁锁住的其实是索引项，更加具体地来说，就是锁住了**叶子节点**
 
+1. **锁的物理载体**：B+树索引节点（非数据页）
+2. **锁升级条件**：无索引或索引失效时退化为表锁
+3. **锁兼容性**：共享锁（S锁）允许并行读，排他锁（X锁）独占写
+
 ### MySQL 中有哪几种锁，列举一下？
 
 **从对数据操作的类型分类**：
@@ -2024,9 +2028,15 @@ Shell> mysqladmin extended-status -u username -p password——显示状态信�
 
 ### MySQL分区？
 
-一般情况下我们创建的表对应一组存储文件，使用`MyISAM`存储引擎时是一个`.MYI`和`.MYD`文件，使用`Innodb`存储引擎时是一个`.ibd`和`.frm`（表结构）文件。
+一般情况下我们创建的表对应一组存储文件
+
+1. **未分区的表文件结构**
+   - **MyISAM引擎**： `.frm`（表结构） + `.MYD`（数据文件） + `.MYI`（索引文件） *例如：`user.frm`、`user.MYD`、`user.MYI`* 
+   - **InnoDB引擎**： `.frm`（表结构） + `.ibd`（数据+索引文件） *例如：`user.frm`、`user.ibd`* 
 
 当数据量较大时（一般千万条记录级别以上），MySQL的性能就会开始下降，这时我们就需要将数据分散到多组存储文件，保证其单个文件的执行效率
+
+2. **分区后的表文件结构** 每个分区对应独立的物理文件，文件命名规则为： `表名#分区名.ibd` *例如：`user#p0.ibd`、`user#p1.ibd`*
 
 MySQL分区是一种数据库优化技术，通过将表的数据划分为更小、更易管理的部分，来提高查询性能和管理效率。下面是关于MySQL分区的一些关键点，适合在面试中讨论：
 
@@ -2040,67 +2050,12 @@ MySQL分区是一种数据库优化技术，通过将表的数据划分为更小
 
 **分区类型及操作**
 
-- **RANGE分区**：基于属于一个给定连续区间的列值，把多行分配给分区。mysql将会根据指定的拆分策略，把数据放在不同的表文件上。相当于在文件上,被拆成了小块.但是,对外给客户的感觉还是一张表，透明的。
-
-  按照 range 来分，就是每个库一段连续的数据，这个一般是按比如**时间范围**来的，比如交易表啊，销售表啊等，可以根据年月来存放数据。可能会产生热点问题，大量的流量都打在最新的数据上了。
-
-  range 来分，好处在于说，扩容的时候很简单。
-
-  ```mysql
-  CREATE TABLE sales (
-      id INT,
-      amount DECIMAL(10,2),
-      sale_date DATE
-  )
-  PARTITION BY RANGE (YEAR(sale_date)) (
-      PARTITION p0 VALUES LESS THAN (2000),
-      PARTITION p1 VALUES LESS THAN (2005),
-      PARTITION p2 VALUES LESS THAN (2010),
-      PARTITION p3 VALUES LESS THAN MAXVALUE
-  );
-  ```
-
-- **LIST分区**：按列表划分，类似于RANGE分区，但使用的是明确的值列表。
-
-  它们的主要区别在于，LIST分区中每个分区的定义和选择是基于某列的值从属于一个值列表集中的一个值，而RANGE分区是从属于一个连续区间值的集合。
-
-  ```mysql
-  CREATE TABLE customers (
-      id INT,
-      name VARCHAR(50),
-      country VARCHAR(50)
-  )
-  PARTITION BY LIST (country) (
-      PARTITION p0 VALUES IN ('USA', 'Canada'),
-      PARTITION p1 VALUES IN ('UK', 'France'),
-      PARTITION p2 VALUES IN ('Germany', 'Italy')
-  );
-  ```
-
-- **HASH分区**：按哈希算法划分，将数据根据某个列的哈希值均匀分布到不同的分区中。
-
-  hash 分发，好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表 
-
-  ```mysql
-  CREATE TABLE orders (
-      id INT,
-      order_date DATE,
-      customer_id INT
-  )
-  PARTITION BY HASH(id) PARTITIONS 4;
-  ```
-
-- **KEY分区**：类似于HASH分区，但使用MySQL内部的哈希函数。
-
-  ```mysql
-  CREATE TABLE logs (
-      id INT,
-      log_date DATE
-  )
-  PARTITION BY KEY(id) PARTITIONS 4;
-  ```
-
-  
+| 类型      | 说明                                                         | 适用场景                 | 性能风险点                       | 示例场景               |
+| --------- | ------------------------------------------------------------ | ------------------------ | -------------------------------- | ---------------------- |
+| **RANGE** | 基于属于一个给定连续区间的列值，把多行分配给分区             | 时间序列、连续数值       | 数据倾斜导致热点分区（如最新月） | 订单表按创建年份分区   |
+| **LIST**  | 按列表划分，类似于RANGE分区，但使用的是明确的值列表          | 离散枚举值（地区、状态） | 分区键值变更需重构分区           | 用户表按国家代码分区   |
+| **HASH**  | 按哈希算法划分，将数据根据某个列的哈希值均匀分布到不同的分区中 | 均匀分布请求压力         | 扩容需重新计算哈希分布           | 评论表按用户ID哈希分区 |
+| **KEY**   | 类似于HASH分区，但使用MySQL内部的哈希函数                    | 非整型字段的均匀分布     | 依赖MySQL内置哈希算法            | 日志表按UUID前缀分区   |
 
 **看上去分区表很帅气，为什么大部分互联网还是更多的选择自己分库分表来水平扩展咧？**
 
@@ -2191,13 +2146,18 @@ MySQL分区是一种数据库优化技术，通过将表的数据划分为更小
 
 - 雪花算法（SnowFlake）：`Snowflake`生成的是Long类型的ID，一个Long类型占8个字节，每个字节占8比特，也就是说一个Long类型占64个比特
 
-  Snowflake ID组成结构：`正数位`（占1比特）+ `时间戳`（占41比特）+ `机器ID`（占5比特）+ `数据中心`（占5比特）+ `自增值`（占12比特），总共64比特组成的一个Long类型。
+  Snowflake ID 组成结构：`正数位`（占1比特）+ `时间戳`（占41比特）+ `机器ID`（占5比特）+ `数据中心`（占5比特）+ `自增值`（占12比特），总共64比特组成的一个Long类型。
 
-- 滴滴出品（TinyID）
+  - **缺点**：时钟回拨需特殊处理
+  - 改进：
+    - 百度UidGenerator：自定义时间位、引入RingBuffer
+    - 美团Leaf：混用号段模式应对时钟问题 
+
+- 滴滴出品（TinyID）：基于ZooKeeper的号段服务化
 
 - 百度 （Uidgenerator）
 
-- 美团（Leaf）
+- 美团（Leaf）：号段模式 + 双Buffer预加载
 
 
 

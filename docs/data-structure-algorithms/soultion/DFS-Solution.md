@@ -153,59 +153,61 @@ categories: leetcode
 > 输出：true
 > ```
 
-- **DFS 思路**：从每个起点出发，四方向搜索匹配字符，回溯恢复现场。
+思路：本问题是典型的回溯问题，需要使用**深度优先搜索（DFS）+ 剪枝**解决。
 
-- 代码实现：
+**DFS 思路**：从每个起点出发，四方向搜索匹配字符，回溯恢复现场。
 
-  ```java
-  public boolean exist(char[][] board, String word) {
-      // 遍历网格中的每一个单元格作为起始点
-      for (int i = 0; i < board.length; i++) {
-          for (int j = 0; j < board[0].length; j++) {
-              // 注意：此处缺少首字符过滤，会进入不必要的递归，但最终结果正确
-              if (dfs(board, word, 0, i, j)) 
-                  return true; // 找到路径立即返回
-          }
-      }
-      return false; // 全部遍历后仍未找到
-  }
-  
-  /**
-   * 深度优先搜索核心方法
-   * @param board 二维字符网格
-   * @param word 目标单词
-   * @param idx 当前需要匹配的字符索引
-   * @param r 当前行坐标
-   * @param c 当前列坐标
-   * @return 是否找到有效路径
-   */
-  private boolean dfs(char[][] board, String word, int idx, int r, int c) {
-      // 成功条件：已匹配完所有字符
-      if (idx == word.length()) return true;
-      
-      // 边界检查 + 剪枝（当前字符不匹配）
-      if (r < 0 || c < 0 || r >= board.length || c >= board[0].length 
-          || board[r][c] != word.charAt(idx)) 
-          return false;
-      
-      // 标记已访问（防止重复使用）
-      char tmp = board[r][c];
-      board[r][c] = '#'; 
-      
-      // 向四个方向递归搜索（顺序：下、上、右、左）
-      boolean res = dfs(board, word, idx + 1, r + 1, c)  // 向下
-                 || dfs(board, word, idx + 1, r - 1, c)  // 向上
-                 || dfs(board, word, idx + 1, r, c + 1)  // 向右
-                 || dfs(board, word, idx + 1, r, c - 1); // 向左
-      
-      // 回溯：恢复现场，让其他路径能重新访问该节点
-      board[r][c] = tmp;
-      
-      return res;
-  }
-  ```
+```java
+public boolean exist(char[][] board, String word) {
+    // 遍历网格中的每一个单元格作为起始点
+    for (int i = 0; i < board.length; i++) {
+        for (int j = 0; j < board[0].length; j++) {
+            // 注意：此处缺少首字符过滤，会进入不必要的递归，但最终结果正确
+            if (dfs(board, word, 0, i, j)) 
+                return true; // 找到路径立即返回
+        }
+    }
+    return false; // 全部遍历后仍未找到
+}
+
+/**
+ * 深度优先搜索核心方法
+ * @param board 二维字符网格
+ * @param word 目标单词
+ * @param idx 当前需要匹配的字符索引
+ * @param r 当前行坐标
+ * @param c 当前列坐标
+ * @return 是否找到有效路径
+ */
+private boolean dfs(char[][] board, String word, int idx, int r, int c) {
+    // 成功条件：已匹配完所有字符
+    if (idx == word.length()) return true;
+    
+    // 边界检查 + 剪枝（当前字符不匹配）
+    if (r < 0 || c < 0 || r >= board.length || c >= board[0].length 
+        || board[r][c] != word.charAt(idx)) 
+        return false;
+    
+    // 标记已访问（防止重复使用）
+    char tmp = board[r][c];
+    board[r][c] = '#'; 
+    
+    // 向四个方向递归搜索（顺序：下、上、右、左）
+    boolean res = dfs(board, word, idx + 1, r + 1, c)  // 向下
+               || dfs(board, word, idx + 1, r - 1, c)  // 向上
+               || dfs(board, word, idx + 1, r, c + 1)  // 向右
+               || dfs(board, word, idx + 1, r, c - 1); // 向左
+    
+    // 回溯：恢复现场，让其他路径能重新访问该节点
+    board[r][c] = tmp;
+    
+    return res;
+}
+```
 
 - **复杂度**：时间 $O(mn × 3ᴸ)$，空间 $O(L)$（L 为单词长度）。
+
+
 
 ### 4.2 树相关 DFS 问题
 
@@ -230,7 +232,7 @@ categories: leetcode
 思路：深度优先搜索
 
 ```java
-public static int maxDepth(TreeNode root) {
+public int maxDepth(TreeNode root) {
   if (root == null) {
     return 0;
   } 
@@ -283,7 +285,7 @@ public boolean isSymmetric(TreeNode root){
 }
 
 public boolean check(TreeNode left,TreeNode right){
-  //递归的终止条件是两个节点都为空
+  //递归的终止条件是两个节点都为空,必须先判断这个，确保都为null
   //或者两个节点中有一个为空
   //或者两个节点的值不相等
   if(left==null && right==null){
@@ -300,9 +302,15 @@ public boolean check(TreeNode left,TreeNode right){
 
 #### [验证二叉搜索树『98』](https://leetcode.cn/problems/validate-binary-search-tree/)
 
-- **问题描述**：判断二叉树是否满足 BST 性质。
+> **问题描述**：判断二叉树是否满足 BST 性质。
+>
+> **有效** 二叉搜索树定义如下：
+>
+> - 节点的左子树只包含 **小于** 当前节点的数。
+> - 节点的右子树只包含 **大于** 当前节点的数。
+> - 所有左子树和右子树自身必须也是二叉搜索树。
 
-- **DFS 思路**：传递当前节点的值范围 [min, max]。
+思路：**DFS 思路**：我们可以在遍历的过程中维护一个范围（最大值到最小值），并检查每个节点的值是否落在这个范围内。
 
 - 代码实现：
 
@@ -312,10 +320,11 @@ public boolean check(TreeNode left,TreeNode right){
   }
   
   private boolean validate(TreeNode node, long min, long max) {
+      //叶子结点为空，说明不违反BST性质，true
       if (node == null) return true;
       //当前节点小于等于最小值或大于等于最大值，不满足
       if (node.val <= min || node.val >= max) return false;
-      //递归左右子树，左子树的话，传递当前值为最大值
+      //递归左右子树，左子树的话，传递当前值为最大值，这里要用 && 且
       return validate(node.left, min, node.val) 
           && validate(node.right, node.val, max);
   }
