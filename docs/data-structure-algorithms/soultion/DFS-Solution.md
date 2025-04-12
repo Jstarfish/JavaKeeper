@@ -90,38 +90,43 @@ categories: leetcode
 
 #### [岛屿数量『200』](https://leetcode.cn/problems/number-of-islands/)
 
-- **问题描述**：给你一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，请你计算网格中岛屿的数量。
+> 给你一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，请你计算网格中岛屿的数量。
+>
+> 岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。
+>
+> 此外，你可以假设该网格的四条边均被水包围。![](https://pic.leetcode-cn.com/c36f9ee4aa60007f02ff4298bc355fd6160aa2b0d628c3607c9281ce864b75a2.jpg)
+>
+> ```
+> 输入：grid = [
+>   ["1","1","1","1","0"],
+>   ["1","1","0","1","0"],
+>   ["1","1","0","0","0"],
+>   ["0","0","0","0","0"]
+> ]
+> 输出：1
+> ```
 
-  ![](https://pic.leetcode-cn.com/c36f9ee4aa60007f02ff4298bc355fd6160aa2b0d628c3607c9281ce864b75a2.jpg)
+**思路**：
 
-  ```
-  输入：grid = [
-    ["1","1","1","1","0"],
-    ["1","1","0","1","0"],
-    ["1","1","0","0","0"],
-    ["0","0","0","0","0"]
-  ]
-  输出：1
-  ```
+- 遍历网格，遇到未访问的`'1'`时启动DFS，将该岛屿所有相连陆地标记为已访问。
+- **标记方式**：直接修改原数组（如`'1'`→`'0'`），或使用独立`visited`数组
 
-- **DFS 思路**：遍历网格，遇到 '1' 时启动 DFS 淹没相连的陆地。
-
-- 代码实现：
-
-  ```java
+```java
+public Class Soultion{
   public int numIslands(char[][] grid) {
-      int count = 0;
-      for (int i = 0; i < grid.length; i++) {
-          for (int j = 0; j < grid[0].length; j++) {
-              if (grid[i][j] == '1') {
-                  dfs(grid, i, j);
-                  count++;
-              }
-          }
-      }
-      return count;
-  }
-  
+    int count = 0;
+    for (int i = 0; i < grid.length; i++) {
+        for (int j = 0; j < grid[0].length; j++) {
+            //如果当前是陆地，才开始一次DFS遍历
+            if (grid[i][j] == '1') {
+                dfs(grid, i, j);
+                count++;
+            }
+        }
+    }
+    return count;
+ }	
+
   private void dfs(char[][] grid, int r, int c) {
        // 判断 base case
       // 检查边界条件和当前位置是否为陆地
@@ -134,7 +139,22 @@ categories: leetcode
       dfs(grid, r, c + 1);
       dfs(grid, r, c - 1);
   }
-  ```
+}
+
+---单测
+@Test
+public void testNumIslands_singleIsland() {
+    char[][] grid = {
+            {'1', '1', '1', '1', '0'},
+            {'1', '1', '0', '1', '0'},
+            {'1', '1', '0', '0', '0'},
+            {'0', '0', '0', '0', '0'}
+    };
+    DfsSolution solution = new DfsSolution();
+    int result = solution.numIslands(grid);
+    assertEquals(1, result);
+}
+```
 
 - **复杂度**：时间 $O(MN)$，空间 $O(MN)$（递归栈）。
 
@@ -490,6 +510,86 @@ public boolean check(TreeNode left,TreeNode right){
   ```
 
 - **复杂度**：时间 O(4^N/√N)，空间 O(N)。
+
+
+
+#### [课程表『207』](https://leetcode.cn/problems/course-schedule/)
+
+> 你这个学期必须选修 `numCourses` 门课程，记为 `0` 到 `numCourses - 1` 。
+>
+> 在选修某些课程之前需要一些先修课程。 先修课程按数组 `prerequisites` 给出，其中 `prerequisites[i] = [ai, bi]` ，表示如果要学习课程 `ai` 则 **必须** 先学习课程 `bi` 。
+>
+> - 例如，先修课程对 `[0, 1]` 表示：想要学习课程 `0` ，你需要先完成课程 `1` 。
+>
+> 请你判断是否可能完成所有课程的学习？如果可以，返回 `true` ；否则，返回 `false` 。
+>
+> ```
+> 输入：numCourses = 2, prerequisites = [[1,0],[0,1]]
+> 输出：false
+> 解释：总共有 2 门课程。学习课程 1 之前，你需要先完成 课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。
+> ```
+
+思路：要检测有向图中的环，我们可以使用DFS遍历图，并记录访问状态。在遍历过程中，如果我们遇到一个已经访问过的节点，并且它不是当前节点的父节点（在递归调用中），那么我们就找到了一个环。
+
+```java
+public class Solution {
+    private boolean hasCycle = false;
+
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // 构建图的邻接表表示
+        List<List<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new ArrayList<>());
+        }
+        for (int[] prerequisite : prerequisites) {
+            int course = prerequisite[0];
+            int prerequisiteCourse = prerequisite[1];
+            graph.get(prerequisiteCourse).add(course);
+        }
+
+        // 初始化访问状态数组
+        boolean[] visited = new boolean[numCourses];
+        boolean[] recursionStack = new boolean[numCourses];
+
+        // 对每个节点进行DFS遍历
+        for (int i = 0; i < numCourses; i++) {
+            if (!visited[i]) {
+                dfs(graph, visited, recursionStack, i);
+            }
+            // 如果在DFS过程中检测到了环，则提前返回false
+            if (hasCycle) {
+                return false;
+            }
+        }
+
+        // 如果没有检测到环，则返回true
+        return true;
+    }
+
+    private void dfs(List<List<Integer>> graph, boolean[] visited, boolean[] recursionStack, int node) {
+        // 将当前节点标记为已访问
+        visited[node] = true;
+        // 将当前节点加入递归栈
+        recursionStack[node] = true;
+
+        // 遍历当前节点的所有邻接节点
+        for (int neighbor : graph.get(node)) {
+            // 如果邻接节点未被访问，则递归访问
+            if (!visited[neighbor]) {
+                dfs(graph, visited, recursionStack, neighbor);
+            } else if (recursionStack[neighbor]) {
+                // 如果邻接节点已经在递归栈中，说明存在环
+                hasCycle = true;
+            }
+        }
+
+        // 将当前节点从递归栈中移除
+        recursionStack[node] = false;
+    }
+}
+```
+
+
 
 #### [目标和『494』](https://leetcode.cn/problems/target-sum/)
 

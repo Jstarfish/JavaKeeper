@@ -652,7 +652,7 @@ public int minDepth(TreeNode root) {
 在**前序位置操作**是为了确保在递归遍历时，首先处理当前节点的子树，具体是交换左右子树的顺序。这样做能够保证在遍历左右子树之前，当前节点的左右子节点已经被正确地交换。
 
 ```java
-public static TreeNode invertTree(TreeNode root) {
+public TreeNode invertTree(TreeNode root) {
   if(root == null){
     return root;
   }
@@ -1526,19 +1526,20 @@ class Solution {
         int[] result = dfs(root);
         return Math.max(result[0], result[1]);
     }
-
+    
+    // 返回数组：int[0]表示偷当前节点的最大值，int[1]表示不偷的最大值
     private int[] dfs(TreeNode node) {
-        if (node == null) {
-            return new int[]{0, 0}; // {rob(node), notRob(node)}
-        }
-
-        int[] left = dfs(node.left);
-        int[] right = dfs(node.right);
-
-        int robNode = node.val + left[1] + right[1]; // 抢劫当前节点
-        int notRobNode = Math.max(left[0], left[1]) + Math.max(right[0], right[1]); // 不抢劫当前节点
-
-        return new int[]{robNode, notRobNode};
+        if (node == null) return new int[]{0, 0}; // 
+        
+        int[] left = dfs(node.left);   // 左子树偷/不偷的最大值
+        int[] right = dfs(node.right); // 右子树偷/不偷的最大值
+        
+        // 偷当前节点：左右子节点必须不偷
+        int robCurrent = node.val + left[1] + right[1]; 
+        // 不偷当前节点：左右子节点可偷或不偷（取最大值）
+        int skipCurrent = Math.max(left[0], left[1]) + Math.max(right[0], right[1]); 
+        
+        return new int[]{robCurrent, skipCurrent}; // 
     }
 }
 ```
@@ -1554,9 +1555,9 @@ class Solution {
 > ![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
 >
 > ```
-> 输入：root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
-> 输出：3
-> 解释：节点 5 和节点 1 的最近公共祖先是节点 3 。
+> 输入：root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+> 输出：5
+> 解释：节点 5 和节点 4 的最近公共祖先是节点 5 。因为根据定义最近公共祖先节点可以为节点本身。
 > ```
 
 **思路：** 
@@ -1573,13 +1574,33 @@ class Solution {
 
 
 ```java
-public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-    if(root == null || root == p || root == q) return root;
-    TreeNode left = lowestCommonAncestor(root.left, p, q);
-    TreeNode right = lowestCommonAncestor(root.right, p, q);
-    if(left == null) return right;
-    if(right == null) return left;
-    return root;
+public class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // 如果当前节点为空，则返回null
+        if (root == null) {
+            return null;
+        }
+        // 如果当前节点是p或q，则返回当前节点
+        if (root == p || root == q) {
+            return root;
+        }
+        // 递归地在左子树中查找p和q
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        // 递归地在右子树中查找p和q
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+        // 根据left和right的值来判断最近公共祖先
+        if (left != null && right != null) {
+            // p和q分别位于左右子树中，当前节点是最近公共祖先
+            return root;
+        } else if (left != null) {
+            // p和q都在左子树中，返回左子树的结果
+            return left;
+        } else {
+            // p和q都在右子树中，返回右子树的结果
+            return right;
+        }
+    }
 }
 ```
 
