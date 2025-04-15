@@ -48,7 +48,7 @@
 
 类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：**加载、验证、准备、解析、初始化、使用和卸载**七个阶段。(验证、准备和解析又统称为连接，为了支持 Java 语言的**运行时绑定**，所以**解析阶段也可以是在初始化之后进行的**。以上顺序都只是说开始的顺序，实际过程中是交叉的混合式进行的，加载过程中可能就已经开始验证了)
 
-![jvm-class-load](https://tva1.sinaimg.cn/large/0082zybply1gbnxhplvkrj30yi0d60ty.jpg)
+![jvm-class-load](https://img.starfish.ink/jvm/jvm-class-load.png)
 
 ### 1. 加载（Loading）：
 

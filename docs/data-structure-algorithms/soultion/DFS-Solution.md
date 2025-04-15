@@ -382,6 +382,91 @@ public boolean check(TreeNode left,TreeNode right){
 
 - **复杂度**：时间 $O(N^2)$，空间 $O(N)$。
 
+#### [二叉树的直径『543』](https://leetcode.cn/problems/diameter-of-binary-tree/)
+
+> 给你一棵二叉树的根节点，返回该树的 **直径** 。
+>
+> 二叉树的 **直径** 是指树中任意两个节点之间最长路径的 **长度** 。这条路径可能经过也可能不经过根节点 `root` 。
+>
+> 两节点之间路径的 **长度** 由它们之间边数表示。
+>
+> ![img](https://assets.leetcode.com/uploads/2021/03/06/diamtree.jpg)
+>
+> ```
+> 输入：root = [1,2,3,4,5]
+> 输出：3
+> 解释：3 ，取路径 [4,2,1,3] 或 [5,2,1,3] 的长度。
+> ```
+
+```java
+public class Solution {
+    private int result = 0; // 用于存储树的最大直径
+
+    public int diameterOfBinaryTree(TreeNode root) {
+        traverse(root); // 遍历树并计算直径
+        return result; // 返回直径
+    }
+
+    private int traverse(TreeNode root) {
+        if (root == null) {
+            return 0; // 空节点的高度为 0
+        }
+
+        int left = traverse(root.left); // 递归计算左子树的高度
+        int right = traverse(root.right); // 递归计算右子树的高度
+
+        int diameter = left + right; // 通过当前节点的最长路径长度，所以没 +1
+        result = Math.max(diameter, result); // 更新最大直径
+
+        return Math.max(left, right) + 1; // 返回当前节点的高度（包括当前节点，所以要+1）
+    }
+}
+```
+
+#### [把二叉搜索树转换为累加树『538』](https://leetcode.cn/problems/convert-bst-to-greater-tree/)
+
+> 给出二叉 **搜索** 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），使每个节点 `node` 的新值等于原树中大于或等于 `node.val` 的值之和。
+>
+> 提醒一下，二叉搜索树满足下列约束条件：
+>
+> - 节点的左子树仅包含键 **小于** 节点键的节点。
+> - 节点的右子树仅包含键 **大于** 节点键的节点。
+> - 左右子树也必须是二叉搜索树。
+>
+> **![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/05/03/tree.png)**
+>
+> ```
+> 输入：[4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]
+> 输出：[30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+> ```
+
+思路：按二叉搜索树的性质，对于任意节点 node，其右子树的所有节点都大于 node 的值，所以，利用中序遍历的逆序（从右子节点开始遍历到左子节点，最后访问根节点）来累加节点的值。
+
+```java
+class Solution {
+    private int sum = 0;
+
+    public TreeNode convertBST(TreeNode root) {
+        traverse(root);
+        return root;
+    }
+
+    private void traverse(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+        traverse(node.right); // 递归右子树
+      
+        node.val += sum; //更新节点值和累加和
+        sum = node.val; // 此时 sum 就是 >= node.val 的所有数之和
+      
+        traverse(node.left); // 递归左子树
+    }
+}
+```
+
+
+
 ### 4.3 回溯算法经典问题
 
 #### [全排列『46』](https://leetcode.cn/problems/permutations/description/)
