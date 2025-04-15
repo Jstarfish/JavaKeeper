@@ -906,17 +906,92 @@ JVM 在我们创建 Java 对象的时候去分配新内存，并使用 GC 算法
 
 ### 对象的死亡过程?
 
-1. 第一次标记
+在 Java 中，对象被垃圾回收器（Garbage Collector, GC）判定为“死亡”并回收内存的过程，涉及 **两次标记** 和潜在的 **自救机会**（通过 `finalize()` 方法）
 
-​	对象在进行可达性分析后发现没有与 GC Roots 相连接的引用链，那它将会被第一次标记。
+**一、第一次标记：可达性分析**
 
-2. 第二次标记
+1. **触发条件**：当 JVM 开始垃圾回收时，首先通过 **可达性分析算法（Reachability Analysis）** 判断对象是否存活。
 
-   假如对象没有覆盖 finalize 方法，或者 finalize 方法已经被虚拟机调用过，那么不执行 finalize 方法。
-   如果有必要执行 finalize 方法，那么该对象将会被放置在一个名为 F-Queue 的队列之中，并在稍后由一条由虚拟机自动建立的、低调度优先级的 Finalizer 线程去执行它们的 finalize 方法。
+2. **GC Roots 的引用链**
 
-   finalize 方法是对象逃脱死亡命运的最后一次机会，稍后收集器将对 F-Queue 中的对象进行第二次小规模的标记，如果对象要在 finalize 中成功拯救自己，只要重新与引用链上的任何一个对象建立关联即可。
-   如果对象这时候还没有逃脱，那基本上它就真的要被回收了。
+   - GC Roots 对象包括：
+     - 虚拟机栈（栈帧中的局部变量表）引用的对象。
+     - 方法区中静态变量引用的对象。
+     - 方法区中常量引用的对象（如字符串常量池）。
+     - JNI（Java Native Interface）引用的本地方法栈对象。
+
+   - **遍历过程**：从 GC Roots 出发，递归遍历所有引用链。未被遍历到的对象即为不可达对象。
+
+3. **第一次标记结果**
+
+   - **存活对象**：与 GC Roots 存在引用链，继续保留。
+
+   - **待回收对象**：不可达，被标记为“可回收”，进入第二次标记阶段。
+
+**二、第二次标记：finalize() 方法的自救机会**
+
+1. **筛选条件**
+
+   - 若对象未覆盖 `finalize()` 方法，或 `finalize()` 已被调用过，则直接判定为死亡，无需进入队列。
+
+   - 若对象覆盖了 `finalize()` 且未被调用过，则将其加入 **F-Queue 队列**，进入自救流程。
+
+2. **F-Queue 与 Finalizer 线程**
+
+   - **F-Queue**：一个低优先级的队列，存放待执行 `finalize()` 的对象。
+
+   - Finalizer 线程：JVM 创建的守护线程，负责异步执行队列中对象的 `finalize()` 方法。
+     - **注意**：`finalize()` 的执行不保证完成（如线程优先级低或方法死循环）。
+
+3. **自救机制**
+
+   在 `finalize()` 方法中，对象可通过重新与 GC Roots 引用链建立关联来自救：
+
+   ```java
+   public class Zombie {
+       private static Zombie SAVE_HOOK;
+   
+       @Override
+       protected void finalize() throws Throwable {
+           super.finalize();
+           System.out.println("finalize() 执行，对象自救");
+           SAVE_HOOK = this; // 重新建立与 GC Roots 的关联
+       }
+   
+       public static void main(String[] args) throws Exception {
+           SAVE_HOOK = new Zombie();
+           SAVE_HOOK = null; // 断开引用，触发 GC
+           System.gc();
+           Thread.sleep(500); // 等待 Finalizer 线程执行 finalize()
+           if (SAVE_HOOK != null) {
+               System.out.println("对象存活");
+           } else {
+               System.out.println("对象被回收");
+           }
+       }
+   }
+   
+   
+   ----- 输出结果
+   finalize() 执行，对象自救
+   对象存活
+   ```
+
+- 关键点：
+  - 对象通过 `finalize()` 将 `this` 赋值给静态变量 `SAVE_HOOK`，重新建立与 GC Roots 的引用链。
+  - 自救仅生效一次，第二次 GC 时对象仍会被回收。
+
+**三、对象回收的最终判定**
+
+1. **第二次标记结果**
+
+   - **自救成功**：对象重新与引用链关联，移出待回收集合。
+
+   - **自救失败**：对象仍不可达，被标记为“死亡”，等待内存回收。
+
+2. **回收内存**
+
+   根据垃圾收集算法（如标记-清除、复制、标记-整理等），将死亡对象的内存回收。
 
 
 
