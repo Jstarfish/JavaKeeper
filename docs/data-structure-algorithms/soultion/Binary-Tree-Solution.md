@@ -1574,32 +1574,30 @@ class Solution {
 
 
 ```java
-public class Solution {
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        // 如果当前节点为空，则返回null
-        if (root == null) {
-            return null;
-        }
-        // 如果当前节点是p或q，则返回当前节点
-        if (root == p || root == q) {
-            return root;
-        }
-        // 递归地在左子树中查找p和q
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        // 递归地在右子树中查找p和q
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
+public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    // 如果当前节点为空，则返回null
+    if (root == null) {
+        return null;
+    }
+    // 如果当前节点是p或q，则返回当前节点
+    if (root == p || root == q) {
+        return root;
+    }
+    // 递归地在左子树中查找p和q
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    // 递归地在右子树中查找p和q
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
 
-        // 根据left和right的值来判断最近公共祖先
-        if (left != null && right != null) {
-            // p和q分别位于左右子树中，当前节点是最近公共祖先
-            return root;
-        } else if (left != null) {
-            // p和q都在左子树中，返回左子树的结果
-            return left;
-        } else {
-            // p和q都在右子树中，返回右子树的结果
-            return right;
-        }
+    // 根据left和right的值来判断最近公共祖先
+    if (left != null && right != null) {
+        // p和q分别位于左右子树中，当前节点是最近公共祖先
+        return root;
+    } else if (left != null) {
+        // p和q都在左子树中，返回左子树的结果
+        return left;
+    } else {
+        // p和q都在右子树中，返回右子树的结果
+        return right;
     }
 }
 ```

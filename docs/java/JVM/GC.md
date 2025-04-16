@@ -1,3 +1,5 @@
+![article-image](https://cdn.packtpub.com/article-hub/articles/23c5e054335d39909b5020b1f241ff4d.jpg)
+
 # 垃圾回收机制
 
 ## 一、前言

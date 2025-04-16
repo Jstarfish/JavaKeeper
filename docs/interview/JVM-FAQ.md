@@ -409,6 +409,8 @@ protected Class<?> loadClass(String name, boolean resolve)
 
 > - 直接内存（Direct Memory）区域， Direct Buffer 所直接分配的内存，也是个容易出现问题的地方。尽管，在 JVM 工程师的眼中，并不认为它是 JVM 内部内存的一部分，也并未体现 JVM 内存模型中。
 > - JVM 本身是个本地程序，还需要其他的内存去完成各种基本任务，比如，JIT Compiler 在运行时对热点方法进行编译，就会将编译后的方法储存在 Code Cache 里面；GC 等功能需要运行在本地线程之中，类似部分都需要占用内存空间。这些是实现 JVM JIT 等功能的需要，但规范中并不涉及。
+>
+> ![JVM Overview](https://abiasforaction.net/wp-content/uploads/2020/12/xJVM_Overview.png,qx60851.pagespeed.ic.yS2Huqqhjz.webp)
 
 
 
@@ -862,11 +864,11 @@ JVM 在我们创建 Java 对象的时候去分配新内存，并使用 GC 算法
 
 - 引用计数法：引用计数算法，顾名思义，就是为对象添加一个引用计数，用于记录对象被引用的情况，如果计数为 0，即表示对象可回收。有循环引用问题
 
-  ![](https://dl-harmonyos.51cto.com/images/202212/6610b0168edd882e5ed921e4eef6daf9c5d378.png)
+  ![Reference Counting](https://img.starfish.ink/jvm/Reference-Counting.png)
 
 - 可达性分析：将对象及其引用关系看作一个图，选定活动的对象作为 GC Roots，然后跟踪引用链条，如果一个对象和 GC Roots 之间不可达，也就是不存在引用链条，那么即可认为是可回收对象
 
-  ![](https://dl-harmonyos.51cto.com/images/202212/c89f360980bd1793f756862748b88614ca44a7.png)
+  ![Tracing Garbage Collectors](https://img.starfish.ink/jvm/Tracing-Garbage-Collectors.png)
 
 
 
@@ -1202,10 +1204,10 @@ JVM 在我们创建 Java 对象的时候去分配新内存，并使用 GC 算法
 
 ```
 APP_OPTS:-Xms6656m -Xmx6656m -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError 
--XX:HeapDumpPath=/home/finance/Logs/vspreadboss.msxf.lo/vspreadbossHeap.hprof 
--verbose:gc -Xloggc:/home/finance/Logs/vspreadboss.msxf.lo/gc.log 
+-XX:HeapDumpPath=/home/finance/Logs/***Heap.hprof 
+-verbose:gc -Xloggc:/home/finance/Logs/gc.log 
 -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintHeapAtGC 
--Dprofiler.msxf.thread.pool.enable=true  -Dprofiler.msxf.thread.pool.spring.enable=true  
+-Dprofiler.msxf.thread.pool.enable=true  -Dprofiler.thread.pool.spring.enable=true  
 -Dprofiler.msxf.thread.pool.reject-handler.enable=true -Dprofiler.jdbc.druid.poolmetric=true
 ```
 
@@ -1229,7 +1231,9 @@ G1垃圾收集器的主要特点：
 
 首先，先来整体了解一下 G1 GC 的内部结构和主要机制。
 
-从内存区域的角度，G1 同样存在着年代的概念，但是与我前面介绍的内存结构很不一样，其内部是类似棋盘状的一个个 region 组成![img](data:image/png;base64,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)
+从内存区域的角度，G1 同样存在着年代的概念，但是与我前面介绍的内存结构很不一样，其内部是类似棋盘状的一个个 region 组成
+
+![](https://img2018.cnblogs.com/blog/157264/201903/157264-20190321131647282-1604848487.png)
 
 region 的大小是一致的，数值是在 1M 到 32M 字节之间的一个 2 的幂值数，JVM 会尽量划分 2048 个左右、同等大小的 region。当然这个数字既可以手动调整，G1 也会根据堆大小自动进行调整。
 
@@ -1404,7 +1408,7 @@ ZGC 即 Z Garbage Collector（Z 垃圾收集器，Z 有 Zero 的意思，主要�
 
 1. 动态调整大小的 Region
 
-   ![37.jpg](https://s0.lgstatic.com/i/image6/M00/56/2A/Cgp9HWEspYeAXzknAAAIiMoiXjE128.jpg)
+   ![ZGC](https://img.starfish.ink/jvm/ZGC.png)
 
 2. 不分代，干掉了 RSets
 
@@ -1412,7 +1416,7 @@ ZGC 即 Z Garbage Collector（Z 垃圾收集器，Z 有 Zero 的意思，主要�
 
 3. 带颜色的指针 Colored Pointer
 
-   ![38.jpg](https://s0.lgstatic.com/i/image6/M00/56/2A/Cgp9HWEspaqAZJgwAAAnVLyDuLg609.jpg)
+   ![getting-started-with-z-garbage-collectorzgc-in-java-11-tutorial-img-1](https://img.starfish.ink/jvm/cc38abc5ba683cf300bdd6e89f426212.png)
 
    这里的指针类似 Java 中的引用，意为对某块虚拟内存的引用。ZGC 采用了64位指针（注：目前只支持 linux 64 位系统），将 42-45 这 4 个 bit 位置赋予了不同含义，即所谓的颜色标志位，也换为指针的 metadata。
 
@@ -1555,62 +1559,17 @@ java -Xmx3550m -Xms3550m -Xmn2g -Xss128k
 
 #### JVM参数类型
 
-- 标配参数
+| **类型**     | **示例**              | **作用**                                      |                                                  |
+| ------------ | --------------------- | --------------------------------------------- | ------------------------------------------------ |
+| **标配参数** | `-version`, `-help`   | 所有 JVM 必须实现的通用功能，无性能影响       |                                                  |
+| **X 参数**   | `-Xint`, `-Xcomp`     | 控制 JVM 运行模式（解释、编译、混合）         |                                                  |
+| **XX 参数**  | `-XX:+PrintGCDetails` | 调优核心参数，分为 **Boolean** 和 **KV 类型** | -xx:+ 或者 - 某个属性值（+表示开启，- 表示关闭） |
 
-  - -version   (java -version) 
-  - -help       (java -help)
-  - java -showversion
+#### **常用工具**
 
-- X 参数（了解）
-
-  - -Xint 解释执行
-
-  - -Xcomp 第一次使用就编译成本地代码
-
-  - -Xmixed 混合模式
-
-- xx参数
-
-  - Boolean 类型
-
-    - 公式： -xx:+ 或者 - 某个属性值（+表示开启，- 表示关闭）
-
-    - Case
-
-      - 是否打印GC收集细节
-
-        - -XX:+PrintGCDetails 
-        - -XX:- PrintGCDetails 
-
-        添加如下参数后，重新查看，发现是 + 号了
-
-      - 是否使用串行垃圾回收器
-
-        - -XX:-UseSerialGC
-    - -XX:+UseSerialGC
-    
-  - KV 设值类型
-  
-    - 公式 -XX:属性key=属性 value
-
-    - Case:
-
-      - -XX:MetaspaceSize=128m
-
-      - -xx:MaxTenuringThreshold=15
-
-      - 我们常见的 -Xms和 -Xmx 也属于 KV 设值类型
-
-        - -Xms 等价于 -XX:InitialHeapSize
-        - -Xmx 等价于 -XX:MaxHeapSize
-  
-  - jinfo 举例，如何查看当前运行程序的配置
-  
-    - jps -l
-    - jinfo -flag [配置项] 进程编号
-    - jinfo **-flags** 1981(打印所有)
-    - jinfo -flag PrintGCDetails 1981
-    - jinfo -flag MetaspaceSize 2044
+- **`jinfo`**：查看或修改运行中 JVM 的参数。
+- **`java` 命令参数**：直接打印默认或修改后的参数。
+- **Runtime API**：通过 Java 代码获取内存信息
 
 这些都是命令级别的查看，我们如何在程序运行中查看
 
@@ -1683,21 +1642,133 @@ System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double
 
   
 
-
 ### 谈谈你的 GC 调优思路？
 
-谈到调优，这一定是针对特定场景、特定目的的事情， 对于 GC 调优来说，首先就需要清楚调优的目标是什么？从性能的角度看，通常关注三个方面，**内存占用**（footprint）、**延时**（latency）和**吞吐量**（throughput），大多数情况下调优会侧重于其中一个或者两个方面的目标，很少有情况可以兼顾三个不同的角度。当然，除了上面通常的三个方面，也可能需要考虑其他 GC 相关的场景，例如，OOM 也可能与不合理的 GC 相关参数有关；或者，应用启动速度方面的需求，GC 也会是个考虑的方面。
+> 谈到调优，这一定是针对特定场景、特定目的的事情， 对于 GC 调优来说，首先就需要清楚调优的目标是什么？从性能的角度看，通常关注三个方面，**内存占用**（footprint）、**延时**（latency）和**吞吐量**（throughput），大多数情况下调优会侧重于其中一个或者两个方面的目标，很少有情况可以兼顾三个不同的角度。当然，除了上面通常的三个方面，也可能需要考虑其他 GC 相关的场景，例如，OOM 也可能与不合理的 GC 相关参数有关；或者，应用启动速度方面的需求，GC 也会是个考虑的方面。
+>
+> - **延迟（Latency）：** 也可以理解为最大停顿时间，即垃圾收集过程中一次 STW 的最长时间，越短越好，一定程度上可以接受频次的增大，GC 技术的主要发展方向。
+> - **吞吐量（Throughput）：** 应用系统的生命周期内，由于 GC 线程会占用 Mutator 当前可用的 CPU 时钟周期，吞吐量即为 Mutator 有效花费的时间占系统总运行时间的百分比，例如系统运行了 100 min，GC 耗时 1 min，则系统吞吐量为 99%，吞吐量优先的收集器可以接受较长的停顿。
+>
+> 基本的调优思路可以总结为：
+>
+> - 理解应用需求和问题，确定调优目标。假设，我们开发了一个应用服务，但发现偶尔会出现性能抖动，出现较长的服务停顿。评估用户可接受的响应时间和业务量，将目标简化为，希望 GC 暂停尽量控制在 200ms 以内，并且保证一定标准的吞吐量。
+> - 掌握 JVM 和 GC 的状态，定位具体的问题，确定真的有 GC 调优的必要。具体有很多方法，比如，通过 jstat 等工具查看 GC 等相关状态，可以开启 GC 日志，或者是利用操作系统提供的诊断工具等。例如，通过追踪 GC 日志，就可以查找是不是 GC 在特定时间发生了长时间的暂停，进而导致了应用响应不及时。
+> - 这里需要思考，选择的 GC 类型是否符合我们的应用特征，如果是，具体问题表现在哪里，是 Minor GC 过长，还是 Mixed GC 等出现异常停顿情况；如果不是，考虑切换到什么类型，如 CMS 和 G1 都是更侧重于低延迟的 GC 选项。
+> - 通过分析确定具体调整的参数或者软硬件配置。
+> - 验证是否达到调优目标，如果达到目标，即可以考虑结束调优；否则，重复完成分析、调整、验证这个过程。
+>
 
-- **延迟（Latency）：** 也可以理解为最大停顿时间，即垃圾收集过程中一次 STW 的最长时间，越短越好，一定程度上可以接受频次的增大，GC 技术的主要发展方向。
-- **吞吐量（Throughput）：** 应用系统的生命周期内，由于 GC 线程会占用 Mutator 当前可用的 CPU 时钟周期，吞吐量即为 Mutator 有效花费的时间占系统总运行时间的百分比，例如系统运行了 100 min，GC 耗时 1 min，则系统吞吐量为 99%，吞吐量优先的收集器可以接受较长的停顿。
+一、调优核心目标与基本原则
 
-基本的调优思路可以总结为：
+1. **核心目标**
+   - 延迟优化：减少GC导致的STW时间（如Young GC < 50ms，Full GC < 1s）
+   - 吞吐量提升：确保GC时间占比低于5%（如GC吞吐量 > 95%）
+   - **内存利用率**：减少内存碎片，避免OOM和频繁扩容
+2. **基本原则**
+   - 先诊断后调优：通过GC日志和监控工具定位问题，避免盲目调整参数
+   - 代码优先原则：优化对象分配模式（如减少大对象、避免内存泄漏）比参数调整更有效
+   - 场景适配：根据应用类型选择GC算法（低延迟选G1/ZGC，高吞吐选Parallel GC）
 
-- 理解应用需求和问题，确定调优目标。假设，我们开发了一个应用服务，但发现偶尔会出现性能抖动，出现较长的服务停顿。评估用户可接受的响应时间和业务量，将目标简化为，希望 GC 暂停尽量控制在 200ms 以内，并且保证一定标准的吞吐量。
-- 掌握 JVM 和 GC 的状态，定位具体的问题，确定真的有 GC 调优的必要。具体有很多方法，比如，通过 jstat 等工具查看 GC 等相关状态，可以开启 GC 日志，或者是利用操作系统提供的诊断工具等。例如，通过追踪 GC 日志，就可以查找是不是 GC 在特定时间发生了长时间的暂停，进而导致了应用响应不及时。
-- 这里需要思考，选择的 GC 类型是否符合我们的应用特征，如果是，具体问题表现在哪里，是 Minor GC 过长，还是 Mixed GC 等出现异常停顿情况；如果不是，考虑切换到什么类型，如 CMS 和 G1 都是更侧重于低延迟的 GC 选项。
-- 通过分析确定具体调整的参数或者软硬件配置。
-- 验证是否达到调优目标，如果达到目标，即可以考虑结束调优；否则，重复完成分析、调整、验证这个过程。
+二、调优方法论与实施步骤
+
+1. **数据采集与问题定位**
+
+   - 监控工具：
+     - `jstat -gcutil <pid>`：实时查看各代内存使用率及GC次数/耗时
+     - `jmap -histo`：分析堆内存对象分布，定位大对象或内存泄漏
+     - GC日志分析：通过 `-Xlog:gc*` 生成日志，使用GCeasy或G1Viewer解析
+
+   - 关键指标：
+     - Young GC频率：高于10秒/次需优化新生代分配
+     - 晋升速率：若单次Young GC后老年代增长>5%，需调整年龄阈值
+
+2. **内存模型优化**
+
+   - 分代策略调整：
+     - 新生代扩容：若Young GC频繁（如<30秒/次），增大 `-Xmn`（不超过堆的60%）
+     - Survivor区平衡：通过 `-XX:SurvivorRatio` 调整Eden与Survivor比例（默认8:1:1），避免动态年龄判定过早触发
+
+   - 大对象控制：
+     - 设置 `-XX:PretenureSizeThreshold=4M`，避免大对象直接进入老年代引发碎片
+
+3. **GC算法选择与参数调优**
+
+   | **GC类型**   | **适用场景**            | **调优参数示例**                                             | **优化目标**     |
+   | ------------ | ----------------------- | ------------------------------------------------------------ | ---------------- |
+   | **G1**       | 低延迟、大堆内存（>8G） | `-XX:MaxGCPauseMillis=200`（目标停顿时间）`-XX:InitiatingHeapOccupancyPercent=45`（并发标记阈值） 5 | 减少Mixed GC频率 |
+   | **Parallel** | 批处理、高吞吐量        | `-XX:ParallelGCThreads=CPU核数`（并行线程数）`-XX:GCTimeRatio=9`（GC/应用时间比） 5 | 最大化吞吐量     |
+   | **ZGC**      | 超低延迟（<10ms）       | `-XX:ZAllocationSpikeTolerance=5`（分配速率容忍度）`-Xmx32G`（堆≤32G） | 亚秒级停顿       |
+
+4. **关键参数调优策略**
+
+   - 晋升阈值优化：降低 `-XX:MaxTenuringThreshold` （默认15→5），加速长生命周期对象进入老年代
+
+   - 堆稳定性保障：设置 `-Xms=-Xmx` 避免堆动态扩容，配合 `-XX:+AlwaysPreTouch` 预分配物理内存
+
+   - 元空间控制： 限制 `-XX:MaxMetaspaceSize=512M` ，防止类加载器泄漏导致Full GC
+
+5. **代码级优化**
+
+   - **对象池化**：复用高频率创建对象（如数据库连接、线程）
+
+   - 软引用控制：通过 SoftReference 缓存大对象，在内存紧张时优先释放
+
+   - **并发数据结构**：使用`ConcurrentHashMap`替代`synchronized`集合，减少锁竞争导致的临时对象激增
+
+三、调优效果验证与持续监控
+
+1. AB测试验证：
+
+   - 对比调优前后的GC暂停时间分布（如P99延迟下降30%）
+
+   - 监控吞吐量变化（如QPS提升20%+）
+
+2. 监控体系构建：
+
+   - **时序数据库**：Prometheus采集`jvm_gc_pause_seconds`指标
+
+   - 告警规则：Full GC次数>1次/小时或STW时间>1秒触发告警
+
+四、典型场景调优案例
+
+> 案例1：电商秒杀系统（低延迟场景）
+>
+> - **问题**：高峰期Young GC暂停时间从50ms飙升至200ms
+>
+> - 调优：
+>
+>   1. 切换至G1回收器，设置`MaxGCPauseMillis=100`
+>   2. 增大Eden区（`-Xmn=4G`），降低动态年龄判定触发频率
+>   3. 代码优化：预加载热点商品数据至堆外缓存
+>
+> - 效果：Young GC平均暂停时间降至80ms，Full GC完全消除
+>
+>   
+>
+> 案例2：大数据计算引擎（高吞吐场景）
+>
+> - **问题**：Full GC导致每小时任务超时
+> - 调优：
+>   1. 采用Parallel GC，设置`-XX:GCTimeRatio=19`（GC时间占比≤5%）
+>   2. 限制大对象分配：`PretenureSizeThreshold=8M`
+>   3. 启用`-XX:+UseLargePages`减少TLB缺失
+> - 效果：任务完成时间缩短40%，CPU利用率提升15%
+
+五、调优工具推荐
+
+| **工具类型** | **推荐工具**         | **核心功能**                      |
+| ------------ | -------------------- | --------------------------------- |
+| 日志分析     | GCeasy、G1Viewer     | 可视化GC暂停分布、内存泄漏检测 9  |
+| 实时监控     | Prometheus + Grafana | 可视化JVM内存、GC频率与耗时趋势 8 |
+| 堆内存分析   | Eclipse MAT          | 对象引用链分析，定位内存泄漏 7    |
+
+总结：调优需避免的误区
+
+1. **参数过度调整**：如盲目设置`-Xmx=物理内存80%`导致系统Swap
+2. 忽略代码优化：90%的GC问题源于代码缺陷而非参数配置
+3. 算法选择错配：在32G以上堆内存使用CMS导致并发模式失败
+
+通过系统化的数据采集、场景化参数调整和代码级优化，可显著提升应用性能。建议结合具体业务特征选择调优路径，并通过持续监控验证长期效果。
 
 
 
@@ -1710,6 +1781,47 @@ System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double
 - jstack pid命令查看当前java进程的堆栈状态
 - 或者 jstack -l  > /tmp/output.txt 把堆栈信息打到一个txt文件。
 - 可以使用 fastthread 堆栈定位，[fastthread.io/](http://fastthread.io/)
+
+
+
+### 如何查看JVM的内存使用情况?
+
+一、命令行工具
+
+1. **`jps` + `jstat` 组合**
+   - **功能**：快速定位 Java 进程并监控内存与 GC 状态。
+   - **操作步骤**：
+     1. 查看 Java 进程 ID：`jps -l`
+     2. 监控堆内存使用（示例 PID=1234）：`jstat -gc 1234 1s 5  # 每1秒刷新，共5次`
+   - 输出关键字段：
+     - `EC/EU`：Eden 区容量/使用量
+     - `OC/OU`：老年代容量/使用量
+     - `YGC/YGCT`：Young GC 次数/耗时
+     - `FGC/FGCT`：Full GC 次数/耗时
+   - **适用场景**：实时监控内存分配与回收效率
+
+2. **`jmap` 堆内存分析**
+
+   - **功能**：生成堆转储文件或直接查看内存分布。
+
+   - 常用命令：
+     - 查看堆内存配置：`jmap -heap 1234`
+     - 生成堆转储文件（用于后续分析内存泄漏）：`jmap -dump:format=b,file=heap.hprof 1234`
+     - 统计对象直方图：`jmap -histo 1234 | head -20  # 显示前20个占用内存最多的类`
+   - **适用场景**：排查内存溢出或对象分布异常
+
+3. **`jinfo` 参数查看**
+
+   - **功能**：查看或修改运行中 JVM 的参数。
+
+   - 示例：
+
+     ```bash
+     jinfo -flags 1234  # 显示所有参数
+     jinfo -flag MaxHeapSize 1234  # 查看堆最大内存
+     ```
+
+   - **适用场景**：验证内存参数配置是否生效
 
 
 
