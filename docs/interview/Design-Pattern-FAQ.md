@@ -49,127 +49,131 @@ categories: Interview
 
 - 懒汉式：懒加载，线程不安全
 
-```java
-public class Singleton
-{
-    private static Singleton singleton;
-
-    private Singleton(){
-    }
-
-    public static Singleton getInstance(){
-        if (singleton == null)
-            singleton = new Singleton();
-        return singleton;
-    }
-}
-```
+  ```java
+  public class Singleton
+  {
+      private static Singleton singleton;
+  
+      private Singleton(){
+      }
+  
+      public static Singleton getInstance(){
+          if (singleton == null)
+              singleton = new Singleton();
+          return singleton;
+      }
+  }
+  ```
 
 - 懒汉式线程安全版：同步效率低
 
-```java
-public class Singleton
-{
-    private static Singleton singleton;
-
-    private Singleton(){
-    }
-
-    public synchronized static Singleton getInstance(){
-        if (singleton == null)
-            singleton = new Singleton();
-        return singleton;
-    }
-}
-```
+  ```java
+  public class Singleton
+  {
+      private static Singleton singleton;
+  
+      private Singleton(){
+      }
+  
+      public synchronized static Singleton getInstance(){
+          if (singleton == null)
+              singleton = new Singleton();
+          return singleton;
+      }
+  }
+  ```
 
 - 饿汉式：
 
-```java
-public class Singleton{
-    private static Singleton singleton = new Singleton();
-
-    private Singleton(){
-    }
-
-    public static Singleton getInstance(){
-        return singleton;
-    }
-}
-```
+  ```java
+  public class Singleton{
+      private static Singleton singleton = new Singleton();
+  
+      private Singleton(){
+      }
+  
+      public static Singleton getInstance(){
+          return singleton;
+      }
+  }
+  ```
 
 - 饿汉式变种：
 
-```java
-public class Singleton{
-    private static Singleton singleton;
-    static{
-        singleton = new Singleton();
-    }
-
-    private Singleton(){
-    }
-
-    public static Singleton getInstance(){
-        return singleton;
-    }
-}
-```
+  ```java
+  public class Singleton{
+      private static Singleton singleton;
+      static{
+          singleton = new Singleton();
+      }
+  	
+      private Singleton(){
+      }
+  
+      public static Singleton getInstance(){
+          return singleton;
+      }
+  }
+  ```
 
 - 静态内部类方式：利用 JVM 的加载机制，当使用到 SingletonHolder 才会进行初始化。
 
-```java
-public class Singleton{
-    private Singleton(){
-    }
-
-    private static class SingletonHolder{
-        private static final Singleton singleton = new Singleton();
-    }
-
-    public static Singleton getInstance(){
-        return SingletonHolder.singleton;
-    }
-}
-```
+  ```java
+  public class Singleton{
+      private Singleton(){
+      }
+  
+      private static class SingletonHolder{
+          private static final Singleton singleton = new Singleton();
+      }
+  
+      public static Singleton getInstance(){
+          return SingletonHolder.singleton;
+      }
+  }
+  ```
 
 - 枚举：
 
-```java
-public enum Singletons
-{
-    INSTANCE;
-    // 此处表示单例对象里面的各种方法
-    public void Method(){
-    }
-}
-```
+  > 枚举的实例创建由 JVM 保证，天生就是线程安全的，无需额外的同步代码。
+
+  ```java
+  public enum Singletons
+  {
+      INSTANCE;
+      // 此处表示单例对象里面的各种方法
+      public void Method(){
+      }
+  }
+  ```
 
 - 双重校验锁：
 
-```java
-public class Singleton
-{
-    private volatile static Singleton singleton;
+  ```java
+  public class Singleton
+  {
+      private volatile static Singleton singleton;
+  
+      private Singleton(){
+      }
+  
+      public static Singleton getInstance(){
+         //进行非同步检查，确定实例是否被创建，减少同步的开销，同事确保线程安全
+          if (singleton == null){
+              //同步检查，实例不存在，进入同步块
+              synchronized (Singleton.class){
+                  //第二次检查，确保多个线程同时尝试创建实例时，只有一个可以成功
+                  if (singleton == null){
+                      singleton = new Singleton();
+                  }
+              }
+          }
+          return singleton;
+      }
+  }
+  ```
 
-    private Singleton(){
-    }
-
-    public static Singleton getInstance()
-    {
-        if (singleton == null){
-            synchronized (Singleton.class){
-                if (singleton == null){
-                    singleton = new Singleton();
-                }
-            }
-        }
-        return singleton;
-    }
-}
-```
-
-
+  
 
 ### 如何防止反射和序列化破坏单例？
 

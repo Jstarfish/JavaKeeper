@@ -127,7 +127,7 @@ OSI 参考模型在提出时，他们的理想是非常好的，但实际上，�
 
 TCP/IP 的模型的每一层都需要下一层所提供的协议来完成自己的目的。我们来看下数据是怎么通过 TCP/IP 协议模型从一台主机发送到另一台主机的。
 
-![img](https://ask.qcloudimg.com/http-save/yehe-5359587/8tve72ufz6.jpeg)
+![img](https://img.starfish.ink/network/8tve72ufz6.jpeg)
 
 当用户通过HTTP协议发起一个请求，应用层、传输层、网络互联层和网络访问层的相关协议依次对该请求进行包装并携带对应的首部，最终在网络访问层生成以太网数据包，以太网数据包通过物理介质传输给对方主机，对方接收到数据包以后，然后再一层一层采用对应的协议进行拆包，最后把应用层数据交给应用程序处理。
 
@@ -164,7 +164,7 @@ TCP/IP（Transmission Control Protocol/Internet Protocol，传输控制协议/�
 
 TCP 和 UDP 协议的一些应用
 
-![img](https://ask.qcloudimg.com/http-save/yehe-5359587/nr4vfd9rjq.jpeg)
+![img](https://img.starfish.ink/network/nr4vfd9rjq.jpeg)
 
 
 
@@ -212,7 +212,9 @@ TCP是一种面向连接的**单播协议**，在发送数据前，通信双方�
 
 三次握手的目的是连接服务器指定端口，建立 TCP 连接，并同步连接双方的序列号和确认号，交换 TCP 窗口大小信息。
 
-![img](https://ask.qcloudimg.com/http-save/yehe-5359587/t956gb2aud.jpeg)
+![img](https://miro.medium.com/v2/resize:fit:1102/0*8j0qdKAShOds5Cof.png)
+
+![enter image description here](https://i.sstatic.net/y17TW.png)
 
 - **第一次握手**（SYN）：客户端向服务器发送一个SYN（Synchronize）报文段，用于请求建立连接。这个报文段包含客户端的初始序列号（ISN），用于同步序列号。
 
@@ -237,7 +239,7 @@ TCP是一种面向连接的**单播协议**，在发送数据前，通信双方�
 
 TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way handshake)，也叫做改进的三次握手。**客户端或服务器均可主动发起挥手动作**。
 
-![img](https://ask.qcloudimg.com/http-save/yehe-5359587/tv0i5jc3xp.jpeg)
+![img](https://img.starfish.ink/network/tv0i5jc3xp.jpeg)
 
 - 第一次挥手(FIN=1，seq=x)
 
@@ -354,7 +356,7 @@ MSL（Maximum Segment Lifetime）是TCP报文在网络中可以存在的最长�
 
 利用**滑动窗口机制**可以很方便地在 TCP 连接上实现对发送方的流量控制。
 
-![img](https://ask.qcloudimg.com/http-save/yehe-5359587/mbpsmtcsw3.jpeg)
+![sliding window sender side cumulative acknowledgments](https://img.starfish.ink/network/sliding-window-sender-side-cumulative-acknowledgments-n.jpg)
 
 TCP的滑动窗口机制是一种流量控制技术，用于在不需要等待每个数据包的确认的情况下，实现高效的数据传输。滑动窗口机制允许发送方在等待确认之前发送多个数据段，这样可以更好地利用网络带宽，提高数据传输效率。
 

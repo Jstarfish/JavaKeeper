@@ -3,12 +3,13 @@ title: 二分查找
 date: 2023-02-09
 tags: 
  - binary-search
+ - algorithms
 categories: algorithms
 ---
 
 ![](https://img.starfish.ink/algorithm/binary-search-banner.png)
 
-> 二分查找【折半查找】，一种简单高效的搜索算法，一般是利用有序数组的特性，通过逐步比较中间元素来快速定位目标值
+> 二分查找【折半查找】，一种简单高效的搜索算法，一般是利用有序数组的特性，通过逐步比较中间元素来快速定位目标值。
 >
 > 二分查找并不简单，Knuth 大佬（发明 KMP 算法的那位）都说二分查找：**思路很简单，细节是魔鬼**。比如二分查找让人头疼的细节问题，到底要给 `mid` 加一还是减一，while 里到底用 `<=` 还是 `<`。
 
@@ -68,7 +69,7 @@ int binarySearch(int[] nums, int target) {
 - 二分查找针对的是有序数组
 - 数据量太小太大都不是很适用二分（太小直接顺序遍历就够了，太大的话对连续内存空间要求更高）
 
-### [704. 二分查找](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
+### [二分查找『704』](https://leetcode.cn/problems/binary-search/)（基本的二分搜索）
 
 > 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
 >
@@ -95,6 +96,10 @@ int binarySearch(int[] nums, int target) {
 
 答：因为初始化 `right` 的赋值是 `nums.length - 1`，即最后一个元素的索引，而不是 `nums.length`。
 
+这二者可能出现在不同功能的二分查找中，区别是：前者相当于两端都闭区间 `[left, right]`，后者相当于左闭右开区间 `[left, right)`。因为索引大小为 `nums.length` 是越界的，所以我们把 `right` 这一边视为开区间。
+
+我们这个算法中使用的是前者 `[left, right]` 两端都闭的区间。**这个区间其实就是每次进行搜索的区间**。
+
 **2、为什么 `left = mid + 1`，`right = mid - 1`？我看有的代码是 `right = mid` 或者 `left = mid`，没有这些加加减减，到底怎么回事，怎么判断**？
 
 答：这也是二分查找的一个难点，不过只要你能理解前面的内容，就能够很容易判断。
@@ -103,7 +108,22 @@ int binarySearch(int[] nums, int target) {
 
 当然是去搜索区间 `[left, mid-1]` 或者区间 `[mid+1, right]` 对不对？**因为 `mid` 已经搜索过，应该从搜索区间中去除**。
 
-
+> ##### 1. **左闭右闭区间 `[left, right]`**
+>
+> - **循环条件**：`while (left <= right)`，因为 `left == right` 时区间仍有意义。
+> - 边界调整：
+>   - `nums[mid] < target` → `left = mid + 1`（排除 `mid` 左侧）
+>   - `nums[mid] > target` → `right = mid - 1`（排除 `mid` 右侧）
+> - 适用场景：明确目标值存在于数组时，直接返回下标。
+>
+> ##### 2. **左闭右开区间 `[left, right)`**
+>
+> - **初始化**：`right = nums.length`。
+> - **循环条件**：`while (left < right)`，因为 `left == right` 时区间为空。
+> - 边界调整：
+>   - `nums[mid] < target` → `left = mid + 1`
+>   - `nums[mid] > target` → `right = mid`（右开，不包含 `mid`）
+> - **适用场景**：需要处理目标值可能不在数组中的情况，例如插入位置问题
 
 > 比如说给你有序数组 `nums = [1,2,2,2,3]`，`target` 为 2，此算法返回的索引是 2，没错。但是如果我想得到 `target` 的左侧边界，即索引 1，或者我想得到 `target` 的右侧边界，即索引 3，这样的话此算法是无法处理的。
 >
@@ -112,7 +132,7 @@ int binarySearch(int[] nums, int target) {
 ### 寻找左侧边界的二分搜索
 
 ```java
-public static int leftBound(int[] nums, int target) {
+public int leftBound(int[] nums, int target) {
     int left = 0;
     int right = nums.length - 1;
     while (left <= right) {
@@ -122,7 +142,7 @@ public static int leftBound(int[] nums, int target) {
         } else if (nums[mid] < target) {
             left = mid + 1;
         } else {
-            //mid 是第一个元素，或者前一个元素不等于查找值，锁定
+            //mid 是第一个元素，或者前一个元素不等于查找值，锁定，且返回的是mid
             if (mid == 0 || nums[mid - 1] != target) return mid;
             else right = mid - 1;
         }
@@ -134,7 +154,7 @@ public static int leftBound(int[] nums, int target) {
 ### 寻找右侧边界的二分查找
 
 ```java
-public static int rightBound(int[] nums, int target){
+public int rightBound(int[] nums, int target){
     int left = 0;
     int right = nums.length - 1;
     while(left <= right){
@@ -174,7 +194,127 @@ public int firstNum(int[] nums, int target) {
 
 
 
-### [153. 寻找旋转排序数组中的最小值](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
+### [搜索旋转排序数组『33』](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
+
+> 整数数组 nums 按升序排列，数组中的值 互不相同 。
+>
+> 在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
+>
+> 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
+>
+> ```
+> 输入：nums = [4,5,6,7,0,1,2], target = 0
+> 输出：4
+> ```
+>
+> ```
+> 输入：nums = [4,5,6,7,0,1,2], target = 3
+> 输出：-1
+> ```
+
+**思路**：
+
+对于有序数组（部分有序也可以），可以使用二分查找的方法查找元素。
+
+旋转数组后，依然是局部有序，从数组中间分成左右两部分后，一定有一部分是有序的
+
+- 如果 [L, mid - 1] 是有序数组，且 target 的大小满足 [nums[L],nums[mid]，则我们应该将搜索范围缩小至 [L, mid - 1]，否则在 [mid + 1, R] 中寻找。
+- 如果 [mid, R] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[R]]，则我们应该将搜索范围缩小至 [mid + 1, R]，否则在 [l, mid - 1] 中寻找。
+
+```java
+public static int search(int[] nums,int target) {
+      if(nums.length == 0) return -1;
+      if(nums.length == 1) return target == nums[0] ? 0 : -1;
+      int left = 0, right = nums.length - 1;
+      while(left <= right){
+          int mid = left + (right - left)/2;
+          if(target == nums[mid]) return mid;
+        
+          //左侧有序，注意是小于等于，处理最后只剩两个数的时候
+          if(nums[left] <= nums[mid]){  // 左半部分 [left..mid] 有序
+              if(nums[left] <= target && target < nums[mid]){ // target 在左半部分
+                  right = mid - 1;
+              }else{
+                  left = mid + 1;
+              }
+          }else{
+              if(nums[mid] < target && target <= nums[right]){
+                  left = mid +1;
+              }else{
+                  right = mid - 1;
+              }
+          }
+      }
+      return -1;
+  }
+```
+
+
+
+### [在排序数组中查找元素的第一个和最后一个位置『34』](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
+
+> 给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
+>
+> 如果数组中不存在目标值 target，返回 [-1, -1]。
+>
+> 你可以设计并实现时间复杂度为 $O(log n)$ 的算法解决此问题吗？
+>
+> ```
+> 输入：nums = [5,7,7,8,8,10], target = 8
+> 输出：[3,4]
+> ```
+>
+> ```
+> 输入：nums = [5,7,7,8,8,10], target = 6
+> 输出：[-1,-1]
+> ```
+
+**思路**：二分法寻找左右边界值
+
+```java
+public int[] searchRange(int[] nums, int target) {
+  int first = binarySearch(nums, target, true);
+  int last = binarySearch(nums, target, false);
+  return new int[]{first, last};
+}
+
+public int binarySearch(int[] nums, int target, boolean findLast) {
+  int length = nums.length;
+  int left = 0, right = length - 1;
+  //结果，因为可能有多个值，所以需要先保存起来
+  int index = -1;
+  while (left <= right) {
+    //取中间值
+    int middle = left + (right - left) / 2;
+
+    //找到相同的值（只有这个地方和普通二分查找有不同）
+    if (nums[middle] == target) {
+      //先赋值一下，肯定是找到了，只是不知道这个值是不是在区域的边界内
+      index = middle;
+      //如果是查找最后的
+      if (findLast) {
+        //那我们将浮标移动到下一个值试探一下后面的值还是否有target
+        left = middle + 1;
+      } else {
+        //否则，就是查找第一个值，也是同理，移动指针到上一个值去试探一下上一个值是不是等于target
+        right = middle - 1;
+      }
+
+      //下面2个就是普通的二分查找流程，大于小于都移动指针
+    } else if (nums[middle] < target) {
+      left = middle + 1;
+    } else {
+      right = middle - 1;
+    }
+
+  }
+  return index;
+}
+```
+
+
+
+### [寻找旋转排序数组中的最小值『153』](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
 
 > 已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
 > 若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]        若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
@@ -264,130 +404,7 @@ public static int findMax(int[] nums) {
 }
 ```
 
-
-
-### [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
-
-> 整数数组 nums 按升序排列，数组中的值 互不相同 。
->
-> 在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
->
-> 给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
->
-> ```
-> 输入：nums = [4,5,6,7,0,1,2], target = 0
-> 输出：4
-> ```
->
-> ```
-> 输入：nums = [4,5,6,7,0,1,2], target = 3
-> 输出：-1
-> ```
-
-**思路**：
-
-对于有序数组（部分有序也可以），可以使用二分查找的方法查找元素。
-
-旋转数组后，依然是局部有序，从数组中间分成左右两部分后，一定有一部分是有序的
-
-- 如果 [L, mid - 1] 是有序数组，且 target 的大小满足 [nums[L],nums[mid]，则我们应该将搜索范围缩小至 [L, mid - 1]，否则在 [mid + 1, R] 中寻找。
-- 如果 [mid, R] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[R]]，则我们应该将搜索范围缩小至 [mid + 1, R]，否则在 [l, mid - 1] 中寻找。
-
-```java
-public static int search(int[] nums,int target) {
-      if(nums.length == 0) return -1;
-      if(nums.length == 1) return target == nums[0] ? 0 : -1;
-      int left = 0;
-      int right = nums.length - 1;
-      while(left <= right){
-          int mid = left + (right - left)/2;
-          if(target == nums[mid]) return mid;
-          //左侧有序，注意是小于等于，处理最后只剩两个数的时候
-          if(nums[left] <= nums[mid]){
-              if(nums[left] <= target && target < nums[mid]){
-                  right = mid - 1;
-              }else{
-                  left = mid + 1;
-              }
-          }else{
-              if(nums[mid] < target && target <= nums[right]){
-                  left = mid +1;
-              }else{
-                  right = mid - 1;
-              }
-          }
-
-      }
-      return -1;
-  }
-```
-
-
-
-### [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
-
-> 给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
->
-> 如果数组中不存在目标值 target，返回 [-1, -1]。
->
-> 你可以设计并实现时间复杂度为 $O(log n)$ 的算法解决此问题吗？
->
-> ```
-> 输入：nums = [5,7,7,8,8,10], target = 8
-> 输出：[3,4]
-> ```
->
-> ```
-> 输入：nums = [5,7,7,8,8,10], target = 6
-> 输出：[-1,-1]
-> ```
-
-**思路**：二分法寻找左右边界值
-
-```java
-public int[] searchRange(int[] nums, int target) {
-  int first = binarySearch(nums, target, true);
-  int last = binarySearch(nums, target, false);
-  return new int[]{first, last};
-}
-
-public int binarySearch(int[] nums, int target, boolean findLast) {
-  int length = nums.length;
-  int left = 0, right = length - 1;
-  //结果，因为可能有多个值，所以需要先保存起来
-  int index = -1;
-  while (left <= right) {
-    //取中间值
-    int middle = left + (right - left) / 2;
-
-    //找到相同的值（只有这个地方和普通二分查找有不同）
-    if (nums[middle] == target) {
-      //先赋值一下，肯定是找到了，只是不知道这个值是不是在区域的边界内
-      index = middle;
-      //如果是查找最后的
-      if (findLast) {
-        //那我们将浮标移动到下一个值试探一下后面的值还是否有target
-        left = middle + 1;
-      } else {
-        //否则，就是查找第一个值，也是同理，移动指针到上一个值去试探一下上一个值是不是等于target
-        right = middle - 1;
-      }
-
-      //下面2个就是普通的二分查找流程，大于小于都移动指针
-    } else if (nums[middle] < target) {
-      left = middle + 1;
-    } else {
-      right = middle - 1;
-    }
-
-  }
-  return index;
-}
-```
-
-
-
-### [287. 寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number/)
+### [寻找重复数『287』](https://leetcode-cn.com/problems/find-the-duplicate-number/)
 
 > 给定一个包含 n + 1 个整数的数组 nums ，其数字都在 [1, n] 范围内（包括 1 和 n），可知至少存在一个重复的整数。
 >
@@ -446,7 +463,7 @@ public int findDuplicate(int[] nums) {
 
 
 
-### [162. 寻找峰值](https://leetcode-cn.com/problems/find-peak-element/)
+### [寻找峰值『162』](https://leetcode-cn.com/problems/find-peak-element/)
 
 > 峰值元素是指其值严格大于左右相邻值的元素。
 >
@@ -511,7 +528,7 @@ public int findPeakElement(int[] nums) {
 
 
 
-### [240. 搜索二维矩阵 II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii/)
+### [搜索二维矩阵 II『240』](https://leetcode-cn.com/problems/search-a-2d-matrix-ii/)
 
 > [剑指 Offer 04. 二维数组中的查找](https://leetcode-cn.com/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/) 一样的题目
 >
@@ -555,7 +572,7 @@ public int findPeakElement(int[] nums) {
 
 
 
-### [35. 搜索插入位置](https://leetcode.cn/problems/search-insert-position/)
+### [搜索插入位置『35』](https://leetcode.cn/problems/search-insert-position/)
 
 > 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
 >
@@ -588,7 +605,7 @@ public int searchInsert(int[] nums, int target) {
 
 
 
-### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
+### [最长递增子序列『300』](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
 > 给你一个整数数组 `nums` ，找到其中最长严格递增子序列的长度。
 >
@@ -606,7 +623,7 @@ public int searchInsert(int[] nums, int target) {
 
 
 
-### [4. 寻找两个正序数组的中位数](https://leetcode.cn/problems/median-of-two-sorted-arrays/)
+### [寻找两个正序数组的中位数『4』](https://leetcode.cn/problems/median-of-two-sorted-arrays/)
 
 > 给定两个大小分别为 `m` 和 `n` 的正序（从小到大）数组 `nums1` 和 `nums2`。请你找出并返回这两个正序数组的 **中位数** 。
 >

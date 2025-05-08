@@ -107,7 +107,7 @@ categories: BFS DFS
 
 **重要性质**
 
-  根据定义不难得到以下性质。
+根据定义不难得到以下性质。
 
   - 性质 1：二叉树的 前序遍历 序列，根结点一定是 最先 访问到的结点；
   - 性质 2：二叉树的 后序遍历 序列，根结点一定是 最后 访问到的结点；
@@ -625,4 +625,3 @@ public void bfsGraph(Map<Integer, List<Integer>> graph, int start) {
 ## Reference
 
 - https://leetcode-cn.com/problems/binary-tree-level-order-traversal/solution/bfs-de-shi-yong-chang-jing-zong-jie-ceng-xu-bian-l/
-

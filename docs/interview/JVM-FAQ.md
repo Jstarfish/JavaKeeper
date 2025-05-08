@@ -31,8 +31,6 @@ Java 虚拟机把描述类的数据从 Class 文件加载到内存，并对数�
 
 ![jvm-class-load](https://img.starfish.ink/jvm/jvm-class-load.png)
 
-
-
 > ##### 1. **加载（Loading）**
 >
 > - 核心任务：

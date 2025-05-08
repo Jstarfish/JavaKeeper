@@ -32,6 +32,99 @@ public static int[] twoSum(int[] nums,int target){
 
 
 
+### [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/)
+
+> 给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
+>
+> **字母异位词** 是由重新排列源单词的所有字母得到的一个新单词。
+>
+> ```
+> 输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+> 输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+> ```
+
+**思路**：哈希表。键是字符串中的字符排序后的字符串，值是具有相同键的原始字符串列表
+
+```java
+public List<List<String>> groupAnagrams(String[] strs) {
+      Map<String, List<String>> map = new HashMap<>();
+
+      for (String str : strs) {
+          // 将字符串转换为字符数组并排序
+          char[] chars = str.toCharArray();
+          Arrays.sort(chars);
+
+          // 将排序后的字符数组转换回字符串，作为哈希表的键
+          String key = new String(chars);
+
+          // 如果键不存在于哈希表中，则创建新的列表并添加到哈希表中
+          if (!map.containsKey(key)) {
+              map.put(key, new ArrayList<>());
+          }
+
+          // 将原始字符串添加到对应的列表中
+          map.get(key).add(str);
+      }
+
+      // 返回哈希表中所有值的列表
+      return new ArrayList<>(map.values());
+  }
+```
+
+- 时间复杂度：$O(nklogk)$，其中 n 是 strs 中的字符串的数量，k 是 strs 中的字符串的的最大长度。需要遍历 n 个字符串，对于每个字符串，需要 O(klogk) 的时间进行排序以及 O(1) 的时间更新哈希表，因此总时间复杂度是 O(nklogk)。
+
+- 空间复杂度：$O(nk)$，其中 n 是 strs 中的字符串的数量，k 是 strs 中的字符串的的最大长度。需要用哈希表存储全部字符串
+
+
+
+### [128. 最长连续序列](https://leetcode.cn/problems/longest-consecutive-sequence/)
+
+> 给定一个未排序的整数数组 `nums` ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+>
+> 请你设计并实现时间复杂度为 `O(n)` 的算法解决此问题。
+>
+> ```
+> 输入：nums = [100,4,200,1,3,2]
+> 输出：4
+> 解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
+> ```
+
+**思路**：哈希表
+
+```java
+public int longestConsecutive(int[] nums) {
+    Set<Integer> numSet = new HashSet<>();
+    int longestStreak = 0;
+
+    // 将数组中的所有数字添加到哈希表中
+    for (int num : nums) {
+        numSet.add(num);
+    }
+
+    // 遍历哈希表中的每个数字
+    for (int num : numSet) {
+        // 如果 num-1 不在哈希表中，说明 num 是一个连续序列的起点
+        if (!numSet.contains(num - 1)) {
+            int currentNum = num;
+            int currentStreak = 1;
+
+            // 检查 num+1, num+2, ... 是否在哈希表中，并计算连续序列的长度
+            while (numSet.contains(currentNum + 1)) {
+                currentNum++;
+                currentStreak++;
+            }
+
+            // 更新最长连续序列的长度
+            longestStreak = Math.max(longestStreak, currentStreak);
+        }
+    }
+
+    return longestStreak;
+}
+```
+
+
+
 ### [14. 最长公共前缀](https://leetcode.cn/problems/longest-common-prefix/)
 
 > 编写一个函数来查找字符串数组中的最长公共前缀。如果不存在公共前缀，返回空字符串 `""`。
@@ -81,7 +174,7 @@ public String longestCommonPrefix(String[] strs) {
 **思路**：排序后双指针
 
 ```java
-public static List<List<Integer>> threeSum(int[] nums) {
+public List<List<Integer>> threeSum(int[] nums) {
   //存放结果list
   List<List<Integer>> result = new ArrayList<>();
   int length = nums.length;
@@ -303,7 +396,7 @@ public int maxSubArray(int[] nums) {
 ![283_2.gif](https://pic.leetcode-cn.com/36d1ac5d689101cbf9947465e94753c626eab7fcb736ae2175f5d87ebc85fdf0-283_2.gif)
 
 ```java
-public void moveZeroes_1(int[] nums){
+public void moveZeroes(int[] nums){
     //两个指针i和j
     int j = 0;
     for (int i = 0; i < nums.length; i++) {
@@ -317,6 +410,9 @@ public void moveZeroes_1(int[] nums){
     }
 }
 ```
+
+- 时间复杂度：$O(n)$，其中 *n* 为序列长度。
+- 空间复杂度：$O(1)$。只需要常数的空间存放若干变量。
 
 
 
