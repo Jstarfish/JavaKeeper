@@ -3,7 +3,8 @@ title: 双指针
 date: 2023-05-17
 tags: 
  - pointers
-categories: LeetCode
+ - algorithms
+categories: algorithms
 ---
 
 ![](https://img.starfish.ink/leetcode/two-pointer-banner.png)
@@ -378,7 +379,7 @@ public boolean hasCycle(ListNode head) {
 
 2. **找到环的起点**：
 - 当快慢指针相遇时，我们已经确认链表中存在环。
-   
+  
 - 从相遇点开始，慢指针保持不动，快指针回到链表头部，此时两个指针每次都走一步。两个指针会在环的起点再次相遇。
 
 ```java
@@ -617,6 +618,15 @@ public int findLengthOfLCIS(int[] nums) {
 
 滑动窗口，就是两个指针齐头并进，好像一个窗口一样，不断往前滑。
 
+滑动窗口算法通过维护一个动态调整的窗口范围，高效解决子串、子数组、限流等场景问题。其核心逻辑可概括为以下步骤：
+
+1. **初始化窗口** 使用双指针 `left` 和 `right` 定义窗口边界，初始状态均指向起点。
+2. **扩展右边界** 移动  `right`  指针，将新元素加入窗口，并根据问题需求更新状态（如统计字符频率或请求计数）。
+3. **收缩左边界** 当窗口满足特定条件（如达到限流阈值或包含冗余元素），逐步移动 `left` 指针缩小窗口，直至不满足条件为止。
+4. **记录结果** 在窗口状态变化的每个阶段，捕获符合要求的解（如最长子串长度或限流通过状态）。
+
+
+
 子串问题，几乎都是滑动窗口。滑动窗口算法技巧的思路，就是维护一个窗口，不断滑动，然后更新答案，该算法的大致逻辑如下：
 
 ```java
@@ -635,7 +645,49 @@ while (right < s.size()) {
 }
 ```
 
-
+> 以下是适用于字符串处理、限流等场景的通用框架：
+>
+> ```java
+> public class SlidingWindow {
+> 
+>     // 核心双指针定义
+>     int left = 0, right = 0;
+>     // 窗口状态容器（如哈希表、数组）
+>     Map<Character, Integer> window = new HashMap<>();
+>     // 结果记录
+>     List<Integer> result = new ArrayList<>();
+> 
+>     public void slidingWindow(String s, String target) {
+>         // 初始化目标状态（如字符频率）
+>         Map<Character, Integer> need = new HashMap<>();
+>         for (char c : target.toCharArray()) {
+>             need.put(c, need.getOrDefault(c, 0) + 1);
+>         }
+> 
+>         while (right < s.length()) {
+>             char c = s.charAt(right);
+>             right++;
+>             // 更新窗口状态
+>             window.put(c, window.getOrDefault(c, 0) + 1);
+> 
+>             // 窗口收缩条件
+>             while (window.get(c) > need.getOrDefault(c, 0)) {
+>                 char d = s.charAt(left);
+>                 left++;
+>                 // 更新窗口状态
+>                 window.put(d, window.get(d) - 1);
+>             }
+> 
+>             // 记录结果（如最小覆盖子串长度）
+>             if (right - left == target.length()) {
+>                 result.add(left);
+>             }
+>         }
+>     }
+> }
+> ```
+>
+> 
 
 ### 3.1 同向交替移动的两个变量
 
@@ -697,28 +749,6 @@ public static double getMaxAverage(int[] nums, int k) {
 - 一直维持这样的队列，找出队列出现最长的长度时候，求出解！
 
 ```java
-public static int lengthOfLongestSubstring(String s){
-  HashMap<Character, Integer> map = new HashMap<>();
-  int result = 0;
-  int left = 0;
-  //为了有左右指针的思想，我把我们常用的 i 写成了 right
-  for (int right = 0; right < s.length(); right++) {
-    //当前字符包含在当前有效的子段中，如：abca，当我们遍历到第二个a，当前有效最长子段是 abc，我们又遍历到a，
-    //那么此时更新 left 为 map.get(a)+1=1，当前有效子段更新为 bca；
-    //相当于左指针往前移动了一位
-    char c = s.charAt(right);
-    if (map.containsKey(s.charAt(right))) {
-      left = Math.max(left, map.get(c) + 1);
-    }
-    //右指针一直往前移动
-    map.put(c, right);
-    result = Math.max(result, right - left + 1);
-  }
-  return result;
-}
-```
-
-```java
 int lengthOfLongestSubstring(String s) {
     Map<Character, Integer> window = new HashMap<>();
 
@@ -729,14 +759,14 @@ int lengthOfLongestSubstring(String s) {
         right++;
         // 进行窗口内数据的一系列更新
         window.put(c, window.getOrDefault(c, 0) + 1);
-        // 判断左侧窗口是否要收缩
+        // 判断左侧窗口是否要收缩,字符串重复时收缩，注意这里是 while 不是 if
         while (window.get(c) > 1) {
             char d = s.charAt(left);
             left++;
             // 进行窗口内数据的一系列更新
             window.put(d, window.get(d) - 1);
         }
-        // 在这里更新答案
+        // 在这里更新答案，我们窗口是左闭右开的，所以窗口实际包含的字符数是 right - left，无需 +1
         res = Math.max(res, right - left);
     }
     return res;
