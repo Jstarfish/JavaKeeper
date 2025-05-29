@@ -45,16 +45,16 @@ Collection 接口又有 3 种子类型，List、Set 和 Queue，再下面是一�
 
 Map 接口和 Collection 接口是所有集合框架的父接口：
 
-1. Collection接口的子接口包括：Set、List、Queue
-2. List是有序的允许有重复元素的 Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
-3. Set是一种不包含重复元素且无序的Collection，实现类主要有：HashSet、TreeSet、LinkedHashSet等
-4. Map没有继承Collection接口，Map提供key到value的映射。实现类主要有：HashMap、TreeMap、Hashtable、ConcurrentHashMap 以及 Properties 等
+1. Collection 接口的子接口包括：Set、List、Queue
+2. List 是有序的允许有重复元素的 Collection，实现类主要有：ArrayList、LinkedList、Stack以及Vector等
+3. Set 是一种不包含重复元素且无序的Collection，实现类主要有：HashSet、TreeSet、LinkedHashSet等
+4. Map 没有继承 Collection 接口，Map 提供 key 到 value 的映射。实现类主要有：HashMap、TreeMap、Hashtable、ConcurrentHashMap 以及 Properties 等
 
 
 
 ### ArrayList 和 Vector 的区别
 
-相同点：
+**相同点**：
 
 - ArrayList 和 Vector 都是继承了相同的父类和实现了相同的接口（都实现了List，有序、允许重复和null）
 
@@ -67,7 +67,7 @@ Map 接口和 Collection 接口是所有集合框架的父接口：
 
 - 初始默认长度都为**10**
 
-不同点：
+**不同点**：
 
 - 同步性：Vector 中的 public 方法多数添加了 synchronized 关键字、以确保方法同步、也即是 Vector 线程安全、ArrayList 线程不安全
 
@@ -492,16 +492,10 @@ public class Key {
 
 ### HashMap中key和value可以为null吗？允许几个为null呀？
 
-在Java的`HashMap`中：
-
-1. **键（Key）可以为`null`**：
-   - `HashMap`允许一个键为`null`。当使用`null`作为键时，这个键总是被存储在`HashMap`的第0个桶（bucket）中。
-2. **值（Value）可以为`null`**：
-   - `HashMap`同样允许值为`null`。你可以将任何键映射为`null`值。
-3. **允许的`null`数量**：
-   - 在`HashMap`中，**只有一个键可以是`null`**。因为`HashMap`内部使用键的`hashCode()`来确定键值对的存储位置，而`null`的`hashCode()`值为0。如果允许多个`null`键，它们将无法区分，从而导致键的唯一性被破坏。
-4. **对性能的影响**：
-   - 虽然`HashMap`允许键或值为`null`，但频繁使用`null`键可能会影响性能。因为所有`null`键的哈希值相同，它们会被放在同一个桶中，这可能导致该桶的链表或树结构过长，从而影响查找效率。
+1. **键（Key）可以为`null`**：`HashMap`允许一个键为`null`。当使用`null`作为键时，这个键总是被存储在`HashMap`的第0个桶（bucket）中。
+2. **值（Value）可以为`null`**：`HashMap`同样允许值为`null`。你可以将任何键映射为`null`值。
+3. **允许的`null`数量**：在`HashMap`中，**只有一个键可以是`null`**。因为`HashMap`内部使用键的`hashCode()`来确定键值对的存储位置，而`null`的`hashCode()`值为0。如果允许多个`null`键，它们将无法区分，从而导致键的唯一性被破坏。
+4. **对性能的影响**：虽然`HashMap`允许键或值为`null`，但频繁使用`null`键可能会影响性能。因为所有`null`键的哈希值相同，它们会被放在同一个桶中，这可能导致该桶的链表或树结构过长，从而影响查找效率。
 
 
 

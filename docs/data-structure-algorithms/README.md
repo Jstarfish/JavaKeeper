@@ -2,6 +2,10 @@
 
 ![](https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?cs=srgb&dl=pexels-163064.jpg&fm=jpg)
 
+> 关于怎么刷题的帖子：
+>
+> - 《论如何4个月高效刷满 500 题并形成长期记忆》 https://leetcode-cn.com/circle/discuss/jq9Zke/
+
 ## 概念
 
 **数据**（data）是描述客观事物的数值、字符以及能输入机器且能被处理的各种符号集合。  数据的含义非常广泛，除了通常的数值数据、字符、字符串是数据以外，声音、图像等一切可以输入计算机并能被处理的都是数据。例如除了表示人的姓名、身高、体重等的字符、数字是数据，人的照片、指纹、三维模型、语音指令等也都是数据。

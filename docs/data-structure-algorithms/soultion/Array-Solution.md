@@ -1,3 +1,15 @@
+---
+title: 数组热题
+date: 2025-01-08
+tags: 
+ - Array
+ - algorithms
+ - leetcode
+categories: leetcode
+---
+
+![](https://cdn.pixabay.com/photo/2019/12/04/18/40/machined-parts-4673364_1280.jpg)
+
 ### [1. 两数之和](https://leetcode-cn.com/problems/two-sum/)
 
 > 给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那两个整数，并返回他们的数组下标。
@@ -77,6 +89,8 @@ public List<List<String>> groupAnagrams(String[] strs) {
 
 
 
+
+
 ### [128. 最长连续序列](https://leetcode.cn/problems/longest-consecutive-sequence/)
 
 > 给定一个未排序的整数数组 `nums` ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
@@ -89,7 +103,7 @@ public List<List<String>> groupAnagrams(String[] strs) {
 > 解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
 > ```
 
-**思路**：哈希表
+**思路**：哈希表，**每个数都判断一次这个数是不是连续序列的开头那个数**
 
 ```java
 public int longestConsecutive(int[] nums) {
@@ -122,6 +136,51 @@ public int longestConsecutive(int[] nums) {
     return longestStreak;
 }
 ```
+
+
+
+### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
+
+> 给你一个整数数组 `nums` 和一个整数 `k` ，请你统计并返回 *该数组中和为 `k` 的子数组的个数* 。
+>
+> 子数组是数组中元素的连续非空序列。
+>
+> ```
+> 输入：nums = [1,2,3], k = 3
+> 输出：2
+> ```
+
+思路：**前缀和 + 哈希表**
+
+1. **遍历数组**，逐步计算前缀和（表示从数组起始位置到当前位置的所有元素之和） `prefixSum`。
+2. 检查哈希表中是否存在 `prefixSum - k`：
+   - 若存在，累加其出现次数到结果 `count`。
+3. **更新哈希表**：将当前前缀和存入哈希表，若已存在则次数加 1。![](https://assets.leetcode-cn.com/solution-static/560/3.PNG)
+
+```java
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        int count = 0;
+        int prefixSum = 0;
+        Map<Integer, Integer> sumMap = new HashMap<>();
+        sumMap.put(0, 1); // 初始化前缀和为0的计数为1
+
+        for (int num : nums) {
+            prefixSum += num;
+            // 检查是否存在前缀和为 prefixSum - k 的键
+            if (sumMap.containsKey(prefixSum - k)) {
+                count += sumMap.get(prefixSum - k);
+            }
+            // 更新当前前缀和的次数
+            sumMap.put(prefixSum, sumMap.getOrDefault(prefixSum, 0) + 1);
+        }
+        return count;
+    }
+}
+```
+
+- **时间复杂度**：O(n)，每个元素遍历一次。
+- **空间复杂度**：O(n)，哈希表最多存储 n 个不同的前缀和。
 
 
 
@@ -347,7 +406,7 @@ public int maxArea(int[] height){
 **思路**：「连续」子数组，题目要求的是返回结果，用 [动态规划、分治]
 
 ```java
-public static int maxSubArray3(int[] nums) {
+public static int maxSubArray(int[] nums) {
   //特判
   if (nums == null || nums.length == 0) {
     return 0;
@@ -376,6 +435,59 @@ public int maxSubArray(int[] nums) {
     maxAns = Math.max(maxAns, pre);
   }
   return maxAns;
+}
+```
+
+
+
+### [56. 合并区间](https://leetcode.cn/problems/merge-intervals/)
+
+> 以数组 `intervals` 表示若干个区间的集合，其中单个区间为 `intervals[i] = [starti, endi]` 。请你合并所有重叠的区间，并返回 *一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间* 。
+>
+> ```
+> 输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+> 输出：[[1,6],[8,10],[15,18]]
+> 解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+> ```
+
+思路：
+
+1. **排序** 将区间按起始位置升序排列，使可能重叠的区间相邻，便于合并操作
+
+   ![](https://pic.leetcode-cn.com/50417462969bd13230276c0847726c0909873d22135775ef4022e806475d763e-56-2.png)
+
+2. **合并逻辑**
+
+   **遍历判断**：依次遍历排序后的区间，比较当前区间与结果列表中的最后一个区间是否重叠：
+
+   - 重叠条件：当前区间起始 ≤ 结果列表中最后一个区间的结束。
+   - 合并操作：更新结果列表中最后一个区间的结束值为两者的最大值。
+   - **非重叠条件**：直接将当前区间加入结果列表
+
+```java
+public int[][] merge(int[][] intervals) {
+     // 边界条件：空数组直接返回空
+    if (intervals.length == 0) return new int[0][];
+
+    // 按区间起始点升序排序
+    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+
+    // 结果列表
+    List<int[]> merged = new ArrayList<>();
+    merged.add(intervals[0]); // 初始化第一个区间
+
+    for (int i = 1; i < intervals.length; i++) {
+        int[] last = merged.get(merged.size() - 1);
+        int[] current = intervals[i];
+
+        if (current[0] <= last[1]) { // 重叠，合并区间
+            last[1] = Math.max(last[1], current[1]); // 更新结束值为较大值
+        } else { // 不重叠，直接添加
+            merged.add(current);
+        }
+    }
+
+    return merged.toArray(new int[merged.size()][]); // 转换为二维数组
 }
 ```
 

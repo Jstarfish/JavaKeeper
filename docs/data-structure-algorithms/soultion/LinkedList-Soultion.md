@@ -3,8 +3,11 @@ title: 链表-热题
 date: 2022-06-08
 tags: 
  - LikedList
+ - algorithms
 categories: leetcode
 ---
+
+![](https://cdn.pixabay.com/photo/2018/06/17/20/35/chain-3481377_1280.jpg)
 
 > **导读**：无法高效获取长度，无法根据偏移快速访问元素，是链表的两个劣势。然而面试的时候经常碰见诸如获取倒数第 k 个元素，获取中间位置的元素，判断链表是否存在环，判断环的长度等和长度与位置有关的问题。这些问题都可以通过灵活运用双指针来解决。
 >
@@ -47,7 +50,7 @@ categories: leetcode
 在遍历链表时，将当前节点的 next 指针改为指向前一个节点。由于节点没有引用其前一个节点，因此必须事先存储其前一个节点。在更改引用之前，还需要存储后一个节点。最后返回新的头引用。
 
 ```java
-public ListNode reverseList_1(ListNode head){
+public ListNode reverseList(ListNode head){
   if(head == null || head.next == null){
     return head;
   }
@@ -56,7 +59,8 @@ public ListNode reverseList_1(ListNode head){
   ListNode cur = head;
 
   while(cur != null) {
-    //记录当前节点的下一个节点
+    //记录当前节点的下一个节点 
+    //每一步都需要调整当前阶段 cur 的 next 指针，使其指向前一个节点 pre，然而，调整之前需要先保存 cur 的下一个节点
     ListNode tmp = cur.next;
     //然后将该节点指向pre
     cur.next = pre;
@@ -147,6 +151,15 @@ public boolean hasCycle(ListNode head) {
 > 解释：链表中有一个环，其尾部连接到第二个节点。
 > ```
 
+**思路**：
+
+1. 判断环的存在：
+   - 快指针 `fast`（每次走 2 步）和慢指针 `slow`（每次走 1 步）从链表头节点出发。
+   - 若两指针相遇，说明链表有环；若 `fast` 遇到 `null`，说明无环。
+2. **找到环的入口**：
+   - 相遇后，将 `fast` 重新指向头节点，`slow` 留在相遇点。
+   - 两指针以相同速度（每次 1 步）移动，再次相遇的节点即为环的入口。
+
 如下图所示，设链表中环外部分的长度为 a。slow 指针进入环后，又走了 b 的距离与 fast 相遇。此时，fast 指针已经走完了环的 n 圈，因此它走过的总距离为 `a+n(b+c)+b=a+(n+1)b+nc`。
 
 ![fig1](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
@@ -159,28 +172,37 @@ public boolean hasCycle(ListNode head) {
 因此，当发现 slow 与 fast 相遇时，我们再额外使用一个指针 ptr。起始，它指向链表头部；随后，它和 slow 每次向后移动一个位置。最终，它们会在入环点相遇。
 
 ```java
-public ListNode detectCycle_me(ListNode head) {
-  if (head == null || head.next == null) {
-    return null;
-  }
-  ListNode fast = head;
-  ListNode slow = head;
-  while (fast != null && fast.next != null) {
-    fast = fast.next.next;
-    slow = slow.next;
-    if (fast == slow) {
-      //前边和判断是否有环，一样，只是这里不返回true
-      //构建第二轮相遇，slow指针 位置不变 ，将fast指针重新 指向链表头部节点或者重新构建一个指针 ；slow和fast同时每轮向前走 1 步；
-      ListNode ptr = head;
-
-      while (ptr != slow) {
-        ptr = ptr.next;
-        slow = slow.next;
-      }
-      return ptr;
+public ListNode detectCycle(ListNode head) {
+    if (head == null || head.next == null) {
+        return null;
     }
-  }
-  return null;
+
+    ListNode slow = head;
+    ListNode fast = head;
+
+    // 检测环是否存在
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) {
+            break;
+        }
+    }
+
+    // 如果fast或fast.next为null，说明没有环
+    if (fast == null || fast.next == null) {
+        return null;
+    }
+
+    // 寻找环的入口节点
+    ListNode ptr1 = head;
+    ListNode ptr2 = slow; // 此时slow和fast相遇，可以从slow或fast开始
+    while (ptr1 != ptr2) {
+        ptr1 = ptr1.next;
+        ptr2 = ptr2.next;
+    }
+
+    return ptr1; // 或返回ptr2，此时ptr1和ptr2相等，都指向环的入口节点
 }
 ```
 
@@ -188,6 +210,8 @@ public ListNode detectCycle_me(ListNode head) {
 
 ### [160. 相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)
 
+> 给你两个单链表的头节点 `headA` 和 `headB` ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 `null` 。
+>
 > ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_1.png)
 >
 > ```
@@ -322,39 +346,37 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 >
 > ![img](http://img.starfish.ink/data-structure/pal1linked-list.jpg)
 
+思路：
 
-
-**解法1：**
-
-1. 复制链表值到数组列表中。
-2. 使用双指针法判断是否为回文。
+- 使用栈：遍历链表，将节点值依次压入栈中，然后再遍历链表，将节点值与栈顶元素进行比较，如果都相等，则是回文链表。
+- 使用额外数组：遍历链表，将节点值存入一个数组中，然后双指针检查数组是否为回文数组。
 
 ```java
-public static boolean isPalindrome_me(ListNode head){
-  if(head == null || head.next == null){
-    return false;
-  }
-  List<Integer> list = new ArrayList<>();
-  while(head != null){
-    list.add(head.val);
-    head = head.next;
-  }
-  Integer[] arrs = list.toArray(new Integer[list.size()]);
-
-  int tmp = 0;
-  for(int i=0;i<arrs.length/2;i++){ //注意这里只遍历到一半就可以了
-    if(arrs[i]== arrs[arrs.length-i-1]){
-      tmp++;
+public boolean isPalindrome(ListNode head) {
+    if (head == null || head.next == null) {
+        return true; // 空链表或单个节点是回文
     }
-  }
-  // 双指针，tmp 一直往前走，都相等的话肯定等于数据的一半
-  return tmp == arrs.length / 2;
+
+    List<Integer> list = new ArrayList<>();
+    while (head != null) {
+        list.add(head.val);
+        head = head.next;
+    }
+
+    int left = 0;
+    int right = list.size() - 1;
+
+    while (left < right) {
+        if (!list.get(left).equals(list.get(right))) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+
+    return true;
 }
 ```
-
-**解法2：**
-
-我们先找到链表的中间结点，然后将中间结点后面的链表进行反转（206），反转之后再和前半部分链表进行比较，如果相同则表示该链表属于回文链表，返回true；否则，否则返回false
 
 
 
@@ -382,42 +404,35 @@ public static boolean isPalindrome_me(ListNode head){
 
 
 ```java
-public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-  //定义一个新链表伪指针，用来指向头指针，返回结果，不动
-  ListNode pre = new ListNode(0);
-  //定义一个可移动的指针，指向头结点，动他
-  ListNode cur = pre;
-  //进位
-  int carry = 0;
-  while (l1 != null || l2 != null) {
-    int x = l1 == null ? 0 : l1.val;
-    int y = l2 == null ? 0 : l2.val;
-    int sum = x + y + carry;
+public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    // 创建一个虚拟头节点，用于简化头节点可能发生变化的情况
+    ListNode dummy = new ListNode(0);
+    ListNode current = dummy;
 
-    //如果大于10了，就进位，除以10来计算进位数
-    carry = sum / 10;
-    //进位后剩下的余数
-    sum = sum % 10;
-    //进位后的数据
-    //将求和数赋值给新链表的节点，
-    //注意这个时候不能直接将sum赋值给cur.next = sum。这时候会报，类型不匹配。
-    //所以这个时候要创一个新的节点，将值赋予节点
-    cur.next = new ListNode(sum);
-    //将新链表的节点后移
-    cur = cur.next;
-    //往后移动
-    if (l1 != null) {
-      l1 = l1.next;
+    // 初始化进位为0
+    int carry = 0;
+
+    // 当两个链表都不为空或者存在进位时，继续循环
+    while (l1 != null || l2 != null || carry > 0) {
+        // 获取两个链表当前节点的值，如果链表为空则视为0
+        int x = (l1 != null) ? l1.val : 0;
+        int y = (l2 != null) ? l2.val : 0;
+
+        // 计算当前位的和以及新的进位
+        int sum = carry + x + y;
+        carry = sum / 10;
+
+        // 创建新节点存储当前位的值
+        current.next = new ListNode(sum % 10);
+        current = current.next;
+
+        // 移动到两个链表的下一个节点
+        if (l1 != null) l1 = l1.next;
+        if (l2 != null) l2 = l2.next;
     }
-    if (l2 != null) {
-      l2 = l2.next;
-    }
-  }
-  //如果最后一位还有进位的话，再往后增加一个节点
-  if (carry > 0) {
-    cur.next = new ListNode(carry);
-  }
-  return pre.next;
+
+    // 返回虚拟头节点的下一个节点，即实际结果的头节点
+    return dummy.next;
 }
 ```
 
@@ -451,46 +466,102 @@ public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 > lRUCache.get(4);    // 返回 4
 > ```
 
-分析上面的操作过程，要让 put 和 get 方法的时间复杂度为 O(1)，我们可以总结出 cache 这个数据结构必要的条件：查找快，插入快，删除快，有顺序之分。
+思路：LRU 缓存机制可以通过哈希表（HashMap）和双向链表（Doubly Linked List）的组合来实现。哈希表用于快速查找缓存中的元素，而双向链表用于维护元素的访问顺序。
 
-因为显然 cache 必须有顺序之分，以区分最近使用的和久未使用的数据；而且我们要在 cache 中查找键是否已存在；如果容量满了要删除最后一个数据；每次访问还要把数据插入到队头。
-
-那么，什么数据结构同时符合上述条件呢？哈希表查找快，但是数据无固定顺序；链表有顺序之分，插入删除快，但是查找慢。所以结合一下，形成一种新的数据结构：**哈希链表**。
-
-![HashLinkedList](https://pic.leetcode-cn.com/b84cf65debb43b28bd212787ca63d34c9962696ed427f638763be71a3cb8f89d.jpg)
+- 哈希表：键为缓存的键，值为双向链表中的节点。这样可以在 O(1) 时间内通过键找到对应的节点。
+- 双向链表：每个节点存储键、值和指向前一个节点、后一个节点的指针。链表按照访问顺序排序，最近访问的节点放在链表尾部，最久未访问的节点放在链表头部。
 
 ```java
-// key 映射到 Node(key, val)
-HashMap<Integer, Node> map;
-// Node(k1, v1) <-> Node(k2, v2)...
-DoubleList cache;
+import java.util.HashMap;
+import java.util.Map;
 
-int get(int key) {
-    if (key 不存在) {
-        return -1;
-    } else {        
-        将数据 (key, val) 提到开头；
-        return val;
+class LRUCache {
+    private final int capacity;
+    private final Map<Integer, DLinkedNode> cache;
+    private final int size;
+    private final DLinkedNode head, tail;
+
+    // 使用伪头部和伪尾部节点
+    class DLinkedNode {
+        int key;
+        int value;
+        DLinkedNode prev;
+        DLinkedNode next;
+
+        DLinkedNode() {}
+
+        DLinkedNode(int key, int value) { this.key = key; this.value = value; }
     }
-}
 
-void put(int key, int val) {
-    Node x = new Node(key, val);
-    if (key 已存在) {
-        把旧的数据删除；
-        将新节点 x 插入到开头；
-    } else {
-        if (cache 已满) {
-            删除链表的最后一个数据腾位置；
-            删除 map 中映射到该数据的键；
-        } 
-        将新节点 x 插入到开头；
-        map 中新建 key 对新节点 x 的映射；
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.size = 0;
+        // 使用伪头部和伪尾部节点
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head.next = tail;
+        tail.prev = head;
+        cache = new HashMap<>(capacity);
+    }
+
+    public int get(int key) {
+        DLinkedNode node = cache.get(key);
+        if (node == null) {
+            return -1;
+        }
+        // 移动到头部
+        moveToHead(node);
+        return node.value;
+    }
+
+    public void put(int key, int value) {
+        DLinkedNode node = cache.get(key);
+        if (node == null) {
+            // 如果 key 不存在，创建一个新的节点
+            DLinkedNode newNode = new DLinkedNode(key, value);
+            // 添加进哈希表
+            cache.put(key, newNode);
+            // 添加至双向链表的头部
+            addToHead(newNode);
+            ++size;
+            if (size > capacity) {
+                // 如果超出容量，删除双向链表的尾部节点
+                DLinkedNode tail = removeTail();
+                // 删除哈希表中对应的项
+                cache.remove(tail.key);
+                --size;
+            }
+        } else {
+            // 如果 key 存在，先通过哈希表定位，再修改 value，并移动到头部
+            node.value = value;
+            moveToHead(node);
+        }
+    }
+
+    private void addToHead(DLinkedNode node) {
+        node.prev = head;
+        node.next = head.next;
+        head.next.prev = node;
+        head.next = node;
+    }
+
+    private void removeNode(DLinkedNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void moveToHead(DLinkedNode node) {
+        removeNode(node);
+        addToHead(node);
+    }
+
+    private DLinkedNode removeTail() {
+        DLinkedNode res = tail.prev;
+        removeNode(res);
+        return res;
     }
 }
 ```
-
-
 
 
 
@@ -536,24 +607,31 @@ public ListNode removeNthFromEnd_1(ListNode head, int n) {
 
 - 双指针法，整体思路是让前面的指针先移动`n`步，之后前后指针共同移动直到前面的指针到尾部为止
 
-  ![](https://assets.leetcode-cn.com/solution-static/19/p3.png)
 
 ```java
 public ListNode removeNthFromEnd(ListNode head, int n) {
-  ListNode dummy = new ListNode(0, head);
-  ListNode first = head;
-  ListNode second = dummy;
+   // 创建一个虚拟头结点，方便处理头结点的删除情况
+    ListNode dummyHead = new ListNode(0, head);
+    //dummyHead.next = head;
 
-  //让 first 指针先移动 n 步
-  for (int i = 0; i < n; ++i) {
-    first = first.next;
-  }
-  while (first != null) {
-    first = first.next;
-    second = second.next;
-  }
-  second.next = second.next.next;
-  return dummy.next;
+    ListNode first = dummyHead;
+    ListNode second = dummyHead;
+
+    // 将 first 指针向前移动 n+1 步
+    for (int i = 0; i <= n; i++) {
+        first = first.next;
+    }
+
+    // 同时移动 first 和 second 指针，直到 first 到达链表末尾
+    while (first != null) {
+        first = first.next;
+        second = second.next;
+    }
+
+    // 删除倒数第 N 个节点
+    second.next = second.next.next;
+
+    return dummyHead.next; // 返回新的头结点
 }
 ```
 
@@ -572,11 +650,60 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 > 输出: 1->2->3->4
 > ```
 
-**解答一：归并排序（递归法）**
+思路：题目要求常数级空间复杂度，我们不能使用额外数组来存储数据，排除了递归快速排序的可能性。因此使用归并排序，可以通过迭代完成排序。
 
-**解答二：归并排序（从底至顶直接合并）**
+```java
+public ListNode sortList(ListNode head) {
+    if (head == null || head.next == null) {
+        return head; // 空链表或只有一个节点的链表已经是排序好的
+    }
 
+    // 使用快慢指针找到链表的中间节点
+    ListNode slow = head;
+    ListNode fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
 
+    ListNode mid = slow.next; // mid 是中间节点
+    slow.next = null; // 将链表分成两半
+
+    // 递归或迭代地对两半链表进行排序
+    ListNode left = sortList(head); // 排序左半部分
+    ListNode right = sortList(mid); // 排序右半部分
+
+    // 合并两个已排序的链表
+    ListNode sortedList = mergeTwoLists(left, right);
+    return sortedList;
+}
+
+// 合并两个已排序的链表
+private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+    ListNode dummy = new ListNode(0); // 创建一个虚拟头结点
+    ListNode tail = dummy; // tail 用于追踪合并后的链表的尾部
+
+    while (l1 != null && l2 != null) {
+        if (l1.val < l2.val) {
+            tail.next = l1;
+            l1 = l1.next;
+        } else {
+            tail.next = l2;
+            l2 = l2.next;
+        }
+        tail = tail.next;
+    }
+
+    // 如果其中一个链表已经遍历完，直接将另一个链表的剩余部分接到合并后的链表后面
+    if (l1 != null) {
+        tail.next = l1;
+    } else {
+        tail.next = l2;
+    }
+
+    return dummy.next; // 返回合并后的链表的头结点（跳过虚拟头结点）
+}
+```
 
 
 
@@ -628,8 +755,6 @@ public ListNode partition(ListNode head, int x) {
 
 
 
-
-
 ### [23. 合并K个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists)
 
 > 给你一个链表数组，每个链表都已经按升序排列。
@@ -649,7 +774,46 @@ public ListNode partition(ListNode head, int x) {
 > 1->1->2->3->4->4->5->6
 > ```
 
+思路：对于合并 K 个排序链表的问题，有几种常见的解决方案：
+- 逐个合并：我们可以先将前两个链表合并，然后将结果与第三个链表合并，以此类推，直到合并完所有链表。这种方法的时间复杂度是 $O(K^2 * N)$，其中 K 是链表的个数，N 是链表中节点的平均个数。当 K 较大时，效率较低。
+- 使用优先队列（最小堆）：我们可以将所有的链表节点放入一个最小堆中，然后每次从堆中取出最小的节点，将其添加到结果链表中，并继续将取出节点的下一个节点（如果存在）放入堆中。这种方法的时间复杂度是 $O(K * N * log K)$，其中 K 是链表的个数，N 是链表中节点的平均个数。由于堆的操作（插入和删除最小值）是 $O(log K)$ 的，这种方法在 K 较大时比逐个合并更高效。
+- 分治法：我们可以将 K 个链表分成两组，分别合并这两组链表，然后再将合并后的两个链表合并。这种方法的时间复杂度是 $O(N * log K)$，其中 N 是所有链表中节点的总数。这种方法与快速排序类似，利用了分治的思想来降低时间复杂度。
+在 Java 中，我们可以选择使用优先队列（通过 PriorityQueue 类实现）来解决这个问题，因为它相对容易实现且效率较高。
 
+```java
+public ListNode mergeKLists(ListNode[] lists) {
+    // 创建一个最小堆，用于存储链表节点
+    PriorityQueue<ListNode> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.val));
+
+    // 将所有链表的头节点加入最小堆
+    for (ListNode head : lists) {
+        if (head != null) {
+            pq.offer(head);
+        }
+    }
+
+    // 创建一个虚拟头结点，方便处理合并后的链表
+    ListNode dummy = new ListNode(0);
+    ListNode curr = dummy;
+
+    // 当最小堆不为空时，继续合并链表
+    while (!pq.isEmpty()) {
+        // 从最小堆中取出最小的节点
+        ListNode node = pq.poll();
+        // 将该节点添加到结果链表中
+        curr.next = node;
+        curr = curr.next;
+        // 如果该节点有下一个节点，则将其加入最小堆
+        if (node.next != null) {
+            pq.offer(node.next);
+        }
+    }
+
+    // 返回合并后的链表的头结点（跳过虚拟头结点）
+    return dummy.next;
+}
+}
+```
 
 
 
@@ -665,3 +829,56 @@ public ListNode partition(ListNode head, int x) {
 > ```
 >
 > **索引是从 1 开始的**
+
+**思路**：
+
+- 思路一：逐节点反转法。遍历找到哦啊 left 和 right 的位置，然后对这部分链表进行反转。反转完成后，调整反转部分和前后链表的连接关系
+- 思路二：头插法。创建一个新的虚拟节点，然后将需要反转的部分逐个插入到新链表的前端，实现反转
+
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    // 如果链表为空或left等于right，则无需反转，直接返回原链表头节点
+    if (head == null || left == right) {
+        return head;
+    }
+
+    // 创建虚拟头节点，其next指向原链表头节点
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+
+    // 定位到left位置的前一个节点
+    ListNode pre = dummy;
+    for (int i = 1; i < left; i++) {
+        pre = pre.next;
+    }
+
+    // start指向需要反转的链表部分的起始节点
+    ListNode start = pre.next;
+
+    // 初始化反转链表部分所需的指针
+    ListNode prev = null;
+    ListNode current = start;
+
+    //使用right - left + 1来计算k
+    int k = right - left + 1;
+
+    // 反转k个节点
+    for (int i = 0; i < k; i++) {
+        ListNode next = current.next; // 保存current的下一个节点
+        current.next = prev; // 将current的next指向prev，实现反转
+        // 移动prev和current指针
+        prev = current;
+        current = next;
+    }
+
+    // 连接反转后的链表部分与原链表剩余部分
+    // pre.next指向反转后的链表头节点（即原链表的第right个节点）
+    pre.next = prev;
+    // start.next指向反转后的链表尾节点的下一个节点（即原链表的第right+1个节点）
+    start.next = current;
+
+    // 返回反转后的链表头节点（虚拟头节点的下一个节点）
+    return dummy.next;
+}
+```
+

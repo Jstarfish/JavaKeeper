@@ -182,8 +182,8 @@ C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis �
 
 - **编码方式**：
   - **int**：当值可以用整数表示时，Redis 会使用整数编码。这样可以节省内存，并且在执行数值操作时更高效。
+  - **embstr**：这是一种特殊的编码方式，用于存储短字符串。当字符串的长度小于或等于 44 字节时，Redis 会使用 embstr 编码。只读，修改后自动转为 raw。这种编码方式将字符串直接存储在 Redis 对象的内部，这样可以减少内存分配和内存拷贝的次数，提高性能。
   - **raw**：当字符串值不是整数时，Redis 会使用 raw 编码。raw 编码就是简单地将字符串存储为字节序列。Redis 会根据客户端发送的字节序列来存储字符串，因此可以存储任何类型的数据，包括二进制数据。
-  - **embstr**：这是一种特殊的编码方式，用于存储短字符串。当字符串的长度小于或等于 39 字节时，Redis 会使用 embstr 编码。这种编码方式将字符串直接存储在 Redis 对象的内部，这样可以减少内存分配和内存拷贝的次数，提高性能。
 
 > 可以通过 `TYPE KEY_NAME` 查看 key 所存储的值的类型验证下。
 
@@ -288,6 +288,37 @@ Redis 使用的是 **哈希表（Hash Table）** 来存储 `Hash` 类型的数�
 
 - **哈希表**：采用 **开地址法** 来处理哈希冲突。每个 `Hash` 存储为一个哈希表，哈希表根据一定的哈希算法将键映射到一个位置。
 - **动态扩展**：当哈希表存储的元素数量达到一定的阈值时，Redis 会自动进行 **rehash（重哈希）** 操作，重新分配内存并调整哈希表的大小。
+
+Redis 字典由 **嵌套的三层结构** 构成，采用链地址法处理哈希冲突：
+
+```c
+// 哈希表结构
+typedef struct dictht {
+    dictEntry **table;       // 二维数组（哈希桶）
+    unsigned long size;      // 总槽位数（2^n 对齐）
+    unsigned long sizemask;  // 槽位掩码（size-1）
+    unsigned long used;      // 已用槽位数量
+} dictht;
+
+// 字典结构
+typedef struct dict {
+    dictType *type;          // 类型特定函数（实现多态）
+    void *privdata;          // 私有数据
+    dictht ht[2];            // 双哈希表（用于渐进式rehash）
+    long rehashidx;          // rehash进度标记（-1表示未进行）
+} dict;
+
+// 哈希节点结构
+typedef struct dictEntry {
+    void *key;               // 键（SDS字符串）
+    union {
+        void *val;           // 值（Redis对象）
+        uint64_t u64;
+        int64_t s64;
+    } v;
+    struct dictEntry *next;  // 链地址法指针
+} dictEntry;
+```
 
 #### 2. **Redis Hash 的内部结构**
 
