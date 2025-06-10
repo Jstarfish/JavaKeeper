@@ -295,37 +295,23 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 迭代法：
 
 ```java
-  public ListNode mergeList(ListNode n1,ListNode n2){
-      if(n1 == null) return n2;
-      if(n2 == null) return n1;
+public ListNode mergeTwoLists(ListNode l1, ListNode l2){
+    ListNode dummy = new ListNode(); // 创建哨兵节点
+    ListNode cur = dummy; // 当前指针，指向哨兵节点
+    while(l1 != null && l2 != null){
+        if(l1.val < l2.val){
+            cur.next = l1; // 将较小节点接到当前指针后面
+            l1 = l1.next; // 移动l1指针
+        }else{
+            cur.next = l2;
+            l2 = l2.next;
+        }
+        cur = cur.next;  // 移动当前指针
+    }
+    cur.next = l1 != null ? l1 : l2; // 拼接剩余部分
+    return dummy.next; // 返回合并后的链表头节点
 
-      ListNode dummy = new ListNode(-1);
-      ListNode p = dummy;
-
-      // 比较 p1 和 p2 两个指针
-      // 将值较小的的节点接到 p 指针
-      while (n1 != null && n2 != null){
-          if(n1.val <= n2.val) {
-              p.next = n1;
-              n1 = n1.next;
-          }else {
-              p.next = n2;
-              n2 = n2.next;
-          }
-          // p 指针不断前进
-          p = p.next;
-      }
-
-      //处理比较后较长的链表剩余部分
-      if (n1 != null) {
-          p.next = n1;
-      }
-
-      if (n2 != null) {
-          p.next = n2;
-      }
-      return dummy.next;
-  }
+}
 ```
 
 
@@ -882,3 +868,94 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
 }
 ```
 
+
+
+### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+> 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/10/03/swap_ex1.jpg)
+>
+> ```
+> 输入：head = [1,2,3,4]
+> 输出：[2,1,4,3]
+> ```
+
+思路：迭代法
+
+```java
+public ListNode swapPairs(ListNode head) {
+    // 创建一个虚拟头节点，方便处理边界情况
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode prev = dummy; // prev指针初始指向虚拟头节点
+
+    while (prev.next != null && prev.next.next != null) {
+        ListNode first = prev.next; // 第一个节点
+        ListNode second = prev.next.next; // 第二个节点
+
+        // 交换节点
+        first.next = second.next; // 将第一个节点的next指向第二个节点的下一个节点
+        second.next = first; // 将第二个节点的next指向第一个节点
+        prev.next = second; // 将prev的next指向第二个节点，完成交换
+
+        // 移动指针
+        prev = first; // prev指针移动到第一个节点，为下一次交换做准备
+    }
+
+    return dummy.next; // 返回交换后的链表头节点（虚拟头节点的下一个节点）
+}
+```
+
+> 以 1,2,3,4 链表为例说明步骤
+>
+> 1. 初始化虚拟头节点：
+>
+>    - 创建一个虚拟头节点（dummy node），其值为0，并将其 next 指针指向链表的头节点（值为1的节点）。
+>
+>    - 链表现在变为：`0 -> 1 -> 2 -> 3 -> 4 -> null`
+>
+> 2. 进入while循环：
+>
+>    - 初始时，prev 指向虚拟头节点。
+>
+>    - 循环条件 prev != null && prev.next.next != null 成立，因为 prev 指向虚拟头节点（不为null），且 prev.next（值为1的节点）和 prev.next.next（值为2的节点）都不为null。
+>
+>
+> 3. 交换第一对节点：
+>
+>    - first = prev.next，即 first 指向值为1的节点。
+>
+>    - second = prev.next.next，即 second 指向值为2的节点。
+>
+>    - 执行交换操作：
+>
+>      - first.next = second.next，即值为1的节点的 next 指针指向值为3的节点。
+>
+>      - second.next = first，即值为2的节点的 next 指针指向值为1的节点。
+>
+>      - prev.next = second，即虚拟头节点的 next 指针指向值为2的节点。
+>
+>    - 链表现在变为：`0 -> 2 -> 1 -> 3 -> 4 -> null`
+>
+>    - 更新 prev 为 first，即指向值为1的节点。
+>
+>
+> 4. 交换第二对节点：
+>
+>    - 循环条件再次检查，仍然成立（因为 prev 指向值为1的节点，且 prev.next（值为3的节点）和 prev.next.next（值为4的节点）都不为null）。
+>
+>    - 重复交换操作：
+>      - first 指向值为3的节点，second 指向值为4的节点。
+>      - 交换后，链表变为 `0 -> 2 -> 1 -> 4 -> 3 -> null`
+>
+>    - 更新 prev 为 first，即指向值为3的节点。
+>
+> 5. 退出while循环：
+>
+>    - 循环条件不再成立（因为 prev.next.next 为null，即值为3的节点没有下一个节点）。
+>
+>    - 退出循环。
+>
+> 6. 返回结果：
+>    - 返回虚拟头节点的下一个节点，即值为2的节点，作为交换后的链表头节点。

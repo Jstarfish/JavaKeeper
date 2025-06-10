@@ -1764,13 +1764,16 @@ Redis 是单线程的，意味着其核心功能（如处理命令请求、数�
 
 ### 有哪些Redis分区实现方案？
 
-1. 客户端分区就是在客户端就已经决定数据会被存储到哪个redis节点或者从哪个redis节点读取。大多数客户端已经实现了客户端分区。
+1. 客户端分区：客户端通过哈希算法（如哈希取模、一致性哈希）计算数据的存储节点，直接与目标节点通信，无需中间代理。
 
-2. 代理分区 意味着客户端将请求发送给代理，然后代理决定去哪个节点写数据或者读数据。代理根据分区规则决定请求哪些Redis实例，然后根据Redis的响应结果返回给客户端。redis和memcached的一种代理实现就是Twemproxy
+2. **服务端分区**：
 
-3. 查询路由(Query routing) 的意思是客户端随机地请求任意一个redis实例，然后由Redis将请求转发给正确的Redis节点。Redis Cluster实现了一种混合形式的查询路由，但并不是直接将请求从一个redis节点转发到另一个redis节点，而是在客户端的帮助下直接redirected到正确的redis节点。
+   - Redis 自身提供分区能力，节点通过集群协议（如 Redis Cluster）自动管理数据分布，客户端只需连接任意节点，由集群路由请求到目标节点。
+   - **基于代理的服务端分区（如 Codis）**：通过中间件（如 Codis Proxy）接收客户端请求，代理层维护槽位与节点的映射关系，并路由请求。
 
+3. **代理层分区**：通过独立的代理服务（如 Twemproxy、Codis、Redis Cluster Proxy）实现分区逻辑，客户端只需连接代理，由代理转发请求到后端 Redis 节点。
 
+   
 
 ### Redis分区有什么缺点？
 
@@ -1822,6 +1825,8 @@ Redis 消息队列利用 Redis 的数据结构（如 list、stream）实现生�
 - 基于 `pub/sub` 的发布订阅模式（实时通知）。
 - 基于 `stream` 的消息流功能（高效、可靠的队列）。
 
+
+
 ### Redis 的 `pub/sub` 机制的原理是什么？优缺点是什么？
 
 原理：`pub/sub` 是一种广播机制，发布者将消息发送到指定的频道，订阅者接收频道中的消息。
@@ -1834,6 +1839,8 @@ Redis 消息队列利用 Redis 的数据结构（如 list、stream）实现生�
 - 无法保证订阅者一定能收到消息（离线订阅无效）。
 - 不能实现复杂的消费分组需求。
 
+
+
 ### Redis Stream 是什么？与传统队列有什么区别？
 
 Redis Stream 是 Redis 5.0 引入的日志型数据结构，支持消费分组和持久化。
@@ -1844,7 +1851,9 @@ Redis Stream 是 Redis 5.0 引入的日志型数据结构，支持消费分组�
 - 支持消费分组（类似 Kafka 的消费模型）。
 - 可记录消费偏移量，适用于复杂的消息队列场景。
 
-### **如何用 Redis 实现一个延时队列？**
+
+
+### 如何用 Redis 实现一个延时队列？
 
 - 使用 zset（有序集合）：
   - 将任务的执行时间作为分值 `score`，任务内容作为成员 `member`。
@@ -1857,7 +1866,9 @@ ZADD delay_queue <timestamp> <task>
 ZREMRANGEBYSCORE delay_queue -inf <current_time> -> 执行并删除到期任务
 ```
 
-### **Redis 消息队列的瓶颈在哪？如何优化？**
+
+
+### Redis 消息队列的瓶颈在哪？如何优化？
 
 - 瓶颈：
   - 单线程处理模型下，队列写入和读取的高并发可能导致性能瓶颈。
@@ -2138,6 +2149,8 @@ Redis 的常见性能问题和解决方案包括但不限于以下几点：
 
 ### 如何保证缓存与数据库双写时的数据一致性？
 
+> 秒杀场景下，如何保证Redis扣减库存和DB订单创建的数据一致性?
+
 **常见方案分类**：
 
 - **强一致性方案**（牺牲性能，适用于金融等核心场景）
@@ -2260,6 +2273,8 @@ Redis 的常见性能问题和解决方案包括但不限于以下几点：
    > 但是布隆过滤器本身存在假阳性的问题，所以当攻击者请求一个不存在的 key 的时候，布隆过滤器可能会返回数据存在的假阳性响应。在这种情况下，业务 代码依旧会去查询缓存和数据库。不过这个不需要担心，因为假阳性的概率是 很低的。假如说假阳性概率是万分之一，那么就算攻击的并发有百万，也只有 100 个查询请求会落到数据库上，这一点查询请求就是毛毛雨了。
 
 #### 缓存击穿
+
+> 某明星直播时，粉丝反复刷新其主页导致缓存击穿，数据库压力激增，如何设计多级防护策略？
 
 <mark>缓存击穿是指缓存中没有但数据库中有的数据</mark>（一般是缓存时间到期），这时由于并发用户特别多，同时读缓存没读到数据，又同时去数据库去取数据，引起数据库压力瞬间增大，造成过大压力。
 
@@ -2504,126 +2519,277 @@ end
 
 
 
-### Redis分布式锁，过期时间怎么定的，如果一个业务执行时间比较长，锁过期了怎么办，怎么保证释放锁的一个原子性？
+### Redis分布式锁，过期时间怎么定的?
 
-1. **设定锁的过期时间**
+**锁过期时间的设定**
 
-锁的过期时间应该稍长于业务的预期执行时间，但不能太长，以免资源长期被占用。一般可以按照以下步骤设定锁的过期时间：
+1. **设定原则**
+   - **经验值法**：基于业务逻辑的平均耗时设定，推荐 `TTL = 平均耗时 × 2~3`（如平均耗时 5s → TTL=15s）。
+   - **动态调整**：结合历史数据监控动态调整（如 Prometheus 统计 P99 耗时）。
+   - **兜底策略**：必须设置过期时间，避免死锁（即使业务崩溃，锁也能自动释放）。
 
-- **估算业务执行时间**：根据业务逻辑和历史执行数据，估算业务的最长执行时间。
+2. **极端场景优化**
 
-- **加上缓冲时间**：在估算的执行时间基础上加上一定的缓冲时间，确保大多数情况下锁不会在业务完成前过期。
+   - **自动续期（Watchdog）**： 客户端启动后台线程，定期（如 `TTL/3`）重置锁过期时间。 **示例**：Redisson 的 `lockWatchdogTimeout` 默认 30s，每 10s 续期。
 
-例如，如果某个业务通常在 5 秒内完成，可以设定锁的过期时间为 7 秒。
+     > **续期机制实现**
+     >
+     > 1. **开启一个定时任务**：在获取锁后，开启一个定时任务，每隔一定时间（如过期时间的一半）延长锁的过期时间。
+     >
+     > 2. **判断锁的持有者**：在续期时，确保当前续期操作仍然是由锁的持有者执行，以防止锁误续期。
+     >
+     >    ```java
+     >    public class RedisLockWithRenewal {
+     >    
+     >        private static final String LOCK_KEY = "my_lock";
+     >        private static final String LOCK_VALUE = "unique_value";
+     >        private static final int EXPIRE_TIME = 7; // 过期时间为7秒
+     >    
+     >        public boolean acquireLock(Jedis jedis) {
+     >            String result = jedis.set(LOCK_KEY, LOCK_VALUE, "NX", "EX", EXPIRE_TIME);
+     >            return "OK".equals(result);
+     >        }
+     >    
+     >        public void releaseLock(Jedis jedis) {
+     >            if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
+     >                jedis.del(LOCK_KEY);
+     >            }
+     >        }
+     >    
+     >        public void renewLock(Jedis jedis) {
+     >            Timer timer = new Timer();
+     >            timer.schedule(new TimerTask() {
+     >                @Override
+     >                public void run() {
+     >                    if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
+     >                        jedis.expire(LOCK_KEY, EXPIRE_TIME);
+     >                        System.out.println("Lock renewed.");
+     >                    } else {
+     >                        timer.cancel();
+     >                    }
+     >                }
+     >            }, EXPIRE_TIME * 500, EXPIRE_TIME * 500); // 每 3.5 秒续期一次
+     >        }
+     >    
+     >        public static void main(String[] args) {
+     >            Jedis jedis = new Jedis("localhost", 6379);
+     >            RedisLockWithRenewal lock = new RedisLockWithRenewal();
+     >    
+     >            if (lock.acquireLock(jedis)) {
+     >                lock.renewLock(jedis);
+     >                try {
+     >                    // 业务逻辑
+     >                    System.out.println("Lock acquired, performing business logic...");
+     >                    Thread.sleep(15000); // 模拟长时间业务执行
+     >                } catch (InterruptedException e) {
+     >                    e.printStackTrace();
+     >                } finally {
+     >                    lock.releaseLock(jedis);
+     >                    System.out.println("Lock released.");
+     >                }
+     >            } else {
+     >                System.out.println("Failed to acquire lock.");
+     >            }
+     >        }
+     >    }
+     >    
+     >    ```
+     >
+     > **注意事项**
+     >
+     > - **锁的唯一性**：确保锁的值是唯一的，可以使用 UUID 或业务唯一标识符。
+     > - **原子性操作**：使用 Redis 的 Lua 脚本保证锁的获取和续期操作的原子性，以防止竞态条件。
 
-**2. 处理业务执行时间较长的情况**
+   - **Fencing Token**： 锁服务返回单调递增 Token，业务操作时校验 Token 的时效性（如 ZooKeeper 的 zxid）。
 
-对于可能执行时间较长的业务，确保锁在业务完成前不会过期是关键。可以使用“锁续期”机制，定期延长锁的过期时间。
 
-**续期机制实现**
 
-1. **开启一个定时任务**：在获取锁后，开启一个定时任务，每隔一定时间（如过期时间的一半）延长锁的过期时间。
+### 如果一个业务执行时间比较长，锁过期了怎么办?
 
-2. **判断锁的持有者**：在续期时，确保当前续期操作仍然是由锁的持有者执行，以防止锁误续期。
+1. **锁自动续期机制**
 
    ```java
-   public class RedisLockWithRenewal {
-   
-       private static final String LOCK_KEY = "my_lock";
-       private static final String LOCK_VALUE = "unique_value";
-       private static final int EXPIRE_TIME = 7; // 过期时间为7秒
-   
-       public boolean acquireLock(Jedis jedis) {
-           String result = jedis.set(LOCK_KEY, LOCK_VALUE, "NX", "EX", EXPIRE_TIME);
-           return "OK".equals(result);
-       }
-   
-       public void releaseLock(Jedis jedis) {
-           if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
-               jedis.del(LOCK_KEY);
-           }
-       }
-   
-       public void renewLock(Jedis jedis) {
-           Timer timer = new Timer();
-           timer.schedule(new TimerTask() {
-               @Override
-               public void run() {
-                   if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
-                       jedis.expire(LOCK_KEY, EXPIRE_TIME);
-                       System.out.println("Lock renewed.");
-                   } else {
-                       timer.cancel();
-                   }
-               }
-           }, EXPIRE_TIME * 500, EXPIRE_TIME * 500); // 每 3.5 秒续期一次
-       }
-   
-       public static void main(String[] args) {
-           Jedis jedis = new Jedis("localhost", 6379);
-           RedisLockWithRenewal lock = new RedisLockWithRenewal();
-   
-           if (lock.acquireLock(jedis)) {
-               lock.renewLock(jedis);
-               try {
-                   // 业务逻辑
-                   System.out.println("Lock acquired, performing business logic...");
-                   Thread.sleep(15000); // 模拟长时间业务执行
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               } finally {
-                   lock.releaseLock(jedis);
-                   System.out.println("Lock released.");
-               }
-           } else {
-               System.out.println("Failed to acquire lock.");
-           }
-       }
+   // Redisson 自动续期示例
+   RLock lock = redisson.getLock("order_lock");
+   lock.lock(); // 默认启动看门狗线程自动续期
+   try {
+       // 长耗时业务（如 60s 的订单处理）
+   } finally {
+       lock.unlock();
    }
-   
    ```
 
-**注意事项**
+   - **优势**：无需手动管理 TTL，锁在业务完成前持续有效。
 
-- **锁的唯一性**：确保锁的值是唯一的，可以使用 UUID 或业务唯一标识符。
-- **原子性操作**：使用 Redis 的 Lua 脚本保证锁的获取和续期操作的原子性，以防止竞态条件。
+   - **限制**：需确保客户端进程存活（若客户端宕机，看门狗线程终止，锁仍会超时释放）。
+
+2. **分段锁与锁降级**
+
+   - 分段锁：将大任务拆分为多个子任务，每个子任务单独加锁。
+
+     ```Java
+     for (int i = 0; i < segments; i++) {
+         RLock segmentLock = redisson.getLock("order_lock_" + i);
+         segmentLock.lock();
+         try {
+             // 处理子任务
+         } finally {
+             segmentLock.unlock();
+         }
+     }
+     ```
+
+   - 锁降级：写锁释放前获取读锁，避免锁完全过期后数据不一致。
+
+     ```Java
+     RReadWriteLock rwLock = redisson.getReadWriteLock("data_lock");
+     rwLock.writeLock().lock();
+     try {
+         // 写操作
+         rwLock.readLock().lock(); // 降级为读锁
+     } finally {
+         rwLock.writeLock().unlock();
+     }
+     // 后续继续持有读锁
+     ```
+
+3. **业务超时熔断**：监控业务耗时：若业务执行超过阈值（如 TTL 的 80%），触发熔断并回滚。
+
+   ```Java
+   try {
+       Future<?> future = executor.submit(() -> processOrder());
+       future.get(ttl * 0.8, TimeUnit.MILLISECONDS); // 设置超时等待
+   } catch (TimeoutException e) {
+       future.cancel(true); // 中断业务线程
+       rollback(); // 事务回滚
+   }
+   ```
 
 
 
-### 你们Redis是集群的么，讲讲RedLock算法 
+### 怎么保证释放锁的一个原子性？
 
-Redlock 是 Redis 的一种分布式锁算法，用于确保分布式环境中的锁定机制的安全性和可靠性。它是由 Redis 的作者 Salvatore Sanfilippo（antirez）提出的，旨在解决单个 Redis 实例锁在分布式系统中存在的可靠性问题。以下是 Redlock 算法的工作原理和实现步骤：
+1. **Lua 脚本实现原子操作**
 
-#### Redlock 算法原理
+   ```lua
+   -- 解锁脚本：校验 Value 匹配后删除 Key
+   if redis.call("GET", KEYS[1]) == ARGV[1] then
+       return redis.call("DEL", KEYS[1])
+   else
+       return 0
+   end
+   ```
 
-Redlock 算法依赖于以下假设：
+   - 优势：
+     - 避免非原子操作（先 `GET` 后 `DEL`）导致误删其他客户端的锁。
+     - Redis 单线程执行 Lua 脚本，天然原子性。
 
-1. 有多个 Redis 实例（通常是 5 个），它们分别运行在不同的节点上。
-2. 客户端会在这些 Redis 实例上请求锁，并使用多数（quorum）机制来决定锁的成功与否。
+2. **误删锁的防御**
 
-**实现步骤**
+   - 唯一 Value 设计：使用 UUID + 线程ID 作为 Value，确保锁归属可验证。
 
-1. **获取当前时间**：
-   - 记录当前的精确时间（毫秒级）。
-2. **尝试在每个 Redis 实例上创建锁**：
-   - 使用相同的 key 和随机生成的 value 尝试在每个 Redis 实例上创建锁。创建锁的命令是 `SET resource_name my_random_value NX PX 30000`，其中 NX 表示仅在 key 不存在时设置，PX 30000 表示锁的过期时间为 30 秒。
-   - 设置一个较短的连接和响应超时时间（如 10 毫秒），确保在网络分区或 Redis 实例故障时不会阻塞太久。
-3. **计算获取锁的总时间**：
-   - 计算从开始到成功获取锁所花费的总时间。假设这个时间为 T。
-4. **验证锁的数量和超时**：
-   - 如果客户端在大多数 Redis 实例（例如 3/5 个实例）上成功创建锁，并且 T 小于锁的有效时间（例如 30 秒），则认为锁创建成功。
-   - 否则，尝试在每个实例上删除该锁（释放锁）。
-5. **使用和释放锁**：
-   - 客户端使用锁完成相关的业务逻辑。
-   - 业务逻辑完成后，客户端需要在每个实例上删除该锁。删除锁的命令是 `EVAL "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end" 1 resource_name my_random_value`，确保只删除自己创建的锁。
+     ```Java
+     String lockValue = UUID.randomUUID() + ":" + Thread.currentThread().getId();
+     ```
 
-#### Redlock 算法的注意事项：
+
+
+### 用Redis实现分布式锁，主从切换导致锁失效，如何解决？
+
+**核心原因**： Redis 主从复制是**异步**的，主节点宕机时可能未将锁信息同步到从节点，导致新主节点丢失锁，引发并发风险。
+
+**解决方案**
+
+1. **Redlock 算法（多节点多数派）**
+
+   - **原理**：向多个独立 Redis 节点同时加锁，只有 **半数以上节点成功** 且总耗时 < TTL 才算加锁成功。
+
+   - **优点**：容错性强，避免单点故障。
+
+   - **缺点**：部署复杂，性能开销大。
+
+   - **适用场景**：对一致性要求高的金融级场景。
+
+2. **Redisson 看门狗机制（自动续期）**
+
+   - **原理**：加锁后启动后台线程定期刷新锁过期时间，避免业务执行期间锁失效。
+
+   - **优点**：简化开发，支持自动续期和可重入。
+
+   - **缺点**：无法完全避免主从切换问题。
+
+   - **适用场景**：高并发、低延迟场景（如秒杀、订单系统）。
+
+3. **配置优化（主从同步保障）**
+
+   - **原理**：设置 `min-slaves-to-write 1` 和 `min-slaves-max-lag 10`，确保主节点至少有一个从节点同步数据。
+
+   - **优点**：减少锁丢失风险。
+
+   - **缺点**：性能下降，需合理配置参数。
+
+   - **适用场景**：单节点部署，对一致性要求中等的场景。
+
+4. **降级 Zookeeper 分布式锁（强一致）**
+
+   - **原理**：基于 Zookeeper 的临时顺序节点和 Watcher 机制实现分布式锁。
+
+   - **优点**：强一致性，锁自动释放。
+
+   - **缺点**：性能低，运维复杂。
+
+   - **适用场景**：金融交易、支付等强一致要求的场景。
+
+ “根据业务一致性要求和性能需求，选择 Redlock 保障容错，Redisson 简化实现，或降级 Zookeeper 强一致方案。”
+
+
+
+### 讲讲RedLock算法 ?
+
+- **概念**：RedLock 是 Redis 的作者 Salvatore Sanfilippo（antirez）提出的一种分布式锁算法，用于在分布式环境中实现安全可靠的锁定机制，解决了单个 Redis 实例锁在分布式系统中存在的可靠性问题。
+- 算法原理：
+  - **多节点独立**：假设有 N 个完全独立的 Redis master 节点，这些节点之间不存在主从复制或其他集群协调机制，确保在最苛刻的环境下也能正常工作。
+  - **获取时间戳**：客户端首先获取当前时间戳，单位为毫秒，作为整个操作的起始时间。
+  - **逐个请求锁**：客户端轮流使用相同的 key 和具有唯一性的 value（如 UUID）在 N 个 Redis 节点上请求锁，每个请求都设置一个远小于锁释放时间的超时时间，避免在某个宕掉的节点上阻塞过长时间。
+  - **判断锁获取情况**：客户端获取所有节点锁后，计算获取锁的总时间，即当前时间减去起始时间。当且仅当从大多数（N/2 + 1 个）Redis 节点都取到锁，并且总时间小于锁的失效时间时，才认为获取锁成功。
+  - **计算有效时间**：如果获取锁成功，锁的真正有效时间是设置的锁总超时时间（TTL）减去获取锁的总时间，再减去时钟漂移时间（通常可忽略不计）。
+  - **释放锁**：如果锁获取失败，无论原因是获取成功的锁数量不足还是总消耗时间超过锁释放时间，客户端都会到每个 master 节点上释放锁，包括那些没有获取锁成功的节点。
+- 优点：
+  - **高可靠性**：通过多个独立节点来获取锁，即使部分节点出现故障，只要大多数节点正常工作，就能保证锁的安全性和可用性，有效防止单点故障。
+  - **满足分布式锁特性**：能满足互斥性、防死锁、持锁人解锁等分布式锁的基本特性，适用于各种需要分布式锁的场景。
+- 缺点：
+  - **对时钟同步要求高**：所有 Redis 服务器的时钟必须同步，否则可能由于时钟漂移导致锁的有效时间计算错误，从而引发问题。
+  - **性能开销**：需要与多个 Redis 节点进行通信来获取和释放锁，相比单节点分布式锁，性能上有一定的开销。
+  - **网络分区问题**：在网络分区的情况下，可能会出现不同分区的节点对锁的状态判断不一致，导致锁的安全性无法保证。
+
+Redlock 算法的注意事项：
 
 - **多数节点**：客户端必须至少在大多数 Redis 实例上成功获取锁，才能认为获得了分布式锁。
 - **时钟同步**：所有 Redis 服务器的时钟必须同步，以避免由于时钟漂移导致的问题。
 - **网络分区**：在网络分区的情况下，Redlock 算法可能无法保证锁的安全。
 - **锁超时**：客户端必须设置合理的锁超时时间，以避免死锁。
 - **重试机制**：客户端需要实现重试机制，并在重试时等待随机时间，以避免多个客户端同时重试导致的竞争条件。
+
+
+
+### Redis乐观锁的应用场景，举例说明?
+
+Redis 的乐观锁可以通过事务中的 **`WATCH`** 命令实现、也可以基于类似 CAS（Compare and Swap） 的机制，把 GET、SET 放入 lua 脚本中执行。
+
+```lua
+-- KEYS[1] = key 名称
+-- ARGV[1] = 期望的旧值
+-- ARGV[2] = 要设置的新值
+
+local current = redis.call('GET', KEYS[1])
+if current == ARGV[1] then
+    return redis.call('SET', KEYS[1], ARGV[2])
+else
+    return nil  -- 表示失败
+end
+```
+
+比如**库存扣减（电商秒杀场景）**、**计数器更新（网站访问统计）**、**配置热更新（分布式服务配置同步）**等
 
 ------
 
