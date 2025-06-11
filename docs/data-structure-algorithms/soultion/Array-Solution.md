@@ -374,7 +374,7 @@ public int maxArea(int[] height){
   int l = 0;
   int r = height.length - 1;
   int ans = 0;
-  while( l < r){
+  while(l < r){
     int area = Math.min(height[l], height[r]) * (r - l);
     ans = Math.max(ans,area);
     if(height[l] < height[r]){
@@ -505,18 +505,19 @@ public int[][] merge(int[][] intervals) {
 
 ![283_2.gif](https://pic.leetcode-cn.com/36d1ac5d689101cbf9947465e94753c626eab7fcb736ae2175f5d87ebc85fdf0-283_2.gif)
 
+思路：双指针法，当快指针指向非零元素时，将其与慢指针指向的元素交换，然后慢指针向前移动一位。最后将慢指针之后的所有元素置为0。
+
 ```java
-public void moveZeroes(int[] nums){
-    //两个指针i和j
-    int j = 0;
+public void moveZero(int[] nums) {
+    int j = 0;   //慢指针
     for (int i = 0; i < nums.length; i++) {
-        //当前元素!=0，就把其交换到左边，等于0的交换到右边
-        if(nums[i]!=0){
-            int tmp = nums[i];
-            nums[i] = nums[j];
-            //每移动一次 j加1
-            nums[j++] = tmp;
+        if (nums[i] != 0) {
+            nums[j++] = nums[i]; // 直接将非零元素放到j指针位置，并移动j指针
         }
+    }
+    // 将j指针之后的所有元素置为零
+    for (int i = j; i < nums.length; i++) {
+        nums[i] = 0;
     }
 }
 ```
@@ -556,10 +557,6 @@ public static List<Integer> findNumbers(int[] nums){
   return list;
 }
 ```
-
-
-
-
 
 
 

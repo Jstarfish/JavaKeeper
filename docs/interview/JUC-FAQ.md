@@ -1434,13 +1434,13 @@ LongAdder 引入了分段累加的概念，内部一共有两个参数参与计�
 
 ### Java 并发类库提供的线程池有哪几种？ 分别有什么特点？
 
-常见的线程池的使用方式：
+- `FixedThreadPool`：固定线程数，无界队列，适合稳定负载；
+- `SingleThreadExecutor`：单线程顺序执行，避免竞争；
+- `CachedThreadPool`：动态创建线程，适合短任务；线程数不固定，可动态创建新线程（最大为 Integer.MAX_VALUE）。工作队列是 **SynchronousQueue（无存储能力）**
+- `ScheduledThreadPool`：支持定时 / 周期任务；工作队列是 **DelayedWorkQueue**，按任务执行时间排序
+- `WorkStealingPool`（Java 8+）：基于 ForkJoinPool，利用工作窃取算法提升多核性能。内部使用 **双端队列（WorkQueue）**，任务按 LIFO 顺序执行。
 
-- newFixedThreadPool   创建一个指定工作线程数量的线程池
-- newSingleThreadExecutor   创建一个单线程化的Executor，它的特点在于工作线程数目被限制为 1，操作一个无界的工作队列，所以它保证了所有任务的都是被顺序执行，最多会有一个任务处于活动状态，并且不允许使用者改动线程池实例，因此可以避免其改变线程数目。
-- newCachedThreadPool  创建一个可缓存线程池，它会试图缓存线程并重用，当无缓存线程可用时，就会创建新的工作线程；如果线程闲置的时间超过 60 秒，则被终止并移出缓存；长时间闲置时，这种线程池，不会消耗什么资源。其内部使用 SynchronousQueue 作为工作队列。
-- newScheduledThreadPool   创建一个定长的线程池，而且支持定时的以及周期性的任务执行，支持定时及周期性任务执行
-- newWorkStealingPool  Java8 新特性，使用目前机器上可用的处理器作为它的并行级别
+实际开发中建议自定义 `ThreadPoolExecutor`，避免无界队列导致 OOM，根据任务类型（CPU/IO 密集）设置核心参数
 
 
 
@@ -1458,24 +1458,23 @@ public ThreadPoolExecutor(int corePoolSize,
                               RejectedExecutionHandler handler) {//...}
 ```
 
-- **corePoolSize：** 线程池中的常驻核心线程数
+- **`corePoolSize`（核心线程数）**
 
+  - 线程池初始创建时的线程数量，即使线程空闲也不会被销毁（除非设置 `allowCoreThreadTimeOut` 为 `true`）
   - 创建线程池后，当有请求任务进来之后，就会安排池中的线程去执行请求任务，近似理解为近日当值线程
   - 当线程池中的线程数目达到 corePoolSize 后，就会把到达的任务放到缓存队列中
 
-- **maximumPoolSize：** 线程池最大线程数大小，该值必须大于等于 1
+- **`maximumPoolSize`（最大线程数）**： 线程池允许创建的最大线程数量，必须 ≥ `corePoolSize`。
 
-- **keepAliveTime：** 线程池中非核心线程空闲的存活时间
+- **`keepAliveTime`（线程存活时间）**： 非核心线程（超过 `corePoolSize` 的线程）在空闲时的存活时间
 
-  - 当前线程池数量超过 corePoolSize 时，当空闲时间达到 keepAliveTime 值时，非核心线程会被销毁直到只剩下 corePoolSize 个线程为止
+-  **`unit`（时间单位）**： `keepAliveTime` 的时间单位（如 `TimeUnit.SECONDS`、`MILLISECONDS`）
 
-- **unit：** keepAliveTime 的时间单位
+- **`workQueue`（工作队列）**： 存储等待执行的任务，必须是 `BlockingQueue` 实现类
 
-- **workQueue：** 存放任务的阻塞队列，被提交但尚未被执行的任务
+-  **`threadFactory`（线程工厂）**：用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题
 
-- **threadFactory：** 用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题
-
-- **handler：** 拒绝策略，表示当队列满了且工作线程大于等于线程池的最大线程数（maximumPoolSize）时如何来拒绝请求执行的线程的策略，主要有四种类型。
+- **`handler`（拒绝策略）**：拒绝策略，表示当队列满了且工作线程大于等于线程池的最大线程数（maximumPoolSize）时如何来拒绝请求执行的线程的策略，主要有四种类型。
 
   等待队列也已经满了，再也塞不下新任务。同时，线程池中的 max 线程也达到了，无法继续为新任务服务，这时候我们就需要拒绝策略合理的处理这个问题了。
 
@@ -1492,13 +1491,15 @@ public ThreadPoolExecutor(int corePoolSize,
 
 ![Java线程池实现原理及其在美团业务中的实践- 美团技术团队](https://p0.meituan.net/travelcube/77441586f6b312a54264e3fcf5eebe2663494.png)
 
-**线程池在内部实际上构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程**。线程池的运行主要分成两部分：**任务管理、线程管理**。任务管理部分充当生产者的角色，当任务提交后，线程池会判断该任务后续的流转：
+**线程池在内部实际上构建了一个生产者消费者模型，将线程和任务两者解耦，并不直接关联，从而良好的缓冲任务，复用线程**。线程池的运行主要分成两部分：**任务管理、线程管理**。
+
+任务管理部分充当生产者的角色，当任务提交后（通过 `execute()` 或 `submit()` 方法提交任务），线程池会判断该任务后续的流转：
 
 - 直接申请线程执行该任务；
 - 缓冲到队列中等待线程执行；
 - 拒绝该任务。
 
-线程管理部分是消费者，它们被统一维护在线程池内，根据任务请求进行线程的分配，当线程执行完任务后则会继续获取新的任务去执行，最终当线程获取不到任务的时候，线程就会被回收。
+线程管理部分是消费者角色，它们被统一维护在线程池内，根据任务请求进行线程的分配，当线程执行完任务后则会继续获取新的任务去执行，最终当线程获取不到任务的时候，线程就会被回收。
 
 流程：
 
@@ -1506,10 +1507,26 @@ public ThreadPoolExecutor(int corePoolSize,
 
 2. 当调用 execute() 方法添加一个请求任务时，线程池会做如下判断：
 
-   - 如果正在运行的线程数量小于 corePoolSize，那么马上创建线程运行这个任务
-   - 如果正在运行的线程数量大于或等于 corePoolSize，那么将这个任务**放入队列**
-   - 如果这个时候队列满了且正在运行的线程数量还小于 maximumPoolSize，那么创建非核心线程立刻运行这个任务
-   - 如果队列满了且正在运行的线程数量大于或等于 maximumPoolSize，那么线程池**会启动饱和拒绝策略来执行**
+   - **判断核心线程数**：如果正在运行的线程数量小于 corePoolSize，那么马上创建线程运行这个任务（即使有空闲线程）
+     - 示例：核心线程数为 5，前 5 个任务会立即创建 5 个线程执行。
+   - **判断工作队列**：如果正在运行的线程数量大于或等于 corePoolSize，任务进入 **工作队列（workQueue）** 等待
+     - 若队列为 **无界队列**（如 `LinkedBlockingQueue`），任务会无限排队，`maximumPoolSize` 失效。
+     - 若队列为 **有界队列**（如 `ArrayBlockingQueue`），队列满时进入下一步。
+   - **判断最大线程数**：如果这个时候队列已满且线程数 < `maximumPoolSize`，**创建非核心线程执行任务**
+     - 示例：核心线程数 5，最大线程数 10，队列容量 100。当提交第 106 个任务时（前 5 个线程 + 100 个队列任务），创建第 6 个线程。
+   - **触发拒绝策略**：如果队列满了且正在运行的线程数量大于或等于 maximumPoolSize，那么线程池**会启动饱和拒绝策略来执行**
+     - 若队列已满且线程数 ≥ `maximumPoolSize`，调用 `RejectedExecutionHandler` 处理任务。
+     - 默认策略 `AbortPolicy` 直接抛异常，其他策略包括回退给调用者（`CallerRunsPolicy`）、丢弃最老任务（`DiscardOldestPolicy`）等。
+
+   ```
+   提交任务 → 线程数 < corePoolSize？→ 是：创建核心线程执行
+                        ↓ 否
+                    队列未满？→ 是：入队等待
+                        ↓ 否
+                    线程数 < maxPoolSize？→ 是：创建非核心线程执行
+                            ↓ 否
+                        触发拒绝策略
+   ```
 
 3. 当一个线程完成任务时，它会从队列中取下一个任务来执行
 
@@ -1519,6 +1536,43 @@ public ThreadPoolExecutor(int corePoolSize,
    - 所以线程池的所有任务完成后它**最终会收缩到 corePoolSize 的大小**
 
 >在线程池中，同一个线程可以从 BlockingQueue 中不断提取新任务来执行，其核心原理在于线程池对 Thread 进行了封装，并不是每次执行任务都会调用 Thread.start() 来创建新线程，而是让每个线程去执行一个“循环任务”，在这个“循环任务”中，不停地检查是否还有任务等待被执行，如果有则直接去执行这个任务，也就是调用任务的 run 方法，把 run 方法当作和普通方法一样的地位去调用，相当于把每个任务的 run() 方法串联了起来，所以线程数量并不增加。
+
+#### 线程生命周期管理
+
+线程池中的线程通过 `Worker` 类封装，其生命周期如下：
+
+1. **Worker 初始化**
+   - `Worker` 继承 `AbstractQueuedSynchronizer`（AQS），实现锁机制，避免任务执行期间被中断。
+   - 每个 `Worker` 持有一个 `Thread`，启动时执行 `runWorker()` 方法。
+2. **任务循环执行**
+   - `runWorker()`方法通过 `getTask()`从队列获取任务：
+     - 若为核心线程，`getTask()` 会阻塞等待（除非 `allowCoreThreadTimeOut=true`）。
+     - 若非核心线程，`getTask()` 超时（`keepAliveTime`）后返回 `null`，线程终止。
+3. **线程回收**
+   - 当 `getTask()` 返回 `null` 时，`runWorker()` 退出循环，`Worker` 被移除，线程销毁。
+   - 最终线程池收缩到 `corePoolSize` 大小（除非设置核心线程超时）。
+
+#### **源码级机制解析**
+
+1. **线程池状态与线程数的原子管理**
+
+   - 线程池使用一个 `AtomicInteger`变量 `ctl` 同时存储线程池状态和当前线程数：
+
+     ```java
+     // ctl 的高 3 位表示状态，低 29 位表示线程数
+     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+     ```
+
+   - 状态包括：`RUNNING`（接收新任务）、`SHUTDOWN`（不接收新任务但处理队列任务）、`STOP`（不接收新任务且不处理队列任务）等。
+
+2. **任务窃取与阻塞唤醒**
+
+   - 线程池使用 `ReentrantLock` 保护内部状态，通过 `Condition` 实现线程间通信。
+   - 当队列为空时，线程通过 `notEmpty.await()` 阻塞；当有新任务入队时，通过 `notEmpty.signal()` 唤醒等待线程。
+
+3. **动态调整线程数**
+
+   - 线程池提供 `setCorePoolSize()` 和 `setMaximumPoolSize()` 方法动态调整参数，适应负载变化。
 
 
 
@@ -1555,6 +1609,11 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 2. 如果没有空闲的核心线程，而有空闲的非核心线程，则由非核心线程从队列头部取任务执行。
 
 换句话说，线程池会尽量保持核心线程忙碌，并优先使用核心线程来处理任务。当核心线程忙碌时，非核心线程才会处理队列中的任务。
+
+> 1. **第 6 个任务**：核心线程已满，任务进入队列（队列大小 = 1），线程数保持 5。
+> 2. **第 26 个任务**：队列已满（20/20），创建第 6 个线程（非核心）执行，线程数 = 6。
+> 3. **队列取出顺序**：默认 FIFO（从队列头部取），除非使用优先级队列。
+> 4. **线程优先级**：核心 / 非核心线程无优先级差异，先空闲的线程先获取任务，但非核心线程可能因超时被回收。
 
 
 
@@ -1594,7 +1653,13 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 ### 线程池常用的阻塞队列有哪些？
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/Cgq2xl3nUryAJBkpAAA0_WFSrB8184.png)
+| **阻塞队列类型**          | **存储结构**       | **有界 / 无界**                           | **特点**                                                     | **适用场景**                         |
+| ------------------------- | ------------------ | ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------ |
+| **ArrayBlockingQueue**    | 数组               | 有界                                      | - 初始化时指定容量，满后插入操作阻塞 - 按 FIFO 顺序处理元素 - 支持公平 / 非公平锁（默认非公平） | 任务量可预估、需要控制内存占用的场景 |
+| **LinkedBlockingQueue**   | 链表               | 可选有界 / 无界（默认 Integer.MAX_VALUE） | - 无界时理论上可存储无限任务 - 按 FIFO 顺序处理元素 - 吞吐量高于 ArrayBlockingQueue | 任务量不确定、希望自动缓冲的场景     |
+| **SynchronousQueue**      | 不存储元素         | 无界（逻辑上）                            | - 不存储任何元素，插入操作必须等待消费者接收 - 适合任务与线程直接移交，无缓冲需求 | 要求任务立即执行、避免队列积压的场景 |
+| **PriorityBlockingQueue** | 堆结构             | 无界                                      | - 按元素优先级排序（实现 `Comparable` 或自定义 `Comparator`） - 支持获取优先级最高的任务 | 任务有优先级差异的场景（如紧急任务） |
+| **DelayQueue**            | 优先队列（基于堆） | 无界                                      | - 元素需实现 `Delayed` 接口，按延迟时间排序 - 仅到期任务可被取出执行 | 定时任务、延迟执行场景（如超时处理） |
 
 - 对于 FixedThreadPool 和 SingleThreadExector 而言，它们使用的阻塞队列是容量为 Integer.MAX_VALUE 的 LinkedBlockingQueue，可以认为是无界队列
 - SynchronousQueue，对应的线程池是 CachedThreadPool。线程池 CachedThreadPool 的最大线程数是 Integer 的最大值，可以理解为线程数是可以无限扩展的
@@ -1606,8 +1671,15 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 > 为什么不应该自动创建线程池？
 
-《阿里巴巴Java开发手册》中强制线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险
+创建线程池应直接使用 `ThreadPoolExecutor` 构造函数，避免 `Executors` 工厂方法的风险：
 
+1. **拒绝无界队列**：`FixedThreadPool` 默认使用无界队列，可能导致 OOM。
+2. **控制线程数**：`CachedThreadPool` 允许创建无限线程，可能耗尽资源。
+3. **自定义参数**：根据任务特性（CPU/IO 密集）设置核心线程数、队列类型（如有界队列）和拒绝策略（如 `CallerRunsPolicy`）。
+4. **监控与命名**：使用 `ThreadFactory` 命名线程，便于问题排查
+
+> 《阿里巴巴Java开发手册》中强制线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险
+>
 > Executors 返回线程池对象的弊端如下：
 >
 > - **FixedThreadPool 和 SingleThreadExecutor** ： 允许请求的队列长度为 Integer.MAX_VALUE ，可能堆积大量的请求，从而导致OOM。
@@ -1617,50 +1689,132 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 
 ### 合理配置线程池你是如何考虑的？（创建多少个线程合适）
 
-首先要考虑到 CPU 核心数，那么在 Java 中如何获取核心线程数？
+合理配置线程池的核心是确定线程数量，这需要结合任务类型、系统资源、硬件特性等多维度综合考量。
 
-可以使用 `Runtime.getRuntime().availableProcessor()` 方法来获取（可能不准确，作为参考）
+**一、线程池核心参数与线程数量的关系**
 
-在确认了核心数后，再去判断是 CPU 密集型任务还是 IO 密集型任务：
+线程池的关键参数中，**`corePoolSize`（核心线程数）** 是线程数量配置的核心，它决定了线程池的基础处理能力。而`maximumPoolSize`（最大线程数）则作为流量高峰时的补充，两者需配合队列大小共同调整。
 
-- **CPU 密集型任务**：CPU密集型也叫计算密集型，这种类型大部分状况下，CPU使用时间远高于I/O耗时。有许多计算要处理、许多逻辑判断，几乎没有I/O操作的任务就属于 CPU 密集型。
+**二、任务类型分类与线程数计算**
 
-  CPU 密集任务只有在真正的多核 CPU 上才可能得到加速（通过多线程）
+根据任务的 IO 密集型、CPU 密集型特性，可采用不同的计算模型：
 
-  而在单核 CPU 上，无论开几个模拟的多线程该任务都不可能得到加速，因为 CPU 总的运算能力就那些。
+1.  **CPU 密集型任务（计算密集型）**
 
-  如果是 CPU 密集型任务，频繁切换上下线程是不明智的，此时应该设置一个较小的线程数
+   - **特点**：任务主要消耗 CPU 资源（如加密、压缩、数学计算），几乎没有 IO 等待。
 
-  一般公式：**CPU 核数 + 1 个线程的线程池**
+   - 公式：`corePoolSize = CPU核心数 + 1`
 
-  为什么 +1 呢？
+     - 解释：CPU 核心数可通过`Runtime.getRuntime().availableProcessors()`获取，+1 是为了应对线程偶发的上下文切换开销，避免 CPU 空闲。
 
-  《Java并发编程实战》一书中给出的原因是：**即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。**
+       > 为什么 +1 呢？
+       >
+       > 《Java并发编程实战》一书中给出的原因是：**即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。**
+       >
+       > 比如加密、解密、压缩、计算等一系列需要大量耗费 CPU 资源的任务，因为计算任务非常重，会占用大量的 CPU 资源，所以这时 CPU 的每个核心工作基本都是满负荷的，而我们又设置了过多的线程，每个线程都想去利用 CPU 资源来执行自己的任务，这就会造成不必要的上下文切换，此时线程数的增多并没有让性能提升，反而由于线程数量过多会导致性能下降。
 
-  > 比如加密、解密、压缩、计算等一系列需要大量耗费 CPU 资源的任务，因为计算任务非常重，会占用大量的 CPU 资源，所以这时 CPU 的每个核心工作基本都是满负荷的，而我们又设置了过多的线程，每个线程都想去利用 CPU 资源来执行自己的任务，这就会造成不必要的上下文切换，此时线程数的增多并没有让性能提升，反而由于线程数量过多会导致性能下降。
+   - **示例**：4 核 CPU 的服务器，核心线程数设为 5。
 
-- **IO 密集型任务**：与之相反，IO 密集型则是系统运行时，大部分时间都在进行 I/O 操作，CPU 占用率不高。比如像 MySQL 数据库、文件的读写、网络通信等任务，这类任务**不会特别消耗 CPU 资源，但是 IO 操作比较耗时，会占用比较多时间**。
+2. **IO 密集型任务（读写 / 网络请求等）**
 
-  在单线程上运行 IO 密集型的任务会导致浪费大量的 CPU 运算能力浪费在等待。
+   IO 密集型则是系统运行时，大部分时间都在进行 I/O 操作，CPU 占用率不高。比如像 MySQL 数据库、文件的读写、网络通信等任务，这类任务**不会特别消耗 CPU 资源，但是 IO 操作比较耗时，会占用比较多时间**。
 
-  所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费调的阻塞时间。
+   在单线程上运行 IO 密集型的任务会导致浪费大量的 CPU 运算能力浪费在等待。
 
-  IO 密集型时，大部分线程都阻塞，故需要多配置线程数：
+   所以在 IO 密集型任务中使用多线程可以大大的加速程序运行，即使在单核 CPU 上，这种加速主要就是利用了被浪费调的阻塞时间。
 
-  参考公式： CPU 核数/（1- 阻塞系数）   阻塞系数在 0.8~0.9 之间
+   IO 密集型时，大部分线程都阻塞，故需要多配置线程数：
 
-  比如 8 核 CPU：8/（1 -0.9）= 80个线程数
+   IO 密集型任务：
+
+   - **特点**：任务频繁等待 IO 操作（如数据库查询、文件读写、网络通信），CPU 利用率低。
+
+   - 公式：这个公式有很多种观点，
+
+     - `CPU 核心数 × 2（IO 等待时线程可复用）`
+     -  `CPU 核心数 × （1 + 平均IO等待时间/平均CPU处理时间）`
+     - `CPU 核心数 * (1 + 阻塞系数)`
+     - 解释：IO 等待时间越长，需要越多线程来 “切换执行” 以充分利用 CPU。
+
+     > 《Java并发编程实战》的作者 Brain Goetz 推荐的计算方法：
+     >
+     > ```undefined
+     > 线程数 = CPU 核心数 *（1+平均等待时间/平均工作时间）
+     > ```
+     >
+     > 太少的线程数会使得程序整体性能降低，而过多的线程也会消耗内存等其他资源，所以如果想要更准确的话，可以进行压测，监控 JVM 的线程情况以及 CPU 的负载情况，根据实际情况衡量应该创建的线程数，合理并充分利用资源。
 
 
-  这个其实没有一个特别适用的公式，肯定适合自己的业务，美团给出了个**动态更新**的逻辑，可以看看
+3. **混合型任务（兼具 CPU 和 IO 操作）**
 
-> 《Java并发编程实战》的作者 Brain Goetz 推荐的计算方法：
->
-> ```undefined
-> 线程数 = CPU 核心数 *（1+平均等待时间/平均工作时间）
-> ```
->
-> 太少的线程数会使得程序整体性能降低，而过多的线程也会消耗内存等其他资源，所以如果想要更准确的话，可以进行压测，监控 JVM 的线程情况以及 CPU 的负载情况，根据实际情况衡量应该创建的线程数，合理并充分利用资源。
+   - **方案 1**：拆分为独立线程池，分别处理 CPU 和 IO 任务（推荐）。
+
+   - **方案 2**：若无法拆分，按 IO 密集型任务计算，并通过监控调整。
+
+**三、其他影响因素与实践策略**
+
+1. **系统资源限制**
+
+   - **内存约束**：线程数过多会导致内存溢出（每个线程默认栈大小约 1MB）。
+
+   - **IO 资源**：如数据库连接数限制，线程数不应超过数据库最大连接数。
+
+2. **任务队列大小**
+   - 线程数需与队列容量配合：
+     - 若`corePoolSize`较小，队列可设为中等大小（如 100），应对流量波动；
+     - 若`corePoolSize`较大，队列可设为较小值（如 20），避免任务堆积。
+
+3. **动态调整策略**
+
+   - **自适应线程池**：通过监控 CPU 利用率、任务队列长度动态调整线程数（如使用`ScheduledExecutorService`定期检测）。
+
+   - **示例代码**：
+
+     ```java
+     // 动态线程池实现示例（Spring Boot）
+     @Bean
+     public ThreadPoolTaskExecutor dynamicExecutor() {
+         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+         executor.setCorePoolSize(8); 
+         executor.setMaxPoolSize(32);
+         executor.setQueueCapacity(1000);
+         
+         // 开启监控自动调整
+         executor.setAllowCoreThreadTimeOut(true);
+         executor.setKeepAliveSeconds(30);
+         
+         // 添加监控指标
+         executor.setThreadPoolExecutor(new ThreadPoolExecutor(
+             ... // 参数同上
+         ) {
+             protected void afterExecute(Runnable r, Throwable t) {
+                 monitorAndAdjust(); // 监控回调
+             }
+         });
+         return executor;
+     }
+     
+     private void monitorAndAdjust() {
+         // 基于队列堆积情况调整
+         if (queueSize > 800) { // 队列堆积警告阈值
+             executor.setMaxPoolSize(Math.min(64, executor.getMaxPoolSize() + 4));
+         } 
+         else if (queueSize < 200 && executor.getMaxPoolSize() > 32) {
+             executor.setMaxPoolSize(executor.getMaxPoolSize() - 2);
+         }
+     }
+     ```
+
+4. **压测与监控**
+   - 压测验证：通过 JMeter 等工具模拟不同并发量，观察线程池的：
+     - 任务处理耗时（响应时间）；
+     - CPU、内存利用率；
+     - 队列堆积情况（是否触发拒绝策略）。
+
+- 关键监控指标：
+  - `taskCount`（总任务数）、`completedTaskCount`（完成任务数）；
+  - 线程活跃数、队列剩余容量；
+  - 拒绝任务数（是否触发`RejectedExecutionHandler`）。
 
 
 
@@ -1722,7 +1876,17 @@ AQS是一个用来构建锁和同步器的框架，使用AQS能简单且高效�
 
 ### AQS 原理分析
 
-> 在面试中被问到并发知识的时候，大多都会被问到“请你说一下自己对于AQS原理的理解”。下面给大家一个示例供大家参加，面试不是背题，大家一定要加入自己的思想，即使加入不了自己的思想也要保证自己能够通俗的讲出来而不是背出来。
+> AQS 是 JUC 的核心框架，其原理可概括为：
+>
+> 1. **状态管理**：通过 `volatile int state` 和 CAS 操作保证原子性。
+> 2. **队列设计**：CLH 变体双向链表，管理等待线程。
+> 3. **模板方法**：子类通过重写 `tryAcquire()`/`tryRelease()` 实现独占或共享锁。
+> 4. 核心机制：
+>    - 独占模式（如 `ReentrantLock`）：线程竞争失败则入队阻塞。
+>    - 共享模式（如 `CountDownLatch`）：允许多线程同时访问。
+> 5. **应用场景**：锁、信号量、倒计时器等同步工具的基础。
+
+AQS 是 Java 并发包（JUC）的核心框架，用于构建锁（如 `ReentrantLock`）和同步器（如 `CountDownLatch`）。
 
 下面大部分内容其实在AQS类注释上已经给出了，不过是英语看着比较吃力一点，感兴趣的话可以看看源码。
 
@@ -1814,15 +1978,60 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 
 ### AQS 组件总结
 
-- **Semaphore(信号量)-允许多个线程同时访问：** synchronized 和 ReentrantLock 都是一次只允许一个线程访问某个资源，Semaphore(信号量)可以指定多个线程同时访问某个资源。
-- **CountDownLatch （倒计时器）：** CountDownLatch是一个同步工具类，用来协调多个线程之间的同步。这个工具通常用来控制线程等待，它可以让某一个线程等待直到倒计时结束，再开始执行。
-- **CyclicBarrier(循环栅栏)：** CyclicBarrier 和 CountDownLatch 非常类似，它也可以实现线程间的技术等待，但是它的功能比 CountDownLatch 更加复杂和强大。主要应用场景和 CountDownLatch 类似。CyclicBarrier 的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。CyclicBarrier默认的构造方法是 CyclicBarrier(int parties)，其参数表示屏障拦截的线程数量，每个线程调用await()方法告诉 CyclicBarrier 我已经到达了屏障，然后当前线程被阻塞。
+“AQS 衍生的同步组件可分为：
+
+1. 独占模式：
+   - `ReentrantLock`：可重入锁，支持公平 / 非公平，手动控制加解锁。
+   - `ReentrantReadWriteLock`：读写分离，读锁共享、写锁独占。
+2. 共享模式：
+   - `Semaphore`：信号量，控制并发线程数（如限流）。
+   - `CountDownLatch`：倒计时门栓，一次性等待多线程完成。
+   - `CyclicBarrier`：循环屏障，可重复使用，等待所有线程同步。
+     选择时需根据场景特性（互斥 / 共享、是否可重复、同步类型）合理选用，例如接口限流用 `Semaphore`，任务汇总用 `CountDownLatch`。”
 
 
 
 ### AQS是如何唤醒下一个线程的？
 
 当需要阻塞或者唤醒一个线程的时候，AQS都是使用 LockSupport 这个工具类来完成的。
+
+AQS（AbstractQueuedSynchronizer）的核心功能之一是**线程的阻塞与唤醒**。当持有锁的线程释放资源后，AQS 需要精确地唤醒等待队列中的下一个线程，以确保同步逻辑的正确性。下面从源码角度深入分析这一过程：
+
+一、唤醒线程的触发点
+
+AQS 唤醒线程主要发生在两种场景：
+
+1. **释放锁时**：独占模式下调用 `release()`，共享模式下调用 `releaseShared()`。
+2. **取消等待时**：当线程被中断或超时，会从队列中移除并尝试唤醒后继节点。
+
+二、唤醒线程的核心方法：`unparkSuccessor()`
+
+这是 AQS 唤醒线程的核心实现，其逻辑如下：
+
+```java
+private void unparkSuccessor(Node node) {
+    // 获取当前节点的等待状态
+    int ws = node.waitStatus;
+    // 如果状态为 SIGNAL(-1) 或 CONDITION(-2) 或 PROPAGATE(-3)，尝试将其设为 0
+    if (ws < 0)
+        compareAndSetWaitStatus(node, ws, 0);
+
+    // 找到有效的后继节点（排除状态为 CANCELLED(1) 的节点）
+    Node s = node.next;
+    if (s == null || s.waitStatus > 0) {
+        s = null;
+        // 从尾部向前遍历，找到最靠前的有效节点
+        for (Node t = tail; t != null && t != node; t = t.prev) {
+            if (t.waitStatus <= 0)
+                s = t;
+        }
+    }
+    
+    // 唤醒找到的有效后继节点
+    if (s != null)
+        LockSupport.unpark(s.thread);
+}
+```
 
 
 
