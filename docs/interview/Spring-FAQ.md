@@ -715,6 +715,11 @@ Spring 提供了几种不同的方式来装配 Bean，主要包括以下几种�
 
 ### Spring Boot 自动配置原理是什么？
 
+> - 核心机制：
+>   1. `@SpringBootApplication`组合`@EnableAutoConfiguration`，扫描`META-INF/spring.factories`文件；
+>   2. 根据类路径中的依赖（如`spring-boot-starter-web`）自动配置 Bean（如 Tomcat、MVC 组件）；
+>   3. 可通过`application.properties/yaml`或`@Conditional`注解覆盖默认配置。
+
 Spring Boot 自动配置（Auto-Configuration）是 Spring Boot 的核心特性之一，旨在根据项目中的依赖自动配置 Spring 应用。通过自动配置，开发者无需手动编写大量的配置代码，可以专注于业务逻辑的开发。其实现原理主要基于以下几个方面：
 
 1. **启动类注解的复合结构**
@@ -866,6 +871,16 @@ Spring Profiles 允许用户根据配置文件（dev，test，prod 等）来注�
 ```properties
 server.port = 8090
 ```
+
+
+
+### Spring 如何解决循环依赖？
+
+- 三级缓存机制：
+  1. 一级缓存：完整初始化的 Bean（`singletonObjects`）；
+  2. 二级缓存：早期暴露的 Bean 引用（`earlySingletonObjects`）；
+  3. 三级缓存：Bean 工厂对象（`singletonFactories`），用于生成代理对象。
+- **示例场景**：A 依赖 B，B 依赖 A，通过二级缓存提前暴露 A 的引用，避免死锁。
 
 
 
@@ -1266,6 +1281,15 @@ Spring Boot 的事务管理是基于 **Spring Framework** 的事务抽象实现�
 
 
 
+### 事务失效的常见原因有哪些？
+
+- **方法非 public**：Spring 事务基于代理，非 public 方法无法代理；
+- **自调用问题**：`this.xxx()`调用本类方法，绕过代理导致事务失效；
+- **异常未被捕获**：未声明`rollbackFor`的异常不会回滚；
+- **传播行为设置错误**：如子方法设置`NOT_SUPPORTED`脱离主事务。
+
+
+
 ### 事务管理器
 
 Spring 并不直接管理事务，而是提供了多种事务管理器，他们将事务管理的职责委托给 Hibernate 或者 JTA 等持久化机制所提供的相关平台框架的事务来实现。
@@ -1471,6 +1495,11 @@ Spring MVC 架构是基于请求驱动的模式，处理请求的过程分为以
 
 SpringMVC 处理请求过程：
 
+> 1. **DispatcherServlet**接收请求，委托给 HandlerMapping；
+> 2. HandlerMapping 匹配处理器（Controller），返回 HandlerExecutionChain；
+> 3. 调用 HandlerAdapter 执行 Controller 方法，返回 ModelAndView；
+> 4. ViewResolver 解析视图，渲染响应结果。
+
 1. **请求接收与分发**
    - 入口：用户通过浏览器发送 HTTP 请求，所有请求首先到达 `DispatcherServlet`（前端控制器），它是整个流程的统一入口。
    - 核心作用：`DispatcherServlet` 负责接收请求并协调后续处理流程，类似“调度中心”。
@@ -1583,6 +1612,32 @@ Spring MVC 是 Spring 的 Web 模块，专注于请求处理与视图渲染，�
 Spring Boot 是 Spring 生态的“脚手架”，默认集成 Spring MVC 作为 Web 层框架
 
 
+
+### Spring MVC 如何处理跨域请求（CORS）？
+
+- 配置 `@CrossOrigin`
+
+  ```java
+  @RestController
+  @CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+  public class ApiController { ... }
+  ```
+
+- 或通过 `WebMvcConfigurer`全局配置：
+
+  ```java
+  @Configuration
+  public class WebConfig implements WebMvcConfigurer {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+          registry.addMapping("/api/**").allowedOrigins("*");
+      }
+  }
+  ```
+
+  
+
+  
 
 ## 八、注解
 
@@ -1906,3 +1961,13 @@ Spring boot actuator 是 spring 启动框架中的重要功能之一。Spring bo
 ### 我们如何监视所有 Spring Boot 微服务？
 
 Spring Boot 提供监视器端点以监控各个微服务的度量。这些端点对于获取有关应用程序的信息（如它们是否已启动）以及它们的组件（如数据库等）是否正常运行很有帮助。但是，使用监视器的一个主要缺点或困难是，我们必须单独打开应用程序的知识点以了解其状态或健康状况。想象一下涉及 50 个应用程序的微服务，管理员将不得不击中所有 50 个应用程序的执行终端。为了帮助我们处理这种情况，我们将使用位于的开源项目。 它建立在 Spring Boot Actuator 之上，它提供了一个 Web UI，使我们能够可视化多个应用程序的度量。
+
+
+
+### Spring Cloud 核心组件有哪些？各自作用？
+
+- **服务注册与发现**：Eureka/Nacos（服务实例自动注册与发现）；
+- **服务调用**：Feign（基于接口的声明式 REST 调用）；
+- **负载均衡**：Ribbon（客户端负载均衡算法）；
+- **熔断降级**：Hystrix/Sentinel（防止级联故障）；
+- **网关**：Gateway（统一入口，路由、限流、认证）。

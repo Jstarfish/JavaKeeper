@@ -97,7 +97,7 @@ categories: Algorithm
 
 ### 斐波那契数列
 
-PS：我们先从一个简单的斐波那契数列来进一步理解下重叠子问题与状态转移方程（斐波那契数列并不是严格意义上的动态规划，因为它没有求最值，所以也没设计到最优子结构的问题）
+PS：我们先从一个简单的斐波那契数列来进一步理解下重叠子问题与状态转移方程（斐波那契数列并不是严格意义上的动态规划，因为它没有求最值，所以也没涉及到最优子结构的问题）
 
 **1、暴力递归**
 
@@ -647,22 +647,25 @@ public int coinChange(int[] coins, int amount) {
 
     //初始值
     dp[0] = 0;
-    // 外层 for 循环在遍历所有状态的所有取值
+    // 外层 for 循环在遍历所有可能得金额，（从1到amount）
     //dp[i]上的值不断选择已含有硬币值当前位置的数组值 + 1，min保证每一次保存的是最小值
     for (int i = 1; i < amount + 1; i++) {
-        //内层 for 循环在求所有选择的最小值 状态转移方程
+        //内层循环所有硬币面额
         for (int coin : coins) {
+            //如果i<coin，当前硬币coin面额太大，无法凑成金额i
             if (i >= coin) {
                 //分两种情况，使用硬币coin和不使用，取最小值
                 dp[i] = Math.min(dp[i - coin] + 1, dp[i]);
             }
         }
     }
-    return dp[amount] > amount ? -1 : dp[amount];
+    return dp[amount] == amount + 1 ? -1 : dp[amount];
 }
 ```
 
 > 为啥 `dp` 数组初始化为 `amount + 1` 呢，因为凑成 `amount` 金额的硬币数最多只可能等于 `amount`（全用 1 元面值的硬币），所以初始化为 `amount + 1` 就相当于初始化为正无穷，便于后续取最小值。为啥不直接初始化为 int 型的最大值 `Integer.MAX_VALUE` 呢？因为后面有 `dp[i - coin] + 1`，这就会导致整型溢出。
+>
+> 最终，dp[amout] 就是凑成总金额所需的最少硬币数，如果dp[amount] 仍是初始化的较大值，说明无法凑出，返回 -1。
 
 
 
@@ -692,7 +695,7 @@ public int coinChange(int[] coins, int amount) {
 我们需要找出给定数组中两个数字之间的最大差值（即，最大利润）。此外，第二个数字（卖出价格）必须大于第一个数字（买入价格）
 
 ```java
-public static int dp(int[] prices) {
+public int dp(int[] prices) {
   int length = prices.length;
   if (length == 0) {
     return 0;
@@ -852,8 +855,6 @@ class Solution{
 ## 番外篇
 
 ### 动态规划与其它算法的关系
-
-这一章我们将会介绍分治和贪心算法的核心思想，并与动态规划算法进行比较。
 
 #### 分治
 

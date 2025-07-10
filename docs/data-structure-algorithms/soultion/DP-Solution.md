@@ -1,16 +1,24 @@
+---
+title: 动态规划 通关秘籍
+date: 2025-07-08
+tags: 
+ - DP
+categories: leetcode
+---
+
 > 个人感觉动态规划是最难的，一会爬楼梯，一会兑零钱，一会又要去接雨水，炒股就不说了，还要去偷东西，哎，我太南了
 
 ![](https://cdn.nlark.com/yuque/0/2021/png/21674094/1639551516595-9b6a2bad-c55b-43e1-b172-ced36ffa96cc.png)
 
 ## 子序列问题
 
-一旦涉及到子序列和最值，那几乎可以肯定，**考察的是动态规划技巧，时间复杂度一般都是 O(n^2)**
+一旦涉及到子序列和最值，那几乎可以肯定，**考察的是动态规划技巧，时间复杂度一般都是 $O(n^2)$**
 
 两种思路
 
 **1、第一种思路模板是一个一维的 dp 数组**
 
-```
+```java
 int n = array.length;
 int[] dp = new int[n];
 
@@ -53,18 +61,15 @@ for (int i = 0; i < n; i++) {
 
 PS： 注意「子序列」和「子串」这两个名词的区别，子串一定是连续的，而子序列不一定是连续的
 
-> https://leetcode-cn.com/problems/longest-increasing-subsequence/solution/zui-chang-shang-sheng-zi-xu-lie-dong-tai-gui-hua-2/
-
-这种题目看懂需要看动图
-
-![img](https://labuladong.online/algo/images/%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/gif1.gif)
+![](https://writings.sh/assets/images/posts/algorithm-longest-increasing-subsequence/longest-increasing-subsequence-dp1-2.jpeg)
 
 ```java
- public static int getLengthOfLIS(int[] nums) {
+ public int getLengthOfLIS(int[] nums) {
 
    int[] dp = new int[nums.length];
    Arrays.fill(dp, 1);
 
+   int maxLength = 1;
    for (int i = 0; i < nums.length; i++) {
      for (int j = 0; j < i; j++) {
      //当 nums[i] <= nums[j] 时： nums[i] 无法接在 nums[j]之后，此情况上升子序列不成立，跳过，不是比较dp[i]和dp[j]
@@ -76,10 +81,7 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
          dp[i] = Math.max(dp[i], dp[j] + 1);
        }
      }
-   }
-   int res = 0;
-   for (int i = 0; i < len; i++) {
-     res = Math.max(res, dp[i]);
+     maxLength = Math.max(maxLength, dp[i]);
    }
    return res;
  }

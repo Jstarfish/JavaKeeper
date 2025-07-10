@@ -686,3 +686,192 @@ public void merge(int[] nums1, int m, int[] nums2, int n) {
 }
 ```
 
+
+
+### [136. 只出现一次的数字](https://leetcode.cn/problems/single-number/)
+
+> 给你一个 **非空** 整数数组 `nums` ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+>
+> 你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+>
+> ```
+> 输入：nums = [4,1,2,1,2]
+> 
+> 输出：4
+> ```
+
+思路：**异或运算**
+
+异或运算（`^`）有以下几个重要性质：
+
+1. 任何数和 `0` 做异或运算，结果仍然是原来的数，即 `a ^ 0 = a`。
+2. 任何数和其自身做异或运算，结果是 `0`，即 `a ^ a = 0`。
+3. 异或运算满足交换律和结合律，即 `a ^ b ^ c = a ^ (b ^ c) = (a ^ b) ^ c`。
+
+```java
+public int singleNumber(int[] nums) {
+    int result = 0;
+    for (int num : nums) {
+        result ^= num;
+    }
+    return result;
+}
+```
+
+
+
+### [169. 多数元素](https://leetcode.cn/problems/majority-element/)
+
+> 给定一个大小为 `n` 的数组 `nums` ，返回其中的多数元素。多数元素是指在数组中出现次数 **大于** `⌊ n/2 ⌋` 的元素。
+>
+> 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+>
+> ```
+> 输入：nums = [2,2,1,1,1,2,2]
+> 输出：2
+> ```
+
+思路：排序后取中间元素，如果将数组 `nums` 中的所有元素按照单调递增或单调递减的顺序排序，那么下标为 ⌊2*n*⌋ 的元素（下标从 `0` 开始）一定是众数。
+
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+        Arrays.sort(nums);
+        return nums[nums.length / 2];
+    }
+}
+```
+
+
+
+### [75. 颜色分类](https://leetcode.cn/problems/sort-colors/)
+
+> 给定一个包含红色、白色和蓝色、共 `n` 个元素的数组 `nums` ，**[原地](https://baike.baidu.com/item/原地算法)** 对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+>
+> 我们使用整数 `0`、 `1` 和 `2` 分别表示红色、白色和蓝色。
+>
+> 必须在不使用库内置的 sort 函数的情况下解决这个问题。
+>
+> ```
+> 输入：nums = [2,0,2,1,1,0]
+> 输出：[0,0,1,1,2,2]
+> ```
+
+思路：双指针（荷兰国旗问题）。用 3 个指针遍历数组，过程中，移动 left 、right 和 curr 指针即可。
+
+```java
+public void sortColors(int[] nums) {
+    // 初始化三个指针
+    int left = 0; // 左指针，指向当前遍历到的最左边的一个0的右侧
+    int right = nums.length - 1; // 右指针，指向当前遍历到的最右边的一个2的左侧
+    int curr = 0; // 当前遍历指针
+
+    // 遍历数组
+    while (curr <= right) {
+        // 如果当前元素是0，则将其与左指针指向的元素交换，并将左指针和右指针都向右移动一位
+        if (nums[curr] == 0) {
+            swap(nums, curr, left);
+            left++;
+            curr++;
+        } 
+        // 如果当前元素是2，则将其与右指针指向的元素交换，但只将右指针向左移动一位
+        // 因为交换过来的元素可能是0或1，需要再次判断
+        else if (nums[curr] == 2) {
+            swap(nums, curr, right);
+            right--;
+        } 
+        // 如果当前元素是1，则只需将当前指针向右移动一位
+        else {
+            curr++;
+        }
+    }
+}
+
+// 交换数组中两个元素的位置
+private void swap(int[] nums, int i, int j) {
+    int temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+}
+```
+
+
+
+### [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
+
+> 给定一个包含 `n + 1` 个整数的数组 `nums` ，其数字都在 `[1, n]` 范围内（包括 `1` 和 `n`），可知至少存在一个重复的整数。
+>
+> 假设 `nums` 只有 **一个重复的整数** ，返回 **这个重复的数** 。
+>
+> 你设计的解决方案必须 **不修改** 数组 `nums` 且只用常量级 `O(1)` 的额外空间。
+>
+> ```
+> 输入：nums = [1,3,4,2,2]
+> 输出：2
+> ```
+
+**思路**：由于题目要求不能修改原数组（不能排序），且空间复杂度为$O(1)$，时间复杂度低于$O(n^2)$，我们可以使用二分查找或者快慢指针（循环检测）的方法。
+
+1. 二分查找（基于抽屉原理）
+
+   抽屉原理：如果有 n 个抽屉和 n+1 个物品，那么至少有一个抽屉有至少两个物品。
+
+   我们不是在原始数组上进行二分，而是在数字范围上进行二分。数字的范围是 [1, n]。
+   对于中间数 mid，统计数组中 <= mid 的元素的个数 count：
+
+   - 如果 count <= mid，那么重复元素一定在 [mid+1, n] 之间。
+
+   - 否则，重复元素在 [1, mid] 之间。
+
+   ```java
+   public int findDuplicate(int[] nums) {
+       int left = 1;
+       int right = nums.length - 1;
+       while (left < right) {
+           int mid = left + (right - left) / 2;
+           int count = 0;
+           for (int num : nums) {
+               if (num <= mid) {
+                   count++;
+               }
+           }
+           if (count > mid) {
+               right = mid;
+           } else {
+               left = mid + 1;
+           }
+       }
+       return left;
+   }
+   ```
+
+2. 快慢指针法
+
+   把数组`nums`看成一个特殊的链表，数组的索引是链表节点的编号，数组的值是指向下一个节点的指针。因为存在重复数字，所以链表中必然存在环，那么问题就转化为寻找链表环的入口，该入口对应的数字就是重复的数。
+
+   - 初始化两个指针`slow`和`fast`，都指向数组的第一个元素，即`nums[0]`。
+   - 让`slow`指针每次走一步（`slow = nums[slow]`），`fast`指针每次走两步（`fast = nums[nums[fast]]`），直到`slow`和`fast`相遇。
+   - 相遇后，将`fast`指针重新指向`nums[0]`，然后`slow`和`fast`指针每次都走一步，当它们再次相遇时，相遇点对应的数字就是重复的数。
+
+   ```java
+   public int findDuplicate(int[] nums) {
+       int slow = nums[0];
+       int fast = nums[0];
+       // 第一轮，找到相遇点
+       do {
+           slow = nums[slow];
+           fast = nums[nums[fast]];
+       } while (slow != fast);
+   
+       // 重置其中一个指针到起点
+       fast = nums;
+       // 两个指针都每次一步移动，直到相遇
+       while (slow != fast) {
+           slow = nums[slow];
+           fast = nums[fast];
+       }
+       return slow; // 或者fast，此时它们相等
+   }
+   ```
+
+   
