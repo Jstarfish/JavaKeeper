@@ -62,6 +62,18 @@
             }
           },
           {
+            "id": "80d5c719688f185a",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.8.10"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.8.10"
+            }
+          },
+          {
             "id": "c7c1397df03f59cc",
             "type": "leaf",
             "state": {
@@ -100,7 +112,7 @@
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -254,7 +266,7 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "56243bd84331da43",
+  "active": "80d5c719688f185a",
   "lastOpenFiles": [
     "framework/SpringWebFlux/Webflux~.md",
     "framework/SpringWebFlux/Webflux.md",
