@@ -6,7 +6,7 @@ tags:
 categories: leetcode
 ---
 
-![Depth First Search — DFS Algorithm](https://miro.medium.com/v2/resize:fit:1400/1*nMRjmPilq9qeoP09ou2syA.jpeg)
+![](https://img.starfish.ink/leetcode/leetcode-banner.png)
 
 > 文章将围绕以下内容展开：
 >

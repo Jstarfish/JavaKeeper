@@ -81,27 +81,28 @@ categories: Interview
 >
 >    - **用途**：实时通信（如语音、视频直播）、DNS 查询、在线游戏等对时延敏感的场景。
 >
-> 9. **P (Internet Protocol)**
+> 9. 
 >
+> 10. **IP (Internet Protocol)**
 >    - **作用**：提供逻辑地址（IP 地址）以及数据包路由功能。
 >    - **特点**：不保证数据传输的可靠性。
 >    - 版本：
 >      - IPv4：使用 32 位地址，地址资源有限。
 >      - IPv6：使用 128 位地址，解决了地址耗尽问题。
 >
-> 10. **ICMP (Internet Control Message Protocol)**
+> 11. **ICMP (Internet Control Message Protocol)**
 >
 >     - **作用**：用于网络诊断和错误报告。
 >
 >     - **用途**：`ping` 命令通过 ICMP 测试网络连接是否畅通。
 >
-> 11. **ARP (Address Resolution Protocol)**
+> 12. **ARP (Address Resolution Protocol)**
 >
 >     - **作用**：将 IP 地址解析为物理地址（MAC 地址）。
 >
 >     - **用途**：局域网内通信时，通过 ARP 获取目标设备的 MAC 地址。
 >
-> 12. **NAT (Network Address Translation)**
+> 13. **NAT (Network Address Translation)**
 >
 >     - **作用**：将私有 IP 地址转换为公网 IP 地址。
 >
@@ -359,8 +360,7 @@ MSL（Maximum Segment Lifetime）是TCP报文在网络中可以存在的最长�
 
    - **三次握手**：在建立连接时，通过三次握手机制确认通信双方都已准备好，确保连接的可靠性。
      
-
-   - **四次挥手**：在断开连接时，通过四次挥手机制确保双方都已经完成数据传输，安全地关闭连接。
+- **四次挥手**：在断开连接时，通过四次挥手机制确保双方都已经完成数据传输，安全地关闭连接。
 
 
 通过以上这些机制，TCP能够在一个不可靠的网络环境中，提供端到端的可靠数据传输服务。这些机制确保数据完整、有序地传输，并能够适应网络中的动态变化。

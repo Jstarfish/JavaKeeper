@@ -8,7 +8,7 @@ tags:
 categories: leetcode
 ---
 
-![](https://cdn.pixabay.com/photo/2019/12/04/18/40/machined-parts-4673364_1280.jpg)
+![](https://img.starfish.ink/leetcode/leetcode-banner.png)
 
 ### [1. 两数之和](https://leetcode-cn.com/problems/two-sum/)
 

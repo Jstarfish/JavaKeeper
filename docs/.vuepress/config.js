@@ -374,7 +374,7 @@ function genNetworkSidebar(){
 function genInterviewSidebar(){
   return [
     ['Java-Basics-FAQ', 'Java基础部分'],
-    ['Collections-FAQ', 'Java集合部分'],
+    ['Java-Collections-FAQ', 'Java集合部分'],
     ['JUC-FAQ', 'Java 多线程部分'],
     ['JVM-FAQ', 'JVM 部分'],
     ['MySQL-FAQ', 'MySQL 部分'],
