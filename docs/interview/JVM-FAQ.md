@@ -1900,6 +1900,8 @@ System.out.println("max_memory(-xmx)="+maxMemory+"字节，" +(maxMemory/(double
 
 ### 🎯 如何查看JVM的内存使用情况?
 
+> JVM 内存可以通过 JDK 自带工具（jstat、jmap、jcmd）在命令行查看，也可以用 jconsole、visualvm 图形化分析。如果线上系统，我会用 Arthas 或结合 Prometheus + Grafana 做实时监控。在代码里，还可以通过 JMX 的 MemoryMXBean 获取堆内存使用情况。
+
 一、命令行工具
 
 1. **`jps` + `jstat` 组合**
