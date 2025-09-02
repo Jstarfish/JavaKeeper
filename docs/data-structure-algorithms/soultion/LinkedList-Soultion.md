@@ -277,7 +277,7 @@ public ListNode middleNode(ListNode head) {
 
 ```java
 public ListNode removeNthFromEnd(ListNode head, int n) {
-    ListNode dummy = new ListNode(0, head);
+    ListNode dummy = new ListNode(0);
     ListNode first = dummy, second = dummy;
     
     // 前指针先走 n+1 步
