@@ -185,48 +185,62 @@ public void insertionSort(int[] arr) {
 
 ![img](https://www.runoob.com/wp-content/uploads/2019/03/quickSort.gif)
 
-我们选最后一个数作为基准值，然后从数组左右两边进行扫描，先从左往右找到一个大于基准值的元素，将下标指针记录下来，然后转到从右往左扫描，找到一个小于基准值的元素，交换这两个元素的位置，重复步骤，直到左右两个指针相遇，再将基准值与左侧最右边的元素交换。
-
 ```java
-// 快速排序方法
-public void quickSort(int[] arr) {
-  quickSort(arr, 0, arr.length-1);
-}
-
-public void quickSort(int[] arr, int low, int high) {
-    if (arr == null || low >= high) return;
-
-    int pivot = partition(arr, low, high); // 分区并获取基准位置
-    quickSort(arr, low, pivot - 1);        // 递归左子数组
-    quickSort(arr, pivot + 1, high);       // 递归右子数组
-}
-
-// 用于找到基准元素的正确位置并进行分区
-private int partition(int[] arr, int low, int high) {
-    int pivot = arr[high];    // 选择最后一个元素作为基准
-    int i = low - 1;      // 左区间指针（初始化为low-1，表示小于基准的元素区间）
-
-    for (int j = low; j < high; j++) {
-        // 如果当前元素小于或等于基准值，将它放到左侧
-        if (arr[j] <= pivot) {
-            i++;		// 左区间指针右移
-            swap(arr, i, j);   // 交换当前元素到左区间
+public class QuickSort {
+    // 对外暴露的排序方法：传入待排序数组
+    public static void sort(int[] arr) {
+        if (arr == null || arr.length <= 1) {
+            return; // 数组为空或只有1个元素，无需排序
         }
+        // 调用递归方法：初始排序范围是整个数组（从0到最后一个元素）
+        quickSort(arr, 0, arr.length - 1);
     }
 
-    // 交换 arr[i+1] 和 arr[high] (或 pivot)
-    // 将基准值放到正确位置，即i + 1处
-    swap(arr, i + 1, high);   // 基准归位
-    
-    return i + 1;  // 返回基准值的位置
-}
+    // 递归排序方法：排序 arr 的 [left, right] 区间
+    private static void quickSort(int[] arr, int left, int right) {
+        // 递归终止条件：当 left >= right 时，子数组只有1个元素或为空，无需排序
+        if (left >= right) {
+            return;
+        }
 
-  // 交换数组中的两个元素
-  private static void swap(int[] arr, int i, int j) {
-      int temp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = temp;
-  }
+        // 1. 分区操作：返回基准值最终的索引位置
+        // （把比基准小的放左边，比基准大的放右边，基准在中间）
+        int pivotIndex = partition(arr, left, right);
+
+        quickSort(arr, left, pivotIndex - 1);
+        quickSort(arr, pivotIndex + 1, right);
+    }
+
+    // 分区核心方法：选 arr[right] 为基准，完成分区并返回基准索引
+    private static int partition(int[] arr, int left, int right) {
+        // 基准值：这里选当前区间的最后一个元素
+        int pivot = arr[right];
+        // i 指针：指向“小于基准的区域”的最后一个元素（初始时区域为空，i = left-1）
+        int i = left - 1;
+
+        // j 指针：遍历当前区间的所有元素（从 left 到 right-1，跳过基准）
+        for (int j = left; j < right; j++) {
+            // 如果当前元素 arr[j] 小于等于基准，就加入“小于基准的区域”
+            if (arr[j] <= pivot) {
+                i++; // 先扩大“小于基准的区域”
+                swap(arr, i, j); // 交换 arr[i] 和 arr[j]，把 arr[j] 放进区域
+            }
+        }
+
+        // 最后：把基准值放到“小于基准区域”的后面（i+1 位置）
+        // 此时 i+1 就是基准的最终位置（左边都<=基准，右边都>基准）
+        swap(arr, i + 1, right);
+        return i + 1;
+    }
+
+    // 辅助方法：交换数组中两个位置的元素
+    private static void swap(int[] arr, int a, int b) {
+        int temp = arr[a];
+        arr[a] = arr[b];
+        arr[b] = temp;
+    }
+
+}
 ```
 
 ### 3. 时间复杂度分析

@@ -202,8 +202,6 @@ Redis的“多路复用”指用一个事件循环线程，借助内核的 I/O �
   - 复用：指复用一个或少量线程
   - 核心：用一个线程监视多个文件描述符，一旦某个描述符就绪就能进行相应的I/O操作
 
-Redis 的 I/O 多路复用模型使用的函数可以是 `select`（在一些其他系统上）、`poll`（在 Linux 上）、`epoll` 或 `kqueue`（在 BSD 系统上）。其中，`select` 作为备选方案，由于其限制和性能问题，通常不是首选。而 `epoll` 是 Linux 系统上的高性能选择，特别是在处理大量并发连接时。
-
 以下是 Redis 多路复用的工作原理：
 
 **1. 多路复用简介**
@@ -2734,12 +2732,68 @@ end
 
 
 
-### 🎯 zk 实现分布式锁的思路
+### 🎯 Redis实现分布式锁，还有其他方式么，zookeeper怎么实现，各有什么有缺点，你们为什么用redis实现
 
-1. 客户端对某个方法加锁时，在 zk 上的与该方法对应的指定节点的目录下，生成一个唯一 的瞬时有序节点 node1; 
-2. 客户端获取该路径下所有已经创建的子节点，如果发现自己创建的 node1 的序号是最小 的，就认为这个客户端获得了锁。
-3. 如果发现 node1 不是最小的，则监听比自己创建节点序号小的最大的节点，进入等待。
-4. 获取锁后，处理完逻辑，删除自己创建的 node1 即可。
+> 分布式锁常见有三种实现：基于 **Redis、Zookeeper 和数据库**。
+>  Redis 基于 `SETNX` 实现，性能高，适合高并发，但需要考虑过期续期和主从同步带来的锁丢失问题；
+>  Zookeeper 基于临时顺序节点和 Watch 机制，可靠性和公平性好，但 QPS 不高，适合强一致性场景；
+>  数据库基于唯一索引或行锁，简单但性能差，容易造成死锁。
+>
+> 我们项目里用的是 **Redis 实现分布式锁**，主要原因是系统对性能要求极高（QPS 十万级），Redis 锁的延迟更低，而且 Redisson 已经帮我们封装了续期和可重入机制，开发和维护成本低。
+
+| 实现方式      | 原理                        | 优点                 | 缺点                     | 适用场景                     |
+| ------------- | --------------------------- | -------------------- | ------------------------ | ---------------------------- |
+| **Redis**     | SETNX/RedLock，过期时间控制 | 高性能，简单，生态好 | 锁丢失风险，需要续期机制 | 高并发、对性能敏感           |
+| **Zookeeper** | 临时顺序节点 + Watch 机制   | 强一致，公平性好     | QPS 较低，依赖 zk 集群   | 金融、电商下单等一致性要求高 |
+| **数据库**    | 唯一索引 / 行锁             | 简单易实现           | 性能差，容易死锁         | 小规模系统，临时使用         |
+
+**1. Redis 实现**
+
+- **原理**：利用 `SETNX key value EX expire`（或 Redisson 的 `lock`），保证只有一个客户端能成功写入，拿到锁。解锁时 `DEL key`，结合 Lua 脚本保证原子性。
+- **优化**：RedLock 算法（多节点加锁），避免单点 Redis 故障。
+
+✅ 优点：
+
+- 性能高，适合高并发场景
+- 实现简单，生态成熟（Redisson）
+
+❌ 缺点：
+
+- 需要考虑锁过期、自动续期（看门狗）
+- 单节点 Redis 挂掉会有风险，主从异步可能导致锁丢失
+
+**2. Zookeeper 实现**
+
+- **原理**：基于 **临时顺序节点 + Watch 机制**
+  - 客户端在 `/lock` 下创建 **临时顺序节点**
+  - 序号最小的客户端获得锁
+  - 其他客户端监听前一个节点，前一个节点释放时被唤醒
+- **公平锁**：严格 FIFO 顺序
+
+✅ 优点：
+
+- 天然保证锁的可靠性（会话断开，临时节点自动删除）
+- 公平性好（按顺序排队）
+
+❌ 缺点：
+
+- Zookeeper 是 CP 模型，性能不如 Redis（QPS 万级 vs Redis 十万级以上）
+- 依赖 ZooKeeper 集群，运维成本高
+
+**3. 数据库实现**
+
+- **方式 1**：基于唯一索引，比如 `insert into lock_table (lock_key) values ('xxx')`，失败说明已被占用
+- **方式 2**：基于 `select ... for update` 行锁
+
+✅ 优点：
+
+- 易于理解，直接利用数据库
+- 无需额外组件
+
+❌ 缺点：
+
+- 性能差，不适合高并发
+- 锁超时、死锁处理复杂
 
 
 
@@ -2780,6 +2834,8 @@ end
 | 主从复制延迟     | 主节点加锁后宕机，数据还没同步到从节点 → 锁丢失              | **RedLock 算法**：在多个独立 Redis 节点加锁，超过半数成功算成功 |
 | 单点问题         | 单 Redis 节点宕机 → 锁全丢失                                 | Redis **集群部署** 或 使用 **ZooKeeper/etcd** 这类 CP 系统保证一致性 |
 
+
+
 ### 🎯 Redis分布式锁，过期时间怎么定的?
 
 **锁过期时间的设定**
@@ -2801,22 +2857,22 @@ end
      >
      >    ```java
      >    public class RedisLockWithRenewal {
-     >                
+     >                      
      >        private static final String LOCK_KEY = "my_lock";
      >        private static final String LOCK_VALUE = "unique_value";
      >        private static final int EXPIRE_TIME = 7; // 过期时间为7秒
-     >                
+     >                      
      >        public boolean acquireLock(Jedis jedis) {
      >            String result = jedis.set(LOCK_KEY, LOCK_VALUE, "NX", "EX", EXPIRE_TIME);
      >            return "OK".equals(result);
      >        }
-     >                
+     >                      
      >        public void releaseLock(Jedis jedis) {
      >            if (LOCK_VALUE.equals(jedis.get(LOCK_KEY))) {
      >                jedis.del(LOCK_KEY);
      >            }
      >        }
-     >                
+     >                      
      >        public void renewLock(Jedis jedis) {
      >            Timer timer = new Timer();
      >            timer.schedule(new TimerTask() {
@@ -2831,11 +2887,11 @@ end
      >                }
      >            }, EXPIRE_TIME * 500, EXPIRE_TIME * 500); // 每 3.5 秒续期一次
      >        }
-     >                
+     >                      
      >        public static void main(String[] args) {
      >            Jedis jedis = new Jedis("localhost", 6379);
      >            RedisLockWithRenewal lock = new RedisLockWithRenewal();
-     >                
+     >                      
      >            if (lock.acquireLock(jedis)) {
      >                lock.renewLock(jedis);
      >                try {
@@ -2853,7 +2909,7 @@ end
      >            }
      >        }
      >    }
-     >                
+     >                      
      >    ```
      >
      > **注意事项**
