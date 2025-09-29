@@ -645,9 +645,9 @@ shard = hash(_routing) % (num_of_primary_shards)
 
 聚合是 Elasticsearch 中进行数据统计和分析的功能，常见的聚合类型有 `avg`（平均值）、`sum`（总和）、`terms`（按值分组）等。
 
-
-
 ------
+
+
 
 ## 🌐 三、集群与架构（高可用）
 
@@ -930,9 +930,9 @@ GET /products/_search
 | scroll       | 大规模导出、批处理   | 能遍历全量数据 | 不实时，占用内存         |
 | search_after | 实时业务分页         | 高效、轻量     | 只能往后翻，不能随机跳页 |
 
-
-
 ------
+
+
 
 ## ⚡ 四、性能优化类（高频重点）
 
@@ -1008,132 +1008,107 @@ GET /products/_search
 
 ### 🎯 ES 查询性能优化有哪些方式？
 
-"查询想快，先看索引结构合理不合理，再优化查询语句本身。索引层面做好mapping、分片数、路由；查询层面用filter代替query、控制返回字段、分页用search_after。高并发场景开缓存、用聚合pre-计算，避免深度分页和复杂脚本，监控慢查询就基本够用了。"
+> ES 查询优化，我的整体思路是：**先看索引结构是否合理，再优化查询语句本身，最后配合缓存和系统调优。**
+>
+> 在索引层面，重点是 **mapping 精准、分片数量合适、路由设计合理**；
+> 在查询层面，**能用 filter 就不用 query**，**控制返回字段**，**分页避免 from+size 深度翻页**，多用 `search_after`；
+> 高并发下要用 **缓存** 和 **预聚合**，避免复杂脚本和大范围扫描。
+>
+> 最后，还需要结合 **慢查询监控、profile 分析** 去定位瓶颈。整体遵循「**索引设计优先 > 查询语句优化 > 缓存和系统层面**」这个顺序，就能保证查询性能。
 
-**可落地清单（按优先级）**
+1. **索引设计优化**
 
-**索引设计优化**
+- **Mapping优化**
+  - 字段类型精准：全文检索 `text + keyword`，精确查找只用 `keyword`
+  - 高基数字段避免聚合，可 `doc_values=false` 节省空间
+  - 不需要评分的字段用 `keyword`，关闭 `norms`
+- **分片设计**
+  - 单分片 **10~50GB**，分片过多会导致协调开销大
+  - 多租户/大客户数据用 `_routing`，减少查询 fan-out
+- **索引结构**
+  - 时间序列数据用 **ILM rollover**，只查必要时间段
+  - **冷热分离**：历史数据放 warm/cold 节点
 
-- Mapping优化
+------
 
-  - 字段类型精准：全文用text+keyword multi-fields，精确查找只用keyword
+2. **查询语句优化**
 
-  - 高基数字段避免聚合，用doc_values=false节省空间
+- **Filter vs Query**
 
-  - 不需要评分的用keyword，关闭norms（keyword默认已关闭）
+  - 精确匹配用 **filter**（有缓存、无评分）：`term`、`range`、`bool.filter`
+  - 需要相关性评分才用 **query**：`match`、`multi_match`
 
-- 分片设计
-
-  - 单分片10-50GB，过多分片增加协调开销
-
-  - 用_routing减少查询fan-out，提升命中率
-
-- 索引结构
-
-  - 时间序列数据用ILM rollover，查询只命中必要时间段
-
-  - 冷热分离：历史数据放warm/cold节点
-
-**查询语句优化**
-
-- Filter vs Query
-
-  - 精确匹配用filter（有缓存、无评分）：term、range、bool-filter
-
-  - 全文检索才用query：match、multi_match
-
-    ```java
-    {
-     "bool": {
-      "filter": [{"term": {"status": "active"}}], *// 用filter*
-      "must": [{"match": {"title": "elasticsearch"}}] *// 需要评分用must*
-     }
+  ```
+  {
+    "bool": {
+      "filter": [{"term": {"status": "active"}}], 
+      "must": [{"match": {"title": "elasticsearch"}}]
     }
-    ```
+  }
+  ```
 
-- 返回字段控制
+- **返回字段控制**
 
-  - 用_source_includes/*source_excludes只返回需要字段*
+  - 用 `_source_includes` / `_source_excludes` 只返回需要字段
+  - 大文档场景用 `stored_fields` 替代 `_source`
+  - 统计类查询 `size=0`，避免返回 hits
 
-  - 大文档场景用stored_fields替代_source
+------
 
-  - 统计查询用size=0，不返回hits
+3. **分页优化**
 
-**分页优化**
+- 避免 `from + size` 深度分页（默认最大 `10000`）
+- 大数据分页用 `search_after + sort`（推荐）
+- 遍历历史数据用 `scroll`（7.x 之后推荐 `search_after`）
 
-- 避免深度分页
+------
 
-  - from+size最多10000条（index.max_result_window）
+4. **聚合性能优化**
 
-  - 大数据量用search_after+sort（推荐）
+- 高基数聚合用 **composite aggregation**，避免 terms 爆炸
+- 聚合前先 **filter** 限制范围
+- 优先使用数值聚合，少用字符串
 
-  - 历史数据遍历用scroll（7.x后推荐search_after）
+------
 
-**聚合性能优化**
+5. **缓存策略**
 
-- 合理使用聚合
+- **查询缓存**
+  - filter 查询会自动缓存
+  - 配置 `indices.queries.cache.size`（默认 10% 堆内存）
+- **请求缓存**
+  - 完全相同请求可用 request cache，适合 dashboard 场景
+  - `size=0` 的聚合查询容易命中缓存
 
-  - 高基数聚合用composite，避免terms默认size=10的限制
+------
 
-  - 多层聚合控制深度，先filter再聚合
+6. **高级优化**
 
-  - 数值聚合优于字符串聚合
+- **Routing**
+  - 多租户场景用 `_routing`，减少全分片扫描
+  - 大客户数据独立 routing key
+- **字段优化**
+  - 不需要的字段 `enabled=false`
+  - 慎用 `nested`，查询成本高
+- **脚本优化**
+  - 避免 `script_score` 作用于大数据集
+  - 用 **painless** 预编译脚本
 
-**缓存策略**
+------
 
-- 查询缓存
+7. **系统层面优化**
 
-  - filter查询自动缓存，重复查询命中缓存
+- **硬件**：SSD、充足内存做 Page Cache，堆内存 ≤ 32GB
+- **JVM**：推荐 G1GC，`swappiness=1`，避免 swap
+- **监控**：慢查询日志、ES profile 分析，持续调优
 
-  - 控制indices.queries.cache.size（默认10%堆内存）
+------
 
-- 请求缓存
+**总结**
 
-  - 完全相同请求用request cache，适合dashboard场景
-
-  - size=0的聚合查询容易命中缓存
-
-**高级优化**
-
-- Routing使用
-
-  - 多租户场景用_routing，避免查询所有分片
-
-  - 大客户数据独立routing key
-
-- 字段优化
-
-  - 不需要的字段设enabled=false
-
-  - 数组/对象字段谨慎使用nested（查询成本高）
-
-- 脚本优化
-
-  - 避免script_score在大数据集上使用
-
-  - 用painless预编译，避免运行时编译
-
-**系统层面优化**
-
-- 硬件配置
-
-  - SSD存储，充足内存做Page Cache
-
-  - 堆内存≤32GB，剩余给系统缓存
-
-- JVM调优
-
-  - G1GC适合大堆，关注GC频率
-
-  - 避免内存交换（swappiness=1）
-
-**一句话策略**
-
-- 查询前：索引结构合理、mapping优化、分片适量
-
-- 查询中：filter替代query、控制返回、search_after分页
-
-- 查询后：监控慢查询、profile分析、缓存命中率
+- **查询前**：索引结构合理、mapping 精准、分片适量
+- **查询中**：filter 代替 query、控制返回、search_after 分页
+- **查询后**：监控慢查询、profile 分析、缓存命中率
 
 
 

@@ -57,28 +57,20 @@ while (fast != null && fast.next != null) {
 
 
 
-## 📚 链表题目分类体系
-
-### 🎯 分类原则
-
-- **按解题技巧分类**：每类使用相同的核心技巧
-- **按难度递进**：从简单到困难，循序渐进
-- **按面试频率**：⭐数量表示考察频率
-
 ### 📋 分类索引
 
-1. **🔥 双指针技巧类**：环形链表、环形链表II、链表中间节点、删除倒数第N个、旋转链表
-2. **🔄 反转与重排类**：反转链表、反转链表II、K个一组翻转、重排链表、两两交换
-3. **🔗 相交与合并类**：相交链表、合并两个有序链表、合并K个升序链表
-4. **🗑️ 删除与去重类**：移除链表元素、删除重复元素、删除重复元素II
-5. **🧮 数学运算类**：两数相加、两数相加II
-6. **🔍 特殊结构类**：LRU缓存、复制带随机指针链表、回文链表
-7. **🎯 综合应用类**：排序链表、分隔链表、奇偶链表、分隔链表
-8. **🚀 进阶变体类**：扁平化多级双向链表、有序链表转BST、合并两个链表
+1. **🔥 双指针技巧类**：[环形链表](#_环形链表141)、[环形链表II](#_142-环形链表-ii)、[链表中间节点](#_876-链表的中间结点)、[删除倒数第N个](#_19-删除链表的倒数第n个结点)、[旋转链表](#_61-旋转链表)
+2. **🔄 反转与重排类**：[反转链表](#_206-反转链表)、[反转链表II](#_92-反转链表-ii)、[K个一组翻转](#_25-k个一组翻转链表)、[重排链表](#_143-重排链表)、[两两交换](#_24-两两交换链表中的节点)
+3. **🔗 相交与合并类**：[相交链表](#_160-相交链表)、[合并两个有序链表](#_21-合并两个有序链表)、[合并K个升序链表](#_23-合并k个升序链表)
+4. **🗑️ 删除与去重类**：[移除链表元素](#_203-移除链表元素)、[删除重复元素](#_83-删除排序链表中的重复元素)、[删除重复元素II](#_82-删除排序链表中的重复元素-ii)
+5. **🧮 数学运算类**：[两数相加](#_2-两数相加)、[两数相加II](#_445-两数相加-ii)
+6. **🔍 特殊结构类**：[LRU缓存](#_146-lru缓存)、[复制带随机指针链表](#_138-复制带随机指针的链表)、[回文链表](#_234-回文链表)
+7. **🎯 综合应用类**：[排序链表](#_148-排序链表)、[分隔链表](#_86-分隔链表)、[奇偶链表](#_328-奇偶链表)、[分隔链表2](#_725-分隔链表)
+8. **🚀 进阶变体类**：[扁平化多级双向链表](#_430-扁平化多级双向链表)、[有序链表转BST](#_109-有序链表转换二叉搜索树)、[合并两个链表](#_1669-合并两个链表)
 
 ---
 
-## 🔥 一、双指针技巧类（核心中的核心）
+## 一、双指针技巧类（核心中的核心）🔥 
 
 ### 💡 核心思想
 
@@ -99,7 +91,7 @@ while (fast != null && fast.next != null) {
 
 
 
-### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/) ⭐⭐⭐⭐⭐
+### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/) 
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：双指针经典**
 
@@ -224,7 +216,7 @@ public ListNode detectCycle(ListNode head){
 
 
 
-### [876. 链表的中间结点](https://leetcode.cn/problems/middle-of-the-linked-list/) ⭐⭐⭐⭐
+### [876. 链表的中间结点](https://leetcode.cn/problems/middle-of-the-linked-list/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：快慢指针基础**
 
@@ -258,7 +250,7 @@ public ListNode middleNode(ListNode head) {
 
 
 
-### [19. 删除链表的倒数第N个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/) ⭐⭐⭐⭐⭐
+### [19. 删除链表的倒数第N个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/) 
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：双指针经典**
 
@@ -304,7 +296,7 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 
 
 
-### [61. 旋转链表](https://leetcode.cn/problems/rotate-list/) ⭐⭐⭐
+### [61. 旋转链表](https://leetcode.cn/problems/rotate-list/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：双指针应用**
 
@@ -356,7 +348,7 @@ public ListNode rotateRight(ListNode head, int k) {
 
 
 
-## 🔄 二、反转与重排类（高频考点）
+## 二、反转与重排类（高频考点）🔄 
 
 ### 💡 核心思想
 
@@ -378,7 +370,7 @@ while (curr != null) {
 return prev;
 ```
 
-### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/) ⭐⭐⭐⭐⭐
+### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/) 
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：基础必会**
 
@@ -430,7 +422,7 @@ public ListNode reverseList(ListNode head) {
 
 
 
-### [92. 反转链表 II](https://leetcode.cn/problems/reverse-linked-list-ii/) ⭐⭐⭐⭐
+### [92. 反转链表 II](https://leetcode.cn/problems/reverse-linked-list-ii/) 
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：局部反转经典**
 
@@ -498,7 +490,7 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
 
 
 
-### [25. K个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/) ⭐⭐⭐⭐
+### [25. K个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/) 
 
 **🎯 考察频率：高 | 难度：困难 | 重要性：分组反转**
 
@@ -540,7 +532,7 @@ public ListNode reverseKGroup(ListNode head, int k) {
 
 
 
-### [143. 重排链表](https://leetcode.cn/problems/reorder-list/) ⭐⭐⭐
+### [143. 重排链表](https://leetcode.cn/problems/reorder-list/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：综合应用**
 
@@ -607,7 +599,7 @@ private ListNode reverseList(ListNode head) {
 }
 ```
 
-### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/) ⭐⭐⭐
+### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：指针操作**
 
@@ -649,7 +641,7 @@ public ListNode swapPairs(ListNode head) {
 
 
 
-## 🔗 三、相交与合并类
+## 三、相交与合并类🔗 
 
 ### 💡 核心思想
 
@@ -657,7 +649,7 @@ public ListNode swapPairs(ListNode head) {
 - **归并思想**：有序链表的合并策略
 - **分治算法**：多个链表的合并优化
 
-### [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/) ⭐⭐⭐⭐
+### [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/) 
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：双指针经典**
 
@@ -708,7 +700,7 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 
 
 
-### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/) ⭐⭐⭐⭐⭐
+### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/) 
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：合并算法基础**
 
@@ -769,7 +761,7 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2){
 
 
 
-### [23. 合并K个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/) ⭐⭐⭐⭐⭐
+### [23. 合并K个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/) 
 
 **🎯 考察频率：极高 | 难度：困难 | 重要性：分治算法经典**
 
@@ -827,7 +819,7 @@ public ListNode mergeKLists(ListNode[] lists) {
 
 
 
-## 🗑️ 四、删除与去重类
+## 四、删除与去重类 🗑️ 
 
 ### 💡 核心思想
 
@@ -854,7 +846,7 @@ while (curr != null) {
 return dummy.next;
 ```
 
-### [203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/) ⭐⭐⭐
+### [203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/)
 
 **🎯 考察频率：中等 | 难度：简单 | 重要性：删除基础**
 
@@ -899,7 +891,7 @@ public ListNode removeElements(ListNode head, int val) {
 
 
 
-### [83. 删除排序链表中的重复元素](https://leetcode.cn/problems/remove-duplicates-from-sorted-list/) ⭐⭐⭐
+### [83. 删除排序链表中的重复元素](https://leetcode.cn/problems/remove-duplicates-from-sorted-list/) 
 
 **🎯 考察频率：中等 | 难度：简单 | 重要性：去重基础**
 
@@ -951,7 +943,7 @@ public ListNode deleteDuplicates(ListNode head) {
 - **时间复杂度**：O(n) - 遍历链表一次
 - **空间复杂度**：O(1) - 只使用了常数个指针
 
-### [82. 删除排序链表中的重复元素 II](https://leetcode.cn/problems/remove-duplicates-from-sorted-list-ii/) ⭐⭐⭐⭐
+### [82. 删除排序链表中的重复元素 II](https://leetcode.cn/problems/remove-duplicates-from-sorted-list-ii/) 
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：完全去重**
 
@@ -1033,7 +1025,7 @@ public ListNode deleteDuplicates(ListNode head) {
 
 
 
-## 🧮 五、数学运算类
+## 五、数学运算类 🧮 
 
 ### 💡 核心思想
 
@@ -1041,7 +1033,7 @@ public ListNode deleteDuplicates(ListNode head) {
 - **链表表示数字**：低位在前，高位在后
 - **边界处理**：不同长度链表的处理
 
-### [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/) ⭐⭐⭐⭐⭐
+### [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/) 
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：数学计算经典**
 
@@ -1104,7 +1096,7 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 
 
 
-### [445. 两数相加 II](https://leetcode.cn/problems/add-two-numbers-ii/) ⭐⭐⭐
+### [445. 两数相加 II](https://leetcode.cn/problems/add-two-numbers-ii/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：逆序处理**
 
@@ -1155,7 +1147,7 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 
 
 
-## 🔍 六、特殊结构类
+## 六、特殊结构类 🔍 
 
 ### 💡 核心思想
 
@@ -1163,7 +1155,7 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 - **双向链表**：支持前后遍历
 - **设计数据结构**：LRU、LFU等缓存机制
 
-### [146. LRU缓存](https://leetcode.cn/problems/lru-cache/) ⭐⭐⭐⭐⭐
+### [146. LRU缓存](https://leetcode.cn/problems/lru-cache/) 
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：系统设计经典**
 
@@ -1277,7 +1269,7 @@ class LRUCache {
 - **时间复杂度**：get和put操作都是O(1) - 哈希表查找O(1)，双向链表插入删除O(1)
 - **空间复杂度**：O(capacity) - 哈希表和双向链表存储最多capacity个节点
 
-### [138. 复制带随机指针的链表](https://leetcode.cn/problems/copy-list-with-random-pointer/) ⭐⭐⭐⭐⭐
+### [138. 复制带随机指针的链表](https://leetcode.cn/problems/copy-list-with-random-pointer/) 
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：特殊结构经典**
 
@@ -1367,7 +1359,7 @@ public Node copyRandomList(Node head) {
 
 
 
-### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/) ⭐⭐⭐⭐
+### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/) 
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：综合应用**
 
@@ -1424,7 +1416,7 @@ public boolean isPalindrome(ListNode head) {
 
 
 
-## 🎯 七、综合应用类
+## 七、综合应用类 🎯 
 
 ### 💡 核心思想
 
@@ -1432,7 +1424,7 @@ public boolean isPalindrome(ListNode head) {
 - **多技巧结合**：快慢指针+反转+合并等
 - **优化策略**：时间空间复杂度的权衡
 
-### [148. 排序链表](https://leetcode.cn/problems/sort-list/) ⭐⭐⭐⭐
+### [148. 排序链表](https://leetcode.cn/problems/sort-list/) 
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：归并排序应用**
 
@@ -1502,7 +1494,7 @@ private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 }
 ```
 
-### [86. 分隔链表](https://leetcode.cn/problems/partition-list/) ⭐⭐⭐
+### [86. 分隔链表](https://leetcode.cn/problems/partition-list/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：双链表技巧**
 
@@ -1544,7 +1536,7 @@ public ListNode partition(ListNode head, int x) {
 }
 ```
 
-### [328. 奇偶链表](https://leetcode.cn/problems/odd-even-linked-list/) ⭐⭐⭐
+### [328. 奇偶链表](https://leetcode.cn/problems/odd-even-linked-list/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：指针操作**
 
@@ -1575,7 +1567,7 @@ public ListNode oddEvenList(ListNode head) {
 }
 ```
 
-### [725. 分隔链表](https://leetcode.cn/problems/split-linked-list-in-parts/) ⭐⭐⭐
+### [725. 分隔链表](https://leetcode.cn/problems/split-linked-list-in-parts/) 
 
 **🎯 考察频率：低 | 难度：中等 | 重要性：数学计算**
 
@@ -1759,7 +1751,7 @@ class LRUCache {
 
 
 
-### [109. 有序链表转换二叉搜索树](https://leetcode.cn/problems/convert-sorted-list-to-binary-search-tree/) ⭐⭐⭐
+### [109. 有序链表转换二叉搜索树](https://leetcode.cn/problems/convert-sorted-list-to-binary-search-tree/) 
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：链表与树的结合**
 
@@ -1799,7 +1791,7 @@ public TreeNode sortedListToBST(ListNode head) {
 
 ---
 
-## 🚀 八、进阶与变体类
+## 八、进阶与变体类 🚀 
 
 ### 💡 核心思想
 
@@ -1807,7 +1799,7 @@ public TreeNode sortedListToBST(ListNode head) {
 - **边界优化**：特殊情况的处理
 - **复合应用**：多种技巧的综合运用
 
-### [430. 扁平化多级双向链表](https://leetcode.cn/problems/flatten-a-multilevel-doubly-linked-list/) ⭐⭐⭐
+### [430. 扁平化多级双向链表](https://leetcode.cn/problems/flatten-a-multilevel-doubly-linked-list/)
 
 **🎯 考察频率：低 | 难度：中等 | 重要性：递归应用**
 
@@ -1855,7 +1847,7 @@ public Node flatten(Node head) {
 
 
 
-### [1669. 合并两个链表](https://leetcode.cn/problems/merge-in-between-linked-lists/) ⭐⭐
+### [1669. 合并两个链表](https://leetcode.cn/problems/merge-in-between-linked-lists/) 
 
 **🎯 考察频率：低 | 难度：中等 | 重要性：指针操作**
 

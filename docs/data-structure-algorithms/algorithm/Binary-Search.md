@@ -65,7 +65,7 @@ int binarySearch(int[] nums, int target) {
 ## 三、刷刷热题
 
 - 二分查找，可以用循环（迭代）实现，也可以用递归实现
-- 二分查找依赖的事顺序表结构（也就是数组）
+- 二分查找依赖的是顺序表结构（也就是数组）
 - 二分查找针对的是有序数组
 - 数据量太小太大都不是很适用二分（太小直接顺序遍历就够了，太大的话对连续内存空间要求更高）
 
@@ -91,6 +91,9 @@ int binarySearch(int[] nums, int target) {
     return -1;
 }
 ```
+
+**时间复杂度**：O(log n)，每次都将搜索范围缩小一半
+**空间复杂度**：O(1)，只使用常量级别的额外空间
 
 **1、为什么 while 循环的条件中是 <=，而不是 <**？
 
@@ -222,32 +225,42 @@ public int firstNum(int[] nums, int target) {
 - 如果 [mid, R] 是有序数组，且 target 的大小满足 ({nums}[mid+1],{nums}[R]]，则我们应该将搜索范围缩小至 [mid + 1, R]，否则在 [l, mid - 1] 中寻找。
 
 ```java
-public static int search(int[] nums,int target) {
-      if(nums.length == 0) return -1;
-      if(nums.length == 1) return target == nums[0] ? 0 : -1;
-      int left = 0, right = nums.length - 1;
-      while(left <= right){
-          int mid = left + (right - left)/2;
-          if(target == nums[mid]) return mid;
-        
-          //左侧有序，注意是小于等于，处理最后只剩两个数的时候
-          if(nums[left] <= nums[mid]){  // 左半部分 [left..mid] 有序
-              if(nums[left] <= target && target < nums[mid]){ // target 在左半部分
-                  right = mid - 1;
-              }else{
-                  left = mid + 1;
-              }
-          }else{
-              if(nums[mid] < target && target <= nums[right]){
-                  left = mid +1;
-              }else{
-                  right = mid - 1;
-              }
-          }
-      }
-      return -1;
-  }
+public int search(int[] nums, int target) {
+    if (nums == null || nums.length == 0) return -1;
+
+    int left = 0, right = nums.length - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] == target) {
+            return mid; // 找到目标
+        }
+
+        // 判断左半部分是否有序
+        if (nums[left] <= nums[mid]) {
+            // 左半部分有序
+            if (nums[left] <= target && target < nums[mid]) {
+                right = mid - 1; // 目标在左半部分
+            } else {
+                left = mid + 1; // 目标在右半部分
+            }
+        } else {
+            // 右半部分有序
+            if (nums[mid] < target && target <= nums[right]) {
+                left = mid + 1; // 目标在右半部分
+            } else {
+                right = mid - 1; // 目标在左半部分
+            }
+        }
+    }
+
+    return -1; // 未找到目标
+}
 ```
+
+**时间复杂度**：$O(log n) $，二分查找的时间复杂度
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
 
 
 
@@ -257,7 +270,7 @@ public static int search(int[] nums,int target) {
 >
 > 如果数组中不存在目标值 target，返回 [-1, -1]。
 >
-> 你可以设计并实现时间复杂度为 $O(log n)$ 的算法解决此问题吗？
+> 你可以设计并实现时间复杂度为 $O(log n) $ 的算法解决此问题吗？
 >
 > ```
 > 输入：nums = [5,7,7,8,8,10], target = 8
@@ -312,6 +325,9 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 }
 ```
 
+**时间复杂度**：$O(log n) $，需要进行两次二分查找
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
 
 
 ### [寻找旋转排序数组中的最小值『153』](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
@@ -330,11 +346,6 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 > 解释：原数组为 [1,2,3,4,5] ，旋转 3 次得到输入数组。
 > ```
 > 
->```
-> 输入：nums = [11,13,15,17]
-> 输出：11
-> 解释：原数组为 [11,13,15,17] ，旋转 4 次得到输入数组。
-> ```
 
 **思路**：
 
@@ -377,6 +388,9 @@ public static int findMin(int[] nums) {
 }
 ```
 
+**时间复杂度**：$O(log n) $，每次都将搜索范围缩小一半
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
 **如果是求旋转数组中的最大值呢**
 
 ```java
@@ -406,29 +420,23 @@ public static int findMax(int[] nums) {
 
 ### [寻找重复数『287』](https://leetcode-cn.com/problems/find-the-duplicate-number/)
 
-> 给定一个包含 n + 1 个整数的数组 nums ，其数字都在 [1, n] 范围内（包括 1 和 n），可知至少存在一个重复的整数。
->
-> 假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
->
-> 你设计的解决方案必须 不修改 数组 nums 且只用常量级 $O(1)$ 的额外空间。
+> 长度为 n+1 的数组，元素在 1~n 之间，有且仅有一个重复数（可能重复多次）。要求不修改数组且只用 O (1) 空间。
 >
 > ```
-> 输入：nums = [1,3,4,2,2]
+>输入：nums = [1,3,4,2,2]
 > 输出：2
-> ```
->
+>```
+> 
 > ```
 > 输入：nums = [3,1,3,4,2]
 > 输出：3
-> ```
+>```
 
 **思路**：
 
-这里二分的不是数组中的数，而是[1,n]中用来度量的数
-
-二分查找的思路是先猜一个数（有效范围 [left..right] 里位于中间的数 mid），然后统计原始数组中 小于等于 mid 的元素的个数 cnt：
-
-如果 cnt 严格大于 mid。根据抽屉原理，重复元素就在区间 [left..mid] 里；否则，重复元素就在区间 [mid + 1..right] 里。
+- 统计小于等于 mid 的元素个数
+- 若 count > mid，说明重复数在 [1, mid] 区间
+- 否则在 [mid+1, n] 区间
 
 > 抽屉原理：把 `10` 个苹果放进 `9` 个抽屉，至少有一个抽屉里至少放 `2` 个苹果。
 
@@ -461,6 +469,9 @@ public int findDuplicate(int[] nums) {
 }
 ```
 
+**时间复杂度**：$O(n log n)$，每次需要遍历数组O(n)
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
 
 
 ### [寻找峰值『162』](https://leetcode-cn.com/problems/find-peak-element/)
@@ -488,43 +499,124 @@ public int findDuplicate(int[] nums) {
 
 **思路**：
 
-这题，最简单的思路就是直接找最大值，但这样复杂度是 $O(n)$
+- 比较 `nums[mid]` 和 `nums[mid+1]`
+- 如果 `nums[mid] < nums[mid+1]`，说明右侧一定有峰值
+- 否则左侧一定有峰值
 
-在二分查找中，每次会找到一个位置 mid。我们发现，mid 只有如下三种情况：
+**为什么有效**：
 
-- mid 为一个峰值，此时我们通过比较 mid 位置元素与两边元素大小即可。
-- mid 在一个峰值右侧，此时有 nums[mid] < nums[mid + 1]，此时我们向右调整搜索范围，在 [mid + 1, r] 范围内继续查找。
-- mid 在一个峰值左侧，此时有 nums[mid] < nums[mid - 1]，此时我们向左调整搜索范围，在 [l + 1, mid] 范围内继续查找。
+- 峰值条件 `nums[i] > nums[i+1]` 保证单调性
+- 二分查找每次可以缩小一半搜索范围
 
 ```java
 public int findPeakElement(int[] nums) {
-  int n = nums.length;
-  if (n == 1) {
-    return 0;
-  }
+    int left = 0, right = nums.length - 1;
 
-  // 先特判两边情况
-  if (nums[0] > nums[1]) return 0;
-  if (nums[n - 1] > nums[n - 2]) return n - 1;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
 
-  int l = 0, r = n - 1;
-  while (l <= r) {
-    int mid = (l + r) / 2;
-
-    // 当前为峰值
-    if (mid >= 1 && mid < n - 1 && nums[mid] > nums[mid - 1] && nums[mid] > nums[mid + 1]) {
-      return mid;
-    } else if (mid >= 1 && nums[mid] < nums[mid - 1]) {
-      // 峰值在 mid 左侧
-      r = mid - 1;
-    } else if (mid < n - 1 && nums[mid] < nums[mid + 1]) {
-      // 峰值在 mid 右侧
-      l = mid + 1;
+        if (nums[mid] < nums[mid + 1]) {
+            // 右侧有峰值
+            left = mid + 1;
+        } else {
+            // 左侧有峰值
+            right = mid;
+        }
     }
-  }
-  return -1;
+
+    return left; // left == right，即为峰值位置
 }
 ```
+
+**时间复杂度**：$O(log n) $，二分查找的时间复杂度
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
+
+
+### [搜索二维矩阵『74』](https://leetcode.cn/problems/search-a-2d-matrix/)
+
+> 给你一个满足以下两点的 `m x n` 矩阵：
+>
+> - 每行从左到右递增
+> - 每行第一个数大于上一行最后一个数
+>
+> 判断目标值 `target` 是否在矩阵中。
+>
+> 给你一个整数 `target` ，如果 `target` 在矩阵中，返回 `true` ；否则，返回 `false` 。
+>
+> ![img](https://assets.leetcode.com/uploads/2020/10/05/mat.jpg)
+>
+> ```
+> 输入：matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
+> 输出：true
+> ```
+
+**思路**：由于每行的第一个元素都大于前一行的最后一个元素，整个矩阵可以被看作一个**完全有序的一维数组**。
+
+例如，上面的示例矩阵可以被 “拉直” 为：`[1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60]`
+
+要实现 “一次二分”，必须能将一维数组的索引 `mid`（二分查找中的中间位置）转换回二维矩阵的 `(行号, 列号)`，公式如下：
+
+- **行号 = mid /n**（整除，因为每一行有 `n` 个元素，商表示当前元素在第几行）
+- **列号 = mid % n**（取余，余数表示当前元素在该行的第几列）
+
+举例：
+
+- 一维索引 `mid = 5`，`n = 4`（列数）：
+  - 行号 = 5 / 4 = 1（第 2 行，索引从 0 开始）
+  - 列号 = 5 % 4 = 1（第 2 列）
+  - 对应矩阵值：`matrix[1][1] = 11`，与一维数组索引 5 的值一致。
+
+```java
+public boolean searchMatrix(int[][] matrix, int target) {
+    // 1. 处理边界情况：矩阵为空（行数为 0）
+    int m = matrix.length;
+    if (m == 0) {
+        return false;
+    }
+
+    // 2. 处理边界情况：矩阵列数为空（每行没有元素）
+    int n = matrix[0].length;
+    if (n == 0) {
+        return false;
+    }
+
+    // 3. 初始化二分查找的左右指针（对应一维数组的起始和末尾索引）
+    int left = 0;
+    int right = m * n - 1; // 总元素数 = 行数 × 列数，末尾索引 = 总元素数 - 1
+
+    // 4. 二分查找循环：left <= right 确保不遗漏元素
+    while (left <= right) {
+        // 计算中间索引：避免 left + right 直接相加导致整数溢出
+        int mid = left + (right - left) / 2;
+
+        // 关键：将一维索引 mid 转换为二维矩阵的 (row, col) 坐标
+        int row = mid / n; // 行号 = 中间索引 ÷ 列数（整除）
+        int col = mid % n; // 列号 = 中间索引 % 列数（取余）
+
+        // 获取当前中间位置的矩阵值
+        int midValue = matrix[row][col];
+
+        // 5. 比较 midValue 与 target，调整二分范围
+        if (midValue == target) {
+            // 找到目标值，直接返回 true
+            return true;
+        } else if (midValue < target) {
+            // 中间值比目标小：目标在右半部分，left 移到 mid + 1
+            left = mid + 1;
+        } else {
+            // 中间值比目标大：目标在左半部分，right 移到 mid - 1
+            right = mid - 1;
+        }
+    }
+
+    // 6. 循环结束仍未找到，说明目标不在矩阵中
+    return false;
+}
+```
+
+**时间复杂度**：$O(log(mn)) $：二分查找的时间复杂度是 `O(log(总元素数))`，总元素数为 `m×n`，因此复杂度为 `O(log(m×n))`
+**空间复杂度**：$O(1)$：仅使用了 `m、n、left、right、mid、row、col、midValue` 等常数个变量，没有额外占用空间
 
 
 
@@ -561,7 +653,7 @@ public int findPeakElement(int[] nums) {
       int row = matrix.length;
       //从左下角开始，根据大小选择走的方向
       int x = row - 1, y = 0;
-      while (x >= 0 && y < row) {
+      while (x >= 0 && y < col) {
           if (target == matrix[x][y]) return true;
           else if (target > matrix[x][y]) y++;
           else x--;
@@ -569,6 +661,9 @@ public int findPeakElement(int[] nums) {
       return false;
   }
 ```
+
+**时间复杂度**：O(m + n)，其中m是行数，n是列数，最坏情况下需要遍历m+n个元素
+**空间复杂度**：O(1)，只使用常量级别的额外空间
 
 
 
@@ -603,6 +698,9 @@ public int searchInsert(int[] nums, int target) {
   }
 ```
 
+**时间复杂度**：O(log n)，标准的二分查找时间复杂度
+**空间复杂度**：O(1)，只使用常量级别的额外空间
+
 
 
 ### [最长递增子序列『300』](https://leetcode.cn/problems/longest-increasing-subsequence/)
@@ -619,7 +717,66 @@ public int searchInsert(int[] nums, int target) {
 
 **思路**：
 
-- 优先使用动态规划
+- 优先使用动态规划，时间复杂度O(n²)
+- 也可以使用二分查找优化，时间复杂度O(n log n)
+
+**动态规划解法**：
+```java
+public int lengthOfLIS(int[] nums) {
+    if (nums == null || nums.length == 0) return 0;
+    int[] dp = new int[nums.length];
+    Arrays.fill(dp, 1);
+    int maxLen = 1;
+    
+    for (int i = 1; i < nums.length; i++) {
+        for (int j = 0; j < i; j++) {
+            if (nums[j] < nums[i]) {
+                dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+        }
+        maxLen = Math.max(maxLen, dp[i]);
+    }
+    return maxLen;
+}
+```
+
+**二分查找优化解法**：
+```java
+public int lengthOfLIS(int[] nums) {
+    if (nums == null || nums.length == 0) return 0;
+    
+    List<Integer> tails = new ArrayList<>();
+    
+    for (int num : nums) {
+        // 二分查找第一个大于等于num的位置
+        int left = 0, right = tails.size();
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (tails.get(mid) < num) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        
+        // 如果找到末尾，说明num比所有元素都大，直接添加
+        if (left == tails.size()) {
+            tails.add(num);
+        } else {
+            // 否则替换找到的位置
+            tails.set(left, num);
+        }
+    }
+    
+    return tails.size();
+}
+```
+
+**时间复杂度**：
+- 动态规划：O(n²)
+- 二分查找优化：O(n log n)
+
+**空间复杂度**：O(n)，需要额外的数组空间
 
 
 
@@ -639,3 +796,208 @@ public int searchInsert(int[] nums, int target) {
 
 中位数是指将一组数据从小到大排序后，位于中间位置的数值。如果数据集中的元素数量是奇数，中位数就是中间的那个元素；如果是偶数，则中位数是中间两个元素的平均值。
 
+这道题要求时间复杂度为 O(log(m+n))，提示我们使用二分查找。关键思路是：
+
+1. **问题转化**：寻找第 k 小的元素，其中 k = (m+n+1)/2（奇数情况）或需要找第k和第k+1小的元素（偶数情况）
+2. **二分搜索**：在较短的数组上进行二分，确保左半部分元素个数等于右半部分
+3. **分割线性质**：左半部分的最大值 ≤ 右半部分的最小值
+
+```java
+public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    // 确保 nums1 是较短的数组
+    if (nums1.length > nums2.length) {
+        return findMedianSortedArrays(nums2, nums1);
+    }
+    
+    int m = nums1.length;
+    int n = nums2.length;
+    int left = 0, right = m;
+    
+    while (left <= right) {
+        // nums1的分割点
+        int cut1 = (left + right) / 2;
+        // nums2的分割点
+        int cut2 = (m + n + 1) / 2 - cut1;
+        
+        // 处理边界情况
+        int left1 = (cut1 == 0) ? Integer.MIN_VALUE : nums1[cut1 - 1];
+        int left2 = (cut2 == 0) ? Integer.MIN_VALUE : nums2[cut2 - 1];
+        int right1 = (cut1 == m) ? Integer.MAX_VALUE : nums1[cut1];
+        int right2 = (cut2 == n) ? Integer.MAX_VALUE : nums2[cut2];
+        
+        // 找到正确的分割
+        if (left1 <= right2 && left2 <= right1) {
+            // 总长度为偶数
+            if ((m + n) % 2 == 0) {
+                return (Math.max(left1, left2) + Math.min(right1, right2)) / 2.0;
+            } else {
+                // 总长度为奇数
+                return Math.max(left1, left2);
+            }
+        }
+        // nums1分割点太靠右
+        else if (left1 > right2) {
+            right = cut1 - 1;
+        }
+        // nums1分割点太靠左
+        else {
+            left = cut1 + 1;
+        }
+    }
+    
+    return 0.0;
+}
+```
+
+**算法步骤详解**：
+1. 确保在较短数组上进行二分搜索，减少搜索空间
+2. 计算两个数组的分割点，使得左半部分元素个数 = 右半部分元素个数（或多1个）
+3. 检查分割是否正确：左半部分最大值 ≤ 右半部分最小值
+4. 根据总长度奇偶性计算中位数
+
+**时间复杂度**：O(log(min(m,n)))，在较短数组上进行二分搜索
+**空间复杂度**：O(1)，只使用常量级别的额外空间
+
+
+## 四、常见题目补充
+
+
+### [x 的平方根『69』](https://leetcode.cn/problems/sqrtx/)
+
+> 给你一个非负整数 `x`，计算并返回 `x` 的平方根的整数部分。
+
+**思路**：在区间 `[1, x/2]` 上二分，寻找最大的 `mid` 使得 `mid*mid <= x`。注意用 `long` 防止乘法溢出。
+
+```java
+public int mySqrt(int x) {
+    if (x < 2) return x;
+    int left = 1, right = x / 2, ans = 0;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if ((long) mid * mid <= x) {
+            ans = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    return ans;
+}
+```
+
+**时间复杂度**：O(log x)  
+**空间复杂度**：O(1)
+
+
+### [第一个错误的版本『278』](https://leetcode.cn/problems/first-bad-version/)
+
+> 有 `n` 个版本，从 1 到 n，给你 `isBadVersion(version)` 接口。找出第一个错误版本。
+
+**思路**：典型“找左边界”。`isBad(mid)` 为真时收缩到左侧，并记录答案。
+
+```java
+// isBadVersion(version) 由系统提供
+public int firstBadVersion(int n) {
+    int left = 1, right = n, ans = n;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (isBadVersion(mid)) {
+            ans = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return ans;
+}
+```
+
+**时间复杂度**：O(log n)  
+**空间复杂度**：O(1)
+
+
+### [有序数组中的单一元素『540』](https://leetcode.cn/problems/single-element-in-a-sorted-array/)
+
+> 一个按升序排列的数组，除了某个元素只出现一次外，其余每个元素均出现两次。找出这个元素。
+
+**思路**：利用“成对对齐”的性质。让 `mid` 偶数化（`mid -= mid % 2`），若 `nums[mid] == nums[mid+1]`，唯一元素在右侧；否则在左侧（含 `mid`）。
+
+```java
+public int singleNonDuplicate(int[] nums) {
+    int left = 0, right = nums.length - 1;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (mid % 2 == 1) mid--; // 偶数化
+        if (nums[mid] == nums[mid + 1]) {
+            left = mid + 2;
+        } else {
+            right = mid;
+        }
+    }
+    return nums[left];
+}
+```
+
+**时间复杂度**：O(log n)  
+**空间复杂度**：O(1)
+
+
+### [爱吃香蕉的珂珂『875』](https://leetcode.cn/problems/koko-eating-bananas/)
+
+> 给定每堆香蕉数量 `piles` 和总小时数 `h`，最小化吃速 `k` 使得能在 `h` 小时内吃完。
+
+**思路**：对答案 `k` 二分。检验函数为以速率 `k` 需要的总小时数是否 `<= h`。
+
+```java
+public int minEatingSpeed(int[] piles, int h) {
+    int left = 1, right = 0;
+    for (int p : piles) right = Math.max(right, p);
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        long hours = 0;
+        for (int p : piles) {
+            hours += (p + mid - 1) / mid; // 向上取整
+        }
+        if (hours <= h) right = mid;
+        else left = mid + 1;
+    }
+    return left;
+}
+```
+
+**时间复杂度**：O(n log max(piles))  
+**空间复杂度**：O(1)
+
+
+### [在 D 天内送达包裹的能力『1011』](https://leetcode.cn/problems/capacity-to-ship-packages-within-d-days/)
+
+> 给定包裹重量数组 `weights` 与天数 `days`，求最小运力使得能按顺序在 `days` 天内送达。
+
+**思路**：对答案（运力）二分。下界是最大单件重量，上界是总重量。检验函数为用给定运力需要的天数是否 `<= days`。
+
+```java
+public int shipWithinDays(int[] weights, int days) {
+    int left = 0, right = 0;
+    for (int w : weights) {
+        left = Math.max(left, w);
+        right += w;
+    }
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        int need = 1, cur = 0;
+        for (int w : weights) {
+            if (cur + w > mid) {
+                need++;
+                cur = 0;
+            }
+            cur += w;
+        }
+        if (need <= days) right = mid;
+        else left = mid + 1;
+    }
+    return left;
+}
+```
+
+**时间复杂度**：O(n log(sum(weights)))  
+**空间复杂度**：O(1)

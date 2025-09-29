@@ -16,6 +16,24 @@ categories: leetcode
 >
 > 当然，在做二叉树题目时候，第一想到的应该是用 **递归** 来解决。
 
+### 📋 分类索引
+
+1. **🌳 遍历基础类**：[二叉树的前序遍历](#_144-二叉树的前序遍历)、[二叉树的中序遍历](#_94-二叉树的中序遍历)、[二叉树的后序遍历](#_145-二叉树的后序遍历)、[二叉树的层序遍历](#_102-二叉树的层序遍历)、[锯齿形层序遍历](#_103-二叉树的锯齿形层序遍历)、[完全二叉树的节点个数](#_222-完全二叉树的节点个数)、[在每个树行中找最大值](#_515-在每个树行中找最大值)、[二叉树最大宽度](#_662-二叉树最大宽度)
+
+2. **🔍 查找路径类**：[二叉树的最大深度](#_104-二叉树的最大深度)、[二叉树的最小深度](#_111-二叉树的最小深度)、[路径总和](#_112-路径总和)、[路径总和II](#_113-路径总和-ii)、[二叉树的右视图](#_199-二叉树的右视图)、[路径总和III](#_437-路径总和-iii)、[二叉树的最近公共祖先](#_236-二叉树的最近公共祖先)、[二叉树中的最大路径和](#_124-二叉树中的最大路径和)
+
+3. **🏗️ 构造变换类**：[从前序与中序遍历序列构造二叉树](#_105-从前序与中序遍历序列构造二叉树)、[翻转二叉树](#_226-翻转二叉树)、[对称二叉树](#_101-对称二叉树)、[相同的树](#_100-相同的树)
+
+4. **⚖️ 平衡验证类**：[平衡二叉树](#_110-平衡二叉树)、[验证二叉搜索树](#_98-验证二叉搜索树)、[二叉搜索树中第K小的元素](#_230-二叉搜索树中第K小的元素)
+
+5. **🎯 搜索树操作类**：[二叉搜索树的最近公共祖先](#_235-二叉搜索树的最近公共祖先)、[删除二叉搜索树中的节点](#_450-删除二叉搜索树中的节点)、[将有序数组转换为二叉搜索树](#_108-将有序数组转换为二叉搜索树)
+
+6. **📊 树形DP类**：[打家劫舍III](#_337-打家劫舍-iii)、[二叉树的直径](#_543-二叉树的直径)、[另一棵树的子树](#_572-另一棵树的子树)
+
+7. **🔄 序列化类**：[二叉树的序列化与反序列化](#_297-二叉树的序列化与反序列化)
+
+8. **🚀 进阶技巧类**：[二叉树展开为链表](#_114-二叉树展开为链表)、[填充每个节点的下一个右侧节点指针](#_116-填充每个节点的下一个右侧节点指针)、[二叉树的完全性检验](#_958-二叉树的完全性检验)、[填充每个节点的下一个右侧节点指针II](#_117-填充每个节点的下一个右侧节点指针-ii)
+
 ## 🎯 核心考点概览
 
 - **遍历技巧**：前序、中序、后序、层序遍历
@@ -109,20 +127,6 @@ public ResultType divide(TreeNode root) {
 - **平衡判断**："高度差不超过一，递归检查每个节点"
 - **最值问题**："深度优先找路径，广度优先找最近"
 
-
-## 📚 二叉树题目分类体系
-
-### 📋 正确分类索引（热题100完整版）
-
-1. **🌳 遍历基础类**：二叉树的前序遍历、中序遍历、后序遍历、层序遍历、锯齿形层序遍历、完全二叉树的节点个数、在每个树行中找最大值、二叉树最大宽度
-2. **🔍 查找路径类**：二叉树的最大深度、最小深度、路径总和、路径总和II、二叉树的右视图、路径总和III、二叉树的最近公共祖先、二叉树中的最大路径和
-3. **🏗️ 构造变换类**：从前序与中序遍历序列构造二叉树、翻转二叉树、对称二叉树、相同的树
-4. **⚖️ 平衡验证类**：平衡二叉树、验证二叉搜索树、二叉搜索树中第K小的元素
-5. **🎯 搜索树操作类**：二叉搜索树的最近公共祖先、删除二叉搜索树中的节点、将有序数组转换为二叉搜索树
-6. **📊 树形DP类**：打家劫舍III、二叉树的直径、另一棵树的子树
-7. **🔄 序列化类**：二叉树的序列化与反序列化、根据前序和后序遍历构造二叉树
-8. **🚀 进阶技巧类**：二叉树展开为链表、填充每个节点的下一个右侧节点指针、二叉树的完全性检验、填充每个节点的下一个右侧节点指针II
-
 ---
 
 ## 🌳 一、遍历基础类（核心中的核心）
@@ -133,7 +137,7 @@ public ResultType divide(TreeNode root) {
 - **迭代遍历**：手动维护栈模拟递归过程  
 - **层序遍历**：队列实现广度优先搜索
 
-### [144. 二叉树的前序遍历](https://leetcode.cn/problems/binary-tree-preorder-traversal/) ⭐⭐⭐⭐
+### [144. 二叉树的前序遍历](https://leetcode.cn/problems/binary-tree-preorder-traversal/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：遍历基础**
 
@@ -194,7 +198,7 @@ public List<Integer> preorderTraversal(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度，h为树高
 
-### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/) ⭐⭐⭐⭐
+### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：BST基础**
 
@@ -259,7 +263,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈或显式栈的深度
 
-### [145. 二叉树的后序遍历](https://leetcode.cn/problems/binary-tree-postorder-traversal/) ⭐⭐⭐⭐
+### [145. 二叉树的后序遍历](https://leetcode.cn/problems/binary-tree-postorder-traversal/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：分治思想基础**
 
@@ -325,7 +329,7 @@ public List<Integer> postorderTraversal(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/) ⭐⭐⭐⭐⭐
+### [102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：BFS经典**
 
@@ -375,7 +379,7 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(w) - w为树的最大宽度
 
-### [103. 二叉树的锯齿形层序遍历](https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/) ⭐⭐⭐⭐
+### [103. 二叉树的锯齿形层序遍历](https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：层序变种**
 
@@ -428,7 +432,7 @@ public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(w) - 队列存储的最大宽度
 
-### [222. 完全二叉树的节点个数](https://leetcode.cn/problems/count-complete-tree-nodes/) ⭐⭐⭐⭐
+### [222. 完全二叉树的节点个数](https://leetcode.cn/problems/count-complete-tree-nodes/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：完全二叉树性质**
 
@@ -489,7 +493,7 @@ public int countNodes(TreeNode root) {
   - 时间复杂度：O(n) - 访问每个节点
   - 空间复杂度：O(logn) - 递归栈深度
 
-### [515. 在每个树行中找最大值](https://leetcode.cn/problems/find-largest-value-in-each-tree-row/) ⭐⭐⭐⭐
+### [515. 在每个树行中找最大值](https://leetcode.cn/problems/find-largest-value-in-each-tree-row/)
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：层序遍历变种**
 
@@ -536,7 +540,7 @@ public List<Integer> largestValues(TreeNode root) {
 - **时间复杂度**：O(n) - 访问每个节点一次
 - **空间复杂度**：O(w) - 队列存储的最大宽度
 
-### [662. 二叉树最大宽度](https://leetcode.cn/problems/maximum-width-of-binary-tree/) ⭐⭐⭐⭐
+### [662. 二叉树最大宽度](https://leetcode.cn/problems/maximum-width-of-binary-tree/)
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：位置编码技巧**
 
@@ -635,7 +639,7 @@ private void dfs(TreeNode root, int depth, int pos, List<Integer> startPositions
 - **路径追踪**：回溯法记录路径
 - **路径和**：递归过程中累加计算
 
-### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/) ⭐⭐⭐⭐
+### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：递归入门**
 
@@ -692,7 +696,7 @@ public int maxDepth(TreeNode root) {
 - **时间复杂度**：O(n) - 访问每个节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [111. 二叉树的最小深度](https://leetcode.cn/problems/minimum-depth-of-binary-tree/) ⭐⭐⭐⭐
+### [111. 二叉树的最小深度](https://leetcode.cn/problems/minimum-depth-of-binary-tree/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：递归理解**
 
@@ -737,7 +741,7 @@ public int minDepth(TreeNode root) {
 - **时间复杂度**：O(n) - 最坏情况访问所有节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [112. 路径总和](https://leetcode.cn/problems/path-sum/) ⭐⭐⭐⭐
+### [112. 路径总和](https://leetcode.cn/problems/path-sum/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：路径递归**
 
@@ -772,7 +776,7 @@ public boolean hasPathSum(TreeNode root, int targetSum) {
 - **时间复杂度**：O(n) - 最坏情况访问所有节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [113. 路径总和 II](https://leetcode.cn/problems/path-sum-ii/) ⭐⭐⭐⭐
+### [113. 路径总和 II](https://leetcode.cn/problems/path-sum-ii/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：回溯算法**
 
@@ -822,7 +826,7 @@ private void dfs(TreeNode root, int targetSum, List<Integer> path,
 - **时间复杂度**：O(n²) - 最坏情况每个节点都要复制路径
 - **空间复杂度**：O(h) - 递归栈和路径存储
 
-### [199. 二叉树的右视图](https://leetcode.cn/problems/binary-tree-right-side-view/) ⭐⭐⭐⭐
+### [199. 二叉树的右视图](https://leetcode.cn/problems/binary-tree-right-side-view/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：层序遍历应用**
 
@@ -899,7 +903,7 @@ private void dfs(TreeNode root, int depth, List<Integer> result) {
 - **时间复杂度**：O(n) - 访问每个节点一次
 - **空间复杂度**：O(h) - 递归栈深度或队列空间
 
-### [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/) ⭐⭐⭐⭐⭐
+### [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：前缀和在树中的应用**
 
@@ -982,7 +986,7 @@ private int pathSumFrom(TreeNode root, long targetSum) {
   - 时间复杂度：O(n²) - 每个节点都要向下搜索
   - 空间复杂度：O(h) - 递归栈深度
 
-### [236. 二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/) ⭐⭐⭐⭐⭐
+### [236. 二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：树的经典问题**
 
@@ -1081,7 +1085,7 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
   - 时间复杂度：O(n) - 遍历所有节点
   - 空间复杂度：O(n) - 存储父节点映射
 
-### [124. 二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/) ⭐⭐⭐⭐⭐
+### [124. 二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)
 
 **🎯 考察频率：极高 | 难度：困难 | 重要性：树形DP经典**
 
@@ -1140,7 +1144,7 @@ private int maxGain(TreeNode node) {
 - **树的变换**：翻转、对称等操作
 - **结构比较**：递归比较两树的结构和值
 
-### [105. 从前序与中序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) ⭐⭐⭐⭐⭐
+### [105. 从前序与中序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：构造经典**
 
@@ -1198,7 +1202,7 @@ private TreeNode build(int[] preorder, int preStart, int preEnd,
 - **时间复杂度**：O(n) - 每个节点创建一次
 - **空间复杂度**：O(n) - 哈希表和递归栈
 
-### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/) ⭐⭐⭐⭐
+### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：基础操作**
 
@@ -1259,7 +1263,7 @@ public TreeNode invertTree(TreeNode root) {
 - **时间复杂度**：O(n) - 访问每个节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/) ⭐⭐⭐⭐
+### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：结构判断**
 
@@ -1301,7 +1305,7 @@ private boolean isSymmetricHelper(TreeNode left, TreeNode right) {
 - **时间复杂度**：O(n) - 最坏情况访问所有节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [100. 相同的树](https://leetcode.cn/problems/same-tree/) ⭐⭐⭐
+### [100. 相同的树](https://leetcode.cn/problems/same-tree/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：基础比较**
 
@@ -1347,7 +1351,7 @@ public boolean isSameTree(TreeNode p, TreeNode q) {
 - **BST验证**：利用中序遍历或范围检查
 - **有序性利用**：BST的中序遍历是有序的
 
-### [110. 平衡二叉树](https://leetcode.cn/problems/balanced-binary-tree/) ⭐⭐⭐⭐
+### [110. 平衡二叉树](https://leetcode.cn/problems/balanced-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：平衡树理解**
 
@@ -1389,7 +1393,7 @@ private int height(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/) ⭐⭐⭐⭐⭐
+### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：BST性质理解**
 
@@ -1455,7 +1459,7 @@ private boolean inorder(TreeNode root) {
 - **时间复杂度**：O(n) - 访问每个节点
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [230. 二叉搜索树中第K小的元素](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/) ⭐⭐⭐⭐
+### [230. 二叉搜索树中第K小的元素](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：BST应用**
 
@@ -1534,7 +1538,7 @@ public int kthSmallest(TreeNode root, int k) {
 - **查找效率**：利用有序性快速定位
 - **递归操作**：插入、删除、查找的递归实现
 
-### [235. 二叉搜索树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/) ⭐⭐⭐⭐
+### [235. 二叉搜索树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：BST应用**
 
@@ -1594,7 +1598,7 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 - **时间复杂度**：O(h) - h为树的高度
 - **空间复杂度**：O(1) - 迭代版本为常数空间
 
-### [450. 删除二叉搜索树中的节点](https://leetcode.cn/problems/delete-node-in-a-bst/) ⭐⭐⭐⭐
+### [450. 删除二叉搜索树中的节点](https://leetcode.cn/problems/delete-node-in-a-bst/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：BST操作**
 
@@ -1650,7 +1654,7 @@ private TreeNode findMin(TreeNode root) {
 - **时间复杂度**：O(h) - h为树的高度
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [108. 将有序数组转换为二叉搜索树](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/) ⭐⭐⭐⭐
+### [108. 将有序数组转换为二叉搜索树](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：BST构造**
 
@@ -1700,7 +1704,7 @@ private TreeNode helper(int[] nums, int left, int right) {
 - **状态转移**：根据子树状态计算当前状态
 - **最优子结构**：问题的最优解包含子问题的最优解
 
-### [337. 打家劫舍 III](https://leetcode.cn/problems/house-robber-iii/) ⭐⭐⭐⭐⭐
+### [337. 打家劫舍 III](https://leetcode.cn/problems/house-robber-iii/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：树形DP经典**
 
@@ -1744,7 +1748,7 @@ private int[] robHelper(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [543. 二叉树的直径](https://leetcode.cn/problems/diameter-of-binary-tree/) ⭐⭐⭐⭐
+### [543. 二叉树的直径](https://leetcode.cn/problems/diameter-of-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：路径长度计算**
 
@@ -1788,7 +1792,7 @@ private int depth(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [572. 另一棵树的子树](https://leetcode.cn/problems/subtree-of-another-tree/) ⭐⭐⭐⭐
+### [572. 另一棵树的子树](https://leetcode.cn/problems/subtree-of-another-tree/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：子树匹配**
 
@@ -1838,7 +1842,7 @@ private boolean isSame(TreeNode s, TreeNode t) {
 - **反序列化**：从字符串重建树结构
 - **编码策略**：前序、层序等不同的编码方式
 
-### [297. 二叉树的序列化与反序列化](https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/) ⭐⭐⭐⭐⭐
+### [297. 二叉树的序列化与反序列化](https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/)
 
 **🎯 考察频率：极高 | 难度：困难 | 重要性：综合能力考察**
 
@@ -1910,7 +1914,7 @@ public class Codec {
 - **指针操作**：巧妙使用指针连接节点
 - **空间优化**：常数空间完成复杂操作
 
-### [114. 二叉树展开为链表](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/) ⭐⭐⭐⭐
+### [114. 二叉树展开为链表](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：树变链表**
 
@@ -1971,7 +1975,7 @@ public void flatten(TreeNode root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(h) - 递归栈深度
 
-### [116. 填充每个节点的下一个右侧节点指针](https://leetcode.cn/problems/populating-next-right-pointers-in-each-node/) ⭐⭐⭐⭐
+### [116. 填充每个节点的下一个右侧节点指针](https://leetcode.cn/problems/populating-next-right-pointers-in-each-node/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：层序连接**
 
@@ -2019,7 +2023,7 @@ public Node connect(Node root) {
 - **时间复杂度**：O(n) - 每个节点访问一次
 - **空间复杂度**：O(1) - 常数空间
 
-### [958. 二叉树的完全性检验](https://leetcode.cn/problems/check-completeness-of-a-binary-tree/) ⭐⭐⭐⭐
+### [958. 二叉树的完全性检验](https://leetcode.cn/problems/check-completeness-of-a-binary-tree/)
 
 **🎯 考察频率：中等 | 难度：中等 | 重要性：完全二叉树判断**
 
@@ -2065,7 +2069,7 @@ public boolean isCompleteTree(TreeNode root) {
 - **时间复杂度**：O(n) - 最坏情况访问所有节点
 - **空间复杂度**：O(w) - 队列存储的最大宽度
 
-### [117. 填充每个节点的下一个右侧节点指针 II](https://leetcode.cn/problems/populating-next-right-pointers-in-each-node-ii/) ⭐⭐⭐⭐
+### [117. 填充每个节点的下一个右侧节点指针 II](https://leetcode.cn/problems/populating-next-right-pointers-in-each-node-ii/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：任意二叉树的指针连接**
 

@@ -1269,13 +1269,13 @@ Thread 独享的区域：PC Regiester、JVM Stack、Native Method Stack，其生
 
 - **CMS(Concurrent Mark Sweep) 收集器：** 是一种以获得最短回收停顿时间为目标的收集器，**标记清除算法，运作过程：初始标记，并发标记，重新标记，并发清除**，收集结束会产生大量空间碎片。其中初始标记和重新标记会 STW。另外，既然强调了并发（Concurrent），CMS 会占用更多 CPU 资源，并和用户线程争抢。多数应用于互联网站或者 B/S 系统的服务器端上，JDK9 被标记弃用，JDK14 被删除，详情可见 [JEP 363](https://openjdk.java.net/jeps/363)。
 
-  ![26.jpg](https://s0.lgstatic.com/i/image6/M00/56/29/Cgp9HWEsoZSAEqicAABcDI3t_Mo844.jpg)
-
 - **G1收集器：** 一种兼顾吞吐量和停顿时间的 GC 实现，是 Oracle JDK 9 以后的默认 GC 选项。
 
   G1 GC 仍然存在着年代的概念，但是其内存结构并不是简单的条带式划分，而是类似棋盘的一个个 Region。Region 之间是复制算法，但整体上实际可看作是标记 - 整理（Mark-Compact）算法，可以有效地避免内存碎片，尤其是当 Java 堆非常大的时候，G1 的优势更加明显。
 
   标记整理算法实现，**运作流程主要包括以下：初始标记，并发标记，最终标记，筛选标记**。不会产生空间碎片，可以精确地控制停顿。
+
+  ![Garbage Collector Type](https://www.perfmatrix.com/wp-content/uploads/2019/02/Garbage-Collector-Type.png)
 
 - **Z Garbage Collector (ZGC)**（Z 垃圾回收器）：ZGC 是 **低延迟垃圾回收器**，它的设计目标是将垃圾回收的停顿时间控制在毫秒级别。ZGC 是一种并行、并发、分代的垃圾回收器，特别适合需要低停顿和大堆内存的应用。
 
@@ -1346,6 +1346,9 @@ Thread 独享的区域：PC Regiester、JVM Stack、Native Method Stack，其生
 
 5. Metaspace（元空间）在空间不足时会进行扩容，当扩容到了-XX:MetaspaceSize 参数的指定值时，也会触发FGC
 
+6. G1 收集器的 Mixed GC 触发条件满足时，会对老年代和部分新生代进行回收，本质上也属于 Full GC 的范畴。当老年代占用空间达到阈值（默认 45%），就会触发混合回收来控制内存使用。
+
+
 
 
 ### 🎯 System.gc() 和 Runtime.gc() 会做什么事情
@@ -1374,8 +1377,8 @@ APP_OPTS:-Xms6656m -Xmx6656m -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=1024m -
 -XX:HeapDumpPath=/home/Logs/***Heap.hprof 
 -verbose:gc -Xloggc:/home/Logs/gc.log 
 -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintHeapAtGC 
--Dprofiler.msxf.thread.pool.enable=true  -Dprofiler.thread.pool.spring.enable=true  
--Dprofiler.msxf.thread.pool.reject-handler.enable=true -Dprofiler.jdbc.druid.poolmetric=true
+-Dprofiler.thread.pool.enable=true  -Dprofiler.thread.pool.spring.enable=true  
+-Dprofiler.thread.pool.reject-handler.enable=true -Dprofiler.jdbc.druid.poolmetric=true
 ```
 
 ```
@@ -2064,91 +2067,40 @@ java -XX:+UseG1GC -jar yourapp.jar
 
 ### 🎯 假设生产环境出现 CPU占用过高，请谈谈你的分析思路和定位
 
-生产环境出现 CPU 占用过高的情况可能影响应用的性能和响应速度。下面是详细的分析思路和定位步骤：
+生产环境中 CPU 占用过高是常见的性能问题，需要结合系统工具和 Java 诊断工具逐步定位，我的分析思路通常分为 "快速定位 - 分层拆解 - 精准溯源" 三个阶段，结合实际案例可以这样展开：
 
-**分析思路和定位步骤**
+" 遇到 CPU 占用过高的问题，我会按照‘从系统到应用，从进程到代码’的顺序逐层排查，确保定位精准：
 
-1. **确认问题**
+1. **第一步：快速锁定目标进程**登录服务器后，先用`top`命令查看整体 CPU 使用情况（关注 % user、% sys、% idle 指标），找到 CPU 占比异常的 Java 进程（通常是 PID 对应的进程 % CPU 持续超过 80%）。比如之前处理过一个订单服务，top 显示其进程 CPU 长期维持在 150%（2 核机器），明显异常。
 
-   - **监控系统**：检查监控系统（如 Prometheus、Grafana）上的 CPU 使用率图表，确认 CPU 使用率过高的时间段和趋势。
-   - **范围确认**：确定是单个服务器还是整个集群的 CPU 占用都很高。
+   若要更细致，可用`pidstat -p [pid] 1 5`观察进程的 CPU 使用趋势，区分是用户态（% usr）还是内核态（% sys）占用高：用户态高可能是应用代码问题（如循环计算），内核态高可能是线程切换频繁或系统调用过多。
 
-2. **检查操作系统和硬件资源**
+2. **第二步：定位异常线程**确定进程后，用`top -H -p [pid]`查看该进程内的线程 CPU 占用，找到 % CPU 高的线程 ID（LWP 列），并转换为 16 进制（如`printf "%x\n" 1234`），因为 jstack 日志中的线程 ID 是 16 进制。
 
-   - **系统日志**：查看操作系统日志（如 `/var/log/syslog` 或 `/var/log/messages`），检查是否有硬件故障、驱动问题等。
+   接着用`jstack [pid] > stack.log`导出线程栈，在日志中搜索转换后的 16 进制 ID，分析线程状态：
 
-   - **资源使用工具**：使用 `top`、`htop`、`vmstat`、`iostat` 等工具实时查看 CPU 使用情况，识别占用 CPU 最高的进程。
+   - 若线程处于`RUNNABLE`且栈信息显示在执行某段业务代码（如循环处理、复杂计算），可能是代码逻辑导致的 CPU 密集型操作
+   - 若大量线程处于`BLOCKED`或`WAITING`，可能是锁竞争激烈（如 synchronized 块过大），导致线程频繁上下文切换消耗 CPU
+   - 若发现多个`GC Thread`或`VM Thread`占用高，可能是频繁 GC 导致（需结合 jstat 进一步验证）
 
-   - 进程检查：使用  `ps` 命令列出所有进程及其 CPU 使用情况，例如：
+   我曾遇到过一个案例：jstack 显示多个线程卡在`HashMap.put()`，结合代码发现是在高并发下使用了非线程安全的 HashMap，导致死循环（扩容时的链表成环），CPU 瞬间飙升到 100%。
 
-     ```bash
-     ps aux --sort=-%cpu
-     ```
+3. **第三步：结合业务代码溯源**根据线程栈中的类名和方法名（如`com.xxx.service.OrderService.calculatePrice()`），定位到具体代码逻辑：
 
-3. **应用层面分析**
+   - 检查是否有死循环、递归调用失控等问题
+   - 分析是否有大量重复计算、正则表达式频繁编译等 CPU 密集型操作
+   - 排查是否使用了低效的数据结构（如 ArrayList 在大数据量下频繁扩容）
+   - 确认是否有第三方库存在性能问题（如 JSON 序列化效率低）
 
-   - **应用日志**：检查应用日志，查看是否有异常错误、超时或其他提示信息。
-   - **线程分析**：如果是 Java 应用，使用 `jstack` 或其他线程分析工具生成线程堆栈信息，查看哪些线程在占用大量 CPU。
-   - **热点分析**：使用 `perf`、`flame graph`（火焰图）等性能分析工具进行热点分析，查看具体哪些代码或方法在消耗 CPU。
+4. **辅助验证手段**
 
-4. **数据库和外部服务**
+   - 用`jstat -gcutil [pid] 1000 10`查看 GC 情况，若 YGC 频繁或 GC 耗时过长（如 STW 超过 100ms），可能是内存问题间接导致 CPU 高
+   - 结合 APM 工具（如 SkyWalking）的调用链，查看是否有高频调用的接口存在性能瓶颈
+   - 对于容器化部署，需确认容器的 CPU 配额（如 cgroups 限制）是否合理，避免资源争用
 
-   - **数据库性能**：检查数据库性能，查看是否有慢查询、大量锁等待等问题。使用工具如 `slow query log`、`explain` 分析 SQL 语句。
-   - **外部依赖**：检查依赖的第三方服务或 API 调用是否存在性能问题，导致应用在等待响应时占用 CPU。
+比如之前处理的一个商品搜索服务 CPU 过高问题，最终定位是 lucene 索引查询时的正则匹配逻辑过于复杂，在高并发下每次查询消耗大量 CPU，优化为前缀匹配后，CPU 使用率从 90% 降至 30%。
 
-5. **内存和垃圾回收**
-
-   - **内存使用**：检查内存使用情况，是否有内存泄漏导致频繁的垃圾回收。
-
-   - 垃圾回收日志：如果是 Java 应用，检查垃圾回收日志，查看是否存在频繁的 Full GC。使用 `jstat` 工具查看 GC 活动：
-
-     ```bash
-     jstat -gcutil <pid> 1000
-     ```
-
-6. **代码和配置优化**
-
-   - **代码检查**：检查代码是否存在效率低下的算法或循环，特别是高频调用的部分。
-   - **配置调整**：调整应用和服务器的配置，例如线程池大小、数据库连接池配置等，以优化性能。
-
-**具体步骤和工具示例**
-
-1. **使用 `top` 或 `htop` 查看 CPU 使用情况**
-
-   ```bash
-   top
-   ```
-
-   观察哪个进程占用 CPU 最高，记下 PID。
-
-2. **使用 `ps` 查看详细进程信息**
-
-   ```bash
-   ps aux --sort=-%cpu | head -n 10
-   ```
-
-   查看占用 CPU 前 10 的进程。
-
-3. **生成线程堆栈信息（针对 Java 应用）**
-
-   ```bash
-   jstack <pid> > thread_dump.txt
-   ```
-
-   分析 `thread_dump.txt` 文件，查看哪些线程在占用大量 CPU。
-
-4. **使用 `perf` 工具进行性能分析**
-
-   ```bash
-   perf record -F 99 -p <pid> -g -- sleep 30
-   perf script > out.perf
-   ```
-
-   然后使用 `FlameGraph` 工具生成火焰图，分析热点代码。
-
-5. **检查和调整垃圾回收配置** 查看垃圾回收日志，分析是否有频繁的 Full GC，可以尝试调整堆大小或更换垃圾回收器。
-
-通过上述步骤，可以系统地分析和定位生产环境中 CPU 占用过高的问题。首先确认问题范围，然后检查系统和应用层面，使用合适的工具和方法进行深入分析，最终根据分析结果进行代码和配置优化。定期的性能监控和分析可以预防和及时解决类似问题，保证系统的稳定运行。
+总结来说，CPU 过高的排查核心是 "缩小范围，精准定位"—— 从系统到进程，从线程到代码，每个环节都用数据（监控指标、日志）验证假设，避免经验主义判断。”
 
 
 

@@ -185,7 +185,8 @@ function genDSASidebar() {
       	['soultion/LinkedList-Soultion', '链表'],
         ['soultion/DFS-Solution', 'DFS'],
       	['soultion/Math-Solution', '数学'],
-        ['soultion/stock-problems', '股票问题']
+        ['soultion/stock-problems', '股票问题'],
+        ['soultion/剑指offer', '剑指offer']
       ]
     }
   ];

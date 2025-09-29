@@ -582,21 +582,44 @@ Spring 提供了以下四种集合类的配置元素:
 
 ### 🎯 Spring Bean的生命周期是怎样的？
 
+> Spring Bean 的生命周期大致分为三部分：**创建、使用、销毁**。
+>  在创建阶段，容器先通过反射实例化对象，然后进行依赖注入；
+>  接着会触发一些扩展点，比如 Aware 接口的回调，以及 BeanPostProcessor 前置处理；
+>  然后执行初始化方法（`afterPropertiesSet` 或 `init-method`），再经过后置处理器，Bean 才算完全可用；
+>  在销毁阶段，如果实现了 `DisposableBean` 或配置了 `destroy-method`，容器会在关闭时调用这些方法，完成资源释放。
+>  这个生命周期让我们有很多扩展点，可以参与 Bean 的创建和管理过程。
+
 Spring的核心概念之一是**依赖注入（Dependency Injection, DI）和控制反转（Inversion of Control, IoC）**，这两个概念帮助管理对象的生命周期和依赖关系。
 
 在Spring中，**Bean**指的是由Spring IoC容器管理的对象。Bean的生命周期主要由以下几个阶段构成：
 
-1. **实例化（Instantiation）：**Spring容器首先根据Bean定义创建Bean的实例。这个实例可以通过构造函数、工厂方法等方式创建。
-2. **属性赋值（Populating Properties）：**在Bean实例化后，Spring会进行**依赖注入**。Spring根据Bean的定义，为这个实例注入所需的依赖，例如为属性赋值、调用`@Autowired`注解的方法等。
-3. **初始化（Initialization）：**
-   - 在完成属性赋值后，Spring会调用Bean的初始化方法。如果Bean实现了`InitializingBean`接口，Spring会调用其`afterPropertiesSet()`方法。此外，如果在Bean定义中指定了`init-method`，这个方法也会被调用。
-   - 此外，如果Bean被声明为需要某个生命周期回调方法，比如`@PostConstruct`注解的回调方法，也会在此阶段执行。
-4. **使用（Using the Bean）：**在Bean完成初始化后，它可以被应用程序使用。此时，Bean处于Spring容器的控制下，应用程序可以通过依赖注入获取并使用该Bean。
-5. **销毁（Destruction）：**
-   - 当Spring容器关闭时（例如应用程序上下文被关闭），Spring会销毁Bean。如果Bean实现了`DisposableBean`接口，Spring会调用其`destroy()`方法。此外，如果在Bean定义中指定了`destroy-method`，这个方法也会被调用。
-   - 如果Bean使用了`@PreDestroy`注解，Spring也会在此阶段执行相应的方法。
+一个 Bean 从创建到销毁，大致会经历以下步骤（假设是单例 Bean）：
 
-**💻 代码示例**：
+1. **实例化（Instantiation）**
+   - 容器通过反射调用构造方法，创建 Bean 对象。
+2. **属性赋值（Populate Properties）**
+   - IoC 容器根据 `@Autowired`、`@Value` 或 XML 配置，将依赖的 Bean 注入。
+3. **Aware 接口回调**（可选）
+   - 如果 Bean 实现了某些 `Aware` 接口，Spring 会回调：
+     - `BeanNameAware`：注入当前 Bean 的名字
+     - `BeanFactoryAware`：注入 BeanFactory
+     - `ApplicationContextAware`：注入 ApplicationContext
+4. **BeanPostProcessor 前置处理**
+   - 调用所有注册的 `BeanPostProcessor.postProcessBeforeInitialization()`
+   - 常用于 AOP 代理对象生成。
+5. **初始化（Initialization）**
+   - 如果实现了 `InitializingBean`，调用 `afterPropertiesSet()`
+   - 如果指定了 `init-method`，调用该方法。
+6. **BeanPostProcessor 后置处理**
+   - 调用所有 `BeanPostProcessor.postProcessAfterInitialization()`
+   - 此时 Bean 已经完全准备好，可以被使用。
+7. **Bean 使用阶段**
+   - 应用代码调用 Bean 的方法。
+8. **销毁（Destroy）**
+   - 容器关闭时：
+     - 调用 `DisposableBean.destroy()`
+     - 调用 `destroy-method`
+   - Bean 生命周期结束。
 
 ```java
 @Component
@@ -952,6 +975,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 - 包含方法信息、参数、目标对象等
 
 **3. 切点（Pointcut）**：
+
 - 匹配连接点的表达式
 - 定义在哪些方法上应用通知
 - 使用AspectJ表达式语言
@@ -1079,7 +1103,7 @@ Spring AOP 通过两种动态代理技术实现切面逻辑的织入：
 
    - **缺点**：无法代理final类和方法
 
-代理创建流程**：
+代理创建流程：
 
 1. Spring检查目标对象是否实现接口
 2. 有接口→JDK动态代理，无接口→CGLIB代理
@@ -1426,7 +1450,7 @@ Spring Web MVC 框架提供 **模型-视图-控制器** 架构和随时可用的
 
 
 
-### 🎯 Spring MVC的优点
+### 🎯 Spring MVC的优点？
 
 - 可以支持各种视图技术，而不仅仅局限于JSP
 - 与Spring框架集成（如IoC容器、AOP等）
@@ -1535,188 +1559,6 @@ public class ScopeTestController {
 1. 不要在controller中定义成员变量
 2. 万一必须要定义一个非静态成员变量时候，则通过注解@Scope(“prototype”)，将其设置为多例模式。
 3. 在Controller中使用ThreadLocal变量
-
-
-
-### 🎯 Spring MVC的工作原理是什么？
-
-"Spring MVC基于前端控制器模式，以DispatcherServlet为核心协调各组件完成请求处理：
-
-**完整请求处理流程**：
-
-**1. 请求接收**：
-- 用户发送HTTP请求到DispatcherServlet
-- DispatcherServlet作为前端控制器接收所有请求
-- 这是整个MVC流程的统一入口
-
-**2. 处理器映射**：
-- DispatcherServlet查询HandlerMapping
-- HandlerMapping根据URL找到对应的Handler
-- 返回HandlerExecutionChain（Handler + 拦截器链）
-
-**3. 处理器适配**：
-- DispatcherServlet通过HandlerAdapter调用Handler
-- HandlerAdapter适配不同类型的处理器
-- 支持@Controller、Controller接口等多种处理器
-
-**4. 业务处理**：
-- HandlerAdapter调用具体的Controller方法
-- Controller执行业务逻辑，调用Service层
-- 返回ModelAndView或@ResponseBody数据
-
-**5. 异常处理**：
-- 如果处理过程中出现异常
-- HandlerExceptionResolver进行异常处理
-- 返回错误视图或错误响应
-
-**6. 视图解析**：
-- ViewResolver解析逻辑视图名到具体视图
-- 创建View对象用于渲染
-- 对于@ResponseBody直接返回，跳过视图解析
-
-**7. 视图渲染**：
-- View渲染模型数据生成响应内容
-- 将最终响应返回给客户端
-
-**核心组件**：
-- DispatcherServlet：前端控制器
-- HandlerMapping：处理器映射器
-- HandlerAdapter：处理器适配器
-- Controller：控制器
-- ViewResolver：视图解析器
-- View：视图"
-
-**💻 代码示例**：
-```java
-// 1. 控制器示例
-@Controller
-@RequestMapping("/users")
-public class UserController {
-    
-    @Autowired
-    private UserService userService;
-    
-    // 返回视图
-    @GetMapping
-    public String listUsers(Model model) {
-        List<User> users = userService.findAll();
-        model.addAttribute("users", users);
-        return "user/list"; // 逻辑视图名
-    }
-    
-    // 返回JSON数据
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public User getUser(@PathVariable Long id) {
-        return userService.findById(id);
-    }
-    
-    // 处理表单提交
-    @PostMapping
-    public String createUser(@ModelAttribute User user, 
-                           RedirectAttributes redirectAttributes) {
-        userService.save(user);
-        redirectAttributes.addFlashAttribute("message", "用户创建成功");
-        return "redirect:/users";
-    }
-}
-
-// 2. 自定义HandlerMapping
-@Component
-public class CustomHandlerMapping extends AbstractHandlerMapping {
-    
-    @Override
-    protected Object getHandlerInternal(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        if (path.startsWith("/custom/")) {
-            return new CustomHandler();
-        }
-        return null;
-    }
-}
-
-// 3. 自定义HandlerAdapter
-@Component
-public class CustomHandlerAdapter implements HandlerAdapter {
-    
-    @Override
-    public boolean supports(Object handler) {
-        return handler instanceof CustomHandler;
-    }
-    
-    @Override
-    public ModelAndView handle(HttpServletRequest request, 
-                              HttpServletResponse response, 
-                              Object handler) throws Exception {
-        CustomHandler customHandler = (CustomHandler) handler;
-        String result = customHandler.handleRequest(request);
-        
-        ModelAndView mv = new ModelAndView();
-        mv.addObject("result", result);
-        mv.setViewName("custom/result");
-        return mv;
-    }
-}
-
-// 4. 配置类
-@Configuration
-@EnableWebMvc
-@ComponentScan("com.example.controller")
-public class WebMvcConfig implements WebMvcConfigurer {
-    
-    // 配置视图解析器
-    @Bean
-    public InternalResourceViewResolver viewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
-        resolver.setSuffix(".jsp");
-        return resolver;
-    }
-    
-    // 配置拦截器
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoggingInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/static/**");
-    }
-    
-    // 配置静态资源
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
-    }
-}
-
-// 5. 拦截器示例
-public class LoggingInterceptor implements HandlerInterceptor {
-    
-    @Override
-    public boolean preHandle(HttpServletRequest request, 
-                           HttpServletResponse response, 
-                           Object handler) {
-        System.out.println("请求前置处理: " + request.getRequestURI());
-        return true;
-    }
-    
-    @Override
-    public void postHandle(HttpServletRequest request, 
-                          HttpServletResponse response, 
-                          Object handler, 
-                          ModelAndView modelAndView) {
-        System.out.println("请求后置处理");
-    }
-    
-    @Override
-    public void afterCompletion(HttpServletRequest request, 
-                               HttpServletResponse response, 
-                               Object handler, 
-                               Exception ex) {
-        System.out.println("请求完成处理");
-    }
-}
-```
 
 
 
@@ -1850,6 +1692,7 @@ public class UserController {
 ```
 
 
+
 ### 🎯 Spring MVC 如何处理跨域请求（CORS）？
 
 - 配置 `@CrossOrigin`
@@ -1872,9 +1715,10 @@ public class UserController {
   }
   ```
 
-  
 
 ---
+
+
 
 ## 🚀 四、Spring Boot核心特性
 
@@ -1938,6 +1782,8 @@ spring:
     password: password
 */
 ```
+
+
 
 ### 🎯说说 Spring Boot 和 Spring 的关系？
 
@@ -2215,6 +2061,16 @@ public class OnRedisCondition implements Condition {
 
 
 
+### 🎯Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
+
+启动类上面的注解是@SpringBootApplication，它也是 Spring Boot 的核心注解，主要组合包含了以下 3 个注解：
+
+- @SpringBootConfiguration：组合了 @Configuration 注解，实现配置文件的功能。
+- @EnableAutoConfiguration：打开自动配置的功能，也可以关闭某个自动配置的选项，如关闭数据源自动配置功能： @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })。
+- @ComponentScan：Spring组件扫描。
+
+
+
 ### 🎯 springboot是怎么加载类的，通过什么方式
 
 Spring Boot 加载类的过程是一个结合了 Spring 框架核心机制与自身自动配置特性的复杂流程，主要通过**类路径扫描**、**依赖注入**和**自动配置**三大核心方式实现，具体如下：
@@ -2443,6 +2299,8 @@ sms:
 */
 ```
 
+
+
 ### 🎯 Spring Boot的配置优先级是怎样的？
 
 "Spring Boot遵循约定大于配置原则，支持多种配置方式，具有明确的优先级顺序：
@@ -2502,109 +2360,6 @@ sms:
 - application.yml (通用配置)
 - application-dev.yml (开发环境)
 - application-prod.yml (生产环境)"
-
-**💻 代码示例**：
-
-```java
-// 1. 配置类读取优先级示例
-@Component
-@ConfigurationProperties(prefix = "app")
-@Data
-public class AppProperties {
-    private String name;
-    private int port;
-    private boolean enabled;
-}
-
-// 2. 多环境配置示例
-// application.yml (基础配置)
-/*
-app:
-  name: MyApp
-  port: 8080
-  
-spring:
-  profiles:
-    active: dev
-*/
-
-// application-dev.yml (开发环境)
-/*
-app:
-  port: 8081
-  enabled: true
-  
-logging:
-  level:
-    root: DEBUG
-*/
-
-// application-prod.yml (生产环境)  
-/*
-app:
-  port: 8080
-  enabled: false
-  
-logging:
-  level:
-    root: WARN
-*/
-
-// 3. @Value注解读取配置
-@RestController
-public class ConfigController {
-    
-    @Value("${app.name:DefaultApp}")
-    private String appName;
-    
-    @Value("${server.port:8080}")
-    private int serverPort;
-    
-    @GetMapping("/config")
-    public Map<String, Object> getConfig() {
-        Map<String, Object> config = new HashMap<>();
-        config.put("appName", appName);
-        config.put("serverPort", serverPort);
-        return config;
-    }
-}
-
-// 4. 条件配置示例
-@Configuration
-public class ConditionalConfig {
-    
-    @Bean
-    @ConditionalOnProperty(name = "app.enabled", havingValue = "true")
-    public MyService myService() {
-        return new MyService();
-    }
-    
-    @Bean
-    @Profile("dev")
-    public DataSource devDataSource() {
-        return new H2DataSource();
-    }
-    
-    @Bean
-    @Profile("prod") 
-    public DataSource prodDataSource() {
-        return new MySQLDataSource();
-    }
-}
-
-// 5. 启动时指定配置
-/*
-命令行方式：
-java -jar app.jar --spring.profiles.active=prod --server.port=8081
-
-环境变量方式：
-export SPRING_PROFILES_ACTIVE=prod
-export SERVER_PORT=8081
-
-IDE配置：
--Dspring.profiles.active=dev
-*/
-```
 
 
 
@@ -2688,142 +2443,6 @@ Spring Boot 提供了异常处理的多种方式，主要通过以下几种手�
 - 可通过management.endpoints.web.exposure.include配置暴露端点
 - 建议生产环境配置安全访问控制"
 
-**💻 代码示例**：
-
-```java
-// 1. 添加Actuator依赖
-/*
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-*/
-
-// 2. Actuator配置
-// application.yml
-/*
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics,info,env
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: always
-    shutdown:
-      enabled: true
-  server:
-    port: 8081  # 管理端口与应用端口分离
-    
-info:
-  app:
-    name: @project.name@
-    version: @project.version@
-    description: Demo Application
-*/
-
-// 3. 自定义健康检查
-@Component
-public class CustomHealthIndicator implements HealthIndicator {
-    
-    @Override
-    public Health health() {
-        // 自定义健康检查逻辑
-        boolean isHealthy = checkExternalService();
-        
-        if (isHealthy) {
-            return Health.up()
-                    .withDetail("status", "服务正常")
-                    .withDetail("timestamp", System.currentTimeMillis())
-                    .build();
-        } else {
-            return Health.down()
-                    .withDetail("status", "外部服务不可用")
-                    .withDetail("error", "连接超时")
-                    .build();
-        }
-    }
-    
-    private boolean checkExternalService() {
-        // 检查外部服务状态
-        return Math.random() > 0.2;
-    }
-}
-
-// 4. 自定义指标
-@RestController
-public class MetricsController {
-    
-    private final Counter requestCounter;
-    private final Timer requestTimer;
-    
-    public MetricsController(MeterRegistry meterRegistry) {
-        this.requestCounter = Counter.builder("http_requests_total")
-                .description("Total HTTP requests")
-                .tag("method", "GET")
-                .register(meterRegistry);
-                
-        this.requestTimer = Timer.builder("http_request_duration")
-                .description("HTTP request duration")
-                .register(meterRegistry);
-    }
-    
-    @GetMapping("/api/data")
-    public String getData() {
-        return requestTimer.recordCallable(() -> {
-            requestCounter.increment();
-            // 模拟业务逻辑
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            return "数据返回成功";
-        });
-    }
-}
-
-// 5. 安全配置
-@Configuration
-public class ActuatorSecurityConfig {
-    
-    @Bean
-    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .requestMatcher(EndpointRequest.toAnyEndpoint())
-                .authorizeHttpRequests(authz -> authz
-                    .requestMatchers(EndpointRequest.to("health")).permitAll()
-                    .anyRequest().hasRole("ADMIN")
-                )
-                .httpBasic(Customizer.withDefaults())
-                .build();
-    }
-}
-
-// 6. 监控集成示例
-// Prometheus配置
-/*
-management:
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
-*/
-
-// 访问监控端点示例
-/*
-curl http://localhost:8080/actuator/health
-curl http://localhost:8080/actuator/metrics
-curl http://localhost:8080/actuator/info
-curl http://localhost:8080/actuator/env
-*/
-```
-
 
 
 ### 🎯spring boot 核心配置文件是什么？bootstrap.properties 和 application.properties 有何区别 ?
@@ -2835,16 +2454,6 @@ spring boot 核心的两个配置文件：
 - bootstrap (. yml 或者 . properties)：boostrap 由父 ApplicationContext 加载的，比 applicaton 优先加载，配置在应用程序上下文的引导阶段生效。一般来说我们在 Spring Cloud Config 或者 Nacos 中会用到它。且 boostrap 里面的属性不能被覆盖；
 - application (. yml 或者 . properties)： 由 ApplicatonContext 加载，用于 spring boot 项目的自动化配置。
 
-
-
-### 🎯Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
-
-启动类上面的注解是@SpringBootApplication，它也是 Spring Boot 的核心注解，主要组合包含了以下 3 个注解：
-
-- @SpringBootConfiguration：组合了 @Configuration 注解，实现配置文件的功能。
-- @EnableAutoConfiguration：打开自动配置的功能，也可以关闭某个自动配置的选项，如关闭数据源自动配置功能： @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })。
-- @ComponentScan：Spring组件扫描。
-
 ------
 
 
@@ -2855,41 +2464,39 @@ spring boot 核心的两个配置文件：
 
 ### 🎯 Spring事务管理机制是什么？
 
-作为企业级应用程序框架,，Spring 在不同的事务管理 API 之上定义了一个抽象层，而应用程序开发人员不必了解底层的事务管理 API，就可以使用 Spring 的事务管理机制
+> Spring 的事务管理是基于 AOP 的声明式事务机制。
+>  当一个方法加上 `@Transactional` 注解后，Spring 会通过 AOP 代理拦截这个方法调用，进入事务切面逻辑：在方法执行前开启事务，执行过程中如果抛出异常则回滚，否则正常提交。
+>  事务的实现是通过 `PlatformTransactionManager`，它屏蔽了底层 JDBC、JPA 等差异，开发者只需要声明事务即可。
+>  此外，Spring 事务支持传播行为和隔离级别，可以灵活控制事务边界，适应不同的业务场景。
 
-Spring 既支持**编程式事务管理**，也支持**声明式的事务管理**
+**1. 核心思想**
 
-- 编程式事务管理：将事务管理代码嵌入到业务方法中来控制事务的提交和回滚，在编程式管理事务时，必须在每个事务操作中包含额外的事务管理代码，属于硬编码
+- Spring 提供了 **统一的事务抽象层**，通过 `PlatformTransactionManager` 接口来管理事务。
+- 常见实现：
+  - **JDBC**：`DataSourceTransactionManager`
+  - **JPA**：`JpaTransactionManager`
+  - **Hibernate**：`HibernateTransactionManager`
+- 上层通过 `@Transactional` 或 XML 配置声明事务，Spring 自动完成事务的开启、提交、回滚。
 
-  - 通过TransactionTemplate或PlatformTransactionManager手动管理
-  - 代码侵入性强，但控制精确
-  - 适用于复杂的事务逻辑
+**2. 工作原理**
 
-- 声明式事务管理：大多数情况下比编程式事务管理更好用。它将事务管理代码从业务方法中分离出来，以声明的方式来实现事务管理。事务管理作为一种横切关注点，可以通过 AOP 方法模块化。
+1. **AOP 代理拦截**
+   - 带有 `@Transactional` 的方法会被 Spring AOP 拦截（默认 JDK 动态代理或 CGLIB）。
+2. **事务切面处理**
+   - 拦截后交给 `TransactionInterceptor`，由它负责事务边界：
+     - 方法执行前：获取 `TransactionManager`，开启事务。
+     - 方法执行中：正常执行目标方法。
+     - 方法抛异常：根据 `rollbackFor` 等规则回滚事务。
+     - 方法执行成功：提交事务。
+3. **事务传播 & 隔离级别**
+   - 事务属性由 `TransactionAttributeSource` 解析，支持传播行为（Propagation）和隔离级别（Isolation）。
 
-  - 基于AOP实现，使用@Transactional注解
-  - 代码无侵入，配置简单
-  - 是企业开发的首选方案
+**3. 关键机制**
 
-  Spring 通过 Spring AOP 框架支持声明式事务管理，**声明式事务又分为两种：**
+- **传播行为（Propagation）**：定义事务方法嵌套调用时的事务边界，比如 `REQUIRED`、`REQUIRES_NEW`、`NESTED` 等。
+- **隔离级别（Isolation）**：避免脏读、不可重复读、幻读，比如 `READ_COMMITTED`、`REPEATABLE_READ`。
+- **回滚规则**：默认遇到 `RuntimeException` 回滚，`CheckedException` 不回滚，可以通过 `rollbackFor` 修改。
 
-  - 基于XML的声明式事务
-  - 基于注解的声明式事务
-
-**核心组件**：
-- PlatformTransactionManager：事务管理器接口
-- TransactionDefinition：事务定义信息
-- TransactionStatus：事务运行状态
-- TransactionTemplate：编程式事务模板
-
-**事务属性**：
-- 传播行为：定义事务方法调用时的行为
-- 隔离级别：控制并发事务的隔离程度
-- 超时时间：事务执行的最大时间
-- 只读属性：优化只读操作的性能
-- 回滚规则：定义哪些异常导致回滚"
-
-**💻 代码示例**：
 ```java
 @Service
 @Transactional
@@ -2923,7 +2530,7 @@ public class UserService {
 
 
 
-### 🎯 事务管理器
+### 🎯 事务管理器?
 
 Spring 并不直接管理事务，而是提供了多种事务管理器，他们将事务管理的职责委托给 Hibernate 或者 JTA 等持久化机制所提供的相关平台框架的事务来实现。
 
@@ -2955,26 +2562,11 @@ Spring 事务管理器的接口是 `org.springframework.transaction.PlatformTran
 
 
 
-### 🎯 用事务通知声明式地管理事务
-
-- 事务管理是一种横切关注点
-- 为了在 Spring 2.x 中启用声明式事务管理，可以通过 tx Schema 中定义的 \<tx:advice> 元素声明事务通知，为此必须事先将这个 Schema 定义添加到 \<beans> 根元素中去
-- 声明了事务通知后，就需要将它与切入点关联起来。由于事务通知是在 \<aop:config> 元素外部声明的, 所以它无法直接与切入点产生关联，所以必须在 \<aop:config> 元素中声明一个增强器通知与切入点关联起来.
-- 由于 Spring AOP 是基于代理的方法，所以只能增强公共方法。因此, 只有公有方法才能通过 Spring AOP 进行事务管理。
-
-
-
-### 🎯 用 @Transactional 注解声明式地管理事务
-
-- 除了在带有切入点，通知和增强器的 Bean 配置文件中声明事务外，Spring 还允许简单地用 @Transactional 注解来标注事务方法
-- 为了将方法定义为支持事务处理的，可以为方法添加 @Transactional 注解，根据 Spring AOP 基于代理机制，**只能标注公有方法.**
-- 可以在方法或者类级别上添加 @Transactional 注解。当把这个注解应用到类上时， 这个类中的所有公共方法都会被定义成支持事务处理的
-- 在 Bean 配置文件中只需要启用 `<tx:annotation-driven>`元素, 并为之指定事务管理器就可以了
-- 如果事务处理器的名称是 transactionManager, 就可以在 `<tx:annotation-driven>` 元素中省略 `transaction-manager` 属性，这个元素会自动检测该名称的事务处理器
-
-
-
 ### 🎯 Spring Boot 的事务是怎么实现的？
+
+>Spring Boot 的事务实现依赖 Spring 的声明式事务机制，本质上还是基于 `PlatformTransactionManager` 和 AOP 拦截器来完成的。
+> 不同的是，Spring Boot 提供了自动配置：比如你用 JDBC，它会自动创建 `DataSourceTransactionManager`；用 JPA，它会自动创建 `JpaTransactionManager`，而且自动启用了 `@EnableTransactionManagement`，所以我们只需要在业务方法上加 `@Transactional` 就能用。
+> 整个流程是：方法调用被代理拦截 → 进入事务拦截器 → 由事务管理器控制事务的开启、提交或回滚。这样开发者只需关注业务逻辑，不需要关心底层事务细节。
 
 Spring Boot 的事务管理是基于 **Spring Framework** 的事务抽象实现的，利用了 Spring 的 **声明式事务**（基于 AOP）和 **编程式事务**（通过 `PlatformTransactionManager`）来进行事务控制。在 Spring Boot 中，事务的实现本质上是 Spring 提供的事务管理功能的自动化配置，通过自动配置机制来简化事务管理的配置。
 
@@ -3159,53 +2751,7 @@ Spring Boot 的事务管理是基于 **Spring Framework** 的事务抽象实现�
 - 嵌套事务，基于保存点实现
 - 内层事务回滚不影响外层事务"
 
-**💻 代码示例**：
-```java
-@Service
-public class OrderService {
-    
-    @Autowired
-    private PaymentService paymentService;
-    @Autowired
-    private LogService logService;
-    
-    @Transactional
-    public void processOrder(Order order) {
-        // 主事务
-        orderRepository.save(order);
-        
-        // REQUIRES_NEW：独立事务，不受主事务影响
-        paymentService.processPayment(order);
-        
-        // NESTED：嵌套事务，可以独立回滚
-        logService.logOrder(order);
-    }
-}
 
-@Service
-public class PaymentService {
-    
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void processPayment(Order order) {
-        // 新的独立事务
-        Payment payment = new Payment(order);
-        paymentRepository.save(payment);
-        // 即使主事务回滚，支付记录也会保存
-    }
-}
-
-@Service  
-public class LogService {
-    
-    @Transactional(propagation = Propagation.NESTED)
-    public void logOrder(Order order) {
-        // 嵌套事务
-        OrderLog log = new OrderLog(order);
-        logRepository.save(log);
-        // 如果日志失败，只回滚日志操作
-    }
-}
-```
 
 ### 🎯 Spring事务失效的常见原因有哪些？
 
@@ -3214,6 +2760,7 @@ public class LogService {
 **AOP代理失效场景**：
 
 **1. 方法不是public**：
+
 - @Transactional只能作用于public方法
 - private/protected/默认方法事务不生效
 
@@ -3295,6 +2842,8 @@ public class UserService {
     }
 }
 ```
+
+
 
 ### 🎯 Spring Data JPA和MyBatis的区别？
 
@@ -4537,6 +4086,7 @@ public class UserService {
 - ReloadableResourceBundleMessageSource：支持热加载
 
 **LocaleResolver**：
+
 - 语言环境解析器，确定用户的Locale
 - AcceptHeaderLocaleResolver：基于HTTP头
 - SessionLocaleResolver：基于Session
@@ -5185,6 +4735,7 @@ public class GlobalExceptionHandler {
 - Serverless架构适配
 
 **响应式编程**：
+
 - Spring WebFlux异步非阻塞
 - R2DBC响应式数据库访问
 - 事件驱动架构设计

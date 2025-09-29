@@ -30,8 +30,9 @@ categories: Interview
 4. **⚠️ 异常处理机制**：异常体系、try-catch-finally、异常传播、自定义异常
 5. **🎯 泛型机制**：泛型语法、类型擦除、通配符、泛型边界
 6. **🪞 反射机制**：Class对象、动态代理、注解处理、反射性能
-7. **📁 IO流体系**：字节流、字符流、缓冲流、NIO基础
-8. **🆕 Java新特性**：Lambda表达式、Stream API、Optional、函数式接口
+7. **🔗 Java引用类型**：强引用、软引用、弱引用、虚引用、WeakHashMap、ThreadLocal原理
+8. **📁 IO流体系**：字节流、字符流、缓冲流、NIO基础
+9. **🆕 Java新特性**：Lambda表达式、Stream API、Optional、函数式接口
 
 
 
@@ -1632,7 +1633,7 @@ List<Integer> list = new ArrayList<>();
 >      Integer a = 127;
 >      Integer b = 127;
 >      System.out.println(a == b); // true（同一缓存对象）
->                                    
+>                                         
 >      Integer c = 128;
 >      Integer d = 128;
 >      System.out.println(c == d); // false（新创建对象）
@@ -2575,9 +2576,14 @@ class NumberBox<T extends Number> {
 
 ### 🎯 什么是反射机制？反射有什么应用场景？
 
-**📋 标准话术**：
-
 > "Java反射机制是在运行状态中，对于任意一个类都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意方法和属性。这种动态获取信息以及动态调用对象方法的功能称为Java的反射机制。
+>
+> Java 反射（Reflection）是指在运行时动态地获取类的信息，并操作类的属性、方法、构造器等能力。
+>  它的原理是：
+>
+> - Java 编译后会生成 `.class` 字节码文件，JVM 类加载器在加载时会把类的元信息存放到 **方法区（元空间 Metaspace）**。
+> - 反射 API（如 `Class`、`Method`、`Field`、`Constructor`）就是对这些元数据的封装。
+> - 程序可以在运行时通过 `Class.forName()` 或 `对象.getClass()` 获取 `Class` 对象，然后操作类的字段和方法。
 >
 > **反射的核心类**：
 >
@@ -2588,7 +2594,7 @@ class NumberBox<T extends Number> {
 >
 > **应用场景**：
 >
-> - 框架开发：Spring、Hibernate等大量使用反射
+> - 框架开发：框架（Spring、MyBatis）通过反射创建对象、注入依赖。
 > - 注解处理：运行时处理注解信息
 > - 动态代理：JDK动态代理基于反射实现
 > - 配置文件：根据配置动态创建对象
@@ -2917,11 +2923,11 @@ class LoggingHandler implements InvocationHandler {
 - **性能**：反射比直接调用慢 10~20 倍，因为多了权限校验和方法查找；JVM 在反射调用一定次数后会做优化（内联）。
 - **应用场景**：框架（Spring、Hibernate、MyBatis）利用反射实现 **依赖注入、AOP、ORM** 等。
 
-
-
 ---
 
-## 📁 七、IO流体系（IO核心）
+
+
+## 📁 八、IO流体系（IO核心）
 
 > **核心思想**：Java IO提供了丰富的输入输出操作，分为字节流、字符流、缓冲流等，满足不同场景的数据处理需求。
 
@@ -3627,9 +3633,759 @@ class IOStreamTypes {
 
 ------
 
+## 🔗 七、Java引用类型（Reference Types）
 
+> **核心思想**：Java提供了四种引用类型来支持不同场景下的内存管理，是垃圾回收和内存优化的重要机制。
 
-## 🆕 八、Java新特性（Modern Java）
+### 🎯 Java的四种引用类型有哪些？
+
+**📋 标准话术**：
+
+> "Java中有四种引用类型：强引用、软引用、弱引用、虚引用。它们的强度依次递减：
+>
+> **强引用（Strong Reference）**：
+>
+> - 最常见的引用类型，如 `Object obj = new Object()`
+> - 只要强引用存在，垃圾收集器永远不会回收被引用的对象
+> - 即使内存不足抛出OutOfMemoryError也不会回收
+> - 是造成内存泄漏的主要原因
+>
+> **软引用（Soft Reference）**：
+>
+> - 用于描述有用但非必需的对象
+> - 内存充足时不会被回收，内存不足时会被回收
+> - 适合实现内存敏感的高速缓存
+> - JVM会根据内存使用情况智能回收
+>
+> **弱引用（Weak Reference）**：
+>
+> - 比软引用更弱的引用类型
+> - 无论内存是否充足，下次GC时都会被回收
+> - 适合实现缓存、监听器回调、ThreadLocal等场景
+> - 可以避免循环引用导致的内存泄漏
+>
+> **虚引用（Phantom Reference）**：
+>
+> - 最弱的引用类型，不能通过引用获取对象
+> - 主要用于跟踪对象被垃圾收集的活动
+> - 必须配合ReferenceQueue使用
+> - 适合实现对象销毁的监控和清理工作
+>
+**💻 代码示例**：
+
+```java
+import java.lang.ref.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class ReferenceTypesDemo {
+    
+    public static void main(String[] args) throws InterruptedException {
+        // 1. 强引用演示
+        demonstrateStrongReference();
+        
+        // 2. 软引用演示
+        demonstrateSoftReference();
+        
+        // 3. 弱引用演示
+        demonstrateWeakReference();
+        
+        // 4. 虚引用演示
+        demonstratePhantomReference();
+        
+        // 5. 实际应用场景
+        demonstrateRealWorldUsage();
+    }
+    
+    // 强引用演示
+    public static void demonstrateStrongReference() {
+        System.out.println("=== 强引用演示 ===");
+        
+        // 创建强引用
+        String strongRef = new String("Strong Reference Example");
+        System.out.println("Strong reference created: " + strongRef);
+        
+        // 即使显式调用GC，强引用也不会被回收
+        System.gc();
+        System.out.println("After GC, strong reference still exists: " + strongRef);
+        
+        // 只有将引用设为null，对象才可能被回收
+        strongRef = null;
+        System.gc();
+        System.out.println("Strong reference set to null, object can be collected");
+    }
+    
+    // 软引用演示
+    public static void demonstrateSoftReference() {
+        System.out.println("\n=== 软引用演示 ===");
+        
+        // 创建一个大对象
+        byte[] largeObject = new byte[1024 * 1024]; // 1MB
+        SoftReference<byte[]> softRef = new SoftReference<>(largeObject);
+        
+        // 清除强引用
+        largeObject = null;
+        
+        System.out.println("Soft reference created");
+        System.out.println("Object accessible via soft reference: " + 
+            (softRef.get() != null ? "Yes" : "No"));
+        
+        // 内存充足时，软引用不会被回收
+        System.gc();
+        System.out.println("After GC (memory sufficient): " + 
+            (softRef.get() != null ? "Still alive" : "Collected"));
+    }
+    
+    // 弱引用演示
+    public static void demonstrateWeakReference() {
+        System.out.println("\n=== 弱引用演示 ===");
+        
+        String original = new String("Weak Reference Example");
+        WeakReference<String> weakRef = new WeakReference<>(original);
+        
+        System.out.println("Weak reference created");
+        System.out.println("Object accessible: " + weakRef.get());
+        
+        // 清除强引用
+        original = null;
+        
+        System.out.println("Strong reference cleared");
+        System.out.println("Before GC: " + weakRef.get());
+        
+        // 弱引用在下次GC时会被回收
+        System.gc();
+        Thread.yield(); // 让GC有时间执行
+        
+        System.out.println("After GC: " + (weakRef.get() != null ? weakRef.get() : "Collected"));
+        
+        // WeakHashMap演示
+        demonstrateWeakHashMap();
+    }
+    
+    // WeakHashMap演示
+    public static void demonstrateWeakHashMap() {
+        System.out.println("\n--- WeakHashMap演示 ---");
+        
+        WeakHashMap<UniqueKey, String> weakMap = new WeakHashMap<>();
+        Map<UniqueKey, String> normalMap = new HashMap<>();
+        
+        UniqueKey key1 = new UniqueKey("key1");
+        UniqueKey key2 = new UniqueKey("key2");
+        
+        weakMap.put(key1, "value1");
+        weakMap.put(key2, "value2");
+        normalMap.put(key1, "value1");
+        normalMap.put(key2, "value2");
+        
+        System.out.println("Initial size - WeakHashMap: " + weakMap.size() + 
+                          ", HashMap: " + normalMap.size());
+        
+        // 清除一个key的强引用
+        key1 = null;
+        
+        System.gc();
+        Thread.yield();
+        
+        System.out.println("After GC - WeakHashMap: " + weakMap.size() + 
+                          ", HashMap: " + normalMap.size());
+        System.out.println("WeakHashMap自动清理了无强引用的key");
+    }
+    
+    // 虚引用演示
+    public static void demonstratePhantomReference() {
+        System.out.println("\n=== 虚引用演示 ===");
+        
+        ReferenceQueue<Object> queue = new ReferenceQueue<>();
+        Object obj = new Object();
+        PhantomReference<Object> phantomRef = new PhantomReference<>(obj, queue);
+        
+        System.out.println("Phantom reference created");
+        System.out.println("Can get object from phantom reference: " + phantomRef.get()); // 总是null
+        
+        obj = null; // 清除强引用
+        
+        System.gc();
+        Thread.yield();
+        
+        // 检查ReferenceQueue中是否有被回收的对象通知
+        Reference<?> removedRef = queue.poll();
+        System.out.println("Object collected notification: " + 
+                          (removedRef != null ? "Received" : "Not received"));
+        
+        if (removedRef != null) {
+            System.out.println("Phantom reference equals removed reference: " + 
+                              (removedRef == phantomRef));
+        }
+    }
+    
+    // 实际应用场景演示
+    public static void demonstrateRealWorldUsage() {
+        System.out.println("\n=== 实际应用场景 ===");
+        
+        // 1. 软引用用于缓存
+        ImageCache cache = new ImageCache();
+        cache.putImage("image1", new byte[1024]);
+        cache.putImage("image2", new byte[2048]);
+        
+        System.out.println("Cache size: " + cache.size());
+        
+        // 2. 弱引用用于监听器
+        EventPublisher publisher = new EventPublisher();
+        EventListener listener1 = new EventListener("Listener1");
+        EventListener listener2 = new EventListener("Listener2");
+        
+        publisher.addListener(listener1);
+        publisher.addListener(listener2);
+        
+        System.out.println("Active listeners: " + publisher.getListenerCount());
+        
+        listener1 = null; // 清除强引用
+        System.gc();
+        Thread.yield();
+        
+        publisher.cleanupListeners(); // 清理无效监听器
+        System.out.println("After cleanup: " + publisher.getListenerCount());
+        
+        // 3. ThreadLocal内部使用弱引用
+        demonstrateThreadLocalWeakReference();
+    }
+    
+    // ThreadLocal弱引用演示
+    public static void demonstrateThreadLocalWeakReference() {
+        System.out.println("\n--- ThreadLocal弱引用机制 ---");
+        
+        ThreadLocal<String> threadLocal1 = new ThreadLocal<>();
+        ThreadLocal<String> threadLocal2 = new ThreadLocal<>();
+        
+        threadLocal1.set("Value1");
+        threadLocal2.set("Value2");
+        
+        System.out.println("ThreadLocal values set");
+        System.out.println("Value1: " + threadLocal1.get());
+        System.out.println("Value2: " + threadLocal2.get());
+        
+        // ThreadLocal对象设为null，但WeakReference仍可能存在于ThreadLocalMap中
+        threadLocal1 = null;
+        
+        System.gc();
+        Thread.yield();
+        
+        System.out.println("threadLocal1 set to null");
+        System.out.println("Value2 still accessible: " + threadLocal2.get());
+        
+        // 手动清理ThreadLocal（最佳实践）
+        threadLocal2.remove();
+        System.out.println("threadLocal2 manually removed");
+    }
+}
+
+// 自定义Key类用于WeakHashMap演示
+class UniqueKey {
+    private String name;
+    
+    public UniqueKey(String name) {
+        this.name = name;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UniqueKey key = (UniqueKey) obj;
+        return Objects.equals(name, key.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+    
+    @Override
+    public String toString() {
+        return "UniqueKey{name='" + name + "'}";
+    }
+}
+
+// 软引用缓存实现
+class ImageCache {
+    private Map<String, SoftReference<byte[]>> cache = new ConcurrentHashMap<>();
+    
+    public void putImage(String key, byte[] imageData) {
+        cache.put(key, new SoftReference<>(imageData));
+    }
+    
+    public byte[] getImage(String key) {
+        SoftReference<byte[]> ref = cache.get(key);
+        if (ref != null) {
+            byte[] data = ref.get();
+            if (data == null) {
+                cache.remove(key); // 清理已被回收的条目
+            }
+            return data;
+        }
+        return null;
+    }
+    
+    public int size() {
+        // 清理已被回收的条目
+        cache.entrySet().removeIf(entry -> entry.getValue().get() == null);
+        return cache.size();
+    }
+}
+
+// 弱引用监听器实现
+class EventPublisher {
+    private List<WeakReference<EventListener>> listeners = new ArrayList<>();
+    
+    public void addListener(EventListener listener) {
+        listeners.add(new WeakReference<>(listener));
+    }
+    
+    public void removeListener(EventListener listener) {
+        listeners.removeIf(ref -> {
+            EventListener l = ref.get();
+            return l == null || l == listener;
+        });
+    }
+    
+    public void cleanupListeners() {
+        listeners.removeIf(ref -> ref.get() == null);
+    }
+    
+    public int getListenerCount() {
+        cleanupListeners();
+        return listeners.size();
+    }
+    
+    public void fireEvent(String event) {
+        List<WeakReference<EventListener>> toRemove = new ArrayList<>();
+        
+        for (WeakReference<EventListener> ref : listeners) {
+            EventListener listener = ref.get();
+            if (listener != null) {
+                listener.onEvent(event);
+            } else {
+                toRemove.add(ref);
+            }
+        }
+        
+        listeners.removeAll(toRemove);
+    }
+}
+
+class EventListener {
+    private String name;
+    
+    public EventListener(String name) {
+        this.name = name;
+    }
+    
+    public void onEvent(String event) {
+        System.out.println(name + " received event: " + event);
+    }
+    
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
+/*
+ * Java引用类型总结：
+ * 
+ * ┌─────────────┬─────────────┬─────────────┬─────────────┐
+ * │   引用类型  │   GC行为    │   获取对象  │   应用场景  │
+ * ├─────────────┼─────────────┼─────────────┼─────────────┤
+ * │   强引用    │   永不回收  │     直接    │   常规对象  │
+ * │   软引用    │ 内存不足回收│   get()方法 │   内存缓存  │
+ * │   弱引用    │   下次GC回收│   get()方法 │ 缓存/监听器 │
+ * │   虚引用    │ 回收时通知  │   总是null  │   清理监控  │
+ * └─────────────┴─────────────┴─────────────┴─────────────┘
+ * 
+ * 最佳实践：
+ * 1. 默认使用强引用，满足大部分需求
+ * 2. 软引用适合实现内存敏感的缓存
+ * 3. 弱引用避免循环引用，实现观察者模式
+ * 4. 虚引用配合ReferenceQueue进行资源清理
+ * 5. ThreadLocal使用完毕后及时remove()
+ * 6. WeakHashMap适合实现规范化映射
+ */
+```
+
+**💻 ThreadLocal源码分析**：
+
+```java
+// ThreadLocal内部源码分析
+public class ThreadLocalAnalysis {
+    
+    // 模拟ThreadLocal内部实现
+    static class ThreadLocalMap {
+        
+        // 核心：Entry继承WeakReference，key是弱引用
+        static class Entry extends WeakReference<ThreadLocal<?>> {
+            Object value;
+            
+            Entry(ThreadLocal<?> k, Object v) {
+                super(k); // key作为弱引用传给父类
+                value = v;
+            }
+        }
+        
+        private Entry[] table;
+        
+        // 设置值时的清理逻辑
+        private void set(ThreadLocal<?> key, Object value) {
+            Entry[] tab = table;
+            int len = tab.length;
+            int i = key.threadLocalHashCode & (len-1);
+            
+            for (Entry e = tab[i]; e != null; e = tab[i = nextIndex(i, len)]) {
+                ThreadLocal<?> k = e.get(); // 弱引用获取key
+                
+                if (k == key) {
+                    e.value = value;
+                    return;
+                }
+                
+                if (k == null) {
+                    // key被回收了，替换陈旧的entry
+                    replaceStaleEntry(key, value, i);
+                    return;
+                }
+            }
+            
+            tab[i] = new Entry(key, value);
+        }
+        
+        // 清理陈旧entry的逻辑
+        private void replaceStaleEntry(ThreadLocal<?> key, Object value, int staleSlot) {
+            // 清理key为null的entry，防止value内存泄漏
+            // ... 复杂的清理逻辑
+        }
+        
+        private int nextIndex(int i, int len) {
+            return ((i + 1 < len) ? i + 1 : 0);
+        }
+    }
+    
+    // 演示ThreadLocal内存泄漏场景
+    public static void demonstrateMemoryLeak() {
+        System.out.println("=== ThreadLocal内存泄漏演示 ===");
+        
+        // 错误使用方式：不调用remove()
+        class BadThreadLocalUsage {
+            private ThreadLocal<byte[]> threadLocal = new ThreadLocal<>();
+            
+            public void doWork() {
+                // 存储大对象
+                threadLocal.set(new byte[1024 * 1024]); // 1MB
+                
+                // 业务逻辑...
+                
+                // 错误：没有调用remove()，在线程池环境中会内存泄漏
+            }
+        }
+        
+        // 正确使用方式：及时清理
+        class GoodThreadLocalUsage {
+            private ThreadLocal<byte[]> threadLocal = new ThreadLocal<>();
+            
+            public void doWork() {
+                try {
+                    // 存储大对象
+                    threadLocal.set(new byte[1024 * 1024]);
+                    
+                    // 业务逻辑...
+                    
+                } finally {
+                    // 正确：及时清理，防止内存泄漏
+                    threadLocal.remove();
+                }
+            }
+        }
+        
+        System.out.println("ThreadLocal最佳实践：使用后及时remove()");
+    }
+    
+    // 演示弱引用的自动清理效果
+    public static void demonstrateWeakReferenceCleanup() {
+        System.out.println("\n=== 弱引用自动清理演示 ===");
+        
+        ThreadLocal<String> tl = new ThreadLocal<>();
+        tl.set("test value");
+        
+        System.out.println("ThreadLocal value: " + tl.get());
+        
+        // 清除ThreadLocal的强引用
+        tl = null;
+        
+        System.gc();
+        Thread.yield();
+        
+        System.out.println("ThreadLocal对象已被回收，key变为null");
+        System.out.println("但value可能仍在ThreadLocalMap中，需要后续访问时清理");
+    }
+}
+```
+
+**💻 ReferenceQueue使用示例**：
+
+```java
+// ReferenceQueue应用示例
+public class ReferenceQueueExample {
+    
+    private static ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private static Map<PhantomReference<?>, String> cleanupTasks = new ConcurrentHashMap<>();
+    
+    public static void main(String[] args) throws InterruptedException {
+        // 启动清理线程
+        startCleanupThread();
+        
+        // 创建需要清理的资源
+        createResourceWithCleanup("Resource1");
+        createResourceWithCleanup("Resource2");
+        
+        // 触发GC
+        System.gc();
+        Thread.sleep(1000);
+        
+        System.out.println("创建更多资源...");
+        createResourceWithCleanup("Resource3");
+        
+        System.gc();
+        Thread.sleep(2000);
+        
+        System.out.println("程序结束");
+    }
+    
+    private static void createResourceWithCleanup(String resourceName) {
+        // 模拟需要清理的资源
+        Object resource = new Object() {
+            @Override
+            public String toString() {
+                return resourceName;
+            }
+        };
+        
+        // 创建虚引用监控对象回收
+        PhantomReference<Object> phantomRef = new PhantomReference<>(resource, queue);
+        cleanupTasks.put(phantomRef, resourceName + " cleanup task");
+        
+        System.out.println("创建资源: " + resourceName);
+        
+        // 清除强引用，使对象可被回收
+        resource = null;
+    }
+    
+    private static void startCleanupThread() {
+        Thread cleanupThread = new Thread(() -> {
+            try {
+                while (true) {
+                    // 阻塞等待被回收的引用
+                    Reference<?> ref = queue.remove();
+                    
+                    // 执行清理任务
+                    String task = cleanupTasks.remove(ref);
+                    if (task != null) {
+                        System.out.println("执行清理任务: " + task);
+                        // 这里可以执行实际的资源清理逻辑
+                        // 比如关闭文件、释放网络连接等
+                    }
+                }
+            } catch (InterruptedException e) {
+                System.out.println("清理线程被中断");
+                Thread.currentThread().interrupt();
+            }
+        });
+        
+        cleanupThread.setDaemon(true);
+        cleanupThread.start();
+        System.out.println("清理线程已启动");
+    }
+}
+```
+
+### 🎯 引用类型在实际项目中的最佳实践
+
+**项目实战经验分享**：
+
+1. **图片缓存系统**：
+```java
+public class ImageCache {
+    private final Map<String, SoftReference<BufferedImage>> cache = new ConcurrentHashMap<>();
+    
+    public BufferedImage getImage(String url) {
+        SoftReference<BufferedImage> ref = cache.get(url);
+        BufferedImage image = (ref != null) ? ref.get() : null;
+        
+        if (image == null) {
+            image = loadImageFromUrl(url);
+            cache.put(url, new SoftReference<>(image));
+        }
+        return image;
+    }
+}
+```
+
+2. **监听器管理**：
+```java
+public class EventManager {
+    private final List<WeakReference<EventListener>> listeners = new ArrayList<>();
+    
+    public void addEventListener(EventListener listener) {
+        listeners.add(new WeakReference<>(listener));
+    }
+    
+    public void fireEvent(Event event) {
+        listeners.removeIf(ref -> {
+            EventListener listener = ref.get();
+            if (listener != null) {
+                listener.onEvent(event);
+                return false;
+            }
+            return true; // 移除失效的监听器
+        });
+    }
+}
+```
+
+3. **ThreadLocal最佳实践**：
+```java
+public class UserContextHolder {
+    private static final ThreadLocal<UserContext> CONTEXT = new ThreadLocal<>();
+    
+    public static void setUser(UserContext user) {
+        CONTEXT.set(user);
+    }
+    
+    public static UserContext getUser() {
+        return CONTEXT.get();
+    }
+    
+    public static void clear() {
+        CONTEXT.remove(); // 关键：及时清理
+    }
+}
+```
+
+这些引用类型是Java内存管理的精髓，掌握它们对于写出高性能、低内存占用的Java程序至关重要。
+
+### 🎯 弱引用了解吗？举例说明在哪里可以用？
+
+**📋 面试标准回答**：
+
+> "弱引用我非常了解，它是Java中一种特殊的引用类型，主要有以下特点和应用：
+>
+> **弱引用的特点**：
+>
+> - 不影响对象的生命周期，下次GC时无条件回收
+> - 通过WeakReference.get()方法访问对象，可能返回null
+> - 可以配合ReferenceQueue监控对象回收
+>
+> **典型应用场景**：
+>
+> 1. **WeakHashMap**：实现规范化映射，key被回收时自动清理entry
+> 2. **ThreadLocal内部实现**：ThreadLocalMap的key使用弱引用，避免内存泄漏
+> 3. **观察者模式**：监听器使用弱引用，防止监听器无法被GC
+> 4. **缓存实现**：临时缓存，内存紧张时自动清理
+> 5. **避免循环引用**：父子组件相互引用时，子组件持有父组件的弱引用
+>
+> **实际项目中的使用**：
+>
+> - GUI应用中，组件对监听器的引用
+> - 缓存框架中的临时缓存实现  
+> - 对象池中对象的生命周期管理
+> - 防止Handler导致的Activity内存泄漏（Android开发）
+>
+> 弱引用是解决内存泄漏问题的重要工具，合理使用可以让程序更加健壮。"
+
+### 🎯 ThreadLocal为什么要使用弱引用？
+
+**📋 标准话术**：
+
+> "ThreadLocal使用弱引用是为了防止内存泄漏，具体原理如下：
+>
+> **ThreadLocal的内部结构**：
+>
+> - 每个Thread都有一个ThreadLocalMap
+> - ThreadLocalMap的key是ThreadLocal对象的弱引用
+> - value是实际存储的值
+>
+> **为什么使用弱引用**：
+>
+> 1. **防止ThreadLocal对象无法回收**：如果key是强引用，即使ThreadLocal对象不再被使用，由于ThreadLocalMap持有强引用，ThreadLocal对象无法被GC
+> 
+> 2. **自动清理机制**：当ThreadLocal对象被回收后，key变为null，ThreadLocalMap可以识别并清理这些陈旧的entry
+>
+> 3. **线程长期存活的场景**：在线程池环境中，线程长期存活，如果不清理无用的ThreadLocal，会造成内存泄漏
+>
+> **潜在问题**：
+>
+> - 即使key被回收，value依然存在，仍可能内存泄漏
+> - 最佳实践是使用完ThreadLocal后调用remove()方法
+>
+> 这种设计是权衡之后的最优解决方案。"
+
+### 🎯 什么时候使用软引用？什么时候使用弱引用？
+
+**📋 标准话术**：
+
+> "软引用和弱引用的选择主要基于回收时机和应用场景：
+>
+> **使用软引用的场景**：
+>
+> 1. **内存敏感的缓存**：图片缓存、数据缓存等，内存充足时保留，不足时回收
+> 2. **可重建的昂贵对象**：计算结果缓存、编译后的正则表达式等
+> 3. **大对象的临时存储**：文件内容缓存、网络响应缓存
+> 4. **实现LRU之外的缓存策略**：基于内存压力的智能缓存
+>
+> **使用弱引用的场景**：
+>
+> 1. **避免循环引用**：父子组件、观察者模式
+> 2. **监听器管理**：事件监听器、回调函数
+> 3. **实现规范化映射**：WeakHashMap、对象池
+> 4. **线程本地存储**：ThreadLocal的内部实现
+> 5. **临时关联关系**：对象间的弱关联
+>
+> **选择原则**：
+>
+> - 需要内存管理策略时选择软引用
+> - 需要避免强引用导致的问题时选择弱引用
+> - 软引用适合'有用但非必需'的对象
+> - 弱引用适合'引用但不拥有'的关系
+>
+> 实际开发中，软引用用于缓存，弱引用用于解耦。"
+
+### 🎯 ReferenceQueue的作用是什么？
+
+**📋 标准话术**：
+
+> "ReferenceQueue是Java引用类型的监控机制，主要作用：
+>
+> **核心功能**：
+>
+> - 当引用的对象被GC回收时，引用对象会被加入到关联的ReferenceQueue中
+> - 提供了一种异步通知机制，让程序知道对象何时被回收
+> - 只有弱引用、软引用、虚引用可以与ReferenceQueue关联
+>
+> **典型应用场景**：
+>
+> 1. **资源清理**：文件句柄、网络连接等需要显式关闭的资源
+> 2. **缓存管理**：监控缓存对象的回收，及时清理相关元数据
+> 3. **内存监控**：统计对象的生命周期，进行性能分析
+> 4. **堆外内存管理**：DirectByteBuffer的清理机制
+>
+> **使用模式**：
+>
+> - 创建引用时关联ReferenceQueue
+> - 后台线程轮询队列，处理被回收的引用
+> - 执行清理逻辑，释放相关资源
+>
+> 这种机制让Java可以实现类似C++析构函数的功能。"
+
+---
+
+## 🆕 九、Java新特性（Modern Java）
 
 > **核心思想**：Java 8引入了函数式编程特性，后续版本持续演进，提供了更简洁、高效的编程方式。
 
@@ -4007,12 +4763,13 @@ public class JDK17FeaturesDemo {
 
 ### 📋 Java基础高频面试题清单
 
-| **知识点**   | **核心问题**                   | **关键话术**                     | **代码要点**                   |
-| ------------ | ------------------------------ | -------------------------------- | ------------------------------ |
-| **面向对象** | 三大特性、抽象类vs接口、内部类 | 封装继承多态、is-a关系、访问控制 | 继承重写、接口实现、内部类访问 |
-| **数据类型** | 基本类型vs包装类、==vs equals  | 栈堆存储、自动装箱、缓存机制     | Integer缓存、equals重写        |
-| **字符串**   | String不可变性、三者区别       | 常量池、性能对比、线程安全       | StringBuilder使用、intern方法  |
-| **异常处理** | 异常体系、处理机制、最佳实践   | 检查型vs非检查型、异常链         | try-with-resources、自定义异常 |
+| **知识点**     | **核心问题**                   | **关键话术**                     | **代码要点**                   |
+| -------------- | ------------------------------ | -------------------------------- | ------------------------------ |
+| **面向对象**   | 三大特性、抽象类vs接口、内部类 | 封装继承多态、is-a关系、访问控制 | 继承重写、接口实现、内部类访问 |
+| **数据类型**   | 基本类型vs包装类、==vs equals  | 栈堆存储、自动装箱、缓存机制     | Integer缓存、equals重写        |
+| **字符串**     | String不可变性、三者区别       | 常量池、性能对比、线程安全       | StringBuilder使用、intern方法  |
+| **异常处理**   | 异常体系、处理机制、最佳实践   | 检查型vs非检查型、异常链         | try-with-resources、自定义异常 |
+| **Java引用类型** | 四种引用类型、弱引用应用场景   | 强软弱虚、内存管理、GC行为       | WeakHashMap、ThreadLocal原理   |
 
 ### 🎯 面试回答技巧
 
@@ -4036,12 +4793,13 @@ public class JDK17FeaturesDemo {
 
 ### 📋 Java基础高频面试题清单
 
-| **知识点**   | **核心问题**                   | **关键话术**                     | **代码要点**                   |
-| ------------ | ------------------------------ | -------------------------------- | ------------------------------ |
-| **面向对象** | 三大特性、抽象类vs接口、内部类 | 封装继承多态、is-a关系、访问控制 | 继承重写、接口实现、内部类访问 |
-| **数据类型** | 基本类型vs包装类、==vs equals  | 栈堆存储、自动装箱、缓存机制     | Integer缓存、equals重写        |
-| **字符串**   | String不可变性、三者区别       | 常量池、性能对比、线程安全       | StringBuilder使用、intern方法  |
-| **异常处理** | 异常体系、处理机制、最佳实践   | 检查型vs非检查型、异常链         | try-with-resources、自定义异常 |
+| **知识点**     | **核心问题**                   | **关键话术**                     | **代码要点**                   |
+| -------------- | ------------------------------ | -------------------------------- | ------------------------------ |
+| **面向对象**   | 三大特性、抽象类vs接口、内部类 | 封装继承多态、is-a关系、访问控制 | 继承重写、接口实现、内部类访问 |
+| **数据类型**   | 基本类型vs包装类、==vs equals  | 栈堆存储、自动装箱、缓存机制     | Integer缓存、equals重写        |
+| **字符串**     | String不可变性、三者区别       | 常量池、性能对比、线程安全       | StringBuilder使用、intern方法  |
+| **异常处理**   | 异常体系、处理机制、最佳实践   | 检查型vs非检查型、异常链         | try-with-resources、自定义异常 |
+| **Java引用类型** | 四种引用类型、弱引用应用场景   | 强软弱虚、内存管理、GC行为       | WeakHashMap、ThreadLocal原理   |
 
 ### 🎯 面试回答技巧
 

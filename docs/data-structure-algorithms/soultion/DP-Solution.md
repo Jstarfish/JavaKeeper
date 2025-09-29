@@ -1,14 +1,95 @@
 ---
-title: 动态规划 通关秘籍
-date: 2025-07-08
+title: 动态规划-热题
+date: 2025-01-08
 tags: 
  - DP
+ - algorithms
 categories: leetcode
 ---
 
-> 个人感觉动态规划是最难的，一会爬楼梯，一会兑零钱，一会又要去接雨水，炒股就不说了，还要去偷东西，太南了
+![](https://img.starfish.ink/leetcode/leetcode-banner.png)
 
-![](https://cdn.nlark.com/yuque/0/2021/png/21674094/1639551516595-9b6a2bad-c55b-43e1-b172-ced36ffa96cc.png)
+> **导读**：个人感觉动态规划是最难的，一会爬楼梯，一会兑零钱，一会又要去接雨水，炒股就不说了，还要去偷东西，太南了
+>
+> 动态规划确实是算法面试的"终极boss"，但掌握了核心思路后，这些看似复杂的问题都有迹可循。从状态定义到转移方程，从边界条件到空间优化，让我们一步步征服DP的各个击破点。
+>
+> **关键词**：状态定义、转移方程、记忆化搜索、空间优化、最优子结构
+
+### 📋 分类索引
+
+1. **🎯 线性DP类（基础核心）**
+   - **1.1 单串问题**
+     - 1.1.1 依赖比i小的O(1)个子问题：[爬楼梯](#_70-爬楼梯)、[打家劫舍](#_198-打家劫舍)、[最大子数组和](#_53-最大子数组和)、[单词拆分](#_139-单词拆分)、[杨辉三角](#_118-杨辉三角)、[乘积最大子数组](#_152-乘积最大子数组)
+     - 1.1.2 依赖比i小的O(n)个子问题：[最长递增子序列](#_300-最长递增子序列)、[完全平方数](#_279-完全平方数)
+     - 1.1.3 带维度的单串问题：[买卖股票的最佳时机](#_121-买卖股票的最佳时机)
+   - **1.2 双串问题**：[最长公共子序列](#_1143-最长公共子序列)、[编辑距离](#_72-编辑距离)
+
+2. **🎒 背包DP类（线性DP的变种）**
+   - **0-1背包问题**：[分割等和子集](#_416-分割等和子集)
+   - **完全背包问题**：[零钱兑换](#_322-零钱兑换)、[零钱兑换II](#_518-零钱兑换ii)、[完全平方数](#_279-完全平方数)、[目标和](#_494-目标和)
+   - **背包应用**：[不同路径](#_62-不同路径)、[最小路径和](#_64-最小路径和)
+
+3. **🔄 区间动态规划**
+   - **3.1 区间DP核心**：状态设计与推导顺序
+   - **3.2 经典问题分类**
+     - 3.2.1 依赖常数个子问题：[不同的二叉搜索树](#_96-不同的二叉搜索树)、[最长回文子序列](#_最长回文子序列516)
+     - 3.2.2 依赖O(n)个子问题：[最长回文子串](#_最长回文子串5)、[最大正方形](#_221-最大正方形)
+
+4. **🔗 分治型动态规划**：[括号生成](#_括号生成22)
+
+### 🎯 核心考点概览
+
+- **状态设计**：一维dp[i]、二维dp[i][j]、多维状态转移
+- **转移方程**：从"最后一步"推导状态转移关系
+- **边界条件**：base case的正确设置和处理  
+- **空间优化**：滚动数组、压缩状态降低空间复杂度
+- **决策树模型**：理解最优子结构和无后效性
+
+### 📝 解题万能模板
+
+#### 基础模板
+
+```java
+// 一维DP模板
+int[] dp = new int[n + 1];
+dp[0] = baseCase; // 边界条件
+for (int i = 1; i <= n; i++) {
+    dp[i] = Math.max(dp[i-1] + nums[i], nums[i]); // 状态转移
+}
+
+// 二维DP模板  
+int[][] dp = new int[m + 1][n + 1];
+// 初始化边界条件
+for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+        dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]); // 状态转移
+    }
+}
+
+// 背包问题模板
+int[] dp = new int[capacity + 1];
+for (int i = 0; i < items.length; i++) {
+    for (int j = capacity; j >= weight[i]; j--) { // 0-1背包逆序
+        dp[j] = Math.max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
+```
+
+#### 边界检查清单
+
+- ✅ 数组越界：确保索引在有效范围内
+- ✅ 边界条件：正确设置dp[0]、dp[i][0]等base case
+- ✅ 状态转移：确保每个状态都能从更小的子问题推导
+- ✅ 空间优化：考虑是否可以用滚动数组降低空间复杂度
+
+#### 💡 记忆口诀（朗朗上口版）
+
+- **状态定义**："定义状态含义清，子问题规模要递减"
+- **转移方程**："最后一步怎么走，前面状态来推导"
+- **边界条件**："边界条件要设好，递推基础不能少"
+- **空间优化**："前后依赖看得清，滚动数组省空间"
+- **背包问题**："物品容量两维度，选或不选做决策"
+- **区间DP**："区间长度小到大，分割点上做文章"
 
 **解题心法**
 
@@ -17,11 +98,28 @@ categories: leetcode
 3. **边界条件要清晰**：如`dp[0][j]`（空串与另一串的关系）、`dp[i][i]`（长度为 1 的区间）等。
 4. **空间优化**：部分问题可通过滚动数组将二维`dp`优化为一维（如编辑距离、最长公共子序列）。
 
+**最重要的一个技巧就是，你得行动，写起来**
 
+## 一、线性DP类（基础核心）🎯 
 
-我们按分类，逐个攻破~
+### 💡 核心思想
 
-## 一、线性动态规划
+- **一维状态**：dp[i]表示考虑前i个元素的最优解
+- **递推关系**：dp[i]依赖前面的状态dp[i-1]、dp[i-2]等
+- **时间复杂度**：通常为O(n)或O(n²)
+
+### 🎯 必掌握模板
+
+```java
+// 基础线性DP模板
+int[] dp = new int[n + 1];
+dp[0] = baseCase; // 设置边界条件
+
+for (int i = 1; i <= n; i++) {
+    dp[i] = optimizeFunction(dp[i-1], dp[i-2], ...); // 状态转移
+}
+return dp[n]; // 或者返回过程中的最优值
+```
 
 线性动态规划的特点是**问题规模由单变量（或双变量）的位置表示**，状态推导按位置从小到大依次进行，较大规模的问题依赖较小规模的子问题。
 
@@ -39,7 +137,111 @@ categories: leetcode
 
 比如最大子数组和（53 题）：`dp[i]` 依赖 `dp[i-1]`，判断是否延续前序子数组。
 
-##### [最大子数组和_53](https://leetcode.cn/problems/maximum-subarray/)
+##### [70. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
+
+> 假设你正在爬楼梯。需要 `n` 阶你才能到达楼顶。
+>
+> 每次你可以爬 `1` 或 `2` 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+>
+> ```
+> 输入：n = 3
+> 输出：3
+> 解释：有三种方法可以爬到楼顶。
+> 1. 1 阶 + 1 阶 + 1 阶
+> 2. 1 阶 + 2 阶
+> 3. 2 阶 + 1 阶
+> ```
+
+**思路**：典型的斐波那契数列问题
+
+- 状态定义：`dp[i]` 表示爬到第 `i` 阶楼梯的方法数
+- 转移方程：`dp[i] = dp[i-1] + dp[i-2]` （可以从第i-1阶爬1步，或从第i-2阶爬2步）
+- 边界条件：`dp[0] = 1, dp[1] = 1`
+
+```java
+public int climbStairs(int n) {
+    if (n <= 1) return 1;
+    
+    int[] dp = new int[n + 1];
+    dp[0] = 1; // 0阶有1种方法（不爬）
+    dp[1] = 1; // 1阶有1种方法
+    
+    for (int i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+    }
+    
+    return dp[n];
+}
+
+// 空间优化版本
+public int climbStairs(int n) {
+    if (n <= 1) return 1;
+    
+    int prev2 = 1, prev1 = 1;
+    for (int i = 2; i <= n; i++) {
+        int current = prev1 + prev2;
+        prev2 = prev1;
+        prev1 = current;
+    }
+    return prev1;
+}
+```
+
+##### [198. 打家劫舍](https://leetcode.cn/problems/house-robber/)
+
+> 你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
+>
+> 给定一个代表每个房屋存放金额的非负整数数组，计算你不触动警报装置的情况下 ，一夜之间能够偷窃到的最高金额。
+>
+> ```
+> 输入：[2,7,9,3,1]
+> 输出：12
+> 解释：偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。
+>      偷窃到的最高金额 = 2 + 9 + 1 = 12 。
+> ```
+
+**思路**：状态机DP的简化版
+
+- 状态定义：`dp[i]` 表示偷窃前 `i+1` 间房屋能获得的最高金额
+- 转移方程：`dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i])` （不偷第i间房 vs 偷第i间房）
+- 边界条件：`dp[0] = nums[0]`, `dp[1] = Math.max(nums[0], nums[1])`
+
+```java
+public int rob(int[] nums) {
+    if (nums == null || nums.length == 0) return 0;
+    if (nums.length == 1) return nums[0];
+    
+    int n = nums.length;
+    int[] dp = new int[n];
+    dp[0] = nums[0];
+    dp[1] = Math.max(nums[0], nums[1]);
+    
+    for (int i = 2; i < n; i++) {
+        dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+    }
+    
+    return dp[n - 1];
+}
+
+// 空间优化版本
+public int rob(int[] nums) {
+    if (nums == null || nums.length == 0) return 0;
+    if (nums.length == 1) return nums[0];
+    
+    int prev2 = nums[0];
+    int prev1 = Math.max(nums[0], nums[1]);
+    
+    for (int i = 2; i < nums.length; i++) {
+        int current = Math.max(prev1, prev2 + nums[i]);
+        prev2 = prev1;
+        prev1 = current;
+    }
+    
+    return prev1;
+}
+```
+
+##### [53. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
 
 > 给你一个整数数组 `nums` ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 >
@@ -82,7 +284,7 @@ public int maxSubArray(int[] nums) {
 
 
 
-##### [单词拆分_139](https://leetcode.cn/problems/word-break/)
+##### [139. 单词拆分](https://leetcode.cn/problems/word-break/)
 
 > 给你一个字符串 `s` 和一个字符串列表 `wordDict` 作为字典。如果可以利用字典中出现的一个或多个单词拼接出 `s` 则返回 `true`。
 >
@@ -127,7 +329,7 @@ public boolean wordBreak(String s, List<String> wordDict){
 
 
 
-##### [杨辉三角_118](https://leetcode.cn/problems/pascals-triangle/)
+##### [118. 杨辉三角](https://leetcode.cn/problems/pascals-triangle/)
 
 > 给定一个非负整数 *`numRows`，*生成「杨辉三角」的前 *`numRows`* 行。
 >
@@ -189,7 +391,7 @@ public boolean wordBreak(String s, List<String> wordDict){
 
 
 
-##### [乘积最大子数组_152](https://leetcode.cn/problems/maximum-product-subarray/)
+##### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)
 
 > 给你一个整数数组 `nums` ，请你找出数组中乘积最大的非空连续 子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
 >
@@ -243,7 +445,7 @@ public int maxProduct(int[] nums) {
 
 
 
-##### [最长递增子序列_300](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
+##### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
 > 给你一个整数数组 `nums` ，找到其中最长严格递增子序列的长度。
 >
@@ -292,7 +494,7 @@ PS： 注意「子序列」和「子串」这两个名词的区别，子串一�
 
 
 
-##### [完全平方数_279](https://leetcode.cn/problems/perfect-squares/)
+##### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)
 
 > 给你一个整数 `n` ，返回 *和为 `n` 的完全平方数的最少数量* 。
 >
@@ -383,7 +585,7 @@ public int numSquares(int n) {
 
 - 最长公共子序列（1143 题）：`dp[i][j]` 依赖 `dp[i-1][j-1]`（两字符相等）或 `max(dp[i-1][j], dp[i][j-1])`（两字符不等）。
 
-##### [最长公共子序列_1143](https://leetcode.cn/problems/longest-common-subsequence/)
+##### [1143. 最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)
 
 > 给定两个字符串 `text1` 和 `text2`，返回这两个字符串的最长 **公共子序列** 的长度。如果不存在 **公共子序列** ，返回 `0` 。
 >
@@ -448,7 +650,7 @@ public int longestCommonSubsequence(String str1, String str2) {
 
 
 
-##### [编辑距离_72](https://leetcode.cn/problems/edit-distance/)
+##### [72. 编辑距离](https://leetcode.cn/problems/edit-distance/)
 
 > 给你两个单词 `word1` 和 `word2`， *请返回将 `word1` 转换成 `word2` 所使用的最少操作数* 。
 >
@@ -625,7 +827,7 @@ public static int solve(int capacity, int[] weights, int[] values) {
 
 
 
-##### [分割等和子集_416](https://leetcode.cn/problems/partition-equal-subset-sum/)
+##### [416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
 
 > 给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
 >
@@ -746,7 +948,7 @@ public static int solve(int capacity, int[] weights, int[] values) {
 
 
 
-##### [零钱兑换_322](https://leetcode.cn/problems/coin-change/)
+##### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)
 
 > 给你一个整数数组 `coins` ，表示不同面额的硬币；以及一个整数 `amount` ，表示总金额。
 >
@@ -830,7 +1032,7 @@ int coinChangeDPComp(int[] coins, int amt) {
 
 
 
-##### [零钱兑换 II_518](https://leetcode.cn/problems/coin-change-ii/)
+##### [518. 零钱兑换 II](https://leetcode.cn/problems/coin-change-ii/)
 
 > 给你一个整数数组 `coins` 表示不同面额的硬币，另给一个整数 `amount` 表示总金额。
 >
@@ -863,9 +1065,193 @@ int coinChangeDPComp(int[] coins, int amt) {
 
 
 
+### 背包应用
 
+##### [494. 目标和](https://leetcode.cn/problems/target-sum/)
 
-### [最小路径和_64](https://leetcode.cn/problems/minimum-path-sum/)
+**🎯 考察频率：高 | 难度：中等 | 重要性：01背包变体**
+
+> 给你一个整数数组 nums 和一个整数 target 。
+>
+> 向数组中的每个整数前添加 '+' 或 '-' ，然后串联起所有整数，可以构造一个 表达式 ：
+>
+> 例如，nums = [2, 1] ，可以在 2 之前添加 '+' ，在 1 之前添加 '-' ，然后串联起来得到表达式 "+2-1" 。
+> 返回可以通过上述方法构造的、运算结果等于 target 的不同 表达式 的数目。
+>
+> ```
+> 输入：nums = [1,1,1,1,1], target = 3
+> 输出：5
+> 解释：一共有 5 种方法让最终目标和为 3 。
+> -1 + 1 + 1 + 1 + 1 = 3
+> +1 - 1 + 1 + 1 + 1 = 3
+> +1 + 1 - 1 + 1 + 1 = 3
+> +1 + 1 + 1 - 1 + 1 = 3
+> +1 + 1 + 1 + 1 - 1 = 3
+> ```
+
+**思路**：转化为01背包问题
+
+设添加"+"号的数字和为P，添加"-"号的数字和为N，则：
+- P + N = sum（数组总和）
+- P - N = target（目标和）
+
+解得：P = (sum + target) / 2
+
+问题转化为：从数组中选择一些数字，使其和等于P的方案数。这是典型的01背包计数问题。
+
+```java
+public int findTargetSumWays(int[] nums, int target) {
+    int sum = 0;
+    for (int num : nums) {
+        sum += num;
+    }
+    
+    // 边界条件检查
+    if (sum < Math.abs(target) || (sum + target) % 2 == 1) {
+        return 0;
+    }
+    
+    int targetSum = (sum + target) / 2;
+    
+    // dp[i]表示和为i的方案数
+    int[] dp = new int[targetSum + 1];
+    dp[0] = 1; // 和为0的方案数为1（什么都不选）
+    
+    for (int num : nums) {
+        // 01背包，逆序遍历
+        for (int j = targetSum; j >= num; j--) {
+            dp[j] += dp[j - num];
+        }
+    }
+    
+    return dp[targetSum];
+}
+```
+
+**⏱️ 复杂度分析**：
+
+- **时间复杂度**：O(n × target_sum) - n为数组长度，target_sum为目标正数和
+- **空间复杂度**：O(target_sum) - dp数组的空间
+
+### 背包应用
+
+##### [62. 不同路径](https://leetcode.cn/problems/unique-paths/)
+
+> 一个机器人位于一个 `m x n` 网格的左上角 （起始点在下图中标记为 "Start" ）。
+>
+> 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 "Finish" ）。
+>
+> 问总共有多少条不同的路径？
+>
+> ```
+> 输入：m = 3, n = 7
+> 输出：28
+> ```
+
+**思路**：典型的二维DP问题
+
+- 状态定义：`dp[i][j]` 表示到达位置 `(i, j)` 的不同路径数
+- 转移方程：`dp[i][j] = dp[i-1][j] + dp[i][j-1]` （只能从上方或左方到达）
+- 边界条件：`dp[0][j] = 1`, `dp[i][0] = 1` （第一行和第一列都只有一条路径）
+
+```java
+public int uniquePaths(int m, int n) {
+    int[][] dp = new int[m][n];
+    
+    // 初始化边界条件
+    for (int i = 0; i < m; i++) {
+        dp[i][0] = 1; // 第一列只有一条路径
+    }
+    for (int j = 0; j < n; j++) {
+        dp[0][j] = 1; // 第一行只有一条路径
+    }
+    
+    // 状态转移
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+    
+    return dp[m - 1][n - 1];
+}
+
+// 空间优化版本（一维数组）
+public int uniquePaths(int m, int n) {
+    int[] dp = new int[n];
+    Arrays.fill(dp, 1); // 第一行都是1
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[j] = dp[j] + dp[j - 1]; // dp[j]代表上方，dp[j-1]代表左方
+        }
+    }
+    
+    return dp[n - 1];
+}
+```
+
+##### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+
+> 给定一个数组 `prices` ，它的第 `i` 个元素 `prices[i]` 表示一支给定股票第 `i` 天的价格。
+>
+> 你只能选择 **某一天** 买入这只股票，并选择在 **未来的某一个不同的日子** 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+>
+> 返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 `0` 。
+>
+> ```
+> 输入：[7,1,5,3,6,4]
+> 输出：5
+> 解释：在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+>      注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+> ```
+
+**思路**：一次遍历找最低买入价和最大利润
+
+- 状态定义：维护到当前位置的最低价格和最大利润
+- 转移方程：
+  - `minPrice = Math.min(minPrice, prices[i])`
+  - `maxProfit = Math.max(maxProfit, prices[i] - minPrice)`
+
+```java
+public int maxProfit(int[] prices) {
+    if (prices == null || prices.length <= 1) return 0;
+    
+    int minPrice = prices[0]; // 记录到目前为止的最低价格
+    int maxProfit = 0;        // 记录到目前为止的最大利润
+    
+    for (int i = 1; i < prices.length; i++) {
+        // 更新最低价格
+        minPrice = Math.min(minPrice, prices[i]);
+        // 更新最大利润（今天卖出的利润 vs 之前的最大利润）
+        maxProfit = Math.max(maxProfit, prices[i] - minPrice);
+    }
+    
+    return maxProfit;
+}
+
+// DP思路版本
+public int maxProfit(int[] prices) {
+    if (prices == null || prices.length <= 1) return 0;
+    
+    // dp[i][0] 表示第i天不持有股票的最大利润
+    // dp[i][1] 表示第i天持有股票的最大利润
+    int n = prices.length;
+    int[][] dp = new int[n][2];
+    
+    dp[0][0] = 0;           // 第0天不持有股票，利润为0
+    dp[0][1] = -prices[0];  // 第0天持有股票，利润为-prices[0]
+    
+    for (int i = 1; i < n; i++) {
+        dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]); // 不持有：要么昨天就不持有，要么今天卖出
+        dp[i][1] = Math.max(dp[i-1][1], -prices[i]);            // 持有：要么昨天就持有，要么今天买入
+    }
+    
+    return dp[n-1][0]; // 最后一天不持有股票的最大利润
+}
+```
+
+##### [64. 最小路径和](https://leetcode.cn/problems/minimum-path-sum/)
 
 > 给定一个包含非负整数的 `m * x ` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
 >
@@ -903,70 +1289,6 @@ int dp(int[][] grid, int i, int j) {
         ) + grid[i][j];
 }
 ```
-
-
-
-### [分割等和子集_416](https://leetcode.cn/problems/partition-equal-subset-sum/)
-
-> 给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
->
-> ```
-> 输入：nums = [1,5,11,5]
-> 输出：true
-> 解释：数组可以分割成 [1, 5, 5] 和 [11] 。
-> ```
-
-思路：将问题转化为**是否存在子集和为数组总和一半**的背包问题（`target = sum/2`）
-
-我们可以定义一个二维数组 dp，其中 `dp[i][j]` 表示前 `i` 个元素是否能组成和 `j`。状态转移方程如下：
-
-- 不选当前数，则问题转化为在前 i-1 个元素中是否存在和为 j 的子集：`dp[i][j] = dp[i-1][j]`
-- 选当前数，则问题转化为在前 i-1 个元素中是否存在和为 j - nums[i-1] 的子集，：`dp[i][j] = dp[i-1][j - nums[i]]`（需 `j >= nums[i]`）
-
-因此，状态转移方程可以综合为：
-
-`dp[i][j] = dp[i-1][j] || dp[i-1][j - nums[i-1]]`
-
-注意，当 j - nums[i-1] < 0 时，`dp[i-1][j - nums[i-1]]` 是不合法的，我们默认它为 false。
-
-最终，我们需要判断 `dp[n][target]`是否为 true，其中 n 是数组 nums 的长度。如果为 true，则表示存在这样的子集划分；否则，不存在。
-
-```JAVA
-public boolean canPartition(int[] nums) {
-    int sum = 0;
-    for (int num : nums) {
-        sum += num;
-    }
-
-    // 如果总和为奇数，则无法分割成两个和相等的子集
-    if (sum % 2 != 0) {
-        return false;
-    }
-
-    int target = sum / 2;
-    int n = nums.length;
-    boolean[][] dp = new boolean[n + 1][target + 1];
-
-    // 初始化第一列，表示和为0时总是存在子集（空集）
-    for (int i = 0; i <= n; i++) {
-        dp[i][0] = true;
-    }
-
-    // 填充dp数组
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= target; j++) {
-            if (j >= nums[i - 1]) {
-                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - nums[i - 1]];
-            } else {
-                dp[i][j] = dp[i - 1][j];
-            }
-        }
-    }
-
-    return dp[n][target];
-}
-```
-
 
 
 
@@ -1050,7 +1372,62 @@ public boolean canPartition(int[] nums) {
 
 `dp[i][j]`仅与`dp[i+1][j]`、`dp[i][j-1]`、`dp[i+1][j-1]`相关，时间复杂度`O(n²)`。
 
-##### [最长回文子序列_516](https://leetcode.cn/problems/longest-palindromic-subsequence/)
+##### [96. 不同的二叉搜索树](https://leetcode.cn/problems/unique-binary-search-trees/)
+
+> 给你一个整数 `n` ，求恰由 `n` 个节点组成且节点值从 `1` 到 `n` 互不相同的 **二叉搜索树** 有多少种？返回满足题意的二叉搜索树的种数。
+>
+> ```
+> 输入：n = 3
+> 输出：5
+> 解释：给定 n = 3, 一共有 5 种不同结构的二叉搜索树
+> ```
+
+**思路**：卡特兰数/区间DP
+
+当我们确定根节点为 i 时：
+- 左子树包含 [1, i-1] 共 i-1 个节点
+- 右子树包含 [i+1, n] 共 n-i 个节点  
+- 左子树的不同结构数为 `dp[i-1]`
+- 右子树的不同结构数为 `dp[n-i]`
+- 以 i 为根的不同BST数为 `dp[i-1] * dp[n-i]`
+
+- 状态定义：`dp[i]` 表示 i 个节点组成的不同BST数量
+- 转移方程：`dp[i] = sum(dp[j-1] * dp[i-j])` for j in [1, i]
+- 边界条件：`dp[0] = 1, dp[1] = 1`
+
+```java
+public int numTrees(int n) {
+    // dp[i] 表示i个节点组成的不同BST的数量
+    int[] dp = new int[n + 1];
+    
+    // 边界条件
+    dp[0] = 1; // 空树有1种结构
+    dp[1] = 1; // 一个节点有1种结构
+    
+    // 计算dp[2]到dp[n]
+    for (int i = 2; i <= n; i++) {
+        // 枚举根节点j的位置（从1到i）
+        for (int j = 1; j <= i; j++) {
+            // j为根节点时：
+            // 左子树有j-1个节点，右子树有i-j个节点
+            dp[i] += dp[j - 1] * dp[i - j];
+        }
+    }
+    
+    return dp[n];
+}
+
+// 数学公式版本（卡特兰数第n项）
+public int numTrees(int n) {
+    long result = 1;
+    for (int i = 0; i < n; i++) {
+        result = result * 2 * (2 * i + 1) / (i + 2);
+    }
+    return (int) result;
+}
+```
+
+##### [516. 最长回文子序列](https://leetcode.cn/problems/longest-palindromic-subsequence/)
 
 > 给你一个字符串 `s` ，找出其中最长的回文子序列，并返回该序列的长度。
 >
@@ -1103,7 +1480,7 @@ public boolean canPartition(int[] nums) {
 | 线性双串 | `dp[i][j]` | 按 i 和 j 从小到大     | 最长公共子序列、编辑距离     |
 | 区间 DP  | `dp[i][j]` | 按区间长度从小到大     | 最长回文子序列、奇怪的打印机 |
 
-##### [最长回文子串_5](https://leetcode.cn/problems/longest-palindromic-substring/)
+##### [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/)
 
 > 给你一个字符串 `s`，找到 `s` 中最长的 回文子串。
 >
@@ -1162,17 +1539,74 @@ private int centerExpand(String s, int left, int right){
 }
 ```
 
-
-
 ![img](https://pic.leetcode-cn.com/2f205fcd0493818129e8d3604b2d84d94678fda7708c0e9831f192e21abb1f34.png)
 
+##### [221. 最大正方形](https://leetcode.cn/problems/maximal-square/)
+
+**🎯 考察频率：高 | 难度：中等 | 重要性：二维DP经典**
+
+> 在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+>
+> ```
+> 输入：matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+> 输出：4
+> 解释：最大正方形的边长为2，面积为4
+> ```
+
+**思路**：二维DP
+
+- 状态定义：`dp[i][j]` 表示以 `(i,j)` 为右下角的最大正方形的边长
+- 转移方程：如果 `matrix[i][j] == '1'`，则：
+  ```
+  dp[i][j] = Math.min(dp[i-1][j], Math.min(dp[i][j-1], dp[i-1][j-1])) + 1
+  ```
+- 边界条件：第一行和第一列直接根据matrix[i][j]设置
+
+```java
+public int maximalSquare(char[][] matrix) {
+    if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+        return 0;
+    }
+    
+    int m = matrix.length;
+    int n = matrix[0].length;
+    int[][] dp = new int[m][n];
+    int maxSide = 0;
+    
+    // 初始化第一行和第一列
+    for (int i = 0; i < m; i++) {
+        dp[i][0] = matrix[i][0] - '0';
+        maxSide = Math.max(maxSide, dp[i][0]);
+    }
+    
+    for (int j = 0; j < n; j++) {
+        dp[0][j] = matrix[0][j] - '0';
+        maxSide = Math.max(maxSide, dp[0][j]);
+    }
+    
+    // 填充dp数组
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (matrix[i][j] == '1') {
+                dp[i][j] = Math.min(dp[i-1][j], Math.min(dp[i][j-1], dp[i-1][j-1])) + 1;
+                maxSide = Math.max(maxSide, dp[i][j]);
+            }
+        }
+    }
+    
+    return maxSide * maxSide;
+}
+```
+
+**⏱️ 复杂度分析**：
+
+- **时间复杂度**：O(mn) - 遍历整个矩阵一次
+- **空间复杂度**：O(mn) - dp数组，可优化为O(n)
 
 
 
 
-
-
-## 分治型动态规划
+## 四、分治型动态规划
 
 #### **核心特征**：
 
@@ -1187,13 +1621,13 @@ private int centerExpand(String s, int left, int right){
 
 | 问题                                                         | 解法        | 关键思路                                               |
 | ------------------------------------------------------------ | ----------- | ------------------------------------------------------ |
-| [22. 括号生成](https://leetcode.com/problems/generate-parentheses/) | 分治DP/回溯 | `dp[i] = ['('+x+')'+y for x in dp[j], y in dp[i-1-j]]` |
-| [95. 不同的二叉搜索树 II](https://leetcode.com/problems/unique-binary-search-trees-ii/) | 分治DP      | 遍历根节点，左右子树递归生成                           |
-| [17. 电话号码的字母组合](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) | 回溯        | 递归拼接所有可能的字符组合                             |
+| [22. 括号生成](https://leetcode.cn/problems/generate-parentheses/) | 分治DP/回溯 | `dp[i] = ['('+x+')'+y for x in dp[j], y in dp[i-1-j]]` |
+| [95. 不同的二叉搜索树 II](https://leetcode.cn/problems/unique-binary-search-trees-ii/) | 分治DP      | 遍历根节点，左右子树递归生成                           |
+| [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/) | 回溯        | 递归拼接所有可能的字符组合                             |
 
 
 
-##### [括号生成_22](https://leetcode-cn.com/problems/generate-parentheses/)
+##### [22. 括号生成](https://leetcode.cn/problems/generate-parentheses/)
 
 > 数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
 >
@@ -1213,5 +1647,133 @@ private int centerExpand(String s, int left, int right){
 
 
 
-## 其他热题
+## 🚀 面试前15分钟速记表
+
+### 核心模板（必背）
+
+```java
+// 1. 一维DP模板
+int[] dp = new int[n + 1];
+dp[0] = baseCase; // 边界条件
+for (int i = 1; i <= n; i++) {
+    dp[i] = Math.max(dp[i-1] + nums[i], nums[i]); // 状态转移
+}
+
+// 2. 二维DP模板  
+int[][] dp = new int[m + 1][n + 1];
+// 初始化边界条件
+for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+        dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]); // 状态转移
+    }
+}
+
+// 3. 背包问题模板
+int[] dp = new int[capacity + 1];
+for (int i = 0; i < items.length; i++) {
+    for (int j = capacity; j >= weight[i]; j--) { // 0-1背包逆序
+        dp[j] = Math.max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
+```
+
+### 题型速查表
+
+| 题型分类 | 核心技巧 | 高频题目 | 记忆口诀 | 难度 |
+|----------|----------|----------|----------|------|
+| **线性DP-单串类** | 一维状态转移 | 爬楼梯、打家劫舍、最大子数组和、单词拆分、最长递增子序列、乘积最大子数组、买卖股票的最佳时机 | 状态定义含义清，子问题规模要递减 | ⭐⭐⭐ |
+| **线性DP-双串类** | 二维状态比较 | 最长公共子序列、编辑距离 | 最后一步怎么走，前面状态来推导 | ⭐⭐⭐⭐ |
+| **背包DP类** | 容量限制选择 | 分割等和子集、零钱兑换、零钱兑换II、完全平方数、不同路径 | 物品容量两维度，选或不选做决策 | ⭐⭐⭐⭐ |
+| **区间DP类** | 区间分割优化 | 不同的二叉搜索树、最长回文子序列、最长回文子串 | 区间长度小到大，分割点上做文章 | ⭐⭐⭐⭐ |
+| **分治型DP类** | 递归分解 | 括号生成 | 大化小来小化了，分而治之最高效 | ⭐⭐⭐⭐ |
+
+### 核心题目优先级（面试前重点复习）
+
+#### ⭐⭐⭐ 入门必会
+1. **爬楼梯70** - DP入门，斐波那契数列变体
+2. **打家劫舍198** - 状态机DP简化版，选择问题
+3. **最大子数组和53** - Kadane算法，经典一维DP
+4. **买卖股票的最佳时机121** - 最简单的股票DP，贪心思想
+5. **不同路径62** - 二维DP入门，网格路径问题
+
+#### ⭐⭐⭐⭐ 核心重点  
+1. **零钱兑换322** - 完全背包经典，BFS和DP两种思路
+2. **分割等和子集416** - 0-1背包变体，子集和问题
+3. **最长公共子序列1143** - 双串DP经典，编辑距离前置
+4. **最长递增子序列300** - O(n²)和O(nlogn)两种解法
+5. **不同的二叉搜索树96** - 卡特兰数/区间DP，递归思想
+6. **乘积最大子数组152** - 同时维护最大最小值
+
+#### ⭐⭐⭐⭐⭐ 高频困难
+1. **编辑距离72** - 双串DP进阶，三种操作优化
+2. **最长回文子序列516** - 区间DP经典
+3. **零钱兑换II518** - 完全背包计数问题
+4. **单词拆分139** - 字符串DP，记忆化搜索
+5. **最长回文子串5** - 中心扩散法和DP两种解法
+6. **目标和494** - 01背包变体，数学转化
+7. **最大正方形221** - 二维DP经典
+
+### 解题思路总结
+
+#### 🔑 DP问题识别特征
+- **最优子结构**：大问题的最优解包含子问题的最优解
+- **重叠子问题**：递归过程中存在重复计算
+- **无后效性**：当前状态确定后，未来的决策不依赖过去的状态
+
+#### 💡 状态设计原则
+1. **状态含义要明确**：`dp[i]`表示什么要一清二楚
+2. **状态转移要自然**：从小状态推导大状态的逻辑要合理
+3. **边界条件要正确**：base case的设置决定算法正确性
+4. **空间优化要恰当**：能用滚动数组就不用二维数组
+
+#### 🎯 常见状态设计模式
+- **以位置为状态**：`dp[i]`表示考虑前i个元素
+- **以值为状态**：`dp[i]`表示值为i时的最优解  
+- **以区间为状态**：`dp[i][j]`表示区间[i,j]的最优解
+- **多维状态**：`dp[i][j][k]`表示多个约束条件下的最优解
+
+### 常见陷阱提醒
+
+- ⚠️ **状态转移方程错误**：仔细分析最后一步的所有可能性
+- ⚠️ **边界条件遗漏**：dp[0]、dp[i][0]等边界要正确初始化  
+- ⚠️ **数组越界**：确保索引在有效范围内，特别是i-1、j-1
+- ⚠️ **整数溢出**：结果可能很大时要考虑取模或使用long
+- ⚠️ **空间优化错误**：滚动数组时要注意更新顺序
+- ⚠️ **背包问题搞混**：0-1背包逆序，完全背包正序
+
+### 时间复杂度速记
+
+- **一维DP**：O(n) - 线性遍历
+- **二维DP**：O(mn) - 双重循环
+- **背包问题**：O(nW) - n个物品，W容量
+- **区间DP**：O(n³) - 三重循环，枚举分割点
+- **树形DP**：O(n) - 树的遍历
+
+### 面试答题套路
+
+1. **分析问题特征**
+   - 是否有最优子结构？
+   - 是否有重叠子问题？
+   - 状态空间有多大？
+
+2. **设计状态和转移**
+   - 状态定义要清晰
+   - 转移方程要正确
+   - 边界条件要完整
+
+3. **编码实现**
+   - 先写暴力递归
+   - 再加记忆化搜索
+   - 最后改成迭代DP
+
+4. **优化分析**
+   - 能否空间优化？
+   - 能否时间优化？
+   - 特殊情况处理？
+
+**最重要的心得**：DP的核心是**状态定义**和**状态转移**，把这两点想清楚，代码就是水到渠成的事情！
+
+---
+
+**最重要的一个技巧就是，你得行动，写起来**
 

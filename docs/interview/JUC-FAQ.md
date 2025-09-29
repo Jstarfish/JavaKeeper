@@ -292,8 +292,8 @@ Java 通过 `Thread.State` 枚举定义了线程的**6 种状态**（JDK 1.5 后
 线程在生命周期中并不是固定处于某一个状态而是随着代码的执行在不同状态之间切换。
 
 ```
-┌─────────┐      start()      ┌─────────────────┐
-│  NEW    │ ───────────────→ │  RUNNABLE       │
+┌─────────┐      start()    ┌─────────────────┐
+│  NEW    │ ───────────────→│  RUNNABLE       │
 └─────────┘                 └─────────────────┘
                                ↗        ↘
                               ↙          ↘
@@ -580,8 +580,6 @@ public static void main(String[] args) {
 7. `Exchanger`：他提供了两个线程之间的数据交换点。
 8. `StampedLock` ：是一种改进的读写锁，提供了三种模式：写锁、悲观读锁和乐观读锁，适用于读多写少的场景。
 
-
-
 ------
 
 
@@ -655,16 +653,14 @@ public static void main(String[] args) {
 >
 > synchronized 修饰的方法并没有 monitorenter 指令和 monitorexit 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法，JVM 通过该 ACC_SYNCHRONIZED 访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。
 >
-> > **为什么方法的同步使用 `ACC_SYNCHRONIZED`？**
-> >
-> > 1. **简化字节码**
-> >    - 同步方法的范围天然固定为整个方法体，直接用标志位表示更加简洁。
-> >    - 避免了显式插入指令的额外开销。
-> > 2. **由 JVM 执行优化**
-> >    - JVM 可以直接识别 `ACC_SYNCHRONIZED` 并在方法调用层面加锁，而无需用户手动控制。
-> >    - 更容易结合其他锁优化（如偏向锁、轻量级锁）。
->
+> **为什么方法的同步使用 `ACC_SYNCHRONIZED`？**
 > 
+> 1. **简化字节码**
+>    - 同步方法的范围天然固定为整个方法体，直接用标志位表示更加简洁。
+>    - 避免了显式插入指令的额外开销。
+> 2. **由 JVM 执行优化**
+>    - JVM 可以直接识别 `ACC_SYNCHRONIZED` 并在方法调用层面加锁，而无需用户手动控制。
+>    - 更容易结合其他锁优化（如偏向锁、轻量级锁）
 
 **2. 使用方式与区别**
 
@@ -828,7 +824,7 @@ volatile 可以保证线程可见性且提供了一定的有序性，但是无�
 - **volatile关键字能保证数据的可见性，但不能保证数据的原子性。synchronized关键字两者都能保证。**
 - **volatile关键字主要用于解决变量在多个线程之间的可见性，而 synchronized关键字解决的是多个线程之间访问资源的同步性。**
 
-
+------
 
 
 
@@ -1284,7 +1280,7 @@ public class DiningPhilosophers {
 
 公平锁的优点在于各个线程公平平等，每个线程等待一段时间后，都有执行的机会，而它的缺点就在于整体执行速度更慢，吞吐量更小，相反非公平锁的优势就在于整体执行速度更快，吞吐量更大，但同时也可能产生线程饥饿问题，也就是说如果一直有线程插队，那么在等待队列中的线程可能长时间得不到运行
 
-
+------
 
 
 
@@ -1329,51 +1325,93 @@ Java 中的以下几种操作是具备原子性的，属于原子操作：
 
 ### 🎯 AtomicInteger 底层实现原理是什么？如何在自己的产品代码中应用 CAS 操作？
 
-AtomicIntger 是对 int 类型的一个封装，提供原子性的访问和更新操作，其原子性操作的实现是基于 CAS（[compare-and-swap](https://en.wikipedia.org/wiki/Compare-and-swap)）技术。
+> `AtomicInteger` 是基于 **CAS（Compare-And-Swap）+ volatile + Unsafe** 实现的。
+>  它内部维护了一个 `volatile int value`，保证可见性；
+>  更新时通过 `Unsafe` 类的 `compareAndSwapInt` 方法执行 CAS 操作，只有在当前值等于期望值时才更新成功，否则自旋重试。
+>  这样就避免了加锁，实现了高效的线程安全。
+>
+> 在业务代码中，我们也可以用 **CAS 思想**：
+>  比如实现一个自增计数器，先读取旧值，再尝试用 CAS 更新，如果失败就重试，直到成功。
+>  不过手写 CAS 代码容易复杂，实际开发中一般用 JUC 提供的原子类（如 `AtomicInteger`、`AtomicLong`）或者 `LongAdder`。
 
-所谓 CAS，表征的是一系列操作的集合，获取当前数值，进行一些运算，利用 CAS 指令试图进行更新。如果当前数值未变，代表没有其他线程进行并发修改，则成功更新。否则，可能出现不同的选择，要么进行重试，要么就返回一个成功或者失败的结果。
+**AtomicInteger 的底层原理**
 
-从 AtomicInteger 的内部属性可以看出，它依赖于 Unsafe 提供的一些底层能力，进行底层操作；以 volatile 的 value 字段，记录数值，以保证可见性。
+1. **核心字段**
 
-```java
-private static final jdk.internal.misc.Unsafe U = jdk.internal.misc.Unsafe.getUnsafe();
-private static final long VALUE = U.objectFieldOffset(AtomicInteger.class, "value");
-private volatile int value;
-```
+   ```java
+   private volatile int value;
+   ```
 
-具体的原子操作细节，可以参考任意一个原子更新方法，比如下面的 getAndIncrement。
+   - 用 `volatile` 保证多线程下修改的可见性。
 
-Unsafe 会利用 value 字段的内存地址偏移，直接完成操作。
+2. **CAS 操作**
 
-```java
-public final int getAndIncrement() {
-    return U.getAndAddInt(this, VALUE, 1);
-}
-```
+   - 核心方法是 `compareAndSet(int expect, int update)`：
 
-因为 getAndIncrement 需要返归数值，所以需要添加失败重试逻辑。
+     ```java
+     public final boolean compareAndSet(int expect, int update) {
+         return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
+     }
+     ```
 
-```java
-public final int getAndAddInt(Object o, long offset, int delta) {
-    int v;
-    do {
-        v = getIntVolatile(o, offset);
-    } while (!weakCompareAndSetInt(o, offset, v, v + delta));
-    return v;
-}
-```
+   - `Unsafe.compareAndSwapInt` 是一个 **JNI 调用**，最终会映射到 CPU 的 **CAS 指令**（如 x86 的 `cmpxchg`）。
 
-而类似 compareAndSet 这种返回 boolean 类型的函数，因为其返回值表现的就是成功与否，所以不需要重试。
+3. **原理流程**
 
-```java
-public final boolean compareAndSet(int expectedValue, int newValue)
-```
+   - 读出当前值（expect）；
+   - 判断内存里的值是否等于 expect；
+   - 如果相等 → 更新为新值（update）；
+   - 如果不相等 → 更新失败，说明被其他线程修改过 → 重试。
 
-CAS 是 Java 并发中所谓 lock-free 机制的基础。
+4. **自旋重试**
 
+   - CAS 是乐观锁，假设冲突少，大部分情况下会一次成功；
+   - 如果失败，就不断自旋尝试，直到更新成功。
 
+**CAS 的典型问题**
 
-Java 虚拟机又提供了一个轻量级的同步机制——volatile，但是 volatile 算是乞丐版的 synchronized，并不能保证原子性 ，所以，又增加了`java.util.concurrent.atomic`包， 这个包下提供了一系列原子类。
+- **ABA 问题**：值从 A → B → A，CAS 检查时以为没变，但其实发生过变化。
+  - 解决方案：`AtomicStampedReference` 或 `AtomicMarkableReference`（带版本号）。
+- **自旋开销**：并发高时可能频繁失败，自旋消耗 CPU。
+- **只能保证一个变量的原子性**：多个变量需要用 `AtomicReference` 或锁。
+
+------
+
+ **在业务代码中的应用（CAS 思想）**
+
+举几个常见场景：
+
+1. **自定义原子计数器**
+
+   ```java
+   class MyAtomicCounter {
+       private volatile int value = 0;
+       private static final Unsafe unsafe = ...;
+       private static final long valueOffset = ...;
+   
+       public void increment() {
+           int oldValue;
+           do {
+               oldValue = value;
+           } while (!unsafe.compareAndSwapInt(this, valueOffset, oldValue, oldValue + 1));
+       }
+   
+       public int get() {
+           return value;
+       }
+   }
+   ```
+
+   用 CAS 循环实现线程安全自增。
+
+2. **无锁队列 / 栈**
+
+   - 常用 CAS 更新头节点或尾节点，避免加锁；
+   - 典型实现：`ConcurrentLinkedQueue`。
+
+3. **乐观锁机制**
+
+   - 在业务场景（如数据库版本号控制）里，也可以用 CAS 思想：比较版本号是否一致，一致才更新，否则重试。
 
 
 
@@ -1457,29 +1495,32 @@ LongAdder 引入了分段累加的概念，内部一共有两个参数参与计�
 
 
 
-
-
 ## 五、并发工具类（同步辅助）🛠️ 
 
 ### 🎯 AQS 原理分析
 
-> AQS 是 JUC 的核心框架，其原理可概括为：
+> AQS，全称 **AbstractQueuedSynchronizer**，是 JUC 包里并发工具类的核心基础框架。
 >
-> 1. **状态管理**：通过 `volatile int state` 和 CAS 操作保证原子性。
-> 2. **队列设计**：CLH 变体双向链表，管理等待线程。
+> 其原理可概括为：
+>
+> 1. **状态管理**：内部维护一个 **volatile 的 state 状态变量**，通过 **CAS 操作**保证修改的原子性。
+> 2. **队列设计**：使用一个 **FIFO 的双向队列（CLH 队列）**，管理等待线程。
+>
+>    当线程尝试获取资源失败时，会进入队列并被 `LockSupport.park()` 挂起，等待被唤醒。
+>
+>    释放资源时，会通过 CAS 修改 state 并唤醒队列中的下一个线程。
 > 3. **模板方法**：子类通过重写 `tryAcquire()`/`tryRelease()` 实现独占或共享锁。
 > 4. 核心机制：
 >    - 独占模式（如 `ReentrantLock`）：线程竞争失败则入队阻塞。
 >    - 共享模式（如 `CountDownLatch`）：允许多线程同时访问。
 > 5. **应用场景**：锁、信号量、倒计时器等同步工具的基础。
+>
+> 常见的 JUC 工具类，比如 `ReentrantLock`、`Semaphore`、`CountDownLatch`，底层都是基于 AQS 来实现的。
+>  所以 **AQS 的本质就是：用 state + CLH 队列 + CAS + LockSupport 来实现一套通用的同步器框架。**
 
 AQS的全称为（AbstractQueuedSynchronizer），这个类在 `java.util.concurrent.locks` 包下面。
 
 AQS是一个用来构建锁和同步器的框架，使用AQS能简单且高效地构造出应用广泛的大量的同步器，比如我们提到的ReentrantLock，Semaphore，其他的诸如ReentrantReadWriteLock，SynchronousQueue，FutureTask 等等皆是基于 AQS 的。当然，我们自己也能利用 AQS 非常轻松容易地构造出符合我们自己需求的同步器。
-
-AQS 是 Java 并发包（JUC）的核心框架，用于构建锁（如 `ReentrantLock`）和同步器（如 `CountDownLatch`）。
-
-下面大部分内容其实在AQS类注释上已经给出了，不过是英语看着比较吃力一点，感兴趣的话可以看看源码。
 
 **AQS核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。**
 
@@ -1488,6 +1529,8 @@ AQS 是 Java 并发包（JUC）的核心框架，用于构建锁（如 `Reentran
 看个 AQS(AbstractQueuedSynchronizer)原理图：
 
 ![image.png](https://blog-1300588375.cos.ap-chengdu.myqcloud.com/image_1624029202628.png)
+
+
 
 AQS 使用一个 int 成员变量来表示同步状态，通过内置的 FIFO 队列来完成获取资源线程的排队工作。AQS 使用 CAS 对该同步状态进行原子操作实现对其值的修改。
 
@@ -1567,6 +1610,38 @@ tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true�
 
 
 
+**1. 核心组成**
+
+- **state**：`volatile int state`，表示资源状态（比如锁的占用次数）。
+- **CAS 修改 state**：通过 `Unsafe.compareAndSwapInt` 保证并发更新安全。
+- **CLH 队列**：一个 **双向链表**，失败的线程会被包装成 `Node` 挂到队尾。
+- **Node 状态**：`WAITING`、`SIGNAL` 等，用于协调线程挂起和唤醒。
+
+**2. 获取资源流程（acquire）**
+
+1. 线程尝试通过 `tryAcquire()` 获取资源（由子类实现逻辑，比如独占/共享）。
+2. 如果成功，直接返回；失败就进入 CLH 队列。
+3. 在队列中会自旋判断前驱节点是否释放资源，没释放就会 `LockSupport.park()` 挂起。
+
+**3. 释放资源流程（release）**
+
+1. 线程通过 `tryRelease()` 释放资源（由子类实现）。
+2. 修改 state 成功后，会唤醒队列的下一个节点。
+3. 被唤醒的线程重新尝试获取资源。
+
+**4. 独占模式 vs 共享模式**
+
+- **独占模式**（Exclusive）：同一时刻只能一个线程获取（如 `ReentrantLock`）。
+- **共享模式**（Shared）：同一时刻可以有多个线程获取（如 `Semaphore`、`CountDownLatch`）。
+
+**5. 应用场景**
+
+- **ReentrantLock**：可重入锁，state 代表重入次数。
+- **CountDownLatch**：state 表示计数值，减到 0 时释放所有等待线程。
+- **Semaphore**：state 表示许可数，可以多个线程共享。
+
+
+
 ### 🎯 AQS 组件总结
 
 “AQS 衍生的同步组件可分为：
@@ -1637,9 +1712,24 @@ private void unparkSuccessor(Node node) {
 
 ### 🎯 countDownLatch/CycliBarries/Semaphore使用过吗
 
+> 我在项目里用过 JUC 提供的并发工具类，比如：
+>
+> - **CountDownLatch**：适合一次性的任务协调，我用它来让主线程等待多个子任务完成，比如同时发起多个远程请求，等都返回再做汇总。
+> - **CyclicBarrier**：适合多线程阶段性同步，我用它做过分批数据处理，比如多个线程各自处理一段数据，等都处理完再统一进入下一步。
+> - **Semaphore**：主要用于限流，我用它限制同一时间并发访问的线程数，比如防止缓存击穿时过多请求同时打到数据库。
+>
+> 这三者的区别在于：CountDownLatch 一次性、CyclicBarrier 可循环复用，而 Semaphore 更像是限流器。
+
 #### CycliBarries
 
-CycliBarries 的字面意思是可循环（cycli）使用的屏障（Barries）。它主要做的事情是，让一组线程达到一个屏障（也可以叫同步点）时被阻塞，知道最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活，线程进入屏障通过 CycliBarries 的 await() 方法。
+**作用**：让一组线程互相等待，直到都到达屏障点后再一起执行。
+
+**原理**：内部计数器递减，等到 0 时释放所有等待线程，并且可以 **重置（可循环使用）**。
+
+**场景**：
+
+- 多线程分段计算，等所有线程算完阶段结果后，再汇总结果。
+- 比如并行计算矩阵，再合并。
 
 ```java
 public class CyclieBarrierDemo {
@@ -1678,6 +1768,15 @@ public class CyclieBarrierDemo {
 
 信号量主要用于两个目的，一个是用于多个共享资源的互斥使用，另一个用于并发线程数的控制。
 
+**作用**：控制并发线程数，类似一个「许可证池」。
+
+**原理**：内部维护一个许可计数，线程调用 `acquire()` 获取许可，执行完后 `release()` 归还许可。
+
+**场景**：
+
+- 限流，比如限制同一时间最多 10 个线程访问某接口。
+- 资源池控制，比如数据库连接池。
+
 ```java
 /**
  * @description: 模拟抢车位
@@ -1713,7 +1812,19 @@ public class SemaphoreDemo {
 
 #### CountDownLatch
 
-用于等待其他线程完成操作
+> `CountDownLatch` 是一个基于 AQS（AbstractQueuedSynchronizer）的同步工具类，用来让一组线程等待其他线程完成操作。
+>  它内部维护了一个 `volatile state` 作为计数器，初始值由构造函数指定。
+>  每次调用 `countDown()` 就会让计数器减 1，当计数器减到 0 时，所有在 `await()` 上等待的线程都会被唤醒继续执行。
+>  常见场景是：主线程等待多个子任务执行完毕再继续，或者控制某些线程必须等到某个条件完成后才能执行。
+
+**作用**：一个或多个线程等待其他线程完成操作。
+
+**原理**：内部维护一个计数器，调用 `countDown()` 会让计数器减 1，减到 0 时所有 `await()` 的线程会被唤醒。
+
+**场景**：
+
+- 主线程等待多个子线程执行完再汇总结果。
+- 模拟并发请求，等待多个任务都准备好再一起执行。
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/Cgq2xl5h8oSAKLBQAABld2EcD7Q385.png)
 
@@ -1928,16 +2039,22 @@ public ThreadPoolExecutor(int corePoolSize,
 
 因此，第26个任务将由新创建的线程（非核心线程）来处理。
 
+- **第 31 个任务**（扩展分析）：
+  - 此时已创建 5 个核心线程 + 5 个非核心线程（达最大线程数 10）
+  - 队列已填满 20 个任务
+  - 第 31 个任务会触发拒绝策略（默认抛出 RejectedExecutionException）
+
 **问题3：队列任务的取出顺序**
 
 Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务队列，这个队列是一个先进先出（FIFO）的队列。因此，当任务队列中的任务被取出执行时，是从队列头部取出。
 
 **问题4：核心线程和非核心线程执行结束后，谁先执行队列里的任务？**
 
-在 `ThreadPoolExecutor` 中，当核心线程和非核心线程执行完任务后，如果队列中有等待的任务，以下是任务执行的顺序：
+核心线程与非核心线程在执行完当前任务后，获取队列任务的机制是相同的：
 
-1. 如果核心线程有空闲，则由核心线程优先从队列头部取任务执行。
-2. 如果没有空闲的核心线程，而有空闲的非核心线程，则由非核心线程从队列头部取任务执行。
+- 两者都会从队列**头部**获取下一个任务执行
+- 线程池不区分核心线程和非核心线程的任务优先级
+- 非核心线程在空闲时间超过 keepAliveTime 后会被销毁，而核心线程默认会一直存活（可通过 allowCoreThreadTimeOut 参数修改）
 
 换句话说，线程池会尽量保持核心线程忙碌，并优先使用核心线程来处理任务。当核心线程忙碌时，非核心线程才会处理队列中的任务。
 
@@ -1956,28 +2073,28 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
 我们以**`AbstractExecutorService`**接口中的一个 `submit` 方法为例子来看看源代码：
 
 ```java
-    public Future<?> submit(Runnable task) {
-        if (task == null) throw new NullPointerException();
-        RunnableFuture<Void> ftask = newTaskFor(task, null);
-        execute(ftask);
-        return ftask;
-    }
+public Future<?> submit(Runnable task) {
+    if (task == null) throw new NullPointerException();
+    RunnableFuture<Void> ftask = newTaskFor(task, null);
+    execute(ftask);
+    return ftask;
+}
 ```
 
 上面方法调用的 `newTaskFor` 方法返回了一个 `FutureTask` 对象。
 
 ```java
-    protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-        return new FutureTask<T>(runnable, value);
-    }
+protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+    return new FutureTask<T>(runnable, value);
+}
 ```
 
 我们再来看看`execute()`方法：
 
 ```java
-    public void execute(Runnable command) {
-      ...
-    }
+public void execute(Runnable command) {
+  ...
+}
 ```
 
 
@@ -2199,9 +2316,7 @@ Java 中的 `ThreadPoolExecutor` 默认使用 `LinkedBlockingQueue` 作为任务
    
    ```
 
-
-
-
+------
 
 
 
@@ -2353,7 +2468,7 @@ Happen-before 关系，是 Java 内存模型中保证多线程操作可见性的
 
 前面我一直用 happen-before，而不是简单说前后，是因为它不仅仅是对执行时间的保证，也包括对内存读、写操作顺序的保证。仅仅是时钟顺序上的先后，并不能保证线程交互的可见性。
 
-
+------
 
 
 
@@ -2372,22 +2487,34 @@ Happen-before 关系，是 Java 内存模型中保证多线程操作可见性的
 
 ### 🎯 ConcurrentHashMap？
 
-ConcurrentHashMap 是 Java 中的一个**线程安全且高效的HashMap实现**。平时涉及高并发如果要用map结构，那第一时间想到的就是它。相对于hashmap来说，ConcurrentHashMap就是线程安全的map，其中利用了锁分段的思想提高了并发度。
+**1. 为什么需要它？**
 
-那么它到底是如何实现线程安全的？
+- `HashMap` 在多线程下不安全，可能导致死循环、数据丢失。
+- `Hashtable` 虽然线程安全，但用 **synchronized 修饰整张表**，并发性能差。
+- `ConcurrentHashMap` 是 **线程安全、高性能** 的 HashMap 实现。
 
-JDK 1.6版本关键要素：
+**2. JDK1.7 实现**
 
-- segment继承了ReentrantLock充当锁的角色，为每一个segment提供了线程安全的保障；
-- segment维护了哈希散列表的若干个桶，每个桶由HashEntry构成的链表。
+- 采用 **分段锁（Segment）** 思想。
+- 整个 Map 分为若干个 Segment，每个 Segment 内部是一个小的 HashMap，操作时只锁住对应 Segment。
+- **优点**：并发度高（默认 16），多个线程可同时访问不同 Segment。
+- **缺点**：内存浪费，结构复杂。
 
-JDK1.8后，ConcurrentHashMap抛弃了原有的**Segment 分段锁，而采用了 CAS + synchronized 来保证并发安全性**。
+**3. JDK1.8 实现（核心）**
 
-##### ConcurrentHashMap 的并发度是什么？
+- **去掉分段锁，改用 CAS + synchronized 锁粒度缩小到桶（Node）级别**。
+- 底层依然是 **数组 + 链表/红黑树**。
+- **插入过程 put()**：
+  1. 用 CAS 尝试放置新节点，如果位置为空，直接成功。
+  2. 如果失败（位置有冲突），用 synchronized 锁住链表/树的头节点。
+  3. 链表长度 > 8 时转为红黑树，提高查找效率。
+- **扩容**：多线程协作扩容，线程安全，性能更高。
 
-ConcurrentHashMap 把实际 map 划分成若干部分来实现它的可扩展性和线程安全。这种划分是使用并发度获得的，它是 ConcurrentHashMap 类构造函数的一个可选参数，默认值为 16，这样在多线程情况下就能避免争用。
+**4. 特点**
 
-在 JDK8 后，它摒弃了 Segment（锁段）的概念，而是启用了一种全新的方式实现,利用 CAS 算法。同时加入了更多的辅助变量来提高并发度
+- 读操作基本无锁（volatile + CAS 保证可见性）。
+- 写操作用 synchronized，锁粒度小（桶级），不会阻塞全表。
+- 适合 **高并发场景下的缓存、计数器** 等。
 
 
 
@@ -2609,25 +2736,52 @@ public class ConcurrentLinkedQueue<E> extends AbstractQueue<E>
 
 > 比如有两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么ThreadLocal就是用来避免这两个线程竞争的。
 
+> `ThreadLocal` 是 JDK 提供的一种线程本地变量，它为每个线程都维护了一份独立的副本，线程之间互不干扰。
+>  它的典型应用场景包括：
+>
+> - **保存用户会话信息**（如用户 ID、请求上下文）
+> - **数据库连接、Session 管理**（避免频繁传参）
+> - **日期格式化器**（如 `SimpleDateFormat` 线程不安全，可以用 ThreadLocal 保存每线程独立实例）
+>
+> 需要注意：
+>
+> - `ThreadLocal` 不是用来解决共享变量的并发问题，而是让变量在 **当前线程独享**。
+> - 使用后要注意 **内存泄漏风险**，尤其在线程池环境下，使用完需要调用 `remove()`。
+
 ThreadLocal 是 Java 提供的一个线程局部变量工具类，它允许我们创建只能被同一个线程读写的变量。ThreadLocal 提供了线程安全的共享变量，每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。
 
-原理： ThreadLocal 实际上是与线程绑定的一个映射，每个线程都拥有自己的 ThreadLocalMap，其中存储了以 ThreadLocal 对象为键、线程私有数据为值的键值对。
+**1. 基本原理**
 
-主要特点：
+- 每个线程内部有一个 `ThreadLocalMap`，类似一个以 `ThreadLocal` 对象为 key 的哈希表。
+- 当调用 `threadLocal.set(value)` 时，实际上是把 `value` 存入当前线程的 `ThreadLocalMap`。
+- `threadLocal.get()` 会从当前线程的 `ThreadLocalMap` 中取值。
+- 这样每个线程访问到的值，都是独立副本，互不影响。
 
-1. 线程隔离：每个线程都有自己的独立副本。
-2. 数据隐藏：ThreadLocal 中的数据只能被特定线程访问。
-3. 减少同步：由于变量是线程私有的，所以不需要额外的同步。
+**2. 重要特点**
 
-使用场景：
+- **线程隔离**：每个线程有自己的副本，不会出现并发修改冲突。
+- **生命周期**：绑定在线程上，线程结束后才会释放。
+- **内存泄漏问题**：
+  - `ThreadLocalMap` 的 key 是 `ThreadLocal` 的弱引用，value 是强引用。
+  - 如果 ThreadLocal 对象被回收了，而线程还活着，value 可能会泄漏。
+  - 因此建议手动调用 `remove()` 清理。
 
-1. 线程安全的单例模式： 在多线程环境下，可以使用 ThreadLocal 来实现线程安全的单例模式，每个线程都持有对象的一个副本。
-2. 存储用户身份信息： 在 Web 应用中，可以使用 ThreadLocal 来存储用户的登录信息或 Session 信息，使得这些信息在同一线程的不同方法中都可以访问，而不需要显式地传递参数。
-3. 数据库连接管理： 在某些数据库连接池的实现中，可以使用 ThreadLocal 来存储当前线程持有的数据库连接，确保事务中使用的是同一个连接。
-4. 解决线程安全问题： 在一些非线程安全的工具类中（如 SimpleDateFormat），可以使用 ThreadLocal 来为每个线程创建一个独立的实例，避免并发问题。
-5. 跨函数传递数据： 当某些数据需要在同一线程的多个方法中传递，但又不适合作为方法参数时，可以考虑使用 ThreadLocal。
-6. 全局存储线程内数据： 在一些复杂的系统中，可能需要在线程的整个生命周期内存储一些数据，ThreadLocal 提供了一种优雅的解决方案。
-7. 性能优化： 在一些需要频繁创建和销毁对象的场景，可以使用 ThreadLocal 来重用这些对象，减少创建和销毁的开销。
+**3. 常见使用场景**
+
+- **Web 开发**：存储用户信息、请求上下文，避免参数层层传递。
+- **数据库操作**：为每个线程维护独立的数据库连接或事务对象。
+- **工具类**：比如 `SimpleDateFormat`、`NumberFormat` 等非线程安全类的实例。
+- **日志跟踪**：在链路调用中保存 traceId，方便日志打印与追踪。
+
+> 使用场景：
+>
+> 1. 线程安全的单例模式： 在多线程环境下，可以使用 ThreadLocal 来实现线程安全的单例模式，每个线程都持有对象的一个副本。
+> 2. 存储用户身份信息： 在 Web 应用中，可以使用 ThreadLocal 来存储用户的登录信息或 Session 信息，使得这些信息在同一线程的不同方法中都可以访问，而不需要显式地传递参数。
+> 3. 数据库连接管理： 在某些数据库连接池的实现中，可以使用 ThreadLocal 来存储当前线程持有的数据库连接，确保事务中使用的是同一个连接。
+> 4. 解决线程安全问题： 在一些非线程安全的工具类中（如 SimpleDateFormat），可以使用 ThreadLocal 来为每个线程创建一个独立的实例，避免并发问题。
+> 5. 跨函数传递数据： 当某些数据需要在同一线程的多个方法中传递，但又不适合作为方法参数时，可以考虑使用 ThreadLocal。
+> 6. 全局存储线程内数据： 在一些复杂的系统中，可能需要在线程的整个生命周期内存储一些数据，ThreadLocal 提供了一种优雅的解决方案。
+> 7. 性能优化： 在一些需要频繁创建和销毁对象的场景，可以使用 ThreadLocal 来重用这些对象，减少创建和销毁的开销。
 
 
 
@@ -2640,6 +2794,11 @@ ThreadLocal 是 Java 提供的一个线程局部变量工具类，它允许我�
 如果我们把放到 ThreadLocal 中的资源用 static 修饰，让它变成一个共享资源的话，那么即便使用了 ThreadLocal，同样也会有线程安全问题
 
 ### 🎯 ThreadLocal原理？
+
+> ThreadLocal 的核心是为每个线程维护一份独立的变量副本，实现线程隔离。
+>  实现原理是：每个 Thread 内部都有一个 ThreadLocalMap，存放以 ThreadLocal 实例为 key、具体值为 value 的数据。我们调用 set/get，其实就是往当前线程的 ThreadLocalMap 存取数据。
+>  这样同一个 ThreadLocal 在不同线程里查到的数据互不干扰，从而避免了线程安全问题。
+>  值得注意的是，ThreadLocalMap 的 key 是弱引用，如果没有及时调用 remove 清理，在使用线程池时容易导致内存泄漏，这是 ThreadLocal 使用上的一个坑。
 
 当使用 ThreadLocal 维护变量时，其为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立的改变自己的副本，而不会影响其他线程对应的副本。
 
@@ -2721,17 +2880,48 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 
 
-### 🎯 ThreadLocalMap的enrty的key为什么要设置成弱引用
+### 🎯 ThreadLocalMap 的 Entry 为什么 key 用弱引用，而 value 却是强引用？
 
-将Entry的Key设置成弱引用，在配合线程池使用的情况下可能会有内存泄露的风险。之设计成弱引用的目的是为了更好地对ThreadLocal进行回收，当我们在代码中将ThreadLocal的强引用置为null后，这时候Entry中的ThreadLocal理应被回收了，但是如果Entry的key被设置成强引用则该ThreadLocal就不能被回收，这就是将其设置成弱引用的目的。
+> ThreadLocalMap 的 key 用弱引用是为了避免 ThreadLocal 对象本身无法被回收，特别是在线程池里，否则会造成严重内存泄漏。而 value 用强引用是因为它承载业务数据，必须保证线程生命周期内数据可用。如果 value 也设成弱引用，可能在 GC 时被提前回收，导致业务逻辑拿不到数据。不过这种设计也带来了隐患：当 key 被 GC 回收后，value 仍然强引用存在，形成内存泄漏，所以正确的使用姿势是用完 ThreadLocal 后调用 remove()。
 
+**ThreadLocalMap 的 Entry 设计**
 
+在 `ThreadLocalMap` 里，`Entry` 的定义大致是这样的：
 
-**弱引用介绍：**
+```java
+static class Entry extends WeakReference<ThreadLocal<?>> {
+    Object value;
+    Entry(ThreadLocal<?> k, Object v) {
+        super(k);
+        value = v;
+    }
+}
+```
 
-> 如果一个对象只具有弱引用，那就类似于**可有可无的生活用品**。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。
->
-> 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。
+也就是说：
+
+- **key（ThreadLocal 对象）** → 弱引用
+- **value（实际存储的对象）** → 强引用
+
+**为什么 key 是弱引用？**
+
+1. **避免内存泄漏**
+   - 如果 key 是强引用，即使业务代码不再持有 `ThreadLocal` 对象，Map 里的引用仍然会让它无法被 GC 回收。
+   - 设置成 **弱引用**，只要外部不再持有 ThreadLocal 对象，GC 就可以回收 key。
+2. **线程池场景下更重要**
+   - 线程池里的线程不会销毁，它们持有的 `ThreadLocalMap` 生命周期往往很长。
+   - 如果 key 是强引用，会导致 key 和 value 一直存活，造成严重内存泄漏。
+
+**为什么 value 是强引用？**
+
+1. **存储的业务数据需要正常使用**
+   - value 一般是我们真正要存的数据，比如用户信息、事务上下文。
+   - 如果也用弱引用，GC 会在内存紧张时随时回收，业务代码再去 `get()` 时可能直接拿不到值，违背了 ThreadLocal 的设计初衷。
+2. **避免数据过早丢失**
+   - ThreadLocal 的设计目标是“为线程保存变量副本”。
+   - 如果 value 也弱引用，那存进去的数据没法保证生命周期，会让 ThreadLocal 失去意义。
+
+------
 
 
 
@@ -2739,7 +2929,25 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 ### 🎯 什么是 ForkJoinPool？它与传统的线程池有什么区别？
 
-ForkJoinPool 是 Java 并行计算框架中的一部分，主要用于执行大规模并行任务。它基于分而治之（divide-and-conquer）策略，将大任务分解成若干小任务，并行执行后合并结果。与传统的线程池（如 `ThreadPoolExecutor`）不同，ForkJoinPool 设计为处理任务的递归分解和合并，具有更高的吞吐量和效率。
+**什么是 ForkJoinPool？**
+
+- **ForkJoinPool** 是 JDK7 引入的 **并行任务执行框架**，属于 `java.util.concurrent` 包。
+- 适合执行 **递归拆分的大任务**：
+  - **Fork（分治）**：把大任务拆分成多个小任务。
+  - **Join（合并）**：把多个子任务的结果合并，形成最终结果。
+- 底层使用 **工作窃取算法（Work-Stealing）**：
+  - 每个线程维护一个双端队列，优先处理自己的任务。
+  - 空闲时会“窃取”其他线程队列尾部的任务，提高 CPU 利用率。
+
+👉 使用场景：**大任务拆小任务、递归计算、并行数据处理**（比如数组求和、分治排序）。
+
+| 特性         | 传统线程池（ThreadPoolExecutor）   | ForkJoinPool                            |
+| ------------ | ---------------------------------- | --------------------------------------- |
+| **设计目标** | 执行一批独立的、互不依赖的任务     | 递归分治的大任务，结果需要合并          |
+| **任务拆分** | 提交 Runnable/Callable，不支持拆分 | 支持 Fork（拆分）和 Join（合并）        |
+| **队列模型** | 任务队列，线程从队列取任务         | 每个线程一个双端队列，支持工作窃取      |
+| **执行模式** | 通常 FIFO 执行                     | 支持 LIFO（自己队列）+ FIFO（窃取队列） |
+| **适用场景** | Web 请求、异步任务、并发控制       | 大规模计算任务，CPU 密集型              |
 
 ### 🎯 ForkJoinPool 的工作原理是什么？
 
@@ -2872,15 +3080,152 @@ ForkJoinPool 通过任务窃取和任务分解来避免死锁。工作线程在�
 
 
 
-### 🎯 CompletableFuture
+### 🎯 CompletableFuture?
 
-`CompletableFuture` 是 Java 8 引入的一种用于异步编程的类，它实现了 `Future` 和 `CompletionStage` 接口，提供了多种方法来进行异步计算、处理计算结果和错误处理。它不仅可以用来代表一个异步计算的结果，还可以通过多个方法组合多个异步操作，使得编写复杂的异步流变得更加简洁和易读。
+> `CompletableFuture` 是 JDK 1.8 引入的一个异步编程工具类，它在 `Future` 的基础上增强了功能：
+>
+> 1. 可以主动完成（complete），不只是被动等待；
+> 2. 支持链式调用（如 thenApply、thenAccept、thenCompose），让异步任务像“流”一样组合；
+> 3. 支持并行计算（allOf、anyOf 等），方便多个任务聚合；
+> 4. 支持异常处理（exceptionally、handle），更健壮。
+>
+> 它常用于 **异步调用、并行任务调度、提升系统吞吐** 的场景。
 
-1. **异步计算**：支持异步任务的执行，非阻塞地获取结果。
-2. **任务组合**：提供了丰富的 API 来组合多个异步任务。
-3. **结果处理**：可以在异步任务完成后处理结果。
-4. **异常处理**：提供了多种方法来处理异步任务中的异常。
-5. **手动完成**：可以手动完成（`complete`）异步任务。
+CompletableFuture 是 Java 8 引入的异步编程工具，它在 Future 基础上增强了异步任务的编排能力，支持链式调用、组合多个异步任务、异常处理等功能。通过 CompletableFuture，我们可以更优雅地处理异步操作，避免 Future.get () 的阻塞问题，实现非阻塞的异步编程，大幅提升代码可读性和并发处理效率。
+
+**1. CompletableFuture 的核心特性**
+
+CompletableFuture 实现了 Future 和 CompletionStage 接口，相比传统 Future 具有以下优势：
+
+- 支持链式调用，可将多个异步操作串联起来
+- 提供丰富的组合方法，能并行或串行组合多个 CompletableFuture
+- 内置异常处理机制，无需 try-catch 包裹
+- 可主动完成任务（complete ()/completeExceptionally ()）
+- 支持非阻塞回调，避免阻塞等待
+
+**2. 基本使用方式**
+
+**（1）创建 CompletableFuture**
+
+```java
+// 1. 立即完成的CompletableFuture
+CompletableFuture<String> completedFuture = CompletableFuture.completedFuture("Hello");
+
+// 2. 异步执行Runnable（无返回值）
+CompletableFuture<Void> runAsyncFuture = CompletableFuture.runAsync(() -> {
+    // 执行异步任务
+    System.out.println("异步执行Runnable");
+});
+
+// 3. 异步执行Supplier（有返回值）
+CompletableFuture<String> supplyAsyncFuture = CompletableFuture.supplyAsync(() -> {
+    // 执行异步任务并返回结果
+    return "异步执行Supplier的结果";
+});
+```
+
+默认使用 ForkJoinPool.commonPool ()，也可指定自定义线程池：
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(5);
+CompletableFuture<String> customPoolFuture = CompletableFuture.supplyAsync(() -> {
+    return "使用自定义线程池";
+}, executor);
+```
+
+**（2）链式操作**
+
+通过 thenApply ()、thenAccept ()、thenRun () 等方法实现链式调用：
+
+```java
+CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> "Hello")
+    // 对结果进行转换（有返回值）
+    .thenApply(s -> s + " World")
+    // 消费结果（无返回值）
+    .thenAccept(s -> System.out.println("结果：" + s))
+    // 执行后续操作（无输入无输出）
+    .thenRun(() -> System.out.println("链式操作完成"));
+```
+
+**（3）组合多个异步任务**
+
+- 并行执行，都完成后处理结果：
+
+```java
+CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> "任务1结果");
+CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> "任务2结果");
+
+// 两个任务都完成后，组合结果
+CompletableFuture<String> combinedFuture = future1.thenCombine(future2, 
+    (result1, result2) -> result1 + " + " + result2);
+```
+
+- 取第一个完成的任务结果：
+
+```java
+CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> {
+    try { Thread.sleep(100); } catch (InterruptedException e) {}
+    return "任务3";
+});
+
+CompletableFuture<String> future4 = CompletableFuture.supplyAsync(() -> {
+    try { Thread.sleep(50); } catch (InterruptedException e) {}
+    return "任务4";
+});
+
+// 取先完成的任务结果
+CompletableFuture<Object> firstCompleted = CompletableFuture.anyOf(future3, future4);
+```
+
+**（4）异常处理**
+
+```java
+CompletableFuture<String> exceptionFuture = CompletableFuture.supplyAsync(() -> {
+    if (true) {
+        throw new RuntimeException("任务执行失败");
+    }
+    return "正常结果";
+})
+// 异常处理（类似try-catch）
+.exceptionally(ex -> {
+    System.out.println("捕获异常：" + ex.getMessage());
+    return "默认结果";
+})
+// 无论成功失败都会执行（类似finally）
+.whenComplete((result, ex) -> {
+    if (ex == null) {
+        System.out.println("执行成功，结果：" + result);
+    } else {
+        System.out.println("执行失败，异常：" + ex.getMessage());
+    }
+});
+```
+
+**3. 常用核心方法分类**
+
+| 方法类型 | 常用方法                        | 作用                             |
+| -------- | ------------------------------- | -------------------------------- |
+| 转换     | thenApply(), thenApplyAsync()   | 对前一个任务的结果进行转换       |
+| 消费     | thenAccept(), thenAcceptAsync() | 消费前一个任务的结果，无返回值   |
+| 执行     | thenRun(), thenRunAsync()       | 前一个任务完成后执行，无输入输出 |
+| 组合     | thenCombine(), allOf(), anyOf() | 组合多个 CompletableFuture       |
+| 异常     | exceptionally(), whenComplete() | 处理异常或最终操作               |
+
+**4. 实际应用场景**
+
+- **异步接口调用**：并行调用多个外部接口，汇总结果
+- **任务拆分**：将复杂任务拆分为多个子任务并行执行，提高效率
+- **非阻塞 IO**：配合 NIO 实现高效的 IO 操作
+- **事件驱动编程**：基于回调的事件处理机制
+
+**5. 注意事项**
+
+- **线程池管理**：避免过度使用默认线程池，高并发场景建议使用自定义线程池
+- **内存泄漏**：长时间未完成的 CompletableFuture 可能导致内存泄漏
+- **异常传播**：链式操作中异常会向后传播，需合理设置异常处理
+- **阻塞问题**：get () 和 join () 方法会阻塞当前线程，尽量使用非阻塞回调
+
+CompletableFuture 极大地简化了 Java 异步编程，通过其丰富的 API 可以灵活地处理各种异步场景，是现代 Java 并发编程中不可或缺的工具。相比传统的 Future 和线程池组合，它能写出更简洁、更易维护的异步代码。
 
 
 
@@ -3028,7 +3373,7 @@ windows上面用任务管理器看，linux下可以用 top 这个工具看。
 4. 多用并发容器，少用同步容器。
     如果下一次你需要用到 map，你应该首先想到用 ConcurrentHashMap。
 
-
+------
 
 
 

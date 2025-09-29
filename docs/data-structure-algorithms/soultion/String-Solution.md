@@ -133,18 +133,17 @@ public int strStr(String haystack, String needle) {
 - **字符变换**："原地修改要小心，额外空间换时间"
 
 
-## 📚 字符串题目分类体系
 
-### 📋 正确分类索引（热题100完整版）
+### 📋 正确分类索引
 
-1. **🔥 双指针基础类**：验证回文串、反转字符串、反转字符串中的单词、最长回文子串
-2. **🪟 滑动窗口类**：无重复字符的最长子串、最小覆盖子串、长度最小的子数组、找到字符串中所有字母异位词
-3. **📊 字符统计类**：有效的字母异位词、字母异位词分组、赎金信、第一个不重复的字符
-4. **🔍 模式匹配类**：实现strStr()、重复的子字符串、字符串匹配、正则表达式匹配
-5. **🌀 回文专题类**：回文子串、最长回文子串、回文链表、分割回文串
-6. **🎯 动态规划类**：最长公共子序列、编辑距离、不同的子序列、交错字符串
-7. **🔄 字符串变换类**：整数转换、字符串转换整数、字符串相加、字符串相乘
-8. **🚀 进阶技巧类**：最短回文串、复原IP地址、有效的括号、电话号码的字母组合、串联所有单词的子串
+1. **🔥 双指针基础类**：[验证回文串](#_125-验证回文串)、[反转字符串](#_344-反转字符串)、[反转字符串中的单词](#_151-反转字符串中的单词)、[最长回文子串](#_5-最长回文子串)
+2. **🪟 滑动窗口类**：[无重复字符的最长子串](#_3-无重复字符的最长子串)、[最小覆盖子串](#_76-最小覆盖子串)、长度最小的子数组、[找到字符串中所有字母异位词](#_438-找到字符串中所有字母异位词)
+3. **📊 字符统计类**：[有效的字母异位词](#_242-有效的字母异位词)、[字母异位词分组](#_49-字母异位词分组)、赎金信、第一个不重复的字符
+4. **🔍 模式匹配类**：[实现strStr()](#_28-找出字符串中第一个匹配项的下标)、重复的子字符串、字符串匹配、正则表达式匹配
+5. **🌀 回文专题类**：[回文子串](#_647-回文子串)、[最长回文子串](#_5-最长回文子串)、回文链表、分割回文串
+6. **🎯 动态规划类**：[最长公共子序列](#_1143-最长公共子序列)、[编辑距离](#_72-编辑距离)、不同的子序列、交错字符串
+7. **🔄 字符串变换类**：整数转换、[字符串转换整数(atoi)](#_8-字符串转换整数-atoi)、字符串相加、字符串相乘
+8. **🚀 进阶技巧类**：[最短回文串](#_214-最短回文串)、[复原IP地址](#_93-复原ip地址)、[有效的括号](#_20-有效的括号)、[电话号码的字母组合](#_17-电话号码的字母组合)、串联所有单词的子串
 
 ---
 
@@ -156,7 +155,7 @@ public int strStr(String haystack, String needle) {
 - **快慢指针**：不同速度遍历处理
 - **滑动窗口**：动态调整窗口大小
 
-### [125. 验证回文串](https://leetcode.cn/problems/valid-palindrome/) ⭐⭐⭐⭐
+### [125. 验证回文串](https://leetcode.cn/problems/valid-palindrome/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：双指针入门**
 
@@ -209,7 +208,7 @@ public boolean isPalindrome(String s) {
 - **时间复杂度**：O(n) - 遍历字符串一次
 - **空间复杂度**：O(1) - 只使用常数个变量
 
-### [344. 反转字符串](https://leetcode.cn/problems/reverse-string/) ⭐⭐⭐
+### [344. 反转字符串](https://leetcode.cn/problems/reverse-string/)
 
 **🎯 考察频率：高 | 难度：简单 | 重要性：原地操作基础**
 
@@ -245,7 +244,7 @@ public void reverseString(char[] s) {
 - **时间复杂度**：O(n) - 遍历一半字符
 - **空间复杂度**：O(1) - 原地操作
 
-### [151. 反转字符串中的单词](https://leetcode.cn/problems/reverse-words-in-a-string/) ⭐⭐⭐⭐
+### [151. 反转字符串中的单词](https://leetcode.cn/problems/reverse-words-in-a-string/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：字符串处理综合**
 
@@ -307,7 +306,7 @@ public String reverseWords(String s) {
 - **时间复杂度**：O(n) - 遍历字符串
 - **空间复杂度**：O(n) - 存储结果
 
-### [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/) ⭐⭐⭐⭐⭐
+### [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：回文算法经典**
 
@@ -413,7 +412,7 @@ public String longestPalindrome(String s) {
 - **窗口收缩**：不满足条件时缩小窗口
 - **窗口扩展**：满足条件时扩大窗口
 
-### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/) ⭐⭐⭐⭐⭐
+### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：滑动窗口经典**
 
@@ -482,7 +481,7 @@ public int lengthOfLongestSubstring(String s) {
 - **时间复杂度**：O(n) - 每个字符最多被访问两次
 - **空间复杂度**：O(k) - k为字符集大小
 
-### [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/) ⭐⭐⭐⭐⭐
+### [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
 
 **🎯 考察频率：极高 | 难度：困难 | 重要性：滑动窗口终极考验**
 
@@ -554,7 +553,7 @@ public String minWindow(String s, String t) {
 - **时间复杂度**：O(|s| + |t|) - 每个字符最多被访问两次
 - **空间复杂度**：O(|s| + |t|) - 哈希表存储空间
 
-### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/) ⭐⭐⭐⭐
+### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：固定窗口滑动**
 
@@ -627,7 +626,7 @@ public List<Integer> findAnagrams(String s, String p) {
 - **频次比较**：比较两个字符串的字符频次
 - **异位词判断**：相同字符不同排列
 
-### [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/) ⭐⭐⭐
+### [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：字符统计基础**
 
@@ -688,7 +687,7 @@ public boolean isAnagram(String s, String t) {
   - 时间复杂度：O(nlogn) - 排序时间
   - 空间复杂度：O(1) - 原地排序
 
-### [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/) ⭐⭐⭐⭐
+### [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：哈希表分组**
 
@@ -764,7 +763,7 @@ public List<List<String>> groupAnagrams(String[] strs) {
 - **KMP算法**：利用前缀表优化匹配
 - **滚动哈希**：哈希值快速比较
 
-### [28. 找出字符串中第一个匹配项的下标](https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/) ⭐⭐⭐⭐
+### [28. 找出字符串中第一个匹配项的下标](https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：字符串匹配经典**
 
@@ -865,7 +864,7 @@ public int strStr(String haystack, String needle) {
 - **动态规划**：子问题最优解
 - **马拉车算法**：线性时间找所有回文
 
-### [647. 回文子串](https://leetcode.cn/problems/palindromic-substrings/) ⭐⭐⭐⭐
+### [647. 回文子串](https://leetcode.cn/problems/palindromic-substrings/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：回文计数**
 
@@ -923,7 +922,7 @@ private int countPalindromes(String s, int left, int right) {
 - **状态转移**：找出递推关系
 - **边界条件**：初始化基础状态
 
-### [1143. 最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/) ⭐⭐⭐⭐⭐
+### [1143. 最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：字符串DP经典**
 
@@ -986,7 +985,7 @@ public int longestCommonSubsequence(String text1, String text2) {
 - **时间复杂度**：O(m×n) - 双重循环
 - **空间复杂度**：O(min(m,n)) - 空间优化后
 
-### [72. 编辑距离](https://leetcode.cn/problems/edit-distance/) ⭐⭐⭐⭐⭐
+### [72. 编辑距离](https://leetcode.cn/problems/edit-distance/)
 
 **🎯 考察频率：极高 | 难度：困难 | 重要性：字符串DP巅峰**
 
@@ -1043,7 +1042,7 @@ public int minDistance(String word1, String word2) {
 - **字符串运算**：模拟手工计算过程
 - **格式转换**：处理各种特殊情况
 
-### [8. 字符串转换整数 (atoi)](https://leetcode.cn/problems/string-to-integer-atoi/) ⭐⭐⭐⭐
+### [8. 字符串转换整数 (atoi)](https://leetcode.cn/problems/string-to-integer-atoi/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：边界处理考验**
 
@@ -1107,7 +1106,7 @@ public int myAtoi(String s) {
 - **复杂匹配**：多模式匹配、通配符匹配
 - **空间优化**：原地操作、滚动数组
 
-### [214. 最短回文串](https://leetcode.cn/problems/shortest-palindrome/) ⭐⭐⭐⭐⭐
+### [214. 最短回文串](https://leetcode.cn/problems/shortest-palindrome/)
 
 **🎯 考察频率：中等 | 难度：困难 | 重要性：KMP进阶应用**
 
@@ -1161,7 +1160,7 @@ private int[] buildNext(String pattern) {
 - **时间复杂度**：O(n) - KMP算法
 - **空间复杂度**：O(n) - 辅助字符串
 
-### [93. 复原IP地址](https://leetcode.cn/problems/restore-ip-addresses/) ⭐⭐⭐⭐
+### [93. 复原IP地址](https://leetcode.cn/problems/restore-ip-addresses/)
 
 **🎯 考察频率：高 | 难度：中等 | 重要性：回溯算法经典**
 
@@ -1227,7 +1226,7 @@ private boolean isValidSegment(String segment) {
 - **时间复杂度**：O(3^4) - 每段最多3种长度选择，共4段
 - **空间复杂度**：O(4) - 递归深度最多4层
 
-### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/) ⭐⭐⭐⭐
+### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)
 
 **🎯 考察频率：极高 | 难度：简单 | 重要性：栈的经典应用**
 
@@ -1297,7 +1296,7 @@ public boolean isValid(String s) {
 - **时间复杂度**：O(n) - 遍历字符串一次
 - **空间复杂度**：O(n) - 最坏情况栈存储所有左括号
 
-### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/) ⭐⭐⭐⭐
+### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
 
 **🎯 考察频率：极高 | 难度：中等 | 重要性：回溯算法基础**
 
