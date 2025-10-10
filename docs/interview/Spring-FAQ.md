@@ -172,37 +172,38 @@ IoC（Inverse of Control:控制反转）是一种**设计思想**，就是 **将
 
 在传统的编程中，程序中会有显式的代码来创建对象并管理它们的生命周期。IoC 则通过将这些控制权交给容器，让容器在适当的时机创建对象，并根据需要注入对象的依赖项。
 
-将对象之间的相互依赖关系交给 IoC 容器来管理，并由 IoC 容器完成对象的注入。这样可以很大程度上简化应用的开发，把应用从复杂的依赖关系中解放出来。 **IoC 容器就像是一个工厂一样，当我们需要创建一个对象的时候，只需要配置好配置文件/注解即可，完全不用考虑对象是如何被创建出来的。** 在实际项目中一个 Service 类可能有几百甚至上千个类作为它的底层，假如我们需要实例化这个 Service，你可能要每次都要搞清这个 Service 所有底层类的构造函数，这可能会把人逼疯。如果利用 IoC 的话，你只需要配置好，然后在需要的地方引用就行了，这大大增加了项目的可维护性且降低了开发难度。
+IoC 的核心思想是“控制权反转”——对象不再主动创建依赖，而是由容器在运行时自动注入依赖，实现代码解耦与统一管理。
 
-"IOC全称Inversion of Control，即控制反转，是Spring框架的核心思想：
+将对象之间的相互依赖关系交给 IoC 容器来管理，并由 IoC 容器完成对象的注入。这样可以很大程度上简化应用的开发，把应用从复杂的依赖关系中解放出来。 **IoC 容器就像是一个工厂一样，当我们需要创建一个对象的时候，只需要配置好配置文件/注解即可，完全不用考虑对象是如何被创建出来的。** 
 
-**传统模式 vs IOC模式**：
-
-- **传统模式**：对象主动创建和管理依赖对象（我找你）
-- **IOC模式**：对象被动接受外部注入的依赖（你找我）
-- **控制权反转**：从对象内部转移到外部容器
+> "IOC全称Inversion of Control，即控制反转，是Spring框架的核心思想：
+>
+> **传统模式 vs IOC模式**：
+>
+> - **传统模式**：对象主动创建和管理依赖对象（我找你）
+> - **IOC模式**：对象被动接受外部注入的依赖（你找我）
+> - **控制权反转**：从对象内部转移到外部容器
 
 **IoC 的实现原理**
 
-IoC 的实现方式通常有几种，其中最常见的是 **依赖注入（Dependency Injection，DI）**。
+IoC（控制反转）是一种思想，它将对象的控制权从代码中“反转”给外部容器。
+目前 IoC 的主流实现方式是 **依赖注入（Dependency Injection, DI）**。
 
-1. **依赖注入（DI）**：IoC 的实现通常是通过依赖注入来完成的。依赖注入是一种设计模式，用于将对象的依赖关系从外部传入，而不是由对象本身来创建或查找依赖的对象。
+**依赖注入（DI）** 是通过容器在创建对象时，将所需依赖自动注入到对象中的一种机制。常见注入方式包括：
 
-   - **构造器注入**：通过构造函数将依赖项传递给对象。
-   - **Setter 注入**：通过设置器方法传递依赖项。
-   - **接口注入**：对象实现某个接口，容器通过该接口提供依赖项。
+- **构造器注入**
+- **Setter 注入**
+- **字段注入**
 
-   **依赖注入（DI,Dependency Injection）是在编译阶段尚未知所需的功能是来自哪个的类的情况下，将其他对象所依赖的功能对象实例化的模式**。
+在 Spring 中，**IoC 容器**（如 `ApplicationContext`）负责管理 Bean 的生命周期、依赖注入与装配，它是 IoC 思想的具体落地载体。
 
-2. **控制反转容器**：IoC 通常通过容器来实现，容器负责对象的创建、初始化、管理生命周期，并在需要时注入依赖项。常见的 IoC 容器有 Spring（Java）、Unity（.NET）、Guice（Java）、Dagger（Java/Kotlin）等。
+此外，早期 IoC 还有“依赖查找（Dependency Lookup）”的实现方式，但由于耦合性较高，目前几乎被依赖注入完全取代。
 
 **IoC 的好处**「列举 IoC 的一些好处」
 
 - **解耦**：对象之间不需要直接依赖，可以让系统更容易扩展和维护。
 - **易于测试**：通过容器，可以方便地替换依赖项，进行单元测试时可以使用模拟对象（Mock Object）来替代真实对象。
 - **灵活性**：IoC 容器提供了配置和管理对象依赖关系的能力，可以灵活配置依赖项，而不需要改变代码。
-
-> **IoC（控制反转）** 是一种设计原则，其核心思想是将对象创建和依赖关系的管理交给外部容器来控制，避免程序内部直接创建和管理依赖对象，从而解耦系统中的各个组件。常见的 IoC 实现方式是依赖注入（DI），通过构造器注入、Setter 注入或接口注入等方式来实现对象的依赖关系注入。IoC 容器负责管理对象的生命周期和依赖注入，常见的框架如 Spring 在 Java 中就使用了 IoC 原理来实现松耦合的系统设计。IoC 可以提高系统的可测试性、可维护性和灵活性，是现代软件架构中常用的设计思想。
 
 **💻 代码示例**：
 ```java
@@ -252,6 +253,18 @@ IoC容器的主要功能包括：
 通过使用Spring IoC容器，开发者可以专注于业务逻辑的实现，而不必关心对象的创建和依赖管理，从而提高代码的可维护性、可测试性和灵活性。
 
 > “Spring IoC 容器的主要功能包括对象的创建与生命周期管理、依赖注入（DI）、自动装配、bean 的作用域管理、AOP 支持、事件机制、资源管理与外部配置集成等。通过这些功能，Spring IoC 容器使得开发者能够更加灵活、高效地管理应用中的对象和它们之间的依赖关系，从而实现解耦、提高代码的可维护性和扩展性。”
+
+
+
+### 🎯 Spring 默认是单例的，为什么选择用容器这种方式实现呢，还有别的单例实现方式，为什么不用呢
+
+> Spring 采用的是 **容器式单例（Container-managed Singleton）**，
+>  也就是在 IoC 容器中一个 Bean 只会有一个实例存在。
+>  这种方式比传统单例模式更灵活，因为对象的创建、依赖注入、生命周期管理都交给了容器，而不是写死在类中。
+>
+> 传统的懒汉、饿汉、双检锁、静态内部类虽然能实现单例，但缺乏可扩展性和可配置性，也无法支持 AOP、依赖注入、Mock 等框架特性。
+>
+> 所以 Spring 选择用容器来管理单例，这是对“单例模式”的一种**框架级实现和增强**。
 
 
 
@@ -582,44 +595,24 @@ Spring 提供了以下四种集合类的配置元素:
 
 ### 🎯 Spring Bean的生命周期是怎样的？
 
-> Spring Bean 的生命周期大致分为三部分：**创建、使用、销毁**。
->  在创建阶段，容器先通过反射实例化对象，然后进行依赖注入；
->  接着会触发一些扩展点，比如 Aware 接口的回调，以及 BeanPostProcessor 前置处理；
->  然后执行初始化方法（`afterPropertiesSet` 或 `init-method`），再经过后置处理器，Bean 才算完全可用；
->  在销毁阶段，如果实现了 `DisposableBean` 或配置了 `destroy-method`，容器会在关闭时调用这些方法，完成资源释放。
->  这个生命周期让我们有很多扩展点，可以参与 Bean 的创建和管理过程。
+“Spring Bean 的生命周期，是指一个 Bean 从被 Spring 容器创建，经过初始化，到最终被销毁的整个过程。以最常见的单例 Bean 为例，其完整生命周期可以概括为以下几个关键阶段：
 
-Spring的核心概念之一是**依赖注入（Dependency Injection, DI）和控制反转（Inversion of Control, IoC）**，这两个概念帮助管理对象的生命周期和依赖关系。
+1. **实例化（Instantiation）**：Spring 容器通过反射调用 Bean 的构造函数，创建一个 Bean 的实例。
+2. **属性赋值（Populate Properties）**：Spring 容器根据 Bean 定义，为 Bean 的属性注入值，这包括处理`@Autowired`、`@Resource`等依赖注入注解。
+3. **`Aware`接口回调**：如果 Bean 实现了`Aware`系列接口（如`BeanNameAware`, `ApplicationContextAware`），Spring 容器会调用相应的`setXxx()`方法，将容器的相关资源注入给 Bean，让 Bean 能够 “感知” 到容器环境。
+4. **`BeanPostProcessor`前置处理**：容器中所有`BeanPostProcessor`的`postProcessBeforeInitialization`方法被调用。
+5. **初始化（Initialization）**：这是 Bean 准备就绪的关键阶段，执行顺序为：
+   - 执行`@PostConstruct`注解的方法。
+   - 执行`InitializingBean`接口的`afterPropertiesSet`方法。
+   - 执行自定义的`init-method`方法。
+6. **`BeanPostProcessor`后置处理**：容器中所有`BeanPostProcessor`的`postProcessAfterInitialization`方法被调用。**AOP 的代理对象就是在这个步骤生成的**。
+7. **Bean 就绪并使用**：此时，Bean 已经完全创建好，并被放入容器中，随时可以被应用程序调用。对于单例 Bean，它会一直存在于容器中，直到容器关闭。
+8. **销毁（Destruction）**：当 Spring 容器关闭时，会销毁所有单例 Bean，执行顺序为：
+   - 执行`@PreDestroy`注解的方法。
+   - 执行`DisposableBean`接口的`destroy`方法。
+   - 执行自定义的`destroy-method`方法。
 
-在Spring中，**Bean**指的是由Spring IoC容器管理的对象。Bean的生命周期主要由以下几个阶段构成：
-
-一个 Bean 从创建到销毁，大致会经历以下步骤（假设是单例 Bean）：
-
-1. **实例化（Instantiation）**
-   - 容器通过反射调用构造方法，创建 Bean 对象。
-2. **属性赋值（Populate Properties）**
-   - IoC 容器根据 `@Autowired`、`@Value` 或 XML 配置，将依赖的 Bean 注入。
-3. **Aware 接口回调**（可选）
-   - 如果 Bean 实现了某些 `Aware` 接口，Spring 会回调：
-     - `BeanNameAware`：注入当前 Bean 的名字
-     - `BeanFactoryAware`：注入 BeanFactory
-     - `ApplicationContextAware`：注入 ApplicationContext
-4. **BeanPostProcessor 前置处理**
-   - 调用所有注册的 `BeanPostProcessor.postProcessBeforeInitialization()`
-   - 常用于 AOP 代理对象生成。
-5. **初始化（Initialization）**
-   - 如果实现了 `InitializingBean`，调用 `afterPropertiesSet()`
-   - 如果指定了 `init-method`，调用该方法。
-6. **BeanPostProcessor 后置处理**
-   - 调用所有 `BeanPostProcessor.postProcessAfterInitialization()`
-   - 此时 Bean 已经完全准备好，可以被使用。
-7. **Bean 使用阶段**
-   - 应用代码调用 Bean 的方法。
-8. **销毁（Destroy）**
-   - 容器关闭时：
-     - 调用 `DisposableBean.destroy()`
-     - 调用 `destroy-method`
-   - Bean 生命周期结束。
+这个生命周期为我们提供了丰富的扩展点，允许我们在 Bean 的不同阶段执行自定义逻辑，例如使用`@PostConstruct`进行资源加载，或利用`BeanPostProcessor`实现 AOP 等高级功能。”
 
 ```java
 @Component
@@ -1175,15 +1168,90 @@ public class ProxyFactoryDemo {
 }
 ```
 
-> | **特性**     | **JDK 动态代理**                                             | **CGLIB 动态代理**                                           |
-> | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-> | **底层技术** | 基于 Java 反射机制，通过 `Proxy` 类和 `InvocationHandler` 接口生成代理类。 | 基于 **ASM 字节码框架**，通过生成目标类的子类实现代理。      |
-> | **代理方式** | 只能代理实现了接口的类，生成接口的代理类。                   | 可代理普通类（无需接口），生成目标类的子类覆盖方法。         |
-> | **性能**     | 方法调用通过反射实现，性能较低。                             | 通过 **FastClass 机制** 直接调用方法，性能更高（以空间换时间）。 |
-> | **代码生成** | 运行时动态生成代理类的字节码。                               | 生成目标类的子类字节码，修改原始类结构。                     |
-> | **适用场景** | 代理接口实现类，适用于轻量级应用。                           | 代理无接口的类，适用于高性能需求场景（如 Spring AOP）。      |
-> | **优点**     | 1. 无需第三方库依赖；2. 代码简单易用。                       | 1. 支持代理普通类和 final 方法；2. 性能更高（FastClass 机制）。 |
-> | **缺点**     | 1. 只能代理接口；2. 反射调用性能较低。                       | 1. 生成代理类耗时较长；2. 可能破坏类封装性（如代理 final 方法需特殊处理）。 |
+### 🎯 JDK 动态代理和 CGLIB 的区别？
+
+| **特性**     | **JDK 动态代理**                                             | **CGLIB 动态代理**                                           |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **底层技术** | 基于 Java 反射机制，通过 `Proxy` 类和 `InvocationHandler` 接口生成代理类。 | 基于 **ASM 字节码框架**，通过生成目标类的子类实现代理。      |
+| **代理方式** | 只能代理实现了接口的类，生成接口的代理类。                   | 可代理普通类（无需接口），生成目标类的子类覆盖方法。         |
+| **性能**     | 方法调用通过反射实现，性能较低。                             | 通过 **FastClass 机制** 直接调用方法，性能更高（以空间换时间）。 |
+| **代码生成** | 运行时动态生成代理类的字节码。                               | 生成目标类的子类字节码，修改原始类结构。                     |
+| **适用场景** | 代理接口实现类，适用于轻量级应用。                           | 代理无接口的类，适用于高性能需求场景（如 Spring AOP）。      |
+| **优点**     | 1. 无需第三方库依赖；2. 代码简单易用。                       | 1. 支持代理普通类和 final 方法；2. 性能更高（FastClass 机制）。 |
+| **缺点**     | 1. 只能代理接口；2. 反射调用性能较低。                       | 1. 生成代理类耗时较长；2. 可能破坏类封装性（如代理 final 方法需特殊处理）。 |
+
+### 🎯 代理是在什么时候生成的？
+
+> Spring 的代理对象在 **Bean 初始化完成之后（即初始化阶段的后置处理环节）** 由 `BeanPostProcessor` 生成。
+>
+> Spring 的代理对象不是在 Bean 实例化时创建的，而是在 **初始化完成后**，由 AOP 的后置处理器（`AnnotationAwareAspectJAutoProxyCreator`）在 `postProcessAfterInitialization()` 阶段通过 JDK 动态代理或 CGLIB 生成的。
+>
+> 它会判断 Bean 是否匹配切面规则，如果匹配，就创建代理对象并放入容器，从此容器中拿到的都是这个代理对象。
+
+### 🎯 为什么同类方法调用时 AOP 不生效？
+
+简单来说，当一个 Bean 的方法 A 内部直接调用了同一个 Bean 的另一个方法 B 时，如果方法 B 上有 AOP 切面（比如`@Transactional`、`@Log`），那么这个切面在这次内部调用中**不会生效**。
+
+```java
+@Service
+public class UserService {
+
+    // 方法A
+    public void createUser(User user) {
+        // ... 一些逻辑 ...
+        // 内部调用方法B
+        this.updateUserStatus(user.getId(), "ACTIVE"); 
+        // 注意：这里的this指的是原始的目标对象，而非代理对象
+    }
+
+    // 方法B上有AOP切面（比如事务）
+    @Transactional
+    public void updateUserStatus(Long userId, String status) {
+        // ... 更新数据库 ...
+    }
+}
+```
+
+“同类方法调用 AOP 失效，根本原因在于 Spring AOP 的**代理机制**。
+
+简单来说，当一个 Bean 的方法 A 内部调用方法 B 时，它使用的是`this`指针，这个`this`指向的是**原始的目标对象**，而不是 Spring 为它创建的**代理对象**。
+
+由于 AOP 的切面逻辑（比如`@Transactional`）是织入在**代理对象**中的，所以绕过了代理，切面自然就不会生效。
+
+| 解决方案                | 核心思路                                                     | 优点                                          | 缺点                                              |
+| ----------------------- | ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------- |
+| **1. 重构代码（推荐）** | 将需要切面的逻辑拆分到另一个独立的 Bean 中，通过依赖注入调用。 | **代码清晰，解耦，符合 OOP 原则，无副作用。** | 可能需要较大的代码调整。                          |
+| **2. 自注入代理**       | 在同一个 Bean 中，注入自身的代理对象（通过`ApplicationContext`或`@Autowired`），然后用注入的对象调用方法。 | 无需修改方法签名，能快速解决问题。            | 与 Spring 框架耦合度高，可读性稍差。              |
+| **3. 使用`AopContext`** | 开启`exposeProxy = true`，然后在方法内通过`AopContext.currentProxy()`获取代理对象进行调用。 | Spring 官方解决方案，代码侵入性中等。         | 依赖`ThreadLocal`，在异步场景下有风险，可读性差。 |
+
+
+
+### 🎯 为什么@Transactional有时不生效？
+
+`@Transactional`注解的生效，依赖于 Spring 的**AOP 代理机制**和**事务管理器（TransactionManager）**。
+
+1. **AOP 代理**：当一个类被`@Transactional`注解修饰时，Spring 容器会为它创建一个**代理对象**。这个代理对象会拦截所有被`@Transactional`标记的方法。
+2. **拦截与事务管理**：当外部调用该方法时，调用请求会先到达代理对象。代理对象会在方法执行**前**，通过`TransactionManager`开启一个事务；在方法执行**后**，根据是否发生异常来决定提交（commit）或回滚（rollback）事务。
+
+我们可以推导出所有失效场景的根源：**调用流程没有经过 Spring 的代理对象，或者代理对象无法正确地管理事务。**
+
+**`@Transactional`失效场景与解决方案全解析**
+
+| 失效场景                    | 根本原因                                                     | 代码示例                                                     | 解决方案                                                     |
+| --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **1. 同类方法内部调用**     | `this`指向原始目标对象，调用绕过了 Spring 代理，导致切面无法生效。 | `java @Service public class UserService { public void createUser(User user) { // 内部调用，@Transactional失效 this.updateStatus(user.getId(), "NEW"); } @Transactional public void updateStatus(Long userId, String status) { /* ... */ } }` | **最佳实践**：将`updateStatus`方法拆分到另一个`@Service`中（如`StatusService`），在`UserService`中注入`StatusService`并调用。**备选方案**：通过`ApplicationContext`或`AopContext`获取自身的代理对象再调用。 |
+| **2. 方法非`public`**       | Spring AOP 代理（JDK/CGLIB）默认只拦截`public`方法。非`public`方法无法被代理，切面无法织入。 | `java @Service public class UserService { // private方法，@Transactional失效 @Transactional private void updateStatus(Long userId, String status) { /* ... */ } }` | 将方法的访问权限修改为`public`。                             |
+| **3. 类未被 Spring 管理**   | Spring 事务依赖 IOC 容器。未被容器管理的对象，Spring 无法为其创建代理。 | `java // 错误：忘记加@Service注解 public class UserService { @Transactional public void updateStatus(...) { /* ... */ } } // 或在代码中手动new UserService()` | 确保类上添加了`@Service`、`@Component`等注解，并通过 Spring 容器（如`@Autowired`）获取 Bean，而非手动`new`。 |
+| **4. 异常被 “吃了”**        | Spring 默认仅对未捕获的`RuntimeException`回滚。若异常被`try-catch`捕获且未重新抛出，事务会被提交。 | `java @Service public class UserService { @Transactional public void updateUser(User user) { try { // ... 更新数据库 ... int i = 1 / 0; // 发生异常 } catch (Exception e) { // 异常被捕获，事务将提交 log.error("更新失败", e); } } }` | 在`catch`块中，将异常包装成`RuntimeException`或其子类重新抛出，或直接抛出。`java catch (Exception e) { throw new RuntimeException(e); }` |
+| **5. 抛出不被回滚的异常**   | 默认不回滚受检异常（`Checked Exception`）。若方法抛出`Exception`或其子类，事务不会回滚。 | `java @Service public class UserService { // 抛出IOException，默认不回滚 @Transactional public void readFile() throws IOException { throw new IOException("文件读取失败"); } }` | 在`@Transactional`注解中，使用`rollbackFor`属性明确指定需要回滚的异常类型。`java @Transactional(rollbackFor = Exception.class)` |
+| **6. 配置了错误的回滚规则** | 显式配置了`noRollbackFor`，指定了某些异常不回滚，或`rollbackFor`配置错误。 | `java @Service public class UserService { // 即使发生RuntimeException也不回滚 @Transactional(noRollbackFor = RuntimeException.class) public void riskyOperation() { throw new RuntimeException("业务失败"); } }` | 检查并修正`rollbackFor`和`noRollbackFor`的配置，确保其符合预期的业务逻辑。 |
+| **7. 数据库引擎不支持事务** | 底层数据库的存储引擎不支持事务，如 MySQL 的`MyISAM`。        | `sql -- 表使用了不支持事务的MyISAM引擎 CREATE TABLE `user` ( `id` int NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;` | 将数据库表的存储引擎修改为支持事务的引擎，如 MySQL 的`InnoDB`。`sql ALTER TABLE `user` ENGINE=InnoDB;` |
+
+
+
+### 🎯 什么是 Introduction？
+
+Introduction 是 Spring AOP 的一种特殊功能，核心是**不修改目标类代码，通过代理动态为目标类添加新接口的实现**。它需要两个核心要素：一是通过切入点指定‘为哪些类添加’，二是通过 IntroductionInterceptor 提供‘新接口的默认实现’。与普通 AOP 通知不同，它不增强已有方法，而是扩展类的能力范围 —— 比如给 UserService 动态添加 Loggable 接口，最终代理对象既能调用原有方法，又能调用日志方法，适用于第三方类扩展、批量能力注入等无侵入场景。
 
 
 
@@ -1392,53 +1460,49 @@ Spring AOP 主要用于以下几个方面：
 
 ### 🎯 过滤器和拦截器的区别？
 
-**过滤器（Filter）**
+> Filter 是在 **Servlet 容器层** 工作的组件，属于 **JavaEE 规范**，可以过滤所有请求（包括静态资源），适合做通用的请求预处理，比如日志、编码、XSS 防御等。
+>  而 Interceptor 是在 **Spring MVC 框架层** 实现的，基于反射调用 Controller 方法前后执行，主要用于业务层面的拦截，比如登录验证、权限校验、接口耗时监控。
+>
+> 它们的执行顺序是：**Filter → Interceptor → Controller → Interceptor → Filter**。
+>  一般建议：**通用的跨项目逻辑放在 Filter，跟业务强相关的逻辑放在 Interceptor。**
 
-- 作用：过滤器主要用于对请求和响应进行预处理和后处理。它可以在请求到达 Servlet 之前和响应返回客户端之前对请求和响应进行修改。
+| 阶段            | Filter                                                       | Interceptor                                    |
+| --------------- | ------------------------------------------------------------ | ---------------------------------------------- |
+| 作用层级        | Servlet 容器层（Tomcat、Jetty）                              | SpringMVC 框架层                               |
+| 拦截范围        | 所有资源（包括静态资源、JSP、Controller）                    | 仅拦截 Controller（Handler） 请求              |
+| 执行顺序        | 请求进入 → Filter → Servlet → Controller → 响应返回 → Filter | 请求进入 → Interceptor → Controller → 返回视图 |
+| 是否依赖 Spring | ❌ 不依赖（属于 javax.servlet）                               | ✅ 依赖 Spring 容器（属于 Spring MVC）          |
+| 配置方式        | web.xml 或 @WebFilter                                        | 实现 `HandlerInterceptor` 并注册为 Spring Bean |
+| 使用场景        | 编码过滤、日志、跨域、XSS、防止SQL注入等                     | 权限校验、登录验证、接口耗时统计、业务日志     |
 
-- 使用场景
+### 🎯 有 Interceptor  还需要 filter 吗
 
-  - **请求和响应的编码转换**：例如，将所有请求和响应的编码设置为 UTF-8。
+> **需要！**
+>  因为 `Filter` 和 `Interceptor` 作用层级不同、职责不同，很多场景下它们是**互补关系**，而不是替代关系。
 
-  - **权限检查**：例如，检查用户是否已经登录，如果没有登录，则重定向到登录页面。
+ **场景 1：跨域（CORS）处理**
 
-  - **日志记录**：记录每个请求的详细信息。
+- **必须用 Filter**
+- 因为浏览器的预检请求（OPTIONS）不会进入 Spring Controller，也不会被拦截器拦到。
+- 所以要在 Filter 层统一处理跨域。
 
-  - **过滤非法请求**：例如，过滤掉一些恶意的请求。
+**场景 2：字符编码（UTF-8）统一处理**
 
-- **实现方式**
+- 过滤器层配置 `CharacterEncodingFilter`，确保所有请求响应编码一致。
+- Spring 拦截器此时还没执行，没办法控制编码。
 
-  过滤器是基于 Servlet API 的，通常需要实现 `javax.servlet.Filter` 接口，并在 web.xml 文件中配置或使用注解进行配置。
+**场景 3：请求日志与耗时统计**
 
-**拦截器（Interceptor）**
+- 如果你要统计**整个请求链路耗时**（包括静态资源、文件下载），要在 Filter 层；
+- 如果只关注 **Controller 层逻辑耗时**，可以放在 Interceptor。
 
-- **作用**：拦截器用于在请求进入控制器（Controller）之前和离开控制器之后进行处理。它主要用于处理控制器层面的逻辑，如方法调用之前的验证、方法调用之后的日志记录等。
+**场景 4：登录鉴权、权限校验**
 
-- **使用场景**：
-
-  - **权限验证**：例如，检查用户是否具有访问某个控制器方法的权限。
-
-  - **日志记录**：记录每个方法调用的详细信息。
-
-  - **事务管理**：在方法调用之前开启事务，方法调用之后提交或回滚事务。
-
-  - **数据预处理**：在方法调用之前准备数据，在方法调用之后处理返回的数据。
-
-- **实现方式**
-
-  拦截器通常与框架（如 Spring MVC）集成，使用框架提供的接口进行配置和实现。例如，在 Spring MVC 中，拦截器需要实现 `HandlerInterceptor` 接口，并在配置文件或注解中进行配置。
-
-| 特点     | 过滤器（Filter）                            | 拦截器（Interceptor）                                        |
-| -------- | ------------------------------------------- | ------------------------------------------------------------ |
-| 作用范围 | 对请求和响应进行预处理和后处理              | 对控制器方法的调用进行预处理和后处理                         |
-| 使用场景 | 请求和响应的编码转换、权限检查、日志记录等  | 权限验证、日志记录、事务管理等                               |
-| 实现方式 | 实现 `javax.servlet.Filter` 接口            | 实现框架提供的拦截器接口（如 Spring 的 `HandlerInterceptor`） |
-| 配置方式 | 配置在 web.xml 文件中或使用注解             | 配置在框架的配置文件或使用注解                               |
-| 执行时机 | 在请求到达 Servlet 之前和响应返回客户端之前 | 在控制器方法调用之前和之后                                   |
-
-
+- 适合放在 Interceptor，因为它能访问 Spring 容器 Bean，比如 Redis 用户信息、JWT 校验等。
 
 ---
+
+
 
 ## 🌐 三、Spring MVC架构
 
@@ -1562,7 +1626,46 @@ public class ScopeTestController {
 
 
 
-### 🎯 @RequestMapping注解有哪些属性？
+### 🎯 ResponseBody 是怎么生效的？
+
+`@ResponseBody` 的作用是：
+ **将 Controller 方法的返回值序列化为 HTTP 响应体（Response Body）**，而不是作为视图名称进行解析。
+
+Spring 是通过 `RequestResponseBodyMethodProcessor` 这个类完成的，它利用 `HttpMessageConverter`（如 Jackson）将对象转换为 JSON、XML 等格式，最终写入响应流。
+
+**@ResponseBody 的作用机制（通俗说明）**
+
+在没有 `@ResponseBody` 时：
+
+- Spring MVC 默认认为方法返回的是**视图名（View Name）**；
+- DispatcherServlet 会去找对应的 JSP / HTML 模板来渲染。
+
+加上 `@ResponseBody` 后：
+
+- Spring 告诉框架：“这个方法返回的不是视图名，而是数据本身”；
+- 它会跳过视图解析流程，进入 **消息转换（Message Conversion）流程**；
+- 最终将返回对象序列化后写入 `HttpServletResponse`。
+
+
+
+### 🎯 Spring MVC 全局异常处理机制？
+
+Spring MVC 全局异常处理的核心是**集中化管理异常，解耦业务与异常处理**，避免重复 `try-catch` 并保证响应格式统一。
+
+主流实现方式是 `@ControllerAdvice + @ExceptionHandler` 组合：
+
+- `@ControllerAdvice` 定义一个全局通知类，作用于所有或指定包下的 Controller；
+- `@ExceptionHandler` 标记在方法上，指定处理的异常类型（如自定义业务异常、参数校验异常）。
+
+当 Controller 抛出未捕获的异常时，异常会传递到 `DispatcherServlet`，Spring 会找到 `@ControllerAdvice` 中匹配的 `@ExceptionHandler` 方法，执行后返回统一格式的响应（如包含错误码、提示的 JSON）。
+
+此外还有两种补充方案：`@ResponseStatus` 适合异常与固定 HTTP 状态码绑定的场景（如 404 用户不存在）；`HandlerExceptionResolver` 是底层接口，适用于深度定制处理流程，但现在很少用。
+
+实际项目中，我们会用 `@ControllerAdvice` 分场景处理异常：自定义业务异常返回具体提示，参数校验异常返回字段错误信息，兜底的 `Exception` 处理器返回友好提示并记录日志，确保用户体验和问题可排查。
+
+
+
+### 🎯 @RequestMapping 注解有哪些属性？
 
 "@RequestMapping是Spring MVC最核心的注解，用于映射HTTP请求到处理方法：
 
@@ -1690,6 +1793,29 @@ public class UserController {
     }
 }
 ```
+
+
+
+### 🎯 CORS 的原理与实现方式？
+
+“CORS 是浏览器为解决同源策略限制而制定的跨域规范，核心是**服务器通过 HTTP 响应头告知浏览器允许跨域请求**，分简单请求和预检请求两种交互方式。
+
+**原理部分：**
+
+1. 简单请求（GET/POST/HEAD + 简单头）：前端直接发请求，携带 `Origin` 头；服务器返回 `Access-Control-Allow-Origin`，浏览器验证通过则放行；
+2. 预检请求（如 PUT 方法、带自定义头）：浏览器先发 OPTIONS 请求，携带 `Origin`、`Access-Control-Request-Method` 等；服务器返回 `Allow-Origin`、`Allow-Methods` 等许可头；预检通过后，再发真实业务请求。
+
+**实现方式：**
+
+核心在服务器端，以 Spring Boot 为例：
+
+- 局部用 `@CrossOrigin` 注解，对单个接口生效；
+- 全局推荐实现 `WebMvcConfigurer`，统一配置允许的源、方法、头，支持携带 Cookie；
+- 也可自定义 Filter 手动设置响应头。
+
+前端只需配合配置 `withCredentials: true`（如需携带 Cookie），其他由浏览器自动处理。
+
+关键注意点：允许携带 Cookie 时，`Allow-Origin` 不能为 `*`；预检请求需正确处理 OPTIONS 方法，避免 403 错误。
 
 
 
@@ -2445,7 +2571,7 @@ Spring Boot 提供了异常处理的多种方式，主要通过以下几种手�
 
 
 
-### 🎯spring boot 核心配置文件是什么？bootstrap.properties 和 application.properties 有何区别 ?
+### 🎯 Spring boot 核心配置文件是什么？bootstrap.properties 和 application.properties 有何区别 ?
 
 单纯做 Spring Boot 开发，可能不太容易遇到 bootstrap.properties 配置文件，但是在结合 Spring Cloud 时，这个配置就会经常遇到了，特别是在需要加载一些远程配置文件的时侯。
 
@@ -2453,6 +2579,28 @@ spring boot 核心的两个配置文件：
 
 - bootstrap (. yml 或者 . properties)：boostrap 由父 ApplicationContext 加载的，比 applicaton 优先加载，配置在应用程序上下文的引导阶段生效。一般来说我们在 Spring Cloud Config 或者 Nacos 中会用到它。且 boostrap 里面的属性不能被覆盖；
 - application (. yml 或者 . properties)： 由 ApplicatonContext 加载，用于 spring boot 项目的自动化配置。
+
+
+
+### 🎯 shutdown hook 原理？
+
+`Shutdown Hook` 是 Java 提供的一种机制，允许程序在 JVM**正常关闭**时执行一段自定义的清理代码。它的核心原理是：
+
+1. **注册**：开发者通过 `Runtime.getRuntime().addShutdownHook(new Thread(...))` 方法，将一个包含清理逻辑的线程注册到 JVM 中。
+2. **触发**：当 JVM 接收到正常关闭信号时（如`System.exit()`、`Ctrl+C`或`SIGTERM`信号），它会启动一个关闭序列。
+3. **执行**：在这个序列中，JVM 会**并发地**启动所有已注册的钩子线程，并**等待所有线程执行完毕**后，才会彻底退出。
+
+需要注意的是，钩子是并发执行的，执行顺序不确定，且它只在正常关闭时生效。在强制关闭（如`kill -9`）的情况下，钩子不会被执行。
+
+它的主要用途包括：在应用关闭前优雅地关闭数据库连接池、线程池，保存应用状态，或发送关闭通知等。
+
+当我们配置 `server.shutdown=graceful` 时，Spring Boot 会在启动时向 JVM 注册一个特殊的 Shutdown Hook。当应用收到 `SIGTERM` 信号时，JVM 会触发这个钩子，进而启动 Spring Boot 自身的关闭流程。这个流程非常强大，它会：
+
+1. 通知 Web 服务器停止接收新请求。
+2. 等待正在处理的请求完成。
+3. 按顺序销毁所有 Bean，并调用 `@PreDestroy` 方法。
+
+这远比我们手动写一个简单的 Shutdown Hook 要健壮和全面得多，它是 Spring Boot 为我们提供的一个开箱即用的企业级特性。
 
 ------
 
@@ -2899,6 +3047,34 @@ public interface UserMapper {
     List<User> findUsersWithConditions(UserQueryCondition condition);
 }
 ```
+
+
+
+### 🎯 @Transactional 是如何实现的？
+
+“`@Transactional`是通过**Spring AOP**和**事务管理器**共同实现的。
+
+首先，在 Spring 容器启动时，它会扫描到所有带有`@Transactional`注解的类，并为它们创建**代理对象**。
+
+当客户端调用代理对象的方法时，调用会被 AOP 拦截，并交给`TransactionInterceptor`（事务拦截器）处理。
+
+`TransactionInterceptor`会执行以下操作：
+
+1. 读取`@Transactional`注解中的属性，如传播行为、隔离级别等。
+2. 查找对应的`PlatformTransactionManager`。
+3. 根据传播行为，决定是创建新事务、加入现有事务还是以非事务方式执行。
+4. 调用目标方法，执行真正的业务逻辑。
+5. 根据方法执行结果（正常返回或抛出异常），决定是调用`commit()`提交事务，还是调用`rollback()`回滚事务。
+
+简单来说，它就是一个环绕在业务方法周围的、自动完成事务管理的 AOP 切面。”
+
+
+
+### 🎯 Spring 如何实现嵌套事务？
+
+"Spring 实现嵌套事务主要通过**传播行为**和**数据库保存点**。当内层方法使用`Propagation.NESTED`时，Spring 不会创建新事务，而是在当前事务中创建一个保存点。内层回滚时，只会回滚到这个保存点，不影响外层操作；而外层回滚则会导致整个事务全部回滚。
+
+这与`REQUIRES_NEW`不同，后者会创建一个完全独立的新事务，内层回滚和提交都不会影响外层事务。使用嵌套事务时，需要确保数据库支持保存点，并且内层异常被外层捕获，否则整个事务会被回滚。”
 
 
 
@@ -3590,69 +3766,15 @@ public class WebConfig implements WebMvcConfigurer {
 
 ### 🎯 @Autowired和@Resource的区别？
 
-"@Autowired和@Resource都用于依赖注入，但有重要区别：
+`@Autowired`和`@Resource`都是 Spring 中用于依赖注入的注解，但它们有几个关键区别。
 
-**@Autowired（Spring注解）**：
-- 按类型（byType）自动装配
-- 可以配合@Qualifier按名称装配
-- 可以标注在构造器、字段、方法上
-- required属性控制是否必须注入
-- Spring框架专有注解
+首先，**来源不同**。`@Autowired`是 Spring 框架自带的注解，而`@Resource`是 Java EE 规范定义的标准注解，因此`@Resource`的耦合度更低，可移植性更好。
 
-**@Resource（JSR-250标准）**：
-- 按名称（byName）自动装配
-- name属性指定Bean名称
-- type属性指定Bean类型
-- 只能标注在字段和setter方法上
-- Java标准注解，跨框架
+其次，也是最核心的区别，**默认的注入方式不同**。`@Autowired`默认  按类型（byType）**查找 Bean，而`@Resource`默认**按名称（byName） 查找 Bean。如果`@Resource`找不到名称匹配的 Bean，它会降级为按类型查找。
 
-**装配顺序**：
-- @Resource：先按名称，再按类型
-- @Autowired：先按类型，再按名称（配合@Qualifier）
+第三，**解决歧义性的方式不同**。当容器中有多个同类型的 Bean 时，`@Autowired`需要与`@Qualifier`注解结合来指定 Bean 的名称；而`@Resource`可以直接通过其`name`属性来指定，使用上更直接。
 
-**使用建议**：
-- 推荐使用@Autowired + 构造器注入
-- 需要按名称注入时使用@Qualifier
-- 跨框架兼容时考虑@Resource"
-
-**💻 代码示例**：
-```java
-@Service
-public class UserService {
-    
-    // @Autowired按类型注入
-    @Autowired
-    private UserRepository userRepository;
-    
-    // @Autowired + @Qualifier按名称注入
-    @Autowired
-    @Qualifier("cacheUserRepository")
-    private UserRepository cacheRepository;
-    
-    // @Resource按名称注入
-    @Resource(name = "jdbcUserRepository")
-    private UserRepository jdbcRepository;
-    
-    // 构造器注入（推荐）
-    private final EmailService emailService;
-    
-    @Autowired
-    public UserService(EmailService emailService) {
-        this.emailService = emailService;
-    }
-    
-    // 可选依赖注入
-    @Autowired(required = false)
-    private SmsService smsService;
-    
-    public void notifyUser(User user, String message) {
-        emailService.send(user.getEmail(), message);
-        if (smsService != null) {
-            smsService.send(user.getPhone(), message);
-        }
-    }
-}
-```
+在实际开发中，如果是纯 Spring 项目，两者都可以使用。但为了遵循 Java 标准和降低框架耦合，推荐使用`@Resource`。不过，`@Autowired`在 Spring 生态中更为常见，尤其是在构造器注入和字段注入中。
 
 
 
@@ -3856,6 +3978,26 @@ public class UserService {
 ## 🔧 九、高级特性与实践
 
 **核心理念**：Spring提供了丰富的高级特性，包括事件机制、缓存抽象、国际化支持等，助力企业级应用开发。
+
+| 模块                     | 面试问题                                           | 考察点                                                   |
+| ------------------------ | -------------------------------------------------- | -------------------------------------------------------- |
+| BeanDefinition           | Spring 是如何解析 @Bean、@Component 的？           | BeanDefinitionReader、AnnotationConfigApplicationContext |
+| refresh() 方法           | ApplicationContext 刷新流程？                      | prepare → load → instantiate → inject → finishRefresh    |
+| BeanFactoryPostProcessor | 这个接口的作用？                                   | 修改 BeanDefinition 元信息                               |
+| 环境与属性加载           | Environment、PropertySource 的作用？               | 外部化配置解析                                           |
+| Aware 接口体系           | ApplicationContextAware / BeanNameAware 有什么用？ | 让 Bean 获取容器资源                                     |
+| Spring 事件机制          | ApplicationEvent 与 Listener 的原理？              | 观察者模式                                               |
+| 延迟加载                 | @Lazy 的底层原理？                                 | CGLIB 代理 + 延迟初始化                                  |
+
+| 类型     | 题目                                            | 考察方向                                                |
+| -------- | ----------------------------------------------- | ------------------------------------------------------- |
+| 架构题   | 如何在 Spring 项目中实现插件化？                | ClassLoader + ApplicationContext 分层                   |
+| 架构题   | Spring 容器启动慢怎么优化？                     | 懒加载、Bean 预编译、减少反射                           |
+| 框架集成 | Spring 与 MyBatis 是如何整合的？                | SqlSessionTemplate、MapperFactoryBean                   |
+| 多线程   | Spring Bean 在多线程下安全吗？                  | 无状态单例安全、有状态需 ThreadLocal                    |
+| 热加载   | Spring Boot DevTools 实现原理？                 | ClassLoader 重新加载                                    |
+| 性能调优 | 如何优化 Spring Bean 初始化性能？               | 缓存反射信息、减少代理层级                              |
+| 源码理解 | ApplicationContext.refresh() 的主要阶段有哪些？ | prepare、invokeBeanFactoryPostProcessors、finishRefresh |
 
 ### 🎯 Spring的事件机制怎么使用？
 

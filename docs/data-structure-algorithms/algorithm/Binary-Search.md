@@ -330,6 +330,42 @@ public int binarySearch(int[] nums, int target, boolean findLast) {
 
 
 
+### [搜索插入位置『35』](https://leetcode.cn/problems/search-insert-position/)
+
+> 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
+>
+> ```
+> 输入: nums = [1,3,5,6], target = 2
+> 输出: 1
+> ```
+
+```java
+public int searchInsert(int[] nums, int target) {
+      int left = 0;
+      int right = nums.length - 1;
+  		//注意：特例处理
+      if (nums[left] > target) return 0;
+      if (nums[right] < target) return right + 1;
+      while (left <= right) {
+          int mid = left + (right - left) / 2;
+          if (nums[mid] > target) {
+              right = mid - 1;
+          } else if (nums[mid] < target) {
+              left = mid + 1;
+          } else {
+              return mid;
+          }
+      }
+  		//注意：这里如果没有查到，返回left,也就是需要插入的位置
+      return left;
+  }
+```
+
+**时间复杂度**：$O(log n) $，标准的二分查找时间复杂度
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
+
+
 ### [寻找旋转排序数组中的最小值『153』](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
 
 > 已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
@@ -644,62 +680,48 @@ public boolean searchMatrix(int[][] matrix, int target) {
 有序的数组，我们首先应该想到二分
 
 ```java
-  public boolean searchMatrix(int[][] matrix, int target) {
-      if (matrix == null || matrix.length < 1 || matrix[0].length < 1) {
+public boolean searchMatrix(int[][] matrix, int target) {
+      // 1. 处理边界情况：矩阵为空、行数为0、或列数为0
+      if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
           return false;
       }
-      //行，列
-      int col = matrix[0].length;
-      int row = matrix.length;
-      //从左下角开始，根据大小选择走的方向
-      int x = row - 1, y = 0;
-      while (x >= 0 && y < col) {
-          if (target == matrix[x][y]) return true;
-          else if (target > matrix[x][y]) y++;
-          else x--;
-      }
-      return false;
-  }
-```
 
-**时间复杂度**：O(m + n)，其中m是行数，n是列数，最坏情况下需要遍历m+n个元素
-**空间复杂度**：O(1)，只使用常量级别的额外空间
+      // 2. 获取矩阵的行数 m 和列数 n
+      int m = matrix.length;
+      int n = matrix[0].length;
 
+      // 3. 初始化指针，从左下角开始
+      int row = m - 1; // 行指针指向最后一行
+      int col = 0;     // 列指针指向第一列
 
+      // 4. 循环条件：行指针不能越界（>= 0），列指针不能越界（< n）
+      while (row >= 0 && col < n) {
+          // 获取当前指针指向的元素值
+          int current = matrix[row][col];
 
-### [搜索插入位置『35』](https://leetcode.cn/problems/search-insert-position/)
-
-> 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 `O(log n)` 的算法。
->
-> ```
-> 输入: nums = [1,3,5,6], target = 2
-> 输出: 1
-> ```
-
-```java
-public int searchInsert(int[] nums, int target) {
-      int left = 0;
-      int right = nums.length - 1;
-  		//注意：特例处理
-      if (nums[left] > target) return 0;
-      if (nums[right] < target) return right + 1;
-      while (left <= right) {
-          int mid = left + (right - left) / 2;
-          if (nums[mid] > target) {
-              right = mid - 1;
-          } else if (nums[mid] < target) {
-              left = mid + 1;
-          } else {
-              return mid;
+          // 5. 比较 current 与 target
+          if (current == target) {
+              // 找到了目标值，直接返回 true
+              return true;
+          } else if (current < target) {
+              // 当前值小于目标值：目标值不可能在当前行（因为行是递增的）
+              // 将列指针向右移动，去更大的区域查找
+              col++;
+          } else { // current > target
+              // 当前值大于目标值：目标值不可能在当前列（因为列是递增的）
+              // 将行指针向上移动，去更小的区域查找
+              row--;
           }
       }
-  		//注意：这里如果没有查到，返回left,也就是需要插入的位置
-      return left;
+
+      // 6. 如果循环结束仍未找到，说明目标值不存在于矩阵中
+      return false;
   }
+}
 ```
 
-**时间复杂度**：O(log n)，标准的二分查找时间复杂度
-**空间复杂度**：O(1)，只使用常量级别的额外空间
+**时间复杂度**：$O(m + n)$，其中m是行数，n是列数，最坏情况下需要遍历m+n个元素
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
 
 
 
@@ -717,23 +739,27 @@ public int searchInsert(int[] nums, int target) {
 
 **思路**：
 
-- 优先使用动态规划，时间复杂度O(n²)
-- 也可以使用二分查找优化，时间复杂度O(n log n)
-
 **动态规划解法**：
+
 ```java
 public int lengthOfLIS(int[] nums) {
     if (nums == null || nums.length == 0) return 0;
     int[] dp = new int[nums.length];
+    //初始时，每个元素自身构成一个长度为1的子序列
     Arrays.fill(dp, 1);
+    // 记录全局最长递增子序列的长度，初始为1
     int maxLen = 1;
     
     for (int i = 1; i < nums.length; i++) {
+				// 对于每个i，检查所有j < i的元素
         for (int j = 0; j < i; j++) {
+            // 如果nums[j] < nums[i]，说明nums[i]可以接在nums[j]后面
             if (nums[j] < nums[i]) {
+                // 更新dp[i]为dp[j] + 1和当前dp[i]的较大值
                 dp[i] = Math.max(dp[i], dp[j] + 1);
             }
         }
+        // 更新全局最大值
         maxLen = Math.max(maxLen, dp[i]);
     }
     return maxLen;
@@ -773,10 +799,10 @@ public int lengthOfLIS(int[] nums) {
 ```
 
 **时间复杂度**：
-- 动态规划：O(n²)
-- 二分查找优化：O(n log n)
+- 动态规划：$O(n²)$
+- 二分查找优化：$O(n log n)$
 
-**空间复杂度**：O(n)，需要额外的数组空间
+**空间复杂度**：$O(n)$，需要额外的数组空间
 
 
 
@@ -855,8 +881,9 @@ public double findMedianSortedArrays(int[] nums1, int[] nums2) {
 3. 检查分割是否正确：左半部分最大值 ≤ 右半部分最小值
 4. 根据总长度奇偶性计算中位数
 
-**时间复杂度**：O(log(min(m,n)))，在较短数组上进行二分搜索
-**空间复杂度**：O(1)，只使用常量级别的额外空间
+**时间复杂度**：$O(log(min(m,n)))$，在较短数组上进行二分搜索
+**空间复杂度**：$O(1)$，只使用常量级别的额外空间
+
 
 
 ## 四、常见题目补充
@@ -885,8 +912,8 @@ public int mySqrt(int x) {
 }
 ```
 
-**时间复杂度**：O(log x)  
-**空间复杂度**：O(1)
+**时间复杂度**：$O(log x)$  
+**空间复杂度**：$O(1)$
 
 
 ### [第一个错误的版本『278』](https://leetcode.cn/problems/first-bad-version/)
@@ -912,8 +939,8 @@ public int firstBadVersion(int n) {
 }
 ```
 
-**时间复杂度**：O(log n)  
-**空间复杂度**：O(1)
+**时间复杂度**：$O(log n) $ 
+**空间复杂度**：$O(1)$
 
 
 ### [有序数组中的单一元素『540』](https://leetcode.cn/problems/single-element-in-a-sorted-array/)
@@ -938,8 +965,8 @@ public int singleNonDuplicate(int[] nums) {
 }
 ```
 
-**时间复杂度**：O(log n)  
-**空间复杂度**：O(1)
+**时间复杂度**：$O(log n) $ 
+**空间复杂度**：$O(1)$
 
 
 ### [爱吃香蕉的珂珂『875』](https://leetcode.cn/problems/koko-eating-bananas/)
@@ -965,8 +992,8 @@ public int minEatingSpeed(int[] piles, int h) {
 }
 ```
 
-**时间复杂度**：O(n log max(piles))  
-**空间复杂度**：O(1)
+**时间复杂度**：$O(n log max(piles))$ 
+**空间复杂度**：$O(1)$
 
 
 ### [在 D 天内送达包裹的能力『1011』](https://leetcode.cn/problems/capacity-to-ship-packages-within-d-days/)
@@ -999,5 +1026,5 @@ public int shipWithinDays(int[] weights, int days) {
 }
 ```
 
-**时间复杂度**：O(n log(sum(weights)))  
-**空间复杂度**：O(1)
+**时间复杂度**：$O(n log(sum(weights)))$  
+**空间复杂度**：$O(1)$
